@@ -717,6 +717,7 @@ static expCheck (re)
       RD = findGlobal (VALUE.ident, FALSE);
       if (RD->categ == CNEW)
 	SERROR (75);
+      SEENTHROUGH = seenthrough;
       TYPE = TREF;
       QUAL = RD;
       if (RD->kind != KCLASS)

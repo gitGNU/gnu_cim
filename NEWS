@@ -23,6 +23,11 @@ Version 2:
   details.
 
 
+Version 3.36
+
+* Bugfix: New in combination with inspect did not work correctly.
+
+
 Version 3.35
 
 * Minor changes. Corrected a bug that remained from version 3.34.
