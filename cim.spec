@@ -1,8 +1,8 @@
 Summary: Simula to C translator. Mother of all OO-languages.
 Name: cim
-Version: 3.21
+Version: 3.22
 Release: 1
-Source: ftp.ifi.uio.no:/pub/cim/cim-3.21.tar.gz
+Source: ftp.ifi.uio.no:/pub/cim/cim-3.22.tar.gz
 Copyright: distributable
 Group: Development/Languages
 Provides: cim
@@ -16,7 +16,7 @@ with object-oriented features. The Simula language has features for
 quasi-paralell execution and a framework for doing simulations.
 
 %prep
-%setup -n cim-3.21
+%setup -n cim-3.22
 
 %build
 CFLAGS=-O2 LDFLAGS=-s ./configure --prefix=/usr --enable-dump=yes

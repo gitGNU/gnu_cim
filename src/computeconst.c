@@ -18,6 +18,7 @@
 
 #include <stdio.h>
 #include <obstack.h>
+#include <math.h>
 
 #include "const.h"
 #include "mellbuilder.h"

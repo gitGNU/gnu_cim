@@ -23,6 +23,12 @@ Version 2:
   details.
 
 
+Version 3.22
+
+* Corrected an error which caused constant computation over ** to fail
+  for right arguments of type real.
+
+
 Version 3.21
 
 * Corrected an error which caused execution external modeles which
