@@ -817,7 +817,8 @@ static scanDirline ()
 	    case 'I':
 	      if (!strcmp (yytext, "IFDEF")) scanIfdef ();
 	      else if (!strcmp (yytext, "IFNOTDEF")) scanIfdef ();
-	      else if (!strcmp (yytext, "INCLUDE"))
+	      else if (!strcmp (yytext, "INCLUDE") || 
+		       !strcmp (yytext, "INSERT"))
 		{
 		  notintext = FALSE;
 		  defineName (tag ("INCLUDED"), TRUE);
@@ -967,7 +968,7 @@ static scanDirline ()
   else
     /* Hvis det er en blank eller tom linje er hele linja en kommentar */
     if (lexchar != ' ' & lexchar != '\t' & lexchar != '\n'
-	& lexchar != '!' & lexchar != EOF)
+	 & lexchar != '\r' & lexchar != '!' & lexchar != EOF)
       if (!bl_in_dir_line) lerror (8);
 
   while (lexchar != '\n' && lexchar != EOF) newlexchar;

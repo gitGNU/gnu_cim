@@ -10,7 +10,7 @@ typedef struct /*  */
         __dhp c1;
         __dhp c2;
     } __bs0;
-__bs0 __blokk0SIMSET;
+extern __bs0 __blokk0FILE;
 extern __ptyp __p0FILE;
 typedef struct /* FILE */
     {
@@ -283,7 +283,7 @@ __sl=__lb->sl;__rcpp(&__p212SIMSET);__rcpb(27,__m_SIMSET);goto __sw;__l27:;;
 # 66 "./simset.sim"
 __ll3:__repp();goto __sw;/* SLUTT PROCEDURE PRECEDE *//* START PROCEDURE INTO */__l17:
 # 68 "./simset.sim"
-(((__bp=((__bs215 *)__lb)->S)!=__NULL && (__bp->pp->pref[1]!= &__p216SIMSET))?(__dhp)__rerror(__errqual):__bp);__sl=__lb->sl;__rcpp(&__p214SIMSET);;((__bs214 *)__pb)->PTR=((__bs215 *)__lb)->S;__rcpb(28,__m_SIMSET);goto __sw;__l28:;;__repp();goto __sw;/* SLUTT PROCEDURE INTO */__l11:
+(((__bp=((__bs215 *)__lb)->S)!=__NULL && (__bp->pp->pref[1]!= &__p216SIMSET))?(__dhp)__rerror(__errqual):__bp);__sl=__lb->sl;__rcpp(&__p214SIMSET);((__bs214 *)__pb)->PTR=((__bs215 *)__lb)->S;__rcpb(28,__m_SIMSET);goto __sw;__l28:;;__repp();goto __sw;/* SLUTT PROCEDURE INTO */__l11:
 # 42 "./simset.sim"
 __renddecl(1);goto __sw;__l12:__rinner(1);goto __sw;__l13:
 # 70 "./simset.sim"
@@ -331,13 +331,15 @@ goto __ll6;__ll7:
 # 73 "./simset.sim"
 __renddecl(1);goto __sw;__l19:
 # 118 "./simset.sim"
-;((__bs207 *)__lb)->zzsuc=((__bs207 *)__lb)->zzpred=__lb;__rinner(1);goto __sw;__l20:__rendclass(1);goto __sw;/* SLUTT CLASS HEAD */__l2:
+;((__bs207 *)__lb)->zzsuc=((__bs207 *)__lb)->zzpred=__lb;
+# 73 "./simset.sim"
+__rinner(1);goto __sw;__l20:
+# 118 "./simset.sim"
+__rendclass(1);goto __sw;/* SLUTT CLASS HEAD */__l2:
 # 25 "./simset.sim"
 __renddecl(0);goto __sw;__l3:__rinner(0);goto __sw;__l4:
 # 120 "./simset.sim"
-__rendclass(0);goto __sw;/* SLUTT CLASS SIMSET */__ll0:
-/* THUNKS */
-__sw:if(__goto.ment!=(void (*)())__m_SIMSET)return;__s:switch(__goto.ent){case 2: goto __l2;
+__rendclass(0);goto __sw;/* SLUTT CLASS SIMSET */__ll0:__sw:if(__goto.ment!=(void (*)())__m_SIMSET)return;__s:switch(__goto.ent){case 2: goto __l2;
 case 3: goto __l3;
 case 4: goto __l4;
 case 5: goto __l5;

@@ -23,6 +23,15 @@ Version 2:
   details.
 
 
+Version 3.34
+
+* Fixed a bug which caused option -a to not work correctly. NULL from
+  externernal C text procedures are now acepted. Replaced bzery by memset
+  and bcopy by memmove. directive %INSERT is now accepted as a synonym
+  for %INCLUDE. '%\r' is now accepted as a directive line comment.
+  Doing some preparation for Mingw32. Please not upgrade now. More bugs
+  will be corrected later.
+
 Version 3.33
 
 * Minor changes so that the C-compiler will compile with TenDRA C.

@@ -141,6 +141,7 @@ char * newstrcat6(s1, s2, s3, s4, s5, s6)
   obstack_grow (&osNewstr, s2, strlen(s2));
   obstack_grow (&osNewstr, s3, strlen(s3));
   obstack_grow (&osNewstr, s4, strlen(s4));
+  obstack_grow (&osNewstr, s5, strlen(s5));
   obstack_grow0 (&osNewstr, s6, strlen(s6));
   return obstack_finish (&osNewstr);;
 }

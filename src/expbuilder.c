@@ -51,7 +51,7 @@ struct EXP *newexp()
 {
   struct EXP *re;
   re= (struct EXP *)obstack_alloc (&osExpr, sizeof (struct EXP));
-  bzero (re, sizeof (struct EXP));
+  memset (re, 0, sizeof (struct EXP));
   re->line= lineno;
   return re;
 }

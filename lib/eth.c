@@ -40,7 +40,7 @@ __reth ()
     __lb = __lb->dl;
   if ((char *) __fri == (((char *) x) + align (sizeof (__thunk))))
     {
-      bzero ((char *) x, (char *) __fri - (char *) x);
+      memset ((char *) x, 0, (char *) __fri - (char *) x);
       __fri = x;
     }
 }

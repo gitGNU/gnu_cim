@@ -31,6 +31,12 @@
 #include "gen.h"
 #include "trans.h"
 
+#if STDC_HEADERS || HAVE_STRING_H
+#include <string.h>
+#else /* not STDC_HEADERS and not HAVE_STRING_H */
+#include <strings.h>
+#endif /* not STDC_HEADERS and not HAVE_STRING_H */
+
 #if HAVE_UNISTD_H
 #include <unistd.h>
 #endif

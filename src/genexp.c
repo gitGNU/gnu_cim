@@ -410,7 +410,8 @@ genvalue (re)
 	  {
 	    fprintf (ccode, "__ctext= ");
 	    gencproccall (re);
-	      fprintf (ccode, ";__t[%d]= *__rblanks(%ldL,strlen(__ctext));"
+	      fprintf (ccode, ";__t[%d]= *__rblanks(%ldL,"
+		       "__ctext==__NULL?0:strlen(__ctext));"
 		       "(void)strcpy(__t[%d].obj->string,__ctext);",
 		       re->value.combined_stack.entry, 
 		       re->value.combined_stack.n_of_stack_elements, 
@@ -1416,7 +1417,19 @@ genvalue (re)
 	  break;
 	case MDIV:
 	case MINTDIV:
+#ifdef DIV0
+          if (re->right->type == TINTG) {
+            fprintf (ccode, "/ __ridiv0 (");
+          }
+          else if (re->right->type == TREAL) {
+            fprintf (ccode, "/ __rrdiv0 (");
+          }
+          else {
+            fprintf (stderr, "Invalid operand type...\n");
+          }
+#else
 	  fprintf (ccode, "/");
+#endif /* DIV0 */
 	  break;
 	default:
 #ifdef DEBUG
@@ -1431,6 +1444,9 @@ genvalue (re)
       if (re->left->type == TCHAR)
 	fprintf (ccode, "(unsigned char)");
       genvalue (re->right);
+#ifdef DIV0
+      if (re->token == MDIV || re->token == MINTDIV) putc (')', ccode); 
+#endif /* DIV0 */
       putc (')', ccode);
     }
 }

@@ -35,7 +35,7 @@ __rbe ()
   if ((char *) __fri == (((char *) x) + align (size))
       || __roa ((__dhp) ((char *) x + align (size))))
     {
-      bzero ((char *) x, (char *) __fri - (char *) x);
+      memset ((char *) x, 0, (char *) __fri - (char *) x);
       __fri = x;
     }
 }

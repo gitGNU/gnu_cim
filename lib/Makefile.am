@@ -78,7 +78,7 @@ libcim_la_SOURCES = sysin.c sysout.c syserr.c copytexttoc.c addroffirstchar.c \
               textassign.c eqrtext.c eqtext.c lttext.c letext.c char.c \
               isochar.c rank.c isorank.c digit.c letter.c lowten.c \
               decimalmark.c upcase.c lowcase.c simfile.c simenvir.c \
-              xmalloc.c simset.c simulation.c
+              xmalloc.c simset.c simulation.c rdiv0.c idiv0.c
 
 BUILT_SOURCES = simset.c simulation.c
 

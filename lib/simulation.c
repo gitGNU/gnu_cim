@@ -24,7 +24,7 @@ typedef struct /*  */
         __dhp c1;
         __dhp c2;
     } __bs0;
-__bs0 __blokk0SIMULATION;
+extern __bs0 __blokk0FILE;
 extern __ptyp __p0FILE;
 typedef struct /* FILE */
     {
@@ -525,7 +525,7 @@ __repp();goto __sw;/* SLUTT PROCEDURE PASSIVATE *//* START PROCEDURE WAIT */__l1
 # 184 "./simulation.sim"
 ;((__bs233 *)__lb)->p=((__bs225 *)((__bp=((__bs222 *)__lb->sl)->zzsqs)==__NULL?(__dhp)__rerror(__errnone):__bp))->zzsqssuc;
 # 185 "./simulation.sim"
-__sl=((__bp=((__bs233 *)__lb)->p)==__NULL?(__dhp)__rerror(__errnone):__bp);__rcpp(&__p215SIMSET);;((__bs215 *)__pb)->S=((__bs233 *)__lb)->S;__rcpb(29,__m_SIMULATION);return;__l29:;;
+__sl=((__bp=((__bs233 *)__lb)->p)==__NULL?(__dhp)__rerror(__errnone):__bp);__rcpp(&__p215SIMSET);((__bs215 *)__pb)->S=((__bs233 *)__lb)->S;__rcpb(29,__m_SIMULATION);return;__l29:;;
 # 187 "./simulation.sim"
 ;((__bs225 *)((__bp=((__bs225 *)((__bp=((__bs233 *)__lb)->p)==__NULL?(__dhp)__rerror(__errnone):__bp))->zzsqssuc)==__NULL?(__dhp)__rerror(__errnone):__bp))->zzsqspred=((__bs225 *)((__bp=((__bs233 *)__lb)->p)==__NULL?(__dhp)__rerror(__errnone):__bp))->zzsqspred;
 # 188 "./simulation.sim"
@@ -568,7 +568,7 @@ __renddecl(3);goto __sw;__l20:
 __ll45:;if(!(1))goto __ll46;
 # 216 "./simulation.sim"
 ;__rdetach(__lb,32,__m_SIMULATION);goto __sw;__l32:;goto __ll45;__ll46:
-# 215 "./simulation.sim"
+# 213 "./simulation.sim"
 __rinner(3);goto __sw;__l21:
 # 216 "./simulation.sim"
 __rendclass(3);goto __sw;/* SLUTT CLASS zzmain_program *//* START PROCEDURE ACCUM */__l22:
@@ -587,11 +587,11 @@ __sl=__lb;__rcp(&__p235SIMULATION,0L);__rccb(43,__m_SIMULATION);goto __sw;__l43:
 # 227 "./simulation.sim"
 ;((__bs225 *)((__bp=((__bs222 *)__lb)->zzsqs)==__NULL?(__dhp)__rerror(__errnone):__bp))->zzsqssuc=((__bs222 *)__lb)->MAIN;;((__bs225 *)((__bp=((__bs222 *)__lb)->zzsqs)==__NULL?(__dhp)__rerror(__errnone):__bp))->zzsqspred=((__bs222 *)__lb)->MAIN;
 # 228 "./simulation.sim"
-;((__bs225 *)((__bp=((__bs222 *)__lb)->MAIN)==__NULL?(__dhp)__rerror(__errnone):__bp))->zzsqssuc=((__bs222 *)__lb)->zzsqs;;((__bs225 *)((__bp=((__bs222 *)__lb)->MAIN)==__NULL?(__dhp)__rerror(__errnone):__bp))->zzsqspred=((__bs222 *)__lb)->zzsqs;__rinner(1);goto __sw;__l4:
+;((__bs225 *)((__bp=((__bs222 *)__lb)->MAIN)==__NULL?(__dhp)__rerror(__errnone):__bp))->zzsqssuc=((__bs222 *)__lb)->zzsqs;;((__bs225 *)((__bp=((__bs222 *)__lb)->MAIN)==__NULL?(__dhp)__rerror(__errnone):__bp))->zzsqspred=((__bs222 *)__lb)->zzsqs;
+# 27 "./simulation.sim"
+__rinner(1);goto __sw;__l4:
 # 230 "./simulation.sim"
-__rendclass(1);goto __sw;/* SLUTT CLASS SIMULATION */__ll0:
-/* THUNKS */
-__sw:if(__goto.ment!=(void (*)())__m_SIMULATION)return;__s:switch(__goto.ent){case 2: goto __l2;
+__rendclass(1);goto __sw;/* SLUTT CLASS SIMULATION */__ll0:__sw:if(__goto.ment!=(void (*)())__m_SIMULATION)return;__s:switch(__goto.ent){case 2: goto __l2;
 case 3: goto __l3;
 case 4: goto __l4;
 case 5: goto __l5;

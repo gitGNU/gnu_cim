@@ -82,7 +82,7 @@ struct SENT *newSent(token) int token;
 {
   struct SENT *new;
   new= (struct SENT *)obstack_alloc (&osSent, sizeof (struct SENT));
-  bzero (new, sizeof (struct SENT));
+  memset (new, 0, sizeof (struct SENT));
 
   new->token= token;
   new->line= lineno;

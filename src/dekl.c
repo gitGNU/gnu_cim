@@ -131,7 +131,7 @@ struct DECL *newDecl()
 {
   struct DECL *rd;
   rd= (struct DECL *) obstack_alloc (&osDecl, sizeof (struct DECL));
-  bzero (rd, sizeof (struct DECL));
+  memset (rd, 0, sizeof (struct DECL));
   return rd;
 }
 
@@ -139,7 +139,7 @@ static struct BLOCK *newBlock()
 {
   struct BLOCK *rb;
   rb= (struct BLOCK *)obstack_alloc (&osDecl, sizeof (struct BLOCK));
-  bzero (rb, sizeof (struct BLOCK));
+  memset (rb, 0, sizeof (struct BLOCK));
   rb->quant.descr = rb;
   return rb;
 }
@@ -490,7 +490,7 @@ subclass (rdx, rdy)
 {
   if (rdx == rdy)
     return (TRUE);
-  if (rdx == NULL || rdx == NULL) return(FALSE);
+  if (rdx == NULL || rdy == NULL) return(FALSE);
   if (rdx->plev < rdy->plev)
     return (0);
   while (rdx != NULL && rdx->plev > rdy->plev)

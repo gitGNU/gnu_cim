@@ -613,6 +613,8 @@ extern double __raddepsilon ();
 extern double __rsubepsilon ();
 extern long __rlowerbound ();
 extern long __rupperbound ();
+extern long __ridiv0();
+extern double __rrdiv0();
 
 /* Power functions */
 extern long __rpowii ();
