@@ -1,6 +1,6 @@
-Cim NEWS
+GNU Cim NEWS
 
-Copyright (C) 1997-98 Sverre Hvammen Johansen
+Copyright (C) 1997-99 Sverre Hvammen Johansen
 See the end for copying conditions.
 
 Version 4:
@@ -22,6 +22,14 @@ Version 2:
 * Cim uses libtool to build static and shared libraries.  Se README for
   details.
 
+
+Version: 3.30
+
+* Released as a GNU program
+
+* Fixed a bug which produced incorrect code for dotted actual
+  parameters to arrays transmitted by value.
+  
 
 Version: 3.29
 

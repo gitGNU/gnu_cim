@@ -45,7 +45,7 @@ static void *hashlist[NAMEPRIMEVALUE];
 
 char *
 tag (t)
-     unsigned char t[];
+     char t[];
 {
   int leng;
   long hash;
@@ -67,7 +67,7 @@ tag (t)
   obstack_ptr_grow(&osName, NULL);
   obstack_grow0 (&osName, t, leng);
   obstack_1grow (&osName, FALSE);
-  list= obstack_finish (&osName);
+  list= (void * *)obstack_finish (&osName);
 
   if (prevlist == NULL)
     hashlist[hash] = list;

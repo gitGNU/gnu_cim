@@ -18,4 +18,4 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 info_TEXINFOS = cim.texi
-EXTRA_DIST = SIMULA-HISTORY
+EXTRA_DIST = SIMULA-HISTORY texinfo.tex

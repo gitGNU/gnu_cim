@@ -29,7 +29,7 @@ double minRval();
 char *minTval();
 char *minId();
 
-char *mpointer;
+extern char *mpointer;
 
 
 /* De forskjellige tokens som legges ut i pass 1

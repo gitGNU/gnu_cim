@@ -849,13 +849,19 @@ static genarraypar (rex)
       /* V A L U E   P A R A M E T E R */
 
       fprintf (ccode, "__ap=(__arrp)__rca(");
-      if (rex->left->rd->categ == CNAME)
-	fprintf (ccode, "__er);");
-      else
+      if (rex->left->token == MIDENTIFIER)
 	{
-	  gensl (rex->left, TRUE, OFF);
-	  fprintf (ccode, "%s);", rex->left->rd->ident);
+	  if (rex->left->rd->categ == CNAME)
+	    fprintf (ccode, "__er");
+	  else
+	    {
+	      gensl (rex->left, TRUE, OFF);
+	      fprintf (ccode, "%s", rex->left->rd->ident);
+	    }
 	}
+      else
+	genvalue (rex->left);
+      fprintf (ccode, ");");
       fprintf (ccode, "((__bs%d *)__pb)->%s=__ap;"
 		      ,rex->rd->encl->blno, rex->rd->ident);
       break;

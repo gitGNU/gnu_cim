@@ -202,7 +202,7 @@ extern struct DECL *regThis ();
 extern removeBlock ();
 
 extern char *prefquantident;
-int localused;
+extern int localused;
 
 extern struct BLOCK *cblock;
 extern struct BLOCK *ssblock;
