@@ -331,12 +331,12 @@ static struct EXP * genstack (ret, re, only_pointers)
 	if (rex->token == MBOUNDPARSEP && rex->right != re && 	
 	    !only_pointers)	/* sjekk at det er slik at rex->right!=NULL */
 	  {
+	    entry= findallentry (ret, rex->right, USEDVAL);
 	    reconc= concexp (reconc, makeexp(rex->left->type==TTEXT? MREFASSIGNT:MASSIGN,
 					     restack=makeexp (MSTACK, 
 							      NULL,NULL),
 					     rex->right));
 	    type= rex->type;
-	    entry= findallentry (ret, rex->right, USEDVAL);
 
 	    restack->value.entry= rex->right->value.entry= entry;
 	    restack->type= rex->right->type= type;

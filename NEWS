@@ -23,6 +23,12 @@ Version 2:
   details.
 
 
+Version: 3.28
+
+* Fixed a bug which caused segmentation fault when compiling array
+  declarations in some contexts.
+
+
 Version: 3.27
 
 * A really seriouse bug-fix, please upgrade: Transmission of
