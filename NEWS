@@ -23,6 +23,12 @@ Version 2:
   details.
 
 
+Version: 3.29
+
+* Fixed a bug which caused segmentation fault when running programs
+  containing gotos to non-local virtual labels.
+
+
 Version: 3.28
 
 * Fixed a bug which caused segmentation fault when compiling array

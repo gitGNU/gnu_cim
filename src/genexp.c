@@ -890,9 +890,13 @@ genvalue (re)
 		  fprintf (ccode, "__rgoto(");
 		  gensl (re, FALSE, ON);
 		  fprintf (ccode, ");");
+		  fprintf (ccode, "if((__pp=__lb");
 		}
-	      fprintf (ccode, "if((__pp=");
-	      genchain (re->rd->encl, FALSE);
+	      else
+		{
+		  fprintf (ccode, "if((__pp=");
+		  genchain (re->rd->encl, FALSE);
+		}
 
 	      fprintf (ccode, "->pp)->virtlab[%d].ent==0)"
 		       "__rerror(__errvirt);__goto=__pp->virtlab[%d];",

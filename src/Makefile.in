@@ -275,56 +275,6 @@ distdir: $(DISTFILES)
 	  || ln $$d/$$file $(distdir)/$$file 2> /dev/null \
 	  || cp -p $$d/$$file $(distdir)/$$file; \
 	done
-computeconst.o: computeconst.c obstack.h const.h ../limit.h ../config.h \
-	mellbuilder.h builder.h dekl.h lex.h checker.h expmacros.h \
-	newstr.h
-dekl.o: dekl.c const.h ../limit.h ../config.h dekl.h lex.h name.h \
-	obstack.h
-error.o: error.c const.h ../limit.h ../config.h dekl.h cimcomp.h error.h \
-	lex.h extspec.h mapline.h
-expbuilder.o: expbuilder.c obstack.h const.h ../limit.h ../config.h \
-	mellbuilder.h builder.h dekl.h lex.h
-expchecker.o: expchecker.c const.h ../limit.h ../config.h mellbuilder.h \
-	builder.h dekl.h lex.h checker.h expmacros.h
-extspec.o: extspec.c const.h ../limit.h ../config.h dekl.h filelist.h \
-	newstr.h cimcomp.h extspec.h name.h obstack.h
-filelist.o: filelist.c ../config.h const.h ../limit.h newstr.h \
-	filelist.h obstack.h
-genexp.o: genexp.c ../config.h gen.h const.h ../limit.h mellbuilder.h \
-	cimcomp.h builder.h dekl.h lex.h extspec.h
-genindep.o: genindep.c
-genline.o: genline.c gen.h const.h ../limit.h ../config.h mellbuilder.h \
-	cimcomp.h builder.h dekl.h lex.h extspec.h mapline.h
-genpar.o: genpar.c gen.h const.h ../limit.h ../config.h mellbuilder.h \
-	cimcomp.h builder.h dekl.h lex.h extspec.h
-genstr.o: genstr.c const.h ../limit.h ../config.h dekl.h cimcomp.h \
-	error.h extspec.h mapline.h name.h
-getopt.o: getopt.c ../config.h
-getopt1.o: getopt1.c ../config.h getopt.h
-lex.o: lex.c gen.h const.h ../limit.h ../config.h mellbuilder.h \
-	cimcomp.h builder.h dekl.h lex.h parser.h name.h filelist.h \
-	error.h extspec.h mapline.h obstack.h
-mapline.o: mapline.c mapline.h const.h ../limit.h ../config.h cimcomp.h \
-	lex.h extspec.h newstr.h filelist.h obstack.h
-mellbuilder.o: mellbuilder.c obstack.h
-name.o: name.c const.h ../limit.h ../config.h dekl.h name.h obstack.h
-newstr.o: newstr.c obstack.h
-obstack.o: obstack.c ../config.h obstack.h
-parser.o: parser.c const.h ../limit.h ../config.h dekl.h cimcomp.h lex.h \
-	name.h mellbuilder.h obstack.h
-sentbuilder.o: sentbuilder.c obstack.h gen.h const.h ../limit.h \
-	../config.h mellbuilder.h cimcomp.h builder.h dekl.h lex.h
-sentchecker.o: sentchecker.c const.h ../limit.h ../config.h \
-	mellbuilder.h builder.h dekl.h lex.h checker.h trans.h
-sentgen.o: sentgen.c gen.h const.h ../limit.h ../config.h mellbuilder.h \
-	cimcomp.h builder.h dekl.h lex.h extspec.h error.h
-senttrans.o: senttrans.c gen.h const.h ../limit.h ../config.h \
-	mellbuilder.h cimcomp.h builder.h dekl.h lex.h trans.h
-transcall.o: transcall.c ../config.h gen.h const.h ../limit.h \
-	mellbuilder.h cimcomp.h builder.h dekl.h lex.h extspec.h
-transexp.o: transexp.c ../config.h gen.h const.h ../limit.h \
-	mellbuilder.h cimcomp.h builder.h dekl.h lex.h extspec.h
-
 info:
 dvi:
 check: all
