@@ -1,6 +1,6 @@
 dnl Process this file with autoconf to produce a configure script.
 
-dnl Copyright (C) 1994 Sverre Hvammen Johansen, Stein Krogdahl and Terje Mjøs
+dnl Copyright (C) 1994-1997 Sverre Hvammen Johansen,
 dnl Department of Informatics, University of Oslo.
 dnl
 dnl This program is free software; you can redistribute it and/or modify
@@ -17,9 +17,7 @@ dnl along with this program; if not, write to the Free Software
 dnl Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA. */
 
 AC_REVISION($Revision: 1.16 $)dnl
-AC_INIT(csimula.c)
-AC_CONFIG_HEADER(config.h)
-AC_PREFIX_PROGRAM(cim)
+AC_INIT(src/cimcomp.c)
 
 AC_CANONICAL_SYSTEM
 changequote(,)dnl
@@ -31,22 +29,29 @@ AC_DEFINE_UNQUOTED(OS_TYPE_VERSION,"`echo $target_os | tr a-z A-Z`")
 AC_DEFINE_UNQUOTED(MANUFACTURER,"`echo $target_vendor | tr a-z A-Z`")
 AC_DEFINE_UNQUOTED(OS_TYPE,"`echo $target_os_x_version | tr a-z A-Z`")
 
-AC_ARG_PROGRAM
+AM_INIT_AUTOMAKE(cim, 2.10)
+AM_CONFIG_HEADER(config.h)
+AM_CYGWIN32
+AM_PROG_LIBTOOL
+
+PACKAGE_VERSION="$PACKAGE-$VERSION"
+AC_DEFINE_UNQUOTED(PACKAGE_VERSION, "$PACKAGE_VERSION")
+AC_SUBST(PACKAGE_VERSION)
+
+AC_PROG_CC
 
 dnl Checks for programs.
 AC_PROG_LN_S
+dnl  Not needed when using libtool: AC_PROG_RANLIB
 AC_PROG_YACC
-AC_PROG_INSTALL
-AC_PROG_RANLIB
+AC_PATH_PROG(PERL, perl)
 
 dnl Checks for libraries.
 AC_MINIX
 AC_CHECK_LIB(m,main)
 AC_CHECK_LIB(ft,main)
-dnl AC_HAVE_LIBRARY(m)
-dnl AC_HAVE_LIBRARY(fp)
 AC_HEADER_STDC
-AC_CHECK_HEADERS(string.h memory.h malloc.h limits.h values.h fcntl.h sys/resource.h sys/types.h sys/times.h sys/time.h sys/utsname.h signal.h)
+AC_CHECK_HEADERS(string.h memory.h malloc.h limits.h values.h fcntl.h sys/resource.h sys/types.h sys/times.h sys/time.h sys/utsname.h signal.h unistd.h)
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_HEADER_TIME
@@ -57,311 +62,16 @@ AC_CHECK_FUNCS(time times getrusage gettimeofday getdomainname uname gethostname
 AC_FUNC_ALLOCA
 
 AC_C_CHAR_UNSIGNED
-AC_CHECK_SIZEOF(int)
-AC_CHECK_SIZEOF(long)
+AC_CHECK_SIZEOF(int, 4)
+AC_CHECK_SIZEOF(long, 4)
 
-dnl AC_DEFUN(CIM_ALIGN,
-dnl [AC_MSG_CHECKING(alignment)
-dnl AC_TRY_RUN([struct { double d1, d2; } t;
-dnl double *pd;
-dnl tt() { }
-dnl main() {
-dnl #if SIZEOF_LONG ==8
-dnl return(1);
-dnl #endif
-dnl pd = (double *)(((char *) &t)+4);
-dnl *pd = 123456789.0;
-dnl tt();
-dnl return(*pd != 123456789.0);
-dnl }],AC_DEFINE(ALIGN,3L),AC_DEFINE(ALIGN,7L))
-dnl ])
-dnl CIM_ALIGN
 AC_C_BIGENDIAN
-AC_DEFUN(CIM_LD_R,
-[AC_MSG_CHECKING(whether ld -r is needed)
-AC_CACHE_VAL(cim_cv_ld_r,
-[cim_cv_ld_r=no
-cat > conftest.c <<EOF
-extern char abcdef;
-EOF
-eval "${CC-cc} -c conftest.c >/dev/null 2>&1"
-if grep "abcdef" conftest.o; then
-  eval "ld -r conftest.o -o conftesto.o >/dev/null 2>&1"
-  if test -r conftesto.o ; then
-    if grep "abcdef" conftesto.o >/dev/null 2>&1 ; then
-      :
-    else
-      cim_cv_ld_r=yes
-    fi
-  fi
-fi])
-AC_MSG_RESULT($cim_cv_ld_r)
-if test $cim_cv_ld_r = yes; then
-  RLD="ld -r"
-  RLD_O=-o
-else
-  RLD=cp
-fi
-rm -f conftest*
-AC_SUBST(RLD)
-AC_SUBST(RLD_O)
-])dnl
-CIM_LD_R
-AC_DEFUN(CIM_AR_SPLIT,
-[AC_MSG_CHECKING(whether splitting archive is needed)
-AC_CACHE_VAL(cim_cv_ar_split,
-[cat > conftest.c <<EOF
-char abcdef;
-EOF
-eval "${CC-cc} -c conftest.c >/dev/null 2>&1"
-eval "ar rcu conftest.a conftest.c conftest.o >/dev/null 2>&1"
-eval "$RANLIB conftest.a >/dev/null 2>&1"
-cat > conftestm.c <<EOF
-char abc; main(){ extern char abcdef; abc=abcdef; exit(0);}
-EOF
-eval "${CC-cc} $CFLAGS conftestm.c -o conftest conftest.a $LIBS >/dev/null 2>&1"
-if eval "conftest >/dev/null 2>&1"; then
-  cim_cv_ar_split=no
-else
-  cim_cv_ar_split=yes
-fi])dnl
-AC_MSG_RESULT($cim_cv_ar_split)
-if test $cim_cv_ar_split = yes; then
-  SPLIT='$(SPLIT)'
-  AC_DEFINE(SPLIT_ARCH_LIB)
-else
-  SPLIT='$(NOSPLIT)'
-fi
-AC_SUBST(SPLIT)dnl
-rm -f conftest*
-])dnl
-CIM_AR_SPLIT
-AC_DEFUN(CIM_SWAP,
-[AC_MSG_CHECKING(whether elements in structures are swapped)
-AC_CACHE_VAL(cim_cv_swap,
-[AC_TRY_RUN([main() {
-struct { int i1,i2;} ii;
-return(&ii.i1 > &ii.i2);
-}],cim_cv_swap=no,cim_cv_swap=yes)])dnl
-AC_MSG_RESULT($cim_cv_swap)
-if test $cim_cv_swap = yes; then
-  AC_DEFINE(WORDS_SWAPPED)
-fi
-])dnl
-CIM_SWAP
 AC_TYPE_SIGNAL
-AC_DEFUN(CIM_TRAP,
-[
-AC_MSG_CHECKING(signal SIGFPE)
-AC_CACHE_VAL(cim_cv_sigfpe,
-[AC_TRY_RUN([#if HAVE_SIGNAL_H
-#include <signal.h>
-#endif
-int t(){}
-main() {
-signal(SIGFPE,t);
-exit(0);
-}],cim_cv_sigfpe=yes,cim_cv_sigfpe=no)])
-AC_MSG_RESULT($cim_cv_sigfpe)
-if test $cim_cv_sigfpe = yes; then
-  AC_DEFINE(HAVE_SIGFPE)
-fi
-AC_MSG_CHECKING(signal SIGSEGV)
-AC_CACHE_VAL(cim_cv_sigsegv,
-[AC_TRY_RUN([#if HAVE_SIGNAL_H
-#include <signal.h>
-#endif
-int t(){}
-main() {
-signal(SIGSEGV,t);
-exit(0);
-}],cim_cv_sigsegv=yes,cim_cv_sigsegv=no)])
-AC_MSG_RESULT($cim_cv_sigsegv)
-if test $cim_cv_sigsegv = yes; then
-  AC_DEFINE(HAVE_SIGSEGV)
-fi
-AC_MSG_CHECKING(signal SIGILL)
-AC_CACHE_VAL(cim_cv_sigill,
-[AC_TRY_RUN([#if HAVE_SIGNAL_H
-#include <signal.h>
-#endif
-int t(){}
-main() {
-signal(SIGILL,t);
-exit(0);
-}],cim_cv_sigill=yes,cim_cv_sigill=no)])
-AC_MSG_RESULT($cim_cv_sigill)
-if test $cim_cv_sigill = yes; then
-  AC_DEFINE(HAVE_SIGILL)
-fi
-AC_MSG_CHECKING(signal SIGTRAP)
-AC_CACHE_VAL(cim_cv_sigtrap,
-[AC_TRY_RUN([#if HAVE_SIGNAL_H
-#include <signal.h>
-#endif
-int t(){}
-main() {
-signal(SIGTRAP,t);
-exit(0);
-}],cim_cv_sigtrap=yes,cim_cv_sigtrap=no)])
-AC_MSG_RESULT($cim_cv_sigtrap)
-if test $cim_cv_sigtrap = yes; then
-  AC_DEFINE(HAVE_SIGTRAP)
-fi
-AC_MSG_CHECKING(signal SIGSYS)
-AC_CACHE_VAL(cim_cv_sigsys,
-[AC_TRY_RUN([#if HAVE_SIGNAL_H
-#include <signal.h>
-#endif
-int t(){}
-main() {
-signal(SIGSYS,t);
-exit(0);
-}],cim_cv_sigsys=yes,cim_cv_sigsys=no)])
-AC_MSG_RESULT($cim_cv_sigsys)
-if test $cim_cv_sigsys = yes; then
-  AC_DEFINE(HAVE_SIGSYS)
-fi
-AC_MSG_CHECKING(signal SIGBUS)
-AC_CACHE_VAL(cim_cv_sigbus,
-[AC_TRY_RUN([#if HAVE_SIGNAL_H
-#include <signal.h>
-#endif
-int t(){}
-main() {
-signal(SIGBUS,t);
-exit(0);
-}],cim_cv_sigbus=yes,cim_cv_sigbus=no)])
-AC_MSG_RESULT($cim_cv_sigbus)
-if test $cim_cv_sigbus = yes; then
-  AC_DEFINE(HAVE_SIGBUS)
-fi
-])dnl
 CIM_TRAP
+CIM_BINARY_FILE
+CIM_DEFAULTS
+CIM_WL_FLAG
+CIM_LINK_STATIC_FLAG
+CIM_PIC_FLAG
 
-AC_MSG_CHECKING(cim version)
-changequote(,)dnl
-cp $srcdir/version.h conftest.v
-simid=cim-`sed -e '/Revision:/!d' -e 's/[^0-9.]*\([0-9.]*\).*/\1/' -e q conftest.v`
-cp $srcdir/oldversion.h conftest.v
-oldid=cim-`sed -e '/Revision:/!d' -e 's/[^0-9.]*\([0-9.]*\).*/\1/' -e q conftest.v`
-changequote([,])dnl
-rm -f conftest.v
-AC_MSG_RESULT($simid)
-AC_DEFINE_UNQUOTED(SIMID,"$simid")
-AC_SUBST(oldid)
-AC_SUBST(simid)
-
-AC_MSG_CHECKING(user)
-AC_MSG_RESULT($USER)
-AC_SUBST(USER)
-
-AR_COMMAND_LINE='$(longarline)'
-case "$target" in
-  vax-dec-vms*)
-dnl                     AC_DEFINE(LIBDIR,"cim$library:")
-dnl                     AC_DEFINE(INCLUDEDIR,"cim$library:")
-dnl                     AC_DEFINE(SCFLAGS,"/nowarnings ")
-dnl                     AC_DEFINE(SLDFLAGS,"/executable=")
-                        AC_DEFINE(WORDS_VAXENDIAN)
-                        AC_DEFINE(WORDS_BIGENDIAN)
-                        AC_DEFINE(FLOAT_IEEE,0)
-                        AC_DEFINE(FLOAT_VAX)
-                        AC_DEFINE(REALPOINT_E_BUG)
-                        AC_DEFINE(VMS_DIRECTFILE)
-                        AC_DEFINE(NO_SEEK_IN_AR)
-                        AC_DEFINE(SHORT_RECORD)
-                        AC_DEFINE(DIR_MARKER,"")
-                        AC_DEFINE(SH_TRUE,1)
-                        AC_DEFINE(SH_FALSE,42)
-                        AC_DEFINE(EVEN_SH_FALSE)
-                        AC_DEFINE(DBX_OPTION,"/debug")
-                        AC_DEFINE(RM_COMMAND,"delete")
-                        AC_DEFINE(RM_SUFFIX,";*")
-                        AC_DEFINE(C_LINKER,"link")
-                        AC_DEFINE(RUN_PREFIX,"run\ ")
-                        AC_DEFINE(LINK_FILE_SEP_MARKER,",")
-                        AC_DEFINE(EXE_SUFFIX,".exe")
-                        AC_DEFINE(OBJECT_SUFFIX,".obj")
-                        AC_DEFINE(SYSTEM_ARCH_LIB_LINK_FILES,"cim/opt")
-                        AC_DEFINE(STDINNAME,"sys$input")
-                        AC_DEFINE(STDOUTNAME,"sys$output")
-                        AC_DEFINE(STDERRNAME,"sys$output")
-                        AC_DEFINE(DUMP,0)
-                        ;;
-  vax-*-*)
-                        AC_DEFINE(WORDS_VAXENDIAN)
-                        AC_DEFINE(WORDS_BIGENDIAN)
-                        AC_DEFINE(FLOAT_IEEE,0)
-                        AC_DEFINE(FLOAT_VAX)
-                        ;;
-  mips-*-*)
-                        if test "${CC}" = gcc; then : else AC_DEFINE(ANT_CASE_WITHOUT_EXTRA_OPTION_TO_C_COMPILER,500) fi
-                        ;;
-  c1-convex-*)
-                        AC_DEFINE(MIN_DOUBLE,5.56268464626800263062e-309)
-                        AC_DEFINE(MAX_DOUBLE,HUGE)
-                        AC_DEFINE(DAD_LIB)
-                        ;;
-  c2-convex-*)
-                        AC_DEFINE(MIN_DOUBLE,5.56268464626800263062e-309)
-                        AC_DEFINE(MAX_DOUBLE,HUGE_VAL)
-                        AC_DEFINE(DAD_LIB)
-                        ;;
-  *-sony-*)
-                        AC_DEFINE(MIN_DOUBLE,4.94065645841246540e-324)
-                        AC_DEFINE(MAX_DOUBLE,HUGE)
-                        ;;
-  *-*-amigados*)
-dnl                     AC_DEFINE(LIBDIR,"cim:lib")
-dnl                     AC_DEFINE(INCLUDEDIR,"cim:include")
-                        AC_DEFINE(MIN_DOUBLE,1.11253692925360150e-308)
-                        AC_DEFINE(MAX_DOUBLE,1.79769313486231459e+308)
-                        AC_DEFINE(RM_COMMAND,"Delete\ FORCE")
-                        AC_DEFINE(HELP_COMMAND,"More\ cim:doc/cim.man")
-                        AC_DEFINE(DAD_LIB)
-                        AC_DEFINE(COMP_FLOAT_BUG)
-                        ;;
-  *-*-cygwin32)
-                        AC_DEFINE(OPEN_FILE_IN_BINARY_MODE)
-                        ;;
-  *-*-msdos*)
-                        AC_DEFINE(OPEN_FILE_IN_BINARY_MODE)
-                        AC_DEFINE(DIR_MARKER,"\")
-                        AC_DEFINE(HELP_COMMAND,"type\ \lib\cim.hlp")
-                        AC_DEFINE(RM_COMMAND,"delete")
-                        AC_DEFINE(OBJECT_SUFFIX,".obj")
-                        ;;
-  *-cray-unicos*)
-                        AC_DEFINE(FLOAT_IEEE,0)
-                        ;;
-  ns32k-encore-*)
-                        AC_DEFINE(DAD_LIB)
-                        AC_DEFINE(COMP_FLOAT_BUG)
-                        ;;
-  i[34]86-*-go32*)
-                        AC_DEFINE(RUN_PREFIX,"go32\ ")
-                        AC_DEFINE(RM_COMMAND,"delete")
-                        ;;
-  *-*-mpw*)
-dnl                     AC_DEFINE(LIBDIR,"[cim]lib")
-dnl                     AC_DEFINE(INCLUDEDIR,"[cim]include")
-                        AC_DEFINE(DIR_MARKER,":")
-                        AC_DEFINE(DUMP,0)
-                        ;;
-  *-*-minix*)
-                        AC_DEFINE(DAD_LIB)
-                        AC_DEFINE(COMP_FLOAT_BUG)
-                        AC_DEFINE(STDOUT_FLUSH)
-                        AC_DEFINE(KOM_AFTER_LINK,"chmem =80000 %s",outputfile)
-                        AC_DEFINE(DUMP,0)
-                        ;;
-  *-*-sysv32)
-                        AR_COMMAND_LINE='$(shortarline)'
-dnl                        AC_HAVE_LIBRARY(PW)
-dnl                        AC_HAVE_LIBRARY(inet)
-                        ;;
-  *-*-*)                ;;
-esac
-AC_SUBST(AR_COMMAND_LINE)
-AC_OUTPUT(Makefile,date > stamp-h)
+AC_OUTPUT(Makefile src/Makefile lib/Makefile test/Makefile man/Makefile doc/Makefile util/Makefile util/cim2latex util/cim2ps util/cimindent, [test -z "$CONFIG_HEADERS" || echo timestamp > stamp-h])

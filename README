@@ -1,0 +1,79 @@
+Introduction
+------------
+
+Cim is a compiler for the programming language Simula (except
+unspecified parameters to formal or virtual procedures (see the
+documentation for how portable code for formal procedures can be
+written)).  It offers a class concept, separate compilation with full
+type checking, interface to external C routines, an application
+package for process simulation and a coroutine concept.
+
+Cim is a Simula compiler whose portability is based on the C
+programming language.  The compiler and the run-time system is written
+in C, and the compiler produces C code, that is passed to a C compiler
+for further processing towards machine code.
+
+Copyright
+---------
+
+Cim is copyrighted by Sverre Hvammen Johansen, Stein Krogdahl, and
+Terje Mjøs, Department of Informatics, University of Oslo (plus some
+minor parts from Free Software Fundation).
+
+Cim is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free
+Software Foundation; version 2.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+Compilation
+-----------
+
+The following instructions assumes that you are using a
+Bourne-compatible shell. Further details can be found in the enclosed
+INSTALL file.
+
+The simplest way to compile this package is:
+
+  1. `cd' to the directory containing the package's source code and 
+     type `./configure' (or `CFLAGS=-O2 LDFLAGS=-s ./configure', 
+     which is recomended when using GCC) to configure the package
+     for your system.
+
+     Running `configure' takes awhile.  While running, it prints some
+     messages telling which features it is checking for.
+
+  2. Type `make' to compile the package
+
+  3. Type `make install' to install the package
+
+You may want to compile the run-time-system with CFLAGS=-O2, but
+have the cim compiler compile produced C-code with CFLAGS=-O0. 
+This can most easilly be done by the following steps:
+
+  1. `cd' to the directory containing the package's source code and 
+     type `CFLAGS=-O2 ./configure'
+
+  2. Type `make' to compile the package.
+
+  3. Type `make install' to install the package.
+
+  4. type `CFLAGS=-O0 ./configure'
+
+  5. type `cd src; make' followed by `make install'
+     
+GCC may run out of virtual memory, and therefore you may want to use a
+standard C-compiler instead. You can do that by typing `CC=cc
+./configure'
+
+Bugs
+----
+
+Please mail bug reports for Cim to cim-bug@ifi.uio.no. Please include
+the Cim version number and the system type, which you can get by
+running "cim --version", a copy of config.cache, and relevant Simula-
+and produced C-code.
+
+Sverre Hvammen Johansen

@@ -1,0 +1,623 @@
+!<arch>
+simenvir.atr/   870368912   501   501   100644  3564      `
+/*Cim_atr*/
+SIMENVIR
+ FILE simfile.atr
+
+LNCTEXTOBJ* &0 0 0 0LBPCONSTANT ^__rtconstant 20 0
+LIPSTART ^__rtstart 20 0
+LIPLENGTH ^__rtlength 20 0
+LTPMAIN ^__rtmain <0 0
+LIPPOS ^__rtpos <0 0
+LTPSETPOS ^__rtsetpos 20 0DIS*0 
+LBPMORE ^__rtmore <0 0
+LCPGETCHAR ^__rtgetchar <0 0
+LTPPUTCHAR ^__rtputchar 20 0DCS*1 
+LTPSUB ^__rtsub <0 0DIS*2 DIS*3 
+LTPSTRIP ^__rtstrip <0 0
+LIPGETINT ^__rtgetint <0 0
+LRPGETREAL ^__rtgetreal <0 0
+LIPGETFRAC ^__rtgetfrac <0 0
+LTPPUTINT ^__rtputint 20 0DIS*4 
+LTPPUTFIX ^__rtputfix 20 0DRS*5 DIS*6 
+LTPPUTREAL ^__rtputreal 20 0DRS*7 DIS*8 
+LTPPUTFRAC ^__rtputfrac 20 0DIS*9 DIS*10 
+
+LIPMOD ^__rmod 00 0DIS*11 DIS*12 
+LIPREM ^__rrem 00 0DIS*13 DIS*14 
+LEPABS ^* 00 0DES*15 
+LRPABS*R ^__rabsr 00 0DRS*16 
+LIPABS*I ^__rabsi 00 0DIS*17 
+LIPSIGN ^* 00 0DES*18 
+LIPSIGN*R ^__rsignr 00 0DRS*19 
+LIPSIGN*I ^__rsigni 00 0DIS*20 
+LIPENTIER ^__rentier 00 0DRS*21 
+LRPADDEPSILON ^__raddepsilon 00 0DRS*22 
+LRPSUBEPSILON ^__rsubepsilon 00 0DRS*23 
+LTPCOPY ^__rcopy 10 0DTS*24 
+LTPBLANKS ^__rblanks 10 0DIS*25 
+LCPCHAR ^__rchar 00 0DIS*26 
+LCPISOCHAR ^__risochar 00 0DIS*27 
+LIPRANK ^__rrank 00 0DCS*28 
+LIPISORANK ^__risorank 00 0DCS*29 
+LBPDIGIT ^__rdigit 00 0DCS*30 
+LBPLETTER ^__rletter 00 0DCS*31 
+LCPLOWTEN ^__rlowten 00 0DCS*32 
+LCPDECIMALMARK ^__rdecimalmark 00 0DCS*33 
+LTPUPCASE ^__rupcase :0 0DTS*34 
+LTPLOWCASE ^__rlowcase :0 0DTS*35 
+LNCCOMMON* &0 0 0 0LNPDETACH ^__rdetach 40 0
+
+LNPCALL ^__rcall 50 0DPS*36 COMMON* 
+LNPRESUME ^__rresume 50 0DPS*37 COMMON* 
+LNPEXCHANGE ^__rexchange 50 0DPS*38 COMMON* DPS*39 COMMON* 
+LRPSQRT ^__rsqrt 00 0DRS*40 
+LRPSIN ^__rsin 00 0DRS*41 
+LRPCOS ^__rcos 00 0DRS*42 
+LRPTAN ^__rtan 00 0DRS*43 
+LRPCOTAN ^__rcotan 00 0DRS*44 
+LRPARCSIN ^__rarcsin 00 0DRS*45 
+LRPARCCOS ^__rarccos 00 0DRS*46 
+LRPARCTAN ^__rarctan 00 0DRS*47 
+LRPARCTAN2 ^__rarctan2 00 0DRS*48 DRS*49 
+LRPSINH ^__rsinh 00 0DRS*50 
+LRPCOSH ^__rcosh 00 0DRS*51 
+LRPTANH ^__rtanh 00 0DRS*52 
+LRPLN ^__rln 00 0DRS*53 
+LRPLOG10 ^__rlog10 00 0DRS*54 
+LRPEXP ^__rexp 00 0DRS*55 
+LEPMIN ^* 00 0DES*56 DES*57 
+LTPMIN*T ^__rmint 00 0DTS*58 DTS*59 
+LCPMIN*C ^__rminc 00 0DCS*60 DCS*61 
+LRPMIN*R ^__rminr 00 0DRS*62 DRS*63 
+LIPMIN*I ^__rmini 00 0DIS*64 DIS*65 
+LEPMAX ^* 00 0DES*66 DES*67 
+LTPMAX*T ^__rmaxt 00 0DTS*68 DTS*69 
+LCPMAX*C ^__rmaxc 00 0DCS*70 DCS*71 
+LRPMAX*R ^__rmaxr 00 0DRS*72 DRS*73 
+LIPMAX*I ^__rmaxi 00 0DIS*74 DIS*75 
+LIPSOURCELINE ^* 00 0
+CRSMAXLONGREAL 0 CRSMINLONGREAL 0 CRSMAXREAL 0 CRSMINREAL 0 CISMAXRANK 0 CISMAXINT 0 CISMININT 0 LTPSIMULAID ^__rsimulaid 10 0
+LNPERROR ^__rterror 00 0DTS*76 
+LIPLOWERBOUND ^__rlowerbound 00 0DAA*77 0DIS*78 
+LIPUPPERBOUND ^__rupperbound 00 0DAA*79 0DIS*80 
+LBPDRAW ^__rdraw 70 0DRS*81 BIS*82 
+LIPRANDINT ^__rrandint 70 0DIS*83 VIS*84 BIS*85 
+LRPUNIFORM ^__runiform 70 0DRS*86 DRS*87 BIS*88 
+LRPNORMAL ^__rnormal 70 0DRS*89 DRS*90 BIS*91 
+LRPNEGEXP ^__rnegexp 70 0DRS*92 BIS*93 
+LIPPOISSON ^__rpoisson 70 0DRS*94 BIS*95 
+LRPERLANG ^__rerlang 70 0DRS*96 DRS*97 BIS*98 
+LIPDISCRETE ^__rdiscrete 70 0DRA*99 0BIS*100 
+LRPLINEAR ^__rlinear 70 0DRA*101 0DRA*102 0BIS*103 
+LIPHISTD ^__rhistd 70 0DRA*104 0BIS*105 
+LTPDATETIME ^__rdatetime 10 0
+LRPCPUTIME ^__rcputime 00 0
+LRPCLOCKTIME ^__rclocktime 00 0
+LNPHISTO ^__rhisto 00 0DRA*106 0DRA*107 0DRS*108 DRS*109 
+LPPSYSIN !INFILE ^__rsysin 00 0
+LPPSYSOUT !PRINTFILE ^__rsysout 00 0
+LPPSYSERR !PRINTFILE ^__rsyserr 00 0
+LNPTERMINATE_PROGRAM ^__rterminate_program 60 0
+&NCFILE FILE simfile.atr
+LNPGBC ^__rgbc 00 0
+LIPARGC ^__rargc 00 0
+LIPARGV ^__rargv 00 0
+LNPDUMP ^__rdump 50 0VTS*161 
+LNPUNDUMP ^__rundump 50 0VTS*162 
+LNPRETURN ^__rreturn 50 0VIS*163 
+
+simfile.atr/    869765986   501   501   100644  3641      `
+/*Cim_atr*/
+FILE
+
+XNCFILE &0 0 1%1VTSfilename LTPFILENAME ^__rfilename =0 0
+LBPISOPEN ^__risopen 30 0
+LBPSETACCESS ^__rsetaccess 30 0DTSv110 
+
+XNCIMAGEFILE !FILE 0 0 2%4LTSIMAGE LPPSETPOS !IMAGEFILE ^__rsetpos 90 0DISv111 
+LIPPOS ^__rpos 30 0
+LBPMORE ^__rmore 30 0
+LIPLENGTH ^__rlength 30 0
+
+XNCOUTFILE !IMAGEFILE 0 0 3%7LBPOPEN ^__roopen 30 0DTSv112 
+LBPCLOSE ^__roclose 30 0
+LPPOUTIMAGE !OUTFILE ^__rooutimage 90 0
+LPPOUTRECORD !OUTFILE ^__rooutrecord 90 0
+LPPBREAKOUTIMAGE !OUTFILE ^__robreakoutimage 90 0
+LBPCHECKPOINT ^__rdcheckpoint 30 0
+LPPOUTCHAR !OUTFILE ^__rooutchar 90 0DCSv113 
+LPPOUTTEXT !OUTFILE ^__roouttext 90 0DTSv114 
+LPPOUTINT !OUTFILE ^__rooutint 90 0DISv115 DISv116 
+LPPOUTFIX !OUTFILE ^__rooutfix 90 0DRSv117 DISv118 DISv119 
+LPPOUTREAL !OUTFILE ^__rooutreal 90 0DRSv120 DISv121 DISv122 
+LPPOUTFRAC !OUTFILE ^__rooutfrac 90 0DISv123 DISv124 DISv125 
+
+XNCINFILE !IMAGEFILE 0 0 4%10LBPENDFILE ^__riendfile 30 0
+LBPOPEN ^__riopen 30 0DTSv126 
+LBPCLOSE ^__riclose 30 0
+LPPINIMAGE !INFILE ^__riinimage 90 0
+LBPINRECORD ^__riinrecord 30 0
+LCPINCHAR ^__riinchar 30 0
+LBPLASTITEM ^__rilastitem 30 0
+LTPINTEXT ^__riintext =0 0DISv127 
+LIPININT ^__riinint 30 0
+LRPINREAL ^__riinreal 30 0
+LIPINFRAC ^__riinfrac 30 0
+
+XNCDIRECTFILE !IMAGEFILE 0 0 5%13LIPLOCATION ^__rdlocation 30 0
+LBPENDFILE ^__rdendfile 30 0
+LBPLOCKED ^__rdlocked 30 0
+LBPOPEN ^__rdopen 30 0DTSv128 
+LBPCLOSE ^__rdclose 30 0
+LIPLASTLOC ^__rdlastloc 30 0
+LIPMAXLOC ^__rdmaxloc 30 0
+LPPLOCATE !DIRECTFILE ^__rdlocate 90 0DISv129 
+LPPINIMAGE !DIRECTFILE ^__rdinimage 90 0
+LPPOUTIMAGE !DIRECTFILE ^__rdoutimage 90 0
+LBPDELETEIMAGE ^__rddeleteimage 30 0
+LIPLOCK ^__rdlock 30 0DRSv130 DISv131 DISv132 
+LBPUNLOCK ^__rdunlock 30 0
+LBPCHECKPOINT ^__rdcheckpoint 30 0
+LBPLASTITEM ^__rilastitem 30 0
+LCPINCHAR ^__riinchar 30 0
+LTPINTEXT ^__riintext =0 0DISv133 
+LIPININT ^__riinint 30 0
+LRPINREAL ^__riinreal 30 0
+LIPINFRAC ^__riinfrac 30 0
+LPPOUTCHAR !DIRECTFILE ^__rooutchar 90 0DCSv134 
+LPPOUTTEXT !DIRECTFILE ^__roouttext 90 0DTSv135 
+LPPOUTINT !DIRECTFILE ^__rooutint 90 0DISv136 DISv137 
+LPPOUTFIX !DIRECTFILE ^__rooutfix 90 0DRSv138 DISv139 DISv140 
+LPPOUTREAL !DIRECTFILE ^__rooutreal 90 0DRSv141 DISv142 DISv143 
+LPPOUTFRAC !DIRECTFILE ^__rooutfrac 90 0DISv144 DISv145 DISv146 
+
+XNCPRINTFILE !OUTFILE 0 0 6%16LIPLINE ^__rpline 30 0
+LIPPAGE ^__rppage 30 0
+LBPOPEN ^__rpopen 30 0DTSv147 
+LBPCLOSE ^__rpclose 30 0
+LIPLINESPERPAGE ^__rplinesperpage 30 0DISv148 
+LPPSPACING !PRINTFILE ^__rpspacing 90 0DISv149 
+LPPEJECT !PRINTFILE ^__rpeject 90 0DISv150 
+LPPOUTIMAGE !PRINTFILE ^__rpoutimage 90 0
+LPPOUTRECORD !PRINTFILE ^__rpoutrecord 90 0
+
+XNCBYTEFILE !FILE 0 0 7%19LIPBYTESIZE ^__rbytesize 30 0
+
+XNCINBYTEFILE !BYTEFILE 0 0 8%22LBPENDFILE ^__ribendfile 30 0
+LBPOPEN ^__ribopen 30 0
+LBPCLOSE ^__ribclose 30 0
+LIPINBYTE ^__ribinbyte 30 0
+LTPINTEXT ^__ribintext 30 0DTSv151 
+
+XNCOUTBYTEFILE !BYTEFILE 0 0 9%25LBPOPEN ^__robopen 30 0
+LBPCLOSE ^__robclose 30 0
+LPPOUTBYTE !OUTBYTEFILE ^__roboutbyte 90 0DISv152 
+LPPOUTTEXT !OUTBYTEFILE ^__robouttext 90 0DTSv153 
+LBPCHECKPOINT ^__rdcheckpoint 30 0
+
+XNCDIRECTBYTEFILE !BYTEFILE 0 0 10%28LBPENDFILE ^__rdbendfile 30 0
+LIPLOCATION ^__rdblocation 30 0
+LIPMAXLOC ^__rdbmaxloc 30 0
+LBPLOCKED ^__rdblocked 30 0
+LBPOPEN ^__rdbopen 30 0
+LBPCLOSE ^__rdbclose 30 0
+LIPLASTLOC ^__rdblastloc 30 0
+LPPLOCATE !DIRECTBYTEFILE ^__rdblocate 90 0DISv154 
+LIPINBYTE ^__rdbinbyte 30 0
+LPPOUTBYTE !DIRECTBYTEFILE ^__rdboutbyte 90 0DISv155 
+LBPCHECKPOINT ^__rdcheckpoint 30 0
+LIPLOCK ^__rdblock 30 0DRSv156 DISv157 DISv158 
+LBPUNLOCK ^__rdbunlock 30 0
+LTPINTEXT ^__rdbintext 30 0DTSv159 
+LPPOUTTEXT !DIRECTBYTEFILE ^__rdbouttext 90 0DTSv160 
+
+
+
+simset.sim/     868888365   501   501   100644  2965      `
+% $Id: simset.sim,v 1.3 1997/02/14 16:33:02 cim Exp $
+
+% Copyright (C) 1994 Sverre Hvammen Johansen,
+% Department of Informatics, University of Oslo.
+%
+% This program is free software; you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation; version 2.
+%
+% This program is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details.
+%
+% You should have received a copy of the GNU General Public License
+% along with this program; if not, write to the Free Software
+% Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA. */
+
+%ifdef included
+%else
+%timestamp simset
+%endif
+%nonetest off
+%casesensitive on
+CLASS SIMSET;
+BEGIN
+
+  CLASS LINKAGE;
+  BEGIN REF(LINKAGE)zzsuc,zzpred;
+  
+    REF(LINK) PROCEDURE SUC;
+      SUC:- IF zzsuc IN LINK THEN zzsuc ELSE NONE;
+    
+    REF(LINK) PROCEDURE PRED;
+      PRED:- IF zzpred IN LINK THEN zzpred ELSE NONE;
+    
+    REF(LINKAGE) PROCEDURE PREV; PREV:-zzpred;
+  
+  END LINKAGE;
+  
+
+  LINKAGE CLASS LINK;
+  BEGIN
+  
+    PROCEDURE OUT;
+    IF zzsuc=/=NONE THEN BEGIN
+      zzsuc.zzpred:-zzpred;
+      zzpred.zzsuc:-zzsuc;
+      zzsuc:-zzpred:-NONE;
+    END OUT;
+    
+    PROCEDURE FOLLOW(PTR); REF(LINKAGE)PTR;
+    BEGIN OUT;
+      IF PTR=/=NONE AND THEN PTR.zzsuc=/=NONE THEN BEGIN
+        zzpred:-PTR;
+        zzsuc:-PTR.zzsuc;
+        zzsuc.zzpred:-PTR.zzsuc:-THIS LINKAGE END
+    END FOLLOW;
+    
+    PROCEDURE PRECEDE(PTR); REF(LINKAGE)PTR;
+    BEGIN OUT;
+      IF PTR=/=NONE AND THEN PTR.zzpred=/=NONE THEN BEGIN
+        zzsuc:-PTR;
+        zzpred:-PTR.zzpred;
+        zzpred.zzsuc:-PTR.zzpred:-THIS LINKAGE END
+    END PRECEDE;
+    
+    PROCEDURE INTO(S); REF(HEAD)S; PRECEDE(S);
+  
+  END LINK;
+  
+
+  LINKAGE CLASS HEAD;
+  BEGIN
+  
+    REF(LINK) PROCEDURE FIRST;
+      !FIRST:-SUC;
+      FIRST:- IF zzsuc IN LINK THEN zzsuc ELSE NONE;  
+
+    REF(LINK) PROCEDURE LAST; 
+      !LAST:-PRED;
+      LAST:- IF zzpred IN LINK THEN zzpred ELSE NONE;
+    
+    BOOLEAN PROCEDURE EMPTY; EMPTY:= zzsuc==THIS LINKAGE;
+  
+    INTEGER PROCEDURE CARDINAL;
+    BEGIN INTEGER I;
+      REF(LINKAGE) PTR;
+%      PTR:-FIRST;
+%      WHILE PTR =/= NONE DO BEGIN
+%        I:=I+1;
+%        PTR:-PTR.SUC;
+%      END WHILE;
+      PTR:-zzsuc;
+      WHILE PTR =/= THIS LINKAGE DO BEGIN
+        I:=I+1;
+        PTR:-PTR.zzsuc;
+      END WHILE;
+
+      CARDINAL:=I
+    END CARDINAL;
+    
+%    PROCEDURE CLEAR; WHILE FIRST=/= NONE DO FIRST.OUT;
+    PROCEDURE CLEAR; 
+    BEGIN
+      REF(LINKAGE) PTR,PTRSUC;
+      PTR:-zzsuc;
+      WHILE PTR =/= THIS LINKAGE DO 
+      BEGIN
+        PTRSUC:-PTR.zzsuc;
+        PTR.zzsuc:-PTR.zzpred:-NONE;
+        PTR:-PTRSUC;
+      END;
+      zzsuc:-zzpred:-THIS LINKAGE
+    END;
+    
+    zzsuc:-zzpred:-THIS LINKAGE
+  END HEAD;
+
+END SIMSET;
+
+%CASESENSITIVE OFF
+%eof
+
+simulation.sim/ 870001066   501   501   100644  6309      `
+% $Id: simulation.sim,v 1.4 1997/02/14 16:33:03 cim Exp $
+
+
+% Copyright (C) 1994 Sverre Hvammen Johansen and Stein Krogdahl,
+% Department of Informatics, University of Oslo.
+%
+% This program is free software; you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation; version 2.
+%
+% This program is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details.
+%
+% You should have received a copy of the GNU General Public License
+% along with this program; if not, write to the Free Software
+% Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA. */
+
+%ifdef included
+%else
+%timestamp simulation
+%endif
+% nameasvar on
+%nonetest off
+%casesensitive on
+SIMSET CLASS SIMULATION;
+BEGIN
+  REF(PROCESS) zzsqs;
+
+  REF(zzmain_program)MAIN;
+    
+  REF(PROCESS) PROCEDURE CURRENT; CURRENT:-zzsqs.zzsqssuc;
+
+  LONG REAL PROCEDURE TIME; TIME:=zzsqs.zzsqssuc.zzevtime;
+
+  LINK CLASS PROCESS;
+  BEGIN
+    ! From event notice: ;
+    REF(PROCESS) zzsqssuc, zzsqspred;
+    LONG REAL zzevtime;
+      
+    ! From old process: ;
+    BOOLEAN zzterminated_process;
+
+    BOOLEAN PROCEDURE IDLE; IDLE:= (zzsqssuc==NONE);
+
+    BOOLEAN PROCEDURE TERMINATED; TERMINATED:=zzterminated_process;
+    
+    LONG REAL PROCEDURE EVTIME;
+      IF  zzsqssuc==NONE THEN ERROR("No Evtime for idle process")
+      ELSE EVTIME:= zzevtime;
+      
+    REF(PROCESS) PROCEDURE NEXTEV;
+      NEXTEV:-IF zzsqssuc==NONE OR ELSE zzsqssuc==zzsqs THEN NONE
+        ELSE zzsqssuc;
+
+    ! Not necessary: ;  zzsqssuc:- zzsqspred:- NONE;
+
+    DETACH;
+    INNER;
+    zzterminated_process:=TRUE;
+
+    ! Remove from SQS: ;
+    zzsqssuc.zzsqspred:- zzsqspred;
+    zzsqspred.zzsqssuc:- zzsqssuc;
+    zzsqspred:- zzsqssuc:- NONE;
+
+    IF zzsqs.zzsqssuc==zzsqs THEN ERROR("SQS: Empty")
+                             ELSE RESUME(zzsqs.zzsqssuc);
+
+    ERROR("SQS: Terminated process");
+  END PROCESS;
+  
+  PROCEDURE activat(REAC,X,CODE,T,Y,PRIO);
+    REF(PROCESS)X,Y;
+    BOOLEAN REAC,PRIO;
+    CHARACTER CODE;
+    LONG REAL T;
+  BEGIN
+    REF(PROCESS) b, cur; 
+    LONG REAL tm;
+
+    IF X =/= NONE AND THEN NOT X.zzterminated_process
+       AND THEN (REAC OR ELSE X.zzsqssuc == NONE) THEN
+    BEGIN
+      cur:- zzsqs.zzsqssuc; tm:=cur.zzevtime;
+
+      IF CODE = '!1!' THEN
+      BEGIN ! Direct ;
+         IF X==cur THEN GOTO exit;
+         T:=tm; b:- zzsqs;
+      END ELSE
+      IF CODE = '!2!' THEN
+      BEGIN !At;
+         IF T<=tm THEN
+         BEGIN IF PRIO AND THEN X==cur THEN GOTO exit ELSE T:=tm END;
+      END ELSE
+      IF CODE = '!3!' THEN
+      BEGIN !Delay;
+         T:= T+tm;
+         IF T<=tm THEN
+         BEGIN IF PRIO AND THEN X==cur THEN GOTO exit ELSE T:=tm END;
+      END ELSE
+      ! CODE = '!4!' OR CODE = '!5!' ;
+      BEGIN ! 4=Before, 5=After ;
+         IF Y==NONE OR ELSE Y.zzsqssuc==NONE THEN
+         BEGIN
+            IF X.zzsqssuc=/=NONE THEN
+            BEGIN
+              X.zzsqssuc.zzsqspred:- X.zzsqspred;
+              X.zzsqspred.zzsqssuc:- X.zzsqssuc;
+              X.zzsqspred:- NONE; X.zzsqssuc:- NONE;
+            END;
+
+            IF zzsqs.zzsqssuc==zzsqs THEN ERROR("SQS: Empty");
+            GOTO exit;
+         END;
+
+         IF X==Y THEN GOTO exit;
+
+         T:= Y.zzevtime; 
+         
+         IF CODE = '!4!' THEN b:- Y.zzsqspred ELSE b:- Y;
+       END;
+
+       IF X.zzsqssuc =/= NONE THEN
+       BEGIN
+           X.zzsqssuc.zzsqspred:- X.zzsqspred;
+           X.zzsqspred.zzsqssuc:- X.zzsqssuc;
+       END;
+
+       IF b==NONE THEN
+       BEGIN ! Not `direct', `after' or `before' ;
+          b:- zzsqs.zzsqspred;
+          WHILE b.zzevtime>T DO b:- b.zzsqspred;
+          IF PRIO THEN
+            WHILE b.zzevtime=T DO b:- b.zzsqspred;
+       END;
+
+       X.zzevtime:= T;
+       X.zzsqspred:- b; X.zzsqssuc:- b.zzsqssuc;
+       b.zzsqssuc:- X; X.zzsqssuc.zzsqspred:- X;
+
+       IF zzsqs.zzsqssuc=/=cur THEN RESUME(zzsqs.zzsqssuc);
+    END;
+  exit:
+  END activat;
+
+  PROCEDURE HOLD(t); 
+    LONG REAL t;
+  BEGIN
+    REF(PROCESS) p,q; p:- zzsqs.zzsqssuc;
+    IF t>0 THEN p.zzevtime:= p.zzevtime + t;
+    t:= p.zzevtime;  ! New evtime ;
+    IF p.zzsqssuc=/=zzsqs AND THEN p.zzsqssuc.zzevtime<=t THEN
+    BEGIN
+        p.zzsqssuc.zzsqspred:- p.zzsqspred;
+        p.zzsqspred.zzsqssuc:- p.zzsqssuc;
+
+        q:- zzsqs.zzsqspred;
+        WHILE q.zzevtime>t DO q:- q.zzsqspred;
+
+        p.zzsqspred:- q; p.zzsqssuc:- q.zzsqssuc;
+        q.zzsqssuc:- p; p.zzsqssuc.zzsqspred:- p;
+
+        RESUME(zzsqs.zzsqssuc);
+    END IF;
+  END HOLD;
+  
+  PROCEDURE PASSIVATE;
+  BEGIN
+     REF(PROCESS) p; p:- zzsqs.zzsqssuc;
+     p.zzsqssuc.zzsqspred:- p.zzsqspred;
+     p.zzsqspred.zzsqssuc:- p.zzsqssuc;
+     p.zzsqspred:- NONE; p.zzsqssuc:- NONE;
+
+     IF zzsqs.zzsqssuc==zzsqs THEN ERROR("SQS: Empty")
+                              ELSE RESUME(zzsqs.zzsqssuc);
+  END PASSIVATE;
+  
+  PROCEDURE WAIT(S);REF(HEAD)S;
+  BEGIN
+     REF(PROCESS) p; p:- zzsqs.zzsqssuc;
+     p.INTO(S); ! May also be expanded inline ;
+
+     p.zzsqssuc.zzsqspred:- p.zzsqspred;
+     p.zzsqspred.zzsqssuc:- p.zzsqssuc;
+     p.zzsqspred:- NONE; p.zzsqssuc:- NONE;
+
+     IF zzsqs.zzsqssuc==zzsqs THEN ERROR("SQS: Empty")
+                              ELSE RESUME(zzsqs.zzsqssuc);
+  END WAIT;
+  
+  PROCEDURE CANCEL(x); REF(PROCESS)x;
+  BEGIN
+     REF(PROCESS) cur;
+     IF x=/=NONE AND THEN x.zzsqssuc=/=NONE THEN
+     BEGIN
+        cur:- zzsqs.zzsqssuc;
+        x.zzsqssuc.zzsqspred:- x.zzsqspred;
+        x.zzsqspred.zzsqssuc:- x.zzsqssuc;
+        x.zzsqspred:- NONE; x.zzsqssuc:- NONE;
+
+        IF x==cur THEN
+        BEGIN
+           IF zzsqs.zzsqssuc==zzsqs THEN ERROR("SQS: Empty")
+                                    ELSE RESUME(zzsqs.zzsqssuc);
+        END;
+     END;
+  END CANCEL;
+  
+  PROCESS CLASS zzmain_program;
+  BEGIN
+    WHILE TRUE DO DETACH
+  END MAIN_PROGRAM;
+
+  PROCEDURE ACCUM(A,B,C,D);NAME A,B,C; 
+    LONG REAL A,B,C,D;
+  BEGIN
+    A:=A+C*(TIME-B); B:=TIME; C:=C+D;
+  END ACCUM;
+    
+  zzsqs:- NEW PROCESS; zzsqs.zzevtime:= -1;
+
+  MAIN:- NEW zzmain_program;
+  zzsqs.zzsqssuc:- MAIN; zzsqs.zzsqspred:- MAIN;
+  MAIN.zzsqssuc:- zzsqs; MAIN.zzsqspred:- zzsqs;
+
+END SIMULATION;
+
+%CASESENSITIVE OFF
+%eof
+
+simset.atr/     872800858   501   501   100664  464       `
+/*Cim_atr*/
+SIMSET
+ FILE simfile.atr
+ SIMENVIR simenvir.atr
+
+XNCSIMSET $0 0 206 2LNCLINKAGE $0 0 207 5LPSzzsuc LINKAGE LPSzzpred LINKAGE LPPSUC !LINK 208 8
+LPPPRED !LINK 209 9
+LPPPREV !LINKAGE 210 10
+
+LNCLINK !LINKAGE 0 0 211 11LNPOUT $212 14
+LNPFOLLOW $213 15DPSPTR LINKAGE 
+LNPPRECEDE $214 17DPSPTR LINKAGE 
+LNPINTO $215 19DPSS HEAD 
+
+LNCHEAD !LINKAGE 0 0 216 21LPPFIRST !LINK 217 24
+LPPLAST !LINK 218 25
+LBPEMPTY $219 26
+LIPCARDINAL $220 27
+LNPCLEAR $221 28
+
+
+
+simulation.atr/ 872800867   501   501   100664  660       `
+/*Cim_atr*/
+SIMULATION
+ SIMSET simset.atr
+ FILE simfile.atr
+ SIMENVIR simenvir.atr
+
+&NCSIMSET SIMSET simset.atr
+XNCSIMULATION !SIMSET 0 0 222 2LPSzzsqs PROCESS LPSMAIN zzmain_program LPPCURRENT !PROCESS 223 5
+LRPTIME $224 6
+LNCPROCESS !LINK 0 0 225 7LPSzzsqssuc PROCESS LPSzzsqspred PROCESS LRSzzevtime LBSzzterminated_process LBPIDLE $226 10
+LBPTERMINATED $227 11
+LRPEVTIME $228 12
+LPPNEXTEV !PROCESS 229 13
+
+LNPactivat $230 16DBSREAC DPSX PROCESS DCSCODE DRST DPSY PROCESS DBSPRIO 
+LNPHOLD $231 19DRSt 
+LNPPASSIVATE $232 21
+LNPWAIT $233 23DPSS HEAD 
+LNPCANCEL $234 26DPSx PROCESS 
+LNCzzmain_program !PROCESS 0 0 235 28
+LNPACCUM $236 32NRSA NRSB NRSC DRSD 
+
+

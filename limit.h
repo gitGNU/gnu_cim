@@ -1,6 +1,6 @@
 /* $Id: limit.h,v 1.3 1994/12/24 21:04:29 cim Exp $ */
 
-/* Copyright (C) 1994 Sverre Hvammen Johansen, Stein Krogdahl and Terje Mjøs
+/* Copyright (C) 1994 Sverre Hvammen Johansen,
  * Department of Informatics, University of Oslo.
  *
  * This program is free software; you can redistribute it and/or modify

@@ -1,7 +1,10 @@
-# @configure_input@
-# $Id: Makefile.in,v 1.33 1997/01/26 15:17:15 cim Exp $
+# Makefile.in generated automatically by automake 1.2 from Makefile.am
 
-# Copyright (C) 1994 Sverre Hvammen Johansen, Stein Krogdahl and Terje Mjøs
+# Copyright (C) 1994, 1995, 1996, 1997 Free Software Foundation, Inc.
+# This Makefile.in is free software; the Free Software Foundation
+# gives unlimited permission to copy, distribute and modify it.
+
+# Copyright (C) 1997 Sverre Hvammen Johansen,
 # Department of Informatics, University of Oslo.
 #
 # This program is free software; you can redistribute it and/or modify
@@ -17,883 +20,313 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
+
 SHELL = /bin/sh
 
-OLDID = @oldid@
-SIMID = @simid@
-
 srcdir = @srcdir@
+top_srcdir = @top_srcdir@
 VPATH = @srcdir@
-
-# Variables controlling the installation.
 prefix = @prefix@
 exec_prefix = @exec_prefix@
-transform = @program_transform_name@
 
-# Directory in which to install executables.
-bindir = $(exec_prefix)/bin
+bindir = @bindir@
+sbindir = @sbindir@
+libexecdir = @libexecdir@
+datadir = @datadir@
+sysconfdir = @sysconfdir@
+sharedstatedir = @sharedstatedir@
+localstatedir = @localstatedir@
+libdir = @libdir@
+infodir = @infodir@
+mandir = @mandir@
+includedir = @includedir@
+oldincludedir = /usr/include
 
-# Directory in which to install library files.
-libdir = $(exec_prefix)/lib/cim
-oldlibdir = $(exec_prefix)/lib
+pkgdatadir = $(datadir)/@PACKAGE@
+pkglibdir = $(libdir)/@PACKAGE@
+pkgincludedir = $(includedir)/@PACKAGE@
 
-# Directory in which to install man pages.
-mandir = $(prefix)/man/man1
-manext = 1
+top_builddir = .
 
-# Directory in which to install include file.
-includedir = $(prefix)/include
-
-# Directory in which to install formated documentation.
-docdir = $(prefix)/doc
-
-# Directory in which to install documentation info files.
-infodir = $(prefix)/info
+ACLOCAL = @ACLOCAL@
+AUTOCONF = @AUTOCONF@
+AUTOMAKE = @AUTOMAKE@
+AUTOHEADER = @AUTOHEADER@
 
 INSTALL = @INSTALL@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_DATA = @INSTALL_DATA@
-INSTALL_USER = @USER@
-MAKEINFO = makeinfo
-TEXI2DVI = texi2dvi
+INSTALL_SCRIPT = @INSTALL_SCRIPT@
+transform = @program_transform_name@
 
-# Variables controlling compilation.
-CPPFLAGS = @CPPFLAGS@
-LIBS = @LIBS@
-CFLAGS = @CFLAGS@
-LDFLAGS = @LDFLAGS@
+NORMAL_INSTALL = true
+PRE_INSTALL = true
+POST_INSTALL = true
+NORMAL_UNINSTALL = true
+PRE_UNINSTALL = true
+POST_UNINSTALL = true
+build_alias = @build_alias@
+build_triplet = @build@
+host_alias = @host_alias@
+host_triplet = @host@
+target_alias = @target_alias@
+target_triplet = @target@
+CC = @CC@
+EXEEXT = @EXEEXT@
+LD = @LD@
+LIBTOOL = @LIBTOOL@
+LN_S = @LN_S@
+MAKEINFO = @MAKEINFO@
+PACKAGE = @PACKAGE@
+PACKAGE_VERSION = @PACKAGE_VERSION@
+PERL = @PERL@
+RANLIB = @RANLIB@
+VERSION = @VERSION@
+YACC = @YACC@
 
-# Variables controlling compilation of the generated code.
-SCPPFLAGS = $(CPPFLAGS)
-SCC = $(CC)
-SCFLAGS = $(CFLAGS)
-SLDFLAGS = $(LDFLAGS) -o
-SLIBS = $(LIBS)
+SUBDIRS = src util doc man lib test
 
-# Variables controlling compilation of the compiler program.
-CCPPFLAGS = $(CPPFLAGS)
-CCC = $(CC)
-CCFLAGS = $(CFLAGS)
-ALL_CCFLAGS = -I. -I$(srcdir) '-DINCLUDEDIR="$(includedir)"' '-DLIBDIR="$(libdir)"' $(CCFLAGS) '-DSCC="$(SCC)"' '-DSCFLAGS="$(SCFLAGS) -c"' '-DSLIBS="$(SLIBS)"' '-DSLDFLAGS="$(SLDFLAGS)"'
-CLDFLAGS = $(LDFLAGS)
-CLIBS = $(LIBS)
-CPARFLAGS = 
-yacc = @YACC@
+noinst_HEADERS = limit.h
+ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
+mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
+CONFIG_HEADER = config.h
+CONFIG_CLEAN_FILES = 
+HEADERS =  $(noinst_HEADERS)
 
-# Variables controlling compilation of the run-time system.
-RCPPFLAGS = $(CPPFLAGS)
-RCC = $(CC)
-RCFLAGS = $(CFLAGS)
-ALL_RCFLAGS = -I. -I$(srcdir) $(RCFLAGS)
-RLD = @RLD@
-RLD_O = @RLD_O@
+DIST_COMMON =  README AUTHORS COPYING ChangeLog INSTALL Makefile.am \
+Makefile.in NEWS TODO acconfig.h acinclude.m4 aclocal.m4 config.guess \
+config.h.in config.sub configure configure.in install-sh ltconfig \
+ltmain.sh missing mkinstalldirs stamp-h.in
 
-# Variable controlling the Compilation of class Simset and class Simulation.
-CIMFLAGS = -h -L -L. -I$(srcdir) -d
 
-ranlib = @RANLIB@
-ln = @LN_S@
-ar = ar rcuv
-tar = tar cf
-compress = gzip
+DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
-arcommandline= @AR_COMMAND_LINE@
-longarline= $(ar) libcim.a $(LIBDEPENDDATAFILES) $(ROFILES)
-shortarline= $(ar) libcim.a $(LIBDEPENDDATAFILES); \
-        for file in $(ROFILES); do \
-          $(ar) libcim.a $$file; \
-        done
+TAR = tar
+GZIP = --best
+default: all
 
-LIBDATAFILES = simulation.sim simset.sim \
-simenvir.atr simfile.atr simset.atr simulation.atr
+.SUFFIXES:
+$(srcdir)/Makefile.in: Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) 
+	cd $(top_srcdir) && $(AUTOMAKE) --gnu --include-deps Makefile
 
-SPLIT = 
-NOSPLIT = $(LIBDATAFILES)
-LIBDEPENDDATAFILES = @SPLIT@
+Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
+	cd $(top_builddir) \
+	  && CONFIG_FILES=$@ CONFIG_HEADERS= $(SHELL) ./config.status
 
-DISTFILES = clex.c csimula.c cnavn.c cfeil.c cdekl.c csjekker.c \
-cgenstr.c cgen.c cgenexp.c cgenpar.c cextspec.c \
-renvir.c rtextutl.c rcproc.c rrts.c rtext.c rbasic.c rfile.c \
-dad.c simenvir.c simfile.c y_tab.c \
-cgen.h cconst.h cdekl.h cextern.h cmell.h cnavn.h config.h.in \
-csjekker.h dad.h limit.h cim.h y_tab.h version.h oldversion.h\
-simset.sim simulation.sim test.sim \
-cparser.y y.tab.c y.tab.h simenvir.atr simfile.atr libcim.atr \
-cim.1 cim.dvi cim.ps cim.texi cim.info \
-magic configure.in configure Makefile.in mkinstalldirs config.guess \
-config.sub COPYING INSTALL install-sh getopt.c getopt.h getopt1.c \
-alloca.c IAFA-PACKAGE cim.lsm SIMULA-HISTORY \
-cim2latex cim2ps cimindent cimetags config.bat config.dos Makefile.dos \
-INSTALL.DOS
+$(ACLOCAL_M4):  configure.in  acinclude.m4
+	cd $(srcdir) && $(ACLOCAL)
 
-ROFILES = rabsirut.o rabsrrut.o raddepsrut.o radofchrut.o radofelrut.o \
-rarccosrut.o rarcsinrut.o rarctan2rut.o rarctanrut.o rargcrut.o \
-rargvrut.o rberut.o rblanksrut.o rbrut.o rbytesizrut.o \
-rcallrut.o rcarut.o rccbrut.o rcharrut.o rclcktimrut.o \
-rconcrut.o rcopyrut.o rcoshrut.o rcosrut.o rcotanrut.o \
-rcpbrut.o rcpprut.o rcprbbrut.o rcprbrut.o rcprut.o \
-rcptxtacrut.o rcputimerut.o rcpyarrcrut.o rcpytxtcrut.o rctrut.o \
-rdadrut.o rdatetimrut.o rdbcloserut.o rdbendflrut.o rdbinbytrut.o \
-rdbintxtrut.o rdblalocrut.o rdblocatrut.o rdblockerut.o rdblockrut.o \
-rdbloctirut.o rdbmaxlorut.o rdbopenrut.o rdboubytrut.o rdboutxtrut.o \
-rdbunlocrut.o rdchckpntrut.o rdcloserut.o rddelimarut.o rdecmrkrut.o \
-rdendfilrut.o rdetachrut.o rdigitrut.o rdinimagrut.o rdiscrrut.o \
-rdlastlorut.o rdlocaterut.o rdlocatirut.o rdlockedrut.o rdlockrut.o \
-rdmaxlocrut.o rdopenrut.o rdoutimagrut.o rdrawrut.o rdumprut.o \
-rdunlockrut.o rendclsrut.o renddeclrut.o rentierrut.o repprut.o \
-reprut.o reqrtextrut.o reqtextrut.o rerlangrut.o rerrorrut.o \
-rethrut.o rexchgerut.o rexchrut.o rexprut.o rfieldrut.o \
-rfilnamerut.o rgbcrut.o rgetarut.o rgetavrut.o rgetcbvrut.o \
-rgetlabrut.o rgetprocrut.o rgetrvrut.o rgetsarut.o rgettvrut.o rgettarut.o \
-rgotorut.o rhistdrut.o rhistorut.o ribcloserut.o ribendflrut.o \
-ribinbytrut.o ribintxtrut.o ribopenrut.o ricloserut.o riendfilrut.o \
-riincharrut.o riinfracrut.o riinimagrut.o riinintrut.o riinrealrut.o \
-riinrecrut.o riintextrut.o rilastiterut.o rinitierrut.o rinnerrut.o \
-rinrut.o rintrearut.o riopenrut.o risocharrut.o risopenrut.o \
-risorankrut.o risrut.o rleftshrut.o rlengthrut.o rletextrut.o \
-rletterrut.o rlinearrut.o rlnrut.o rlog10rut.o rlowbourut.o \
-rlowcaserut.o rlowtenrut.o rlttextrut.o rmaxcrut.o rmaxirut.o \
-rmaxrrut.o rmaxtrut.o rmincrut.o rminirut.o rminrrut.o \
-rmintrut.o rmodrut.o rmorerut.o rnegexprut.o rnormalrut.o \
-roarut.o robcloserut.o robopenrut.o roboubytrut.o roboutxtrut.o \
-robrkotmrut.o rocloserut.o roopenrut.o rooutcharut.o rooutfixrut.o \
-rooutfrarut.o rooutimagrut.o rooutintrut.o rooutrearut.o rooutrecrut.o \
-roouttxtrut.o rpcloserut.o rpejectrut.o rplinerut.o rplnprpgrut.o \
-rpoissonrut.o rpopenrut.o rposrut.o rpoutimagrut.o rpoutrecrut.o \
-rpowiirut.o rpowrirut.o rpowrut.o rppagerut.o rprfilrut.o \
-rpspacngrut.o rrandintrut.o rrankrut.o rremrut.o rresumerut.o \
-rreturnrut.o rrinrut.o rrsrut.o rsetaccrut.o rsetposrut.o \
-rsignirut.o rsignrrut.o rsigndirut.o rsigndrrut.o rsigndxrut.o \
-rsimidrut.o rsinhrut.o rsinrut.o \
-rsqrtrut.o rssrut.o rstartrut.o rsubepsrut.o rsyserrrut.o \
-rsyserrut.o rsysinrut.o rsysoutrut.o rtanhrut.o rtanrut.o \
-rtconstrut.o rterrorrut.o rtgetchrut.o rtgetfrrut.o rtgetintrut.o \
-rtgetrerut.o rtlengthrut.o rtmainrut.o rtmorerut.o rtposrut.o \
-rtputchrut.o rtputfirut.o rtputfrrut.o rtputinrut.o rtputrearut.o \
-rtracerut.o rtsetposrut.o rtsglrut.o rtstartrut.o \
-rtstriprut.o rtsubrut.o rtxtassrut.o rtxtvassrut.o runiformrut.o \
-rupcaserut.o ruppbourut.o rwarningrut.o simenvir.o simfile.o \
-simset.o simulation.o
-
-all:libcim.a cim.ps info
-
-simenvir.o: simenvir.c
-	$(RCC) $(ALL_RCFLAGS) -c $(srcdir)/simenvir.c
-
-simfile.o: simfile.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c $(srcdir)/simfile.c
-
-libcim.a: $(ROFILES) $(LIBDEPENDDATAFILES)
-	if test -r ./simenvir.atr; then :; else \
-          if ln $(srcdir)/simenvir.atr .; then :; else \
-            cp -p $(srcdir)/simenvir.atr .; fi; fi
-	if test -r ./simfile.atr; then :; else \
-          if ln $(srcdir)/simfile.atr .; then :; else \
-            cp -p $(srcdir)/simfile.atr .; fi; fi
-	if test -r ./simset.sim; then :; else \
-          if ln $(srcdir)/simset.sim .; then :; else \
-            cp -p $(srcdir)/simset.sim .; fi; fi
-	if test -r ./simulation.sim; then :; else \
-          if ln $(srcdir)/simulation.sim .; then :; else \
-            cp -p $(srcdir)/simulation.sim .; fi; fi
-	$(arcommandline)
-	- if test "$(ranlib)" = ":" ; then :; else \
-            $(ranlib) libcim.a; fi;
-
-rstartrut.o:rrts.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drstartrut $(srcdir)/rrts.c &&$(RLD) rrts.o $(RLD_O) $@
-roarut.o:rrts.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Droarut $(srcdir)/rrts.c &&$(RLD) rrts.o $(RLD_O) $@
-rprfilrut.o:rrts.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drprintfillinerut $(srcdir)/rrts.c &&$(RLD) rrts.o $(RLD_O) $@
-rerrorrut.o:rrts.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drerrorrut $(srcdir)/rrts.c &&$(RLD) rrts.o $(RLD_O) $@
-rwarningrut.o:rrts.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drwarningrut $(srcdir)/rrts.c &&$(RLD) rrts.o $(RLD_O) $@
-rtracerut.o:rrts.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drtracerut $(srcdir)/rrts.c &&$(RLD) rrts.o $(RLD_O) $@
-rsyserrrut.o:rrts.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drsystemerrorrut $(srcdir)/rrts.c &&$(RLD) rrts.o $(RLD_O) $@
-rinitierrut.o:rrts.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drinitierrut $(srcdir)/rrts.c &&$(RLD) rrts.o $(RLD_O) $@
-rcprut.o:rrts.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drcprut $(srcdir)/rrts.c &&$(RLD) rrts.o $(RLD_O) $@
-rcpprut.o:rrts.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drcpprut $(srcdir)/rrts.c &&$(RLD) rrts.o $(RLD_O) $@
-rcpbrut.o:rrts.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drcpbrut $(srcdir)/rrts.c &&$(RLD) rrts.o $(RLD_O) $@
-rccbrut.o:rrts.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drccbrut $(srcdir)/rrts.c &&$(RLD) rrts.o $(RLD_O) $@
-reprut.o:rrts.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Dreprut $(srcdir)/rrts.c &&$(RLD) rrts.o $(RLD_O) $@
-repprut.o:rrts.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drepprut $(srcdir)/rrts.c &&$(RLD) rrts.o $(RLD_O) $@
-rcprbrut.o:rrts.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drcprbrut $(srcdir)/rrts.c &&$(RLD) rrts.o $(RLD_O) $@
-rcprbbrut.o:rrts.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drcprbbrut $(srcdir)/rrts.c &&$(RLD) rrts.o $(RLD_O) $@
-rbrut.o:rrts.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drbrut $(srcdir)/rrts.c &&$(RLD) rrts.o $(RLD_O) $@
-rberut.o:rrts.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drberut $(srcdir)/rrts.c &&$(RLD) rrts.o $(RLD_O) $@
-rresumerut.o:rrts.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drresumerut $(srcdir)/rrts.c &&$(RLD) rrts.o $(RLD_O) $@
-rexchgerut.o:rrts.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drexchangerut $(srcdir)/rrts.c &&$(RLD) rrts.o $(RLD_O) $@
-rdetachrut.o:rrts.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drdetachrut $(srcdir)/rrts.c &&$(RLD) rrts.o $(RLD_O) $@
-rcallrut.o:rrts.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drcallrut $(srcdir)/rrts.c &&$(RLD) rrts.o $(RLD_O) $@
-rgotorut.o:rrts.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drgotorut $(srcdir)/rrts.c &&$(RLD) rrts.o $(RLD_O) $@
-renddeclrut.o:rrts.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drenddeclrut $(srcdir)/rrts.c &&$(RLD) rrts.o $(RLD_O) $@
-rinnerrut.o:rrts.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drinnerrut $(srcdir)/rrts.c &&$(RLD) rrts.o $(RLD_O) $@
-rendclsrut.o:rrts.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drendclassrut $(srcdir)/rrts.c &&$(RLD) rrts.o $(RLD_O) $@
-rssrut.o:rrts.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drssrut $(srcdir)/rrts.c &&$(RLD) rrts.o $(RLD_O) $@
-rrsrut.o:rrts.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drrsrut $(srcdir)/rrts.c &&$(RLD) rrts.o $(RLD_O) $@
-rcarut.o:rrts.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drcarut $(srcdir)/rrts.c &&$(RLD) rrts.o $(RLD_O) $@
-rinrut.o:rrts.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drinrut $(srcdir)/rrts.c &&$(RLD) rrts.o $(RLD_O) $@
-rrinrut.o:rrts.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drrinrut $(srcdir)/rrts.c &&$(RLD) rrts.o $(RLD_O) $@
-risrut.o:rrts.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drisrut $(srcdir)/rrts.c &&$(RLD) rrts.o $(RLD_O) $@
-rgbcrut.o:rrts.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drgbcrut $(srcdir)/rrts.c &&$(RLD) rrts.o $(RLD_O) $@
-rctrut.o:rrts.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drctrut $(srcdir)/rrts.c &&$(RLD) rrts.o $(RLD_O) $@
-rethrut.o:rrts.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drethrut $(srcdir)/rrts.c &&$(RLD) rrts.o $(RLD_O) $@
-rgetavrut.o:rrts.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drgetavrut $(srcdir)/rrts.c &&$(RLD) rrts.o $(RLD_O) $@
-rgetcbvrut.o:rrts.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drgetcbvrut $(srcdir)/rrts.c &&$(RLD) rrts.o $(RLD_O) $@
-rgetrvrut.o:rrts.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drgetrvrut $(srcdir)/rrts.c &&$(RLD) rrts.o $(RLD_O) $@
-rgettvrut.o:rrts.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drgettvrut $(srcdir)/rrts.c &&$(RLD) rrts.o $(RLD_O) $@
-rgettarut.o:rrts.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drgettarut $(srcdir)/rrts.c &&$(RLD) rrts.o $(RLD_O) $@
-rgetprocrut.o:rrts.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drgetprocrut $(srcdir)/rrts.c &&$(RLD) rrts.o $(RLD_O) $@
-rgetlabrut.o:rrts.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drgetlabrut $(srcdir)/rrts.c &&$(RLD) rrts.o $(RLD_O) $@
-rgetarut.o:rrts.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drgetarut $(srcdir)/rrts.c &&$(RLD) rrts.o $(RLD_O) $@
-rgetsarut.o:rrts.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drgetsarut $(srcdir)/rrts.c &&$(RLD) rrts.o $(RLD_O) $@
-rdumprut.o:rrts.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drdumprut $(srcdir)/rrts.c &&$(RLD) rrts.o $(RLD_O) $@
-rargcrut.o:rrts.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drargcrut $(srcdir)/rrts.c &&$(RLD) rrts.o $(RLD_O) $@
-rargvrut.o:rrts.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drargvrut $(srcdir)/rrts.c &&$(RLD) rrts.o $(RLD_O) $@
-rtsglrut.o:rrts.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drtsglobals $(srcdir)/rrts.c &&$(RLD) rrts.o $(RLD_O) $@
-rexchrut.o:rrts.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drexchange $(srcdir)/rrts.c &&$(RLD) rrts.o $(RLD_O) $@
-rreturnrut.o:rrts.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drreturnrut $(srcdir)/rrts.c &&$(RLD) rrts.o $(RLD_O) $@
-
-rtconstrut.o:rtext.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drtconstantrut $(srcdir)/rtext.c &&$(RLD) rtext.o $(RLD_O) $@
-rdadrut.o:rtext.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drdadrut $(srcdir)/rtext.c &&$(RLD) rtext.o $(RLD_O) $@
-rtstartrut.o:rtext.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drtstartrut $(srcdir)/rtext.c &&$(RLD) rtext.o $(RLD_O) $@
-rtlengthrut.o:rtext.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drtlengthrut $(srcdir)/rtext.c &&$(RLD) rtext.o $(RLD_O) $@
-rtmainrut.o:rtext.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drtmainrut $(srcdir)/rtext.c &&$(RLD) rtext.o $(RLD_O) $@
-rtposrut.o:rtext.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drtposrut $(srcdir)/rtext.c &&$(RLD) rtext.o $(RLD_O) $@
-rtmorerut.o:rtext.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drtmorerut $(srcdir)/rtext.c &&$(RLD) rtext.o $(RLD_O) $@
-rtsubrut.o:rtext.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drtsubrut $(srcdir)/rtext.c &&$(RLD) rtext.o $(RLD_O) $@
-rtstriprut.o:rtext.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drtstriprut $(srcdir)/rtext.c &&$(RLD) rtext.o $(RLD_O) $@
-rtsetposrut.o:rtext.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drtsetposrut $(srcdir)/rtext.c &&$(RLD) rtext.o $(RLD_O) $@
-rtgetchrut.o:rtext.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drtgetcharrut $(srcdir)/rtext.c &&$(RLD) rtext.o $(RLD_O) $@
-rtgetrerut.o:rtext.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drtgetrealrut $(srcdir)/rtext.c &&$(RLD) rtext.o $(RLD_O) $@
-rtgetfrrut.o:rtext.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drtgetfracrut $(srcdir)/rtext.c &&$(RLD) rtext.o $(RLD_O) $@
-rtputchrut.o:rtext.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drtputcharrut $(srcdir)/rtext.c &&$(RLD) rtext.o $(RLD_O) $@
-rtputinrut.o:rtext.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drtputintrut $(srcdir)/rtext.c &&$(RLD) rtext.o $(RLD_O) $@
-rtputfirut.o:rtext.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drtputfixrut $(srcdir)/rtext.c &&$(RLD) rtext.o $(RLD_O) $@
-rtputrearut.o:rtext.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drtputrealrut $(srcdir)/rtext.c &&$(RLD) rtext.o $(RLD_O) $@
-rtputfrrut.o:rtext.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drtputfracrut $(srcdir)/rtext.c &&$(RLD) rtext.o $(RLD_O) $@
-rcopyrut.o:rtext.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drcopyrut $(srcdir)/rtext.c &&$(RLD) rtext.o $(RLD_O) $@
-rconcrut.o:rtext.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drconcrut $(srcdir)/rtext.c &&$(RLD) rtext.o $(RLD_O) $@
-rblanksrut.o:rtext.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drblanksrut $(srcdir)/rtext.c &&$(RLD) rtext.o $(RLD_O) $@
-rtxtvassrut.o:rtext.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drtextvalassignrut $(srcdir)/rtext.c &&$(RLD) rtext.o $(RLD_O) $@
-rtxtassrut.o:rtext.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drtextassignrut $(srcdir)/rtext.c &&$(RLD) rtext.o $(RLD_O) $@
-reqrtextrut.o:rtext.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Dreqrtextrut $(srcdir)/rtext.c &&$(RLD) rtext.o $(RLD_O) $@
-reqtextrut.o:rtext.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Dreqtextrut $(srcdir)/rtext.c &&$(RLD) rtext.o $(RLD_O) $@
-rlttextrut.o:rtext.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drlttextrut $(srcdir)/rtext.c &&$(RLD) rtext.o $(RLD_O) $@
-rletextrut.o:rtext.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drletextrut $(srcdir)/rtext.c &&$(RLD) rtext.o $(RLD_O) $@
-rtgetintrut.o:rtext.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drtgetintrut $(srcdir)/rtext.c &&$(RLD) rtext.o $(RLD_O) $@
-
-rsysinrut.o:rbasic.c cim.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drsysinrut $(srcdir)/rbasic.c &&$(RLD) rbasic.o $(RLD_O) $@
-rsysoutrut.o:rbasic.c cim.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drsysoutrut $(srcdir)/rbasic.c &&$(RLD) rbasic.o $(RLD_O) $@
-rsyserrut.o:rbasic.c cim.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drsyserrrut $(srcdir)/rbasic.c &&$(RLD) rbasic.o $(RLD_O) $@
-
-rfilnamerut.o:rfile.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drfilenamerut $(srcdir)/rfile.c &&$(RLD) rfile.o $(RLD_O) $@
-risopenrut.o:rfile.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drisopenrut $(srcdir)/rfile.c &&$(RLD) rfile.o $(RLD_O) $@
-rsetaccrut.o:rfile.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drsetaccessrut $(srcdir)/rfile.c &&$(RLD) rfile.o $(RLD_O) $@
-rleftshrut.o:rfile.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drleftshiftrut $(srcdir)/rfile.c &&$(RLD) rfile.o $(RLD_O) $@
-rfieldrut.o:rfile.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drfieldrut $(srcdir)/rfile.c &&$(RLD) rfile.o $(RLD_O) $@
-rsetposrut.o:rfile.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drsetposrut $(srcdir)/rfile.c &&$(RLD) rfile.o $(RLD_O) $@
-rposrut.o:rfile.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drposrut $(srcdir)/rfile.c &&$(RLD) rfile.o $(RLD_O) $@
-rmorerut.o:rfile.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drmorerut $(srcdir)/rfile.c &&$(RLD) rfile.o $(RLD_O) $@
-rlengthrut.o:rfile.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drlengthrut $(srcdir)/rfile.c &&$(RLD) rfile.o $(RLD_O) $@
-rdlocatirut.o:rfile.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drdlocationrut $(srcdir)/rfile.c &&$(RLD) rfile.o $(RLD_O) $@
-rdendfilrut.o:rfile.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drdendfilerut $(srcdir)/rfile.c &&$(RLD) rfile.o $(RLD_O) $@
-rdlockedrut.o:rfile.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drdlockedrut $(srcdir)/rfile.c &&$(RLD) rfile.o $(RLD_O) $@
-rdchckpntrut.o:rfile.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drdcheckpointrut $(srcdir)/rfile.c &&$(RLD) rfile.o $(RLD_O) $@
-rdunlockrut.o:rfile.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drdunlockrut $(srcdir)/rfile.c &&$(RLD) rfile.o $(RLD_O) $@
-rdlockrut.o:rfile.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drdlockrut $(srcdir)/rfile.c &&$(RLD) rfile.o $(RLD_O) $@
-rdopenrut.o:rfile.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drdopenrut $(srcdir)/rfile.c &&$(RLD) rfile.o $(RLD_O) $@
-rdcloserut.o:rfile.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drdcloserut $(srcdir)/rfile.c &&$(RLD) rfile.o $(RLD_O) $@
-rdlocaterut.o:rfile.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drdlocaterut $(srcdir)/rfile.c &&$(RLD) rfile.o $(RLD_O) $@
-rdlastlorut.o:rfile.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drdlastlocrut $(srcdir)/rfile.c &&$(RLD) rfile.o $(RLD_O) $@
-rdmaxlocrut.o:rfile.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drdmaxlocrut $(srcdir)/rfile.c &&$(RLD) rfile.o $(RLD_O) $@
-rdinimagrut.o:rfile.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drdinimagerut $(srcdir)/rfile.c &&$(RLD) rfile.o $(RLD_O) $@
-rdoutimagrut.o:rfile.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drdoutimagerut $(srcdir)/rfile.c &&$(RLD) rfile.o $(RLD_O) $@
-rddelimarut.o:rfile.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drddeleteimagerut $(srcdir)/rfile.c &&$(RLD) rfile.o $(RLD_O) $@
-riendfilrut.o:rfile.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Driendfilerut $(srcdir)/rfile.c &&$(RLD) rfile.o $(RLD_O) $@
-riopenrut.o:rfile.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Driopenrut $(srcdir)/rfile.c &&$(RLD) rfile.o $(RLD_O) $@
-ricloserut.o:rfile.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Dricloserut $(srcdir)/rfile.c &&$(RLD) rfile.o $(RLD_O) $@
-riinimagrut.o:rfile.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Driinimagerut $(srcdir)/rfile.c &&$(RLD) rfile.o $(RLD_O) $@
-riinrecrut.o:rfile.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Driinrecordrut $(srcdir)/rfile.c &&$(RLD) rfile.o $(RLD_O) $@
-riincharrut.o:rfile.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Driincharrut $(srcdir)/rfile.c &&$(RLD) rfile.o $(RLD_O) $@
-rilastiterut.o:rfile.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drilastitemrut $(srcdir)/rfile.c &&$(RLD) rfile.o $(RLD_O) $@
-riintextrut.o:rfile.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Driintextrut $(srcdir)/rfile.c &&$(RLD) rfile.o $(RLD_O) $@
-riinintrut.o:rfile.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Driinintrut $(srcdir)/rfile.c &&$(RLD) rfile.o $(RLD_O) $@
-riinrealrut.o:rfile.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Driinrealrut $(srcdir)/rfile.c &&$(RLD) rfile.o $(RLD_O) $@
-riinfracrut.o:rfile.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Driinfracrut $(srcdir)/rfile.c &&$(RLD) rfile.o $(RLD_O) $@
-roopenrut.o:rfile.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Droopenrut $(srcdir)/rfile.c &&$(RLD) rfile.o $(RLD_O) $@
-rocloserut.o:rfile.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drocloserut $(srcdir)/rfile.c &&$(RLD) rfile.o $(RLD_O) $@
-rooutimagrut.o:rfile.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drooutimagerut $(srcdir)/rfile.c &&$(RLD) rfile.o $(RLD_O) $@
-rooutrecrut.o:rfile.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drooutrecordrut $(srcdir)/rfile.c &&$(RLD) rfile.o $(RLD_O) $@
-robrkotmrut.o:rfile.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drobreakoutimagerut $(srcdir)/rfile.c &&$(RLD) rfile.o $(RLD_O) $@
-rooutcharut.o:rfile.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drooutcharrut $(srcdir)/rfile.c &&$(RLD) rfile.o $(RLD_O) $@
-roouttxtrut.o:rfile.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Droouttextrut $(srcdir)/rfile.c &&$(RLD) rfile.o $(RLD_O) $@
-rooutintrut.o:rfile.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drooutintrut $(srcdir)/rfile.c &&$(RLD) rfile.o $(RLD_O) $@
-rooutfixrut.o:rfile.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drooutfixrut $(srcdir)/rfile.c &&$(RLD) rfile.o $(RLD_O) $@
-rooutrearut.o:rfile.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drooutrealrut $(srcdir)/rfile.c &&$(RLD) rfile.o $(RLD_O) $@
-rooutfrarut.o:rfile.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drooutfracrut $(srcdir)/rfile.c &&$(RLD) rfile.o $(RLD_O) $@
-rplinerut.o:rfile.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drplinerut $(srcdir)/rfile.c &&$(RLD) rfile.o $(RLD_O) $@
-rppagerut.o:rfile.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drppagerut $(srcdir)/rfile.c &&$(RLD) rfile.o $(RLD_O) $@
-rpopenrut.o:rfile.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drpopenrut $(srcdir)/rfile.c &&$(RLD) rfile.o $(RLD_O) $@
-rpcloserut.o:rfile.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drpcloserut $(srcdir)/rfile.c &&$(RLD) rfile.o $(RLD_O) $@
-rplnprpgrut.o:rfile.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drplinesperpagerut $(srcdir)/rfile.c &&$(RLD) rfile.o $(RLD_O) $@
-rpspacngrut.o:rfile.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drpspacingrut $(srcdir)/rfile.c &&$(RLD) rfile.o $(RLD_O) $@
-rpejectrut.o:rfile.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drpejectrut $(srcdir)/rfile.c &&$(RLD) rfile.o $(RLD_O) $@
-rpoutimagrut.o:rfile.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drpoutimagerut $(srcdir)/rfile.c &&$(RLD) rfile.o $(RLD_O) $@
-rpoutrecrut.o:rfile.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drpoutrecordrut $(srcdir)/rfile.c &&$(RLD) rfile.o $(RLD_O) $@
-rbytesizrut.o:rfile.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drbytesizerut $(srcdir)/rfile.c &&$(RLD) rfile.o $(RLD_O) $@
-ribendflrut.o:rfile.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Dribendfilerut $(srcdir)/rfile.c &&$(RLD) rfile.o $(RLD_O) $@
-ribopenrut.o:rfile.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Dribopenrut $(srcdir)/rfile.c &&$(RLD) rfile.o $(RLD_O) $@
-ribcloserut.o:rfile.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Dribcloserut $(srcdir)/rfile.c &&$(RLD) rfile.o $(RLD_O) $@
-ribinbytrut.o:rfile.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Dribinbyterut $(srcdir)/rfile.c &&$(RLD) rfile.o $(RLD_O) $@
-ribintxtrut.o:rfile.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Dribintextrut $(srcdir)/rfile.c &&$(RLD) rfile.o $(RLD_O) $@
-robopenrut.o:rfile.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drobopenrut $(srcdir)/rfile.c &&$(RLD) rfile.o $(RLD_O) $@
-robcloserut.o:rfile.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drobcloserut $(srcdir)/rfile.c &&$(RLD) rfile.o $(RLD_O) $@
-roboubytrut.o:rfile.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Droboutbyterut $(srcdir)/rfile.c &&$(RLD) rfile.o $(RLD_O) $@
-roboutxtrut.o:rfile.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drobouttextrut $(srcdir)/rfile.c &&$(RLD) rfile.o $(RLD_O) $@
-rdbendflrut.o:rfile.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drdbendfilerut $(srcdir)/rfile.c &&$(RLD) rfile.o $(RLD_O) $@
-rdbloctirut.o:rfile.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drdblocationrut $(srcdir)/rfile.c &&$(RLD) rfile.o $(RLD_O) $@
-rdbmaxlorut.o:rfile.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drdbmaxlocrut $(srcdir)/rfile.c &&$(RLD) rfile.o $(RLD_O) $@
-rdblockerut.o:rfile.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drdblockedrut $(srcdir)/rfile.c &&$(RLD) rfile.o $(RLD_O) $@
-rdbunlocrut.o:rfile.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drdbunlockrut $(srcdir)/rfile.c &&$(RLD) rfile.o $(RLD_O) $@
-rdblockrut.o:rfile.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drdblockrut $(srcdir)/rfile.c &&$(RLD) rfile.o $(RLD_O) $@
-rdbopenrut.o:rfile.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drdbopenrut $(srcdir)/rfile.c &&$(RLD) rfile.o $(RLD_O) $@
-rdbcloserut.o:rfile.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drdbcloserut $(srcdir)/rfile.c &&$(RLD) rfile.o $(RLD_O) $@
-rdblalocrut.o:rfile.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drdblastlocrut $(srcdir)/rfile.c &&$(RLD) rfile.o $(RLD_O) $@
-rdblocatrut.o:rfile.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drdblocaterut $(srcdir)/rfile.c &&$(RLD) rfile.o $(RLD_O) $@
-rdbinbytrut.o:rfile.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drdbinbyterut $(srcdir)/rfile.c &&$(RLD) rfile.o $(RLD_O) $@
-rdboubytrut.o:rfile.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drdboutbyterut $(srcdir)/rfile.c &&$(RLD) rfile.o $(RLD_O) $@
-rdbintxtrut.o:rfile.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drdbintextrut $(srcdir)/rfile.c &&$(RLD) rfile.o $(RLD_O) $@
-rdboutxtrut.o:rfile.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drdbouttextrut $(srcdir)/rfile.c &&$(RLD) rfile.o $(RLD_O) $@
-
-rmodrut.o:renvir.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drmodrut $(srcdir)/renvir.c &&$(RLD) renvir.o $(RLD_O) $@
-rremrut.o:renvir.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drremrut $(srcdir)/renvir.c &&$(RLD) renvir.o $(RLD_O) $@
-rsignrrut.o:renvir.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drsignrrut $(srcdir)/renvir.c &&$(RLD) renvir.o $(RLD_O) $@
-rsigndrrut.o:renvir.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drsigndrrut $(srcdir)/renvir.c &&$(RLD) renvir.o $(RLD_O) $@
-rsigndxrut.o:renvir.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drsigndxrut $(srcdir)/renvir.c &&$(RLD) renvir.o $(RLD_O) $@
-rsignirut.o:renvir.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drsignirut $(srcdir)/renvir.c &&$(RLD) renvir.o $(RLD_O) $@
-rsigndirut.o:renvir.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drsigndirut $(srcdir)/renvir.c &&$(RLD) renvir.o $(RLD_O) $@
-rentierrut.o:renvir.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drentierrut $(srcdir)/renvir.c &&$(RLD) renvir.o $(RLD_O) $@
-rintrearut.o:renvir.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drintrearut $(srcdir)/renvir.c &&$(RLD) renvir.o $(RLD_O) $@
-rpowiirut.o:renvir.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drpowiirut $(srcdir)/renvir.c &&$(RLD) renvir.o $(RLD_O) $@
-rpowrirut.o:renvir.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drpowrirut $(srcdir)/renvir.c &&$(RLD) renvir.o $(RLD_O) $@
-rpowrut.o:renvir.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drpowrut $(srcdir)/renvir.c &&$(RLD) renvir.o $(RLD_O) $@
-rsqrtrut.o:renvir.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drsqrtrut $(srcdir)/renvir.c &&$(RLD) renvir.o $(RLD_O) $@
-rsinrut.o:renvir.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drsinrut $(srcdir)/renvir.c &&$(RLD) renvir.o $(RLD_O) $@
-rcosrut.o:renvir.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drcosrut $(srcdir)/renvir.c &&$(RLD) renvir.o $(RLD_O) $@
-rtanrut.o:renvir.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drtanrut $(srcdir)/renvir.c &&$(RLD) renvir.o $(RLD_O) $@
-rarcsinrut.o:renvir.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drarcsinrut $(srcdir)/renvir.c &&$(RLD) renvir.o $(RLD_O) $@
-rarccosrut.o:renvir.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drarccosrut $(srcdir)/renvir.c &&$(RLD) renvir.o $(RLD_O) $@
-rarctanrut.o:renvir.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drarctanrut $(srcdir)/renvir.c &&$(RLD) renvir.o $(RLD_O) $@
-rarctan2rut.o:renvir.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drarctan2rut $(srcdir)/renvir.c &&$(RLD) renvir.o $(RLD_O) $@
-rsinhrut.o:renvir.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drsinhrut $(srcdir)/renvir.c &&$(RLD) renvir.o $(RLD_O) $@
-rcoshrut.o:renvir.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drcoshrut $(srcdir)/renvir.c &&$(RLD) renvir.o $(RLD_O) $@
-rtanhrut.o:renvir.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drtanhrut $(srcdir)/renvir.c &&$(RLD) renvir.o $(RLD_O) $@
-rlnrut.o:renvir.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drlnrut $(srcdir)/renvir.c &&$(RLD) renvir.o $(RLD_O) $@
-rlog10rut.o:renvir.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drlog10rut $(srcdir)/renvir.c &&$(RLD) renvir.o $(RLD_O) $@
-rexprut.o:renvir.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drexprut $(srcdir)/renvir.c &&$(RLD) renvir.o $(RLD_O) $@
-rcotanrut.o:renvir.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drcotanrut $(srcdir)/renvir.c &&$(RLD) renvir.o $(RLD_O) $@
-raddepsrut.o:renvir.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Draddepsilonrut $(srcdir)/renvir.c &&$(RLD) renvir.o $(RLD_O) $@
-rsubepsrut.o:renvir.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drsubepsilonrut $(srcdir)/renvir.c &&$(RLD) renvir.o $(RLD_O) $@
-rabsrrut.o:renvir.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drabsrrut $(srcdir)/renvir.c &&$(RLD) renvir.o $(RLD_O) $@
-rabsirut.o:renvir.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drabsirut $(srcdir)/renvir.c &&$(RLD) renvir.o $(RLD_O) $@
-rmintrut.o:renvir.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drmintrut $(srcdir)/renvir.c &&$(RLD) renvir.o $(RLD_O) $@
-rmincrut.o:renvir.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drmincrut $(srcdir)/renvir.c &&$(RLD) renvir.o $(RLD_O) $@
-rminrrut.o:renvir.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drminrrut $(srcdir)/renvir.c &&$(RLD) renvir.o $(RLD_O) $@
-rminirut.o:renvir.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drminirut $(srcdir)/renvir.c &&$(RLD) renvir.o $(RLD_O) $@
-rmaxtrut.o:renvir.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drmaxtrut $(srcdir)/renvir.c &&$(RLD) renvir.o $(RLD_O) $@
-rmaxcrut.o:renvir.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drmaxcrut $(srcdir)/renvir.c &&$(RLD) renvir.o $(RLD_O) $@
-rmaxrrut.o:renvir.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drmaxrrut $(srcdir)/renvir.c &&$(RLD) renvir.o $(RLD_O) $@
-rmaxirut.o:renvir.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drmaxirut $(srcdir)/renvir.c &&$(RLD) renvir.o $(RLD_O) $@
-rsimidrut.o:renvir.c cim.h config.h version.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drsimulaidrut $(srcdir)/renvir.c &&$(RLD) renvir.o $(RLD_O) $@
-rdatetimrut.o:renvir.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drdatetimerut $(srcdir)/renvir.c &&$(RLD) renvir.o $(RLD_O) $@
-rcputimerut.o:renvir.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drcputimerut $(srcdir)/renvir.c &&$(RLD) renvir.o $(RLD_O) $@
-rclcktimrut.o:renvir.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drclocktimerut $(srcdir)/renvir.c &&$(RLD) renvir.o $(RLD_O) $@
-rlowbourut.o:renvir.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drlowerboundrut $(srcdir)/renvir.c &&$(RLD) renvir.o $(RLD_O) $@
-ruppbourut.o:renvir.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drupperboundrut $(srcdir)/renvir.c &&$(RLD) renvir.o $(RLD_O) $@
-rdrawrut.o:renvir.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drdrawrut $(srcdir)/renvir.c &&$(RLD) renvir.o $(RLD_O) $@
-rrandintrut.o:renvir.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drrandintrut $(srcdir)/renvir.c &&$(RLD) renvir.o $(RLD_O) $@
-runiformrut.o:renvir.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Druniformrut $(srcdir)/renvir.c &&$(RLD) renvir.o $(RLD_O) $@
-rnormalrut.o:renvir.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drnormalrut $(srcdir)/renvir.c &&$(RLD) renvir.o $(RLD_O) $@
-rnegexprut.o:renvir.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drnegexprut $(srcdir)/renvir.c &&$(RLD) renvir.o $(RLD_O) $@
-rpoissonrut.o:renvir.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drpoissonrut $(srcdir)/renvir.c &&$(RLD) renvir.o $(RLD_O) $@
-rerlangrut.o:renvir.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drerlangrut $(srcdir)/renvir.c &&$(RLD) renvir.o $(RLD_O) $@
-rdiscrrut.o:renvir.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drdiscreterut $(srcdir)/renvir.c &&$(RLD) renvir.o $(RLD_O) $@
-rlinearrut.o:renvir.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drlinearrut $(srcdir)/renvir.c &&$(RLD) renvir.o $(RLD_O) $@
-rhistdrut.o:renvir.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drhistdrut $(srcdir)/renvir.c &&$(RLD) renvir.o $(RLD_O) $@
-rhistorut.o:renvir.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drhistorut $(srcdir)/renvir.c &&$(RLD) renvir.o $(RLD_O) $@
-rterrorrut.o:renvir.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drterrorrut $(srcdir)/renvir.c &&$(RLD) renvir.o $(RLD_O) $@
-
-rcharrut.o:rtextutl.c cim.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drcharrut $(srcdir)/rtextutl.c &&$(RLD) rtextutl.o $(RLD_O) $@
-risocharrut.o:rtextutl.c cim.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drisocharrut $(srcdir)/rtextutl.c &&$(RLD) rtextutl.o $(RLD_O) $@
-rrankrut.o:rtextutl.c cim.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drrankrut $(srcdir)/rtextutl.c &&$(RLD) rtextutl.o $(RLD_O) $@
-risorankrut.o:rtextutl.c cim.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drisorankrut $(srcdir)/rtextutl.c &&$(RLD) rtextutl.o $(RLD_O) $@
-rdigitrut.o:rtextutl.c cim.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drdigitrut $(srcdir)/rtextutl.c &&$(RLD) rtextutl.o $(RLD_O) $@
-rletterrut.o:rtextutl.c cim.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drletterrut $(srcdir)/rtextutl.c &&$(RLD) rtextutl.o $(RLD_O) $@
-rlowtenrut.o:rtextutl.c cim.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drlowtenrut $(srcdir)/rtextutl.c &&$(RLD) rtextutl.o $(RLD_O) $@
-rdecmrkrut.o:rtextutl.c cim.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drdecimalmarkrut $(srcdir)/rtextutl.c &&$(RLD) rtextutl.o $(RLD_O) $@
-rupcaserut.o:rtextutl.c cim.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drupcaserut $(srcdir)/rtextutl.c &&$(RLD) rtextutl.o $(RLD_O) $@
-rlowcaserut.o:rtextutl.c cim.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drlowcaserut $(srcdir)/rtextutl.c &&$(RLD) rtextutl.o $(RLD_O) $@
-
-rcpytxtcrut.o:rcproc.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drcopytexttocrut $(srcdir)/rcproc.c &&$(RLD) rcproc.o $(RLD_O) $@
-rcpyarrcrut.o:rcproc.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drcopyarrtocrut $(srcdir)/rcproc.c &&$(RLD) rcproc.o $(RLD_O) $@
-radofchrut.o:rcproc.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Draddroffirstcharrut $(srcdir)/rcproc.c &&$(RLD) rcproc.o $(RLD_O) $@
-radofelrut.o:rcproc.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Draddroffirstelemrut $(srcdir)/rcproc.c &&$(RLD) rcproc.o $(RLD_O) $@
-rcptxtacrut.o:rcproc.c cim.h config.h
-	$(RCC) $(ALL_RCFLAGS) -c -Drcopytextarrtocrut $(srcdir)/rcproc.c &&$(RLD) rcproc.o $(RLD_O) $@
-
-simulation.o simulation.atr: simulation.sim simset.o
-	if test -r ./simenvir.atr; then :; else \
-          if ln $(srcdir)/simenvir.atr .; then :; else \
-            cp -p $(srcdir)/simenvir.atr .; fi; fi
-	if test -r ./simfile.atr; then :; else \
-          if ln $(srcdir)/simfile.atr .; then :; else \
-            cp -p $(srcdir)/simfile.atr .; fi; fi
-	./cim $(CIMFLAGS) $(srcdir)/simulation
-
-simset.o simset.atr: simset.sim cim.h simfile.atr simenvir.atr cim
-	if test -r ./simenvir.atr; then :; else \
-          if ln $(srcdir)/simenvir.atr .; then :; else \
-            cp -p $(srcdir)/simenvir.atr .; fi; fi
-	if test -r ./simfile.atr; then :; else \
-          if ln $(srcdir)/simfile.atr .; then :; else \
-            cp -p $(srcdir)/simfile.atr .; fi; fi
-	./cim $(CIMFLAGS) $(srcdir)/simset
-
-cim: csimula.o cnavn.o cfeil.o y.tab.o clex.o cdekl.o csjekker.o cgenstr.o cgen.o cgenexp.o cgenpar.o cextspec.o getopt.o getopt1.o @ALLOCA@
-	$(CCC) $(CLDFLAGS) clex.o csimula.o cnavn.o cfeil.o y.tab.o cdekl.o csjekker.o cgenstr.o cgen.o cgenexp.o cgenpar.o cextspec.o getopt.o getopt1.o @ALLOCA@ $(CLIBS)
-	rm -f cim cim.exe
-	if ln a.out cim; then :; else \
-          if cp -p a.out cim; then :; else \
-             cp a.exe cim.exe; fi; fi
-	rm -f a.out a.exe
-
-csimula.o: csimula.c cextern.h cconst.h cnavn.h config.h version.h
-	$(CCC) $(ALL_CCFLAGS) -c $(srcdir)/csimula.c
-
-cnavn.o: cnavn.c cdekl.h cextern.h cconst.h cnavn.h
-	$(CCC) $(ALL_CCFLAGS) -c $(srcdir)/cnavn.c
-
-cfeil.o: cfeil.c cdekl.h cextern.h cconst.h config.h
-	$(CCC) $(ALL_CCFLAGS) -c $(srcdir)/cfeil.c
-
-clex.o:	clex.c cdekl.h cextern.h cconst.h cmell.h $(srcdir)/y.tab.c cnavn.h
-	$(CCC) $(ALL_CCFLAGS) -c $(srcdir)/clex.c
-
-y.tab.o: $(srcdir)/y.tab.c cmell.h cdekl.h cextern.h cconst.h
-	$(CCC) $(CPARFLAGS) $(ALL_CCFLAGS) -c $(srcdir)/y.tab.c
-
-$(srcdir)/y.tab.c: cparser.y
-	cd $(srcdir); $(yacc) -d cparser.y
-
-cdekl.o:cdekl.c cdekl.h cextern.h cconst.h 
-	$(CCC) $(ALL_CCFLAGS) -c $(srcdir)/cdekl.c
-
-csjekker.o: csjekker.c cmell.h cdekl.h cextern.h cconst.h
-	$(CCC) $(ALL_CCFLAGS) -c $(srcdir)/csjekker.c
-
-cgenstr.o: cgenstr.c cconst.h cdekl.h 
-	$(CCC) $(ALL_CCFLAGS) -c $(srcdir)/cgenstr.c
-
-cgen.o:	cgen.c cmell.h csjekker.h cdekl.h cextern.h cconst.h cgen.h 
-	$(CCC) $(ALL_CCFLAGS) -c $(srcdir)/cgen.c
-
-cgenexp.o: cgenexp.c cmell.h csjekker.h cdekl.h cextern.h cconst.h cgen.h config.h config.h
-	$(CCC) $(ALL_CCFLAGS) -c $(srcdir)/cgenexp.c
-
-cgenpar.o: cgenpar.c cmell.h csjekker.h cdekl.h cextern.h cconst.h cgen.h
-	$(CCC) $(ALL_CCFLAGS) -c $(srcdir)/cgenpar.c
-
-cextspec.o: cextspec.c cdekl.h cextern.h cconst.h
-	$(CCC) $(ALL_CCFLAGS) -c $(srcdir)/cextspec.c
-
-getopt.o: getopt.c
-	$(CCC) $(ALL_CCFLAGS) -c $(srcdir)/getopt.c
-
-getopt1.o: getopt1.c
-	$(CCC) $(ALL_CCFLAGS) -c $(srcdir)/getopt1.c
-
-alloca.o: alloca.c config.h
-	$(CCC) $(ALL_CCFLAGS) -c $(srcdir)/alloca.c
-
-install: install-bin install-include install-lib install-man install-doc install-info
-
-install-bin: installdirs cim
-	if $(INSTALL_PROGRAM) cim $(bindir)/`echo cim|sed '$(transform)'`; \
-        then :; else \
-          $(INSTALL_PROGRAM) cim.exe $(bindir)/`echo cim|sed '$(transform)'`.exe; fi
-	- $(INSTALL_PROGRAM) cim2latex $(bindir)/`echo cim2latex|sed '$(transform)'`
-	- $(INSTALL_PROGRAM) cim2ps $(bindir)/`echo cim2ps|sed '$(transform)'`
-	- $(INSTALL_PROGRAM) cimindent $(bindir)/`echo simindent|sed '$(transform)'`
-	- $(INSTALL_PROGRAM) cimetags $(bindir)/`echo cimetags|sed '$(transform)'`
-
-install-lib: installdirs libcim.a uninstalloldlib
-	$(INSTALL_DATA) libcim.a $(libdir)/libcim.a
-	- if test "$(ranlib)" = ":" ; then :; else \
-            $(ranlib) $(libdir)/libcim.a; fi;
-	if test "" = "$(LIBDEPENDDATAFILES)"; then \
-          $(INSTALL_DATA) $(srcdir)/libcim.atr $(libdir)/libcim.atr; else :; fi
-
-install-include: installdirs cim.h
-	$(INSTALL_DATA) $(srcdir)/cim.h $(includedir)/cim.h
-
-install-man: installdirs cim.1
-	- $(INSTALL_DATA) $(srcdir)/cim.1 $(mandir)/cim.$(manext)
-
-install-doc: installdirs cim.ps
-	- $(INSTALL_DATA) $(srcdir)/cim.ps $(docdir)/cim.ps
-
-install-info: installdirs info
-	- $(INSTALL_DATA) $(srcdir)/cim.info $(infodir)/cim.info
-
-installdirs:
-	- $(srcdir)/mkinstalldirs $(includedir) $(bindir) $(mandir) $(docdir) $(libdir) $(infodir)
-
-chowninstall:
-	chown $(INSTALL_USER) $(bindir)/`echo cim|sed '$(transform)'`
-	chown $(INSTALL_USER) $(bindir)/`echo cim2latex|sed '$(transform)'`
-	chown $(INSTALL_USER) $(bindir)/`echo cim2ps|sed '$(transform)'`
-	chown $(INSTALL_USER) $(bindir)/`echo cimindent|sed '$(transform)'`
-	chown $(INSTALL_USER) $(bindir)/`echo cimetags|sed '$(transform)'`
-	chown $(INSTALL_USER) $(libdir)/libcim.a
-	if test "" = "$(LIBDEPENDDATAFILES)" ; then \
-          chown $(INSTALL_USER) $(libdir)/libcim.atr; else :; fi
-	chown $(INSTALL_USER) $(includedir)/cim.h
-	- chown $(INSTALL_USER) $(mandir)/cim.$(manext)
-	- chown $(INSTALL_USER) $(docdir)/cim.ps
-	- chown $(INSTALL_USER) $(infodir)/cim.info
-
-uninstall:
-	cd $(bindir); rm -f `echo cim|sed '$(transform)'`
-	cd $(bindir); rm -f `echo cim2latex|sed '$(transform)'`
-	cd $(bindir); rm -f `echo cim2ps|sed '$(transform)'`
-	cd $(bindir); rm -f `echo cimindent|sed '$(transform)'`
-	cd $(bindir); rm -f `echo cimetags|sed '$(transform)'`
-	cd $(libdir); rm -f libcim.a
-	if test "" = "$(LIBDEPENDDATAFILES)" ; then \
-          cd $(libdir); rm -f libcim.atr; else :; fi
-	cd $(includedir); rm -f cim.h
-	cd $(mandir); rm -f cim.$(manext)
-	cd $(docdir); rm -f cim.ps
-	cd $(infodir) rm -f cim.info
-
-uninstalloldlib:
-	cd $(oldlibdir); rm -f libcim.a
-
-check:
-	./cim $(CIMFLAGS) $(srcdir)/test -r
-
-installcheck:
-	rm -rf tmptest
-	mkdir tmptest;
-	if ln $(srcdir)/test.sim tmptest/.; then :; else \
-          cp -p $(srcdir)/test.sim tmptest/.; fi
-	cd tmptest; $(bindir)/cim test -r
-	rm -rf tmptest
-
-Makefile: Makefile.in config.status
-	$(SHELL) config.status
+config.status: $(srcdir)/configure
+	$(SHELL) ./config.status --recheck
+$(srcdir)/configure: $(srcdir)/configure.in $(ACLOCAL_M4) $(CONFIGURE_DEPENDENCIES)
+	cd $(srcdir) && $(AUTOCONF)
 
 config.h: stamp-h
-stamp-h: config.h.in config.status
-	$(SHELL) config.status
+stamp-h: $(srcdir)/config.h.in $(top_builddir)/config.status
+	cd $(top_builddir) \
+	  && CONFIG_FILES= CONFIG_HEADERS=config.h \
+	     $(SHELL) ./config.status
+	@echo timestamp > stamp-h
+$(srcdir)/config.h.in: $(srcdir)/stamp-h.in
+$(srcdir)/stamp-h.in: $(top_srcdir)/configure.in $(ACLOCAL_M4) acconfig.h
+	cd $(top_srcdir) && $(AUTOHEADER)
+	@echo timestamp > $(srcdir)/stamp-h.in
 
-config.status: $(srcdir)/configure version.h
-	$(SHELL) config.status --recheck
+mostlyclean-hdr:
 
-$(srcdir)/configure: configure.in
-	cd $(srcdir); autoconf
+clean-hdr:
 
-mostlyclean:
-	rm -f cim simset.atr simset.c simset.h
-	rm -f simulation.atr simulation.c simulation.h
-	rm -f *.o core
+distclean-hdr:
+	rm -f config.h
 
-clean: mostlyclean
-	rm -f libcim.a
+maintainer-clean-hdr:
 
-distclean: clean
-	rm -f Makefile config.status config.h
+# This directory's subdirectories are mostly independent; you can cd
+# into them and run `make' without going through this Makefile.
+# To change the values of `make' variables: instead of editing Makefiles,
+# (1) if the variable is set in `config.status', edit `config.status'
+#     (which will cause the Makefiles to be regenerated when you run `make');
+# (2) otherwise, pass the desired values on the `make' command line.
 
-realclean: distclean
-	rm -f y.tab.c y.tab.h
-	rm -f TAGS cim.dvi cim.ps libcim.atr
+@SET_MAKE@
 
-TAGS:
-	etags c*.c r*.c c*.h dad.h limit.h Makefile.in configure.in \
-          config.h.in cparser.y
+all-recursive install-data-recursive install-exec-recursive \
+installdirs-recursive install-recursive uninstall-recursive  \
+check-recursive installcheck-recursive info-recursive dvi-recursive:
+	@set fnord $(MAKEFLAGS); amf=$$2; \
+	for subdir in $(SUBDIRS); do \
+	  target=`echo $@ | sed s/-recursive//`; \
+	  echo "Making $$target in $$subdir"; \
+	  (cd $$subdir && $(MAKE) $$target) \
+	   || case "$$amf" in *=*) exit 1;; *k*) fail=yes;; *) exit 1;; esac; \
+	done && test -z "$$fail"
 
-$(srcdir)/cim.ps: $(srcdir)/cim.dvi
-	cd $(srcdir); dvips cim.dvi -o cim.ps
+mostlyclean-recursive clean-recursive distclean-recursive \
+maintainer-clean-recursive:
+	@set fnord $(MAKEFLAGS); amf=$$2; \
+	rev=''; for subdir in $(SUBDIRS); do rev="$$rev $$subdir"; done; \
+	for subdir in $$rev; do \
+	  target=`echo $@ | sed s/-recursive//`; \
+	  echo "Making $$target in $$subdir"; \
+	  (cd $$subdir && $(MAKE) $$target) \
+	   || case "$$amf" in *=*) exit 1;; *k*) fail=yes;; *) exit 1;; esac; \
+	done && test -z "$$fail"
+tags-recursive:
+	list='$(SUBDIRS)'; for subdir in $$list; do \
+	  (cd $$subdir && $(MAKE) tags); \
+	done
 
-info: $(srcdir)/cim.info 
+tags: TAGS
 
-$(srcdir)/cim.info: cim.texi
-	cd $(srcdir); $(MAKEINFO) cim.texi --output=cim.info
+ID: $(HEADERS) $(SOURCES)
+	here=`pwd` && cd $(srcdir) && mkid -f$$here/ID $(SOURCES) $(HEADERS)
 
-dvi: $(srcdir)/cim.dvi
+TAGS: tags-recursive $(HEADERS) $(SOURCES) config.h.in $(TAGS_DEPENDENCIES)
+	tags=; \
+	here=`pwd`; \
+	list='$(SUBDIRS)'; for subdir in $$list; do \
+	  test -f $$subdir/TAGS && tags="$$tags -i $$here/$$subdir/TAGS"; \
+	done; \
+	test -z "$(ETAGS_ARGS)config.h.in$(SOURCES)$(HEADERS)$$tags" \
+	  || (cd $(srcdir) && etags $(ETAGS_ARGS) $$tags config.h.in $(SOURCES) $(HEADERS) -o $$here/TAGS)
 
-$(srcdir)/cim.dvi: cim.texi
-	cd $(srcdir); $(TEXI2DVI) cim.texi
+mostlyclean-tags:
 
-libcim.atr: $(LIBDEPENDDATAFILES)
-	if test -r simset.sim; then :; else \
-          if ln $(srcdir)/simset.sim .; then :; else \
-            cp -p $(srcdir)/simset.sim .; fi; fi
-	if test -r simulation.sim; then :; else \
-          if ln $(srcdir)/simulation.sim .; then :; else \
-            cp -p $(srcdir)/simulation.sim .; fi; fi
-	$(ar) libcim.atr $(LIBDEPENDDATAFILES)
+clean-tags:
 
-dist: Makefile $(DISTFILES)
-	rm -rf $(SIMID)
-	mkdir $(SIMID)
-	for file in $(DISTFILES); do \
-          if ln $$file $(SIMID); then :; else \
-            cp -p $$file $(SIMID); fi; \
-        done
-	chmod ugo=rwx $(SIMID)
-	chmod ugo+r $(SIMID)/*
-	$(tar) $(SIMID).tar $(SIMID)
-	$(compress) $(SIMID).tar
-	rm -rf $(SIMID)
+distclean-tags:
+	rm -f TAGS ID
 
-ftp: dist
-	mv $(SIMID).tar.gz ../ftp/.
-	chmod a=r ../ftp/$(SIMID).tar.gz
-	zcat ../ftp/$(OLDID).tar.gz |tar xf -
-	zcat ../ftp/$(SIMID).tar.gz |tar xf -
-	- diff $(OLDID) $(SIMID) >../ftp/$(OLDID)-$(SIMID).diff
-	rm -fr $(OLDID) $(SIMID)
-	$(compress) ../ftp/$(OLDID)-$(SIMID).diff
-	chmod a=r ../ftp/$(OLDID)-$(SIMID).diff.gz
+maintainer-clean-tags:
 
-# Prevent GNU make v3 from overflowing arg limit on SysV.
+distdir = $(PACKAGE)-$(VERSION)
+top_distdir = $(distdir)
+
+# This target untars the dist file and tries a VPATH configuration.  Then
+# it guarantees that the distribution is self-contained by making another
+# tarfile.
+distcheck: dist
+	rm -rf $(distdir)
+	GZIP=$(GZIP) $(TAR) zxf $(distdir).tar.gz
+	mkdir $(distdir)/=build
+	mkdir $(distdir)/=inst
+	dc_install_base=`cd $(distdir)/=inst && pwd`; \
+	cd $(distdir)/=build \
+	  && ../configure --srcdir=.. --prefix=$$dc_install_base \
+	  && $(MAKE) \
+	  && $(MAKE) dvi \
+	  && $(MAKE) check \
+	  && $(MAKE) install \
+	  && $(MAKE) installcheck \
+	  && $(MAKE) dist
+	rm -rf $(distdir)
+	@echo "========================"; \
+	echo "$(distdir).tar.gz is ready for distribution"; \
+	echo "========================"
+dist: distdir
+	-chmod -R a+r $(distdir)
+	GZIP=$(GZIP) $(TAR) chozf $(distdir).tar.gz $(distdir)
+	rm -rf $(distdir)
+dist-all: distdir
+	-chmod -R a+r $(distdir)
+	GZIP=$(GZIP) $(TAR) chozf $(distdir).tar.gz $(distdir)
+	rm -rf $(distdir)
+distdir: $(DISTFILES)
+	rm -rf $(distdir)
+	mkdir $(distdir)
+	-chmod 777 $(distdir)
+	@for file in $(DISTFILES); do \
+	  d=$(srcdir); \
+	  test -f $(distdir)/$$file \
+	  || ln $$d/$$file $(distdir)/$$file 2> /dev/null \
+	  || cp -p $$d/$$file $(distdir)/$$file; \
+	done
+	for subdir in $(SUBDIRS); do		\
+	  test -d $(distdir)/$$subdir		\
+	  || mkdir $(distdir)/$$subdir		\
+	  || exit 1;				\
+	  chmod 777 $(distdir)/$$subdir;	\
+	  (cd $$subdir && $(MAKE) top_distdir=../$(top_distdir) distdir=../$(distdir)/$$subdir distdir) \
+	    || exit 1; \
+	done
+info: info-recursive
+dvi: dvi-recursive
+check: all-am
+	$(MAKE) check-recursive
+installcheck: installcheck-recursive
+all-recursive-am: config.h
+	$(MAKE) all-recursive
+
+all-am: Makefile $(HEADERS) config.h
+
+install-exec: install-exec-recursive
+	@$(NORMAL_INSTALL)
+
+install-data: install-data-recursive
+	@$(NORMAL_INSTALL)
+
+install: install-recursive
+	@:
+
+uninstall: uninstall-recursive
+
+all: all-recursive-am all-am
+
+install-strip:
+	$(MAKE) INSTALL_PROGRAM='$(INSTALL_PROGRAM) -s' INSTALL_SCRIPT='$(INSTALL_PROGRAM)' install
+installdirs: installdirs-recursive
+
+
+mostlyclean-generic:
+	test -z "$(MOSTLYCLEANFILES)" || rm -f $(MOSTLYCLEANFILES)
+
+clean-generic:
+	test -z "$(CLEANFILES)" || rm -f $(CLEANFILES)
+
+distclean-generic:
+	rm -f Makefile $(DISTCLEANFILES)
+	rm -f config.cache config.log stamp-h stamp-h[0-9]*
+	test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
+
+maintainer-clean-generic:
+	test -z "$(MAINTAINERCLEANFILES)" || rm -f $(MAINTAINERCLEANFILES)
+	test -z "$(BUILT_SOURCES)" || rm -f $(BUILT_SOURCES)
+mostlyclean-am:  mostlyclean-hdr mostlyclean-tags mostlyclean-generic
+
+clean-am:  clean-hdr clean-tags clean-generic mostlyclean-am
+
+distclean-am:  distclean-hdr distclean-tags distclean-generic clean-am
+
+maintainer-clean-am:  maintainer-clean-hdr maintainer-clean-tags \
+		maintainer-clean-generic distclean-am
+
+mostlyclean:  mostlyclean-recursive mostlyclean-am
+
+clean:  clean-recursive clean-am
+
+distclean:  distclean-recursive distclean-am
+	rm -f config.status
+	rm -f libtool
+
+maintainer-clean:  maintainer-clean-recursive maintainer-clean-am
+	@echo "This command is intended for maintainers to use;"
+	@echo "it deletes files that may require special tools to rebuild."
+	rm -f config.status
+
+.PHONY: default mostlyclean-hdr distclean-hdr clean-hdr \
+maintainer-clean-hdr install-data-recursive uninstall-data-recursive \
+install-exec-recursive uninstall-exec-recursive installdirs-recursive \
+uninstalldirs-recursive all-recursive check-recursive \
+installcheck-recursive info-recursive dvi-recursive \
+mostlyclean-recursive distclean-recursive clean-recursive \
+maintainer-clean-recursive tags tags-recursive mostlyclean-tags \
+distclean-tags clean-tags maintainer-clean-tags distdir info dvi \
+installcheck all-recursive-am all-am install-exec install-data install \
+uninstall all installdirs mostlyclean-generic distclean-generic \
+clean-generic maintainer-clean-generic clean mostlyclean distclean \
+maintainer-clean
+
+
+# Tell versions [3.59,3.63) of GNU make to not export all variables.
+# Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:
