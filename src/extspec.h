@@ -25,7 +25,8 @@ struct stamp
   };
 
 void gettimestamp ();
-void initExtspec ();
+extern extspec_init ();
+extern extspec_reinit ();
 extern char *directive_timestamp;
 extern char *timestamp;
 extern lesinn_external_spec ();

@@ -108,9 +108,6 @@
 /* Define version string */
 #undef PACKAGE_VERSION
 
-/* Define version string */
-#undef PACKAGE
-
 /* Define if ISO_LATIN is implemented.  */
 #define ISO_LATIN 1
 
@@ -225,6 +222,13 @@
 
 /* Define if you have the m library (-lm).  */
 #undef HAVE_LIBM
+
+/* Name of package */
+#undef PACKAGE
+
+/* Version number of package */
+#undef VERSION
+
 
 /* Define the adress of the first data location.  */
 #define FIRST_DATA_LOCATION ((int)(&__start_data_segment))

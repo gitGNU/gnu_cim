@@ -19,19 +19,20 @@
 
 bin_PROGRAMS = cim
 
-cim_SOURCES = error.c genpar.c name.c dekl.c genline.c genstr.c \
-              extspec.c transcall.c genexp.c lex.c getopt1.c \
+cim_SOURCES = error.c pargen.c name.c dekl.c linegen.c strgen.c \
+              extspec.c transcall.c expgen.c lex.c getopt1.c \
               getopt.c parser.y filelist.c newstr.c cimcomp.c \
               mellbuilder.c expbuilder.c sentbuilder.c sentchecker.c \
               expchecker.c computeconst.c sentgen.c obstack.c \
-              mapline.c senttrans.c
+              mapline.c senttrans.c salloc.c passes.c dump.c
 
 cim_LDADD = @ALLOCA@
 
 noinst_HEADERS = cimcomp.h const.h dekl.h gen.h name.h error.h \
                  getopt.h parser.h filelist.h newstr.h lex.h \
                  extspec.h mellbuilder.h builder.h checker.h \
-                 obstack.h mapline.h expmacros.h trans.h
+                 obstack.h mapline.h expmacros.h trans.h salloc.h \
+                 passes.h dump.h
 
 YFLAGS= -d
 

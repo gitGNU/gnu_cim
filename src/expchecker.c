@@ -51,67 +51,68 @@ static struct DECL *varargscharvar;
 static struct DECL *varargstextvalue;
 static struct DECL *varargs;
 
-void expCheckerInit ()
+void 
+exp_checker_init_pass2 ()
 {
-  absfunction = findGlobal (tag ("ABS"), TRUE);
-  minfunction = findGlobal (tag ("MIN"), TRUE);
-  maxfunction = findGlobal (tag ("MAX"), TRUE);
-  absfunctionr = findGlobal (tag ("ABS*R"), TRUE);
-  absfunctioni = findGlobal (tag ("ABS*I"), TRUE);
-  minfunctiont = findGlobal (tag ("MIN*T"), TRUE);
-  minfunctionc = findGlobal (tag ("MIN*C"), TRUE);
-  minfunctionr = findGlobal (tag ("MIN*R"), TRUE);
-  minfunctioni = findGlobal (tag ("MIN*I"), TRUE);
-  maxfunctiont = findGlobal (tag ("MAX*T"), TRUE);
-  maxfunctionc = findGlobal (tag ("MAX*C"), TRUE);
-  maxfunctionr = findGlobal (tag ("MAX*R"), TRUE);
-  maxfunctioni = findGlobal (tag ("MAX*I"), TRUE);
-  signfunction = findGlobal (tag ("SIGN"), TRUE);
-  signfunctionr = findGlobal (tag ("SIGN*R"), TRUE);
-  signfunctioni = findGlobal (tag ("SIGN*I"), TRUE);
-  sourcelinefunction = findGlobal (tag ("SOURCELINE"), TRUE);
+  absfunction = find_global (tag ("ABS"), TRUE);
+  minfunction = find_global (tag ("MIN"), TRUE);
+  maxfunction = find_global (tag ("MAX"), TRUE);
+  absfunctionr = find_global (tag ("ABS*R"), TRUE);
+  absfunctioni = find_global (tag ("ABS*I"), TRUE);
+  minfunctiont = find_global (tag ("MIN*T"), TRUE);
+  minfunctionc = find_global (tag ("MIN*C"), TRUE);
+  minfunctionr = find_global (tag ("MIN*R"), TRUE);
+  minfunctioni = find_global (tag ("MIN*I"), TRUE);
+  maxfunctiont = find_global (tag ("MAX*T"), TRUE);
+  maxfunctionc = find_global (tag ("MAX*C"), TRUE);
+  maxfunctionr = find_global (tag ("MAX*R"), TRUE);
+  maxfunctioni = find_global (tag ("MAX*I"), TRUE);
+  signfunction = find_global (tag ("SIGN"), TRUE);
+  signfunctionr = find_global (tag ("SIGN*R"), TRUE);
+  signfunctioni = find_global (tag ("SIGN*I"), TRUE);
+  sourcelinefunction = find_global (tag ("SOURCELINE"), TRUE);
 
-  varargsint = newDecl ();
+  varargsint = new_decl ();
   varargsint->type = TINTG;
   varargsint->kind = KSIMPLE;
   varargsint->categ = CDEFLT;
 
-  varargsreal = newDecl ();
+  varargsreal = new_decl ();
   varargsreal->type = TREAL;
   varargsreal->kind = KSIMPLE;
   varargsreal->categ = CDEFLT;
 
-  varargschar = newDecl ();
+  varargschar = new_decl ();
   varargschar->type = TCHAR;
   varargschar->kind = KSIMPLE;
   varargschar->categ = CDEFLT;
 
-  varargstext = newDecl ();
+  varargstext = new_decl ();
   varargstext->type = TTEXT;
   varargstext->kind = KSIMPLE;
   varargstext->categ = CDEFLT;
 
-  varargsintvar = newDecl ();
+  varargsintvar = new_decl ();
   varargsintvar->type = TINTG;
   varargsintvar->kind = KSIMPLE;
   varargsintvar->categ = CVAR;
 
-  varargsrealvar = newDecl ();
+  varargsrealvar = new_decl ();
   varargsrealvar->type = TREAL;
   varargsrealvar->kind = KSIMPLE;
   varargsrealvar->categ = CVAR;
 
-  varargscharvar = newDecl ();
+  varargscharvar = new_decl ();
   varargscharvar->type = TCHAR;
   varargscharvar->kind = KSIMPLE;
   varargscharvar->categ = CVAR;
 
-  varargstextvalue = newDecl ();
+  varargstextvalue = new_decl ();
   varargstextvalue->type = TTEXT;
   varargstextvalue->kind = KSIMPLE;
   varargstextvalue->categ = CVALUE;
 
-  varargs = newDecl ();
+  varargs = new_decl ();
   varargs->type = TNOTY;
   varargs->kind = KSIMPLE;
   varargs->categ = CDEFLT;
@@ -123,7 +124,8 @@ void expCheckerInit ()
 
 #define SERROR(melding) sserror(melding,re)
 
-static sserror (melding, re)
+static 
+sserror (melding, re)
      int melding;
      struct EXP *re;
 {
@@ -162,7 +164,8 @@ static sserror (melding, re)
                                                                 KONVTYPE     */
 
 /*VARARGS2 */
-static konvtype (re, type, qual)
+static 
+konvtype (re, type, qual)
      struct EXP **re;
      char type;
      struct DECL *qual;
@@ -224,7 +227,8 @@ static konvtype (re, type, qual)
 /******************************************************************************
                                                                 SAMETYPE     */
 
-static sametype (rel, rer)
+static 
+sametype (rel, rer)
      struct EXP **rel,
      **rer;
 {
@@ -237,7 +241,8 @@ static sametype (rel, rer)
 /******************************************************************************
                                                                ARGUMENTERROR */
 
-static argumenterror (melding, re)
+static 
+argumenterror (melding, re)
      int melding;
      struct EXP *re;
 {
@@ -258,27 +263,29 @@ static argumenterror (melding, re)
 /******************************************************************************
                                                                 SET_PARAM    */
 
-static set_param (re)
+static 
+set_param (re)
      struct EXP *re;
 {
-  re->right->rd = firstParam (re->rd);
+  re->right->rd = first_param (re->rd);
   {
     struct EXP *rex;
     for (rex = re->right; rex->token != MENDSEP; rex = rex->right)
       {
-	if (moreParam (rex->rd) == FALSE)
+	if (more_param (rex->rd) == FALSE)
 	  argumenterror (102, rex);
-	rex->right->rd = nextParam (rex->rd);
+	rex->right->rd = next_param (rex->rd);
       }
-    if (moreParam (rex->rd) == TRUE)
+    if (more_param (rex->rd) == TRUE)
       argumenterror (102, rex);
   }
 }
 
 /******************************************************************************
-                                                                EXPCHECK    */
+                                                                EXP_CHECK    */
 
-static expCheck (re)
+static 
+exp_check (re)
      struct EXP *re;
 {
 
@@ -287,10 +294,10 @@ static expCheck (re)
     {
     case MFOR:
     case MFORR:
-      expCheck (LEFT);
+      exp_check (LEFT);
       TYPE = LEFTTYPE;
       QUAL = LEFTQUAL;
-      expCheck (RIGHT);
+      exp_check (RIGHT);
       if (TYPE != RIGHTTYPE)
 	SERROR (86);
       else if (TOKEN == MFOR && TYPE == TREF)
@@ -314,8 +321,8 @@ static expCheck (re)
     case MBOUNDSEP:
       TYPE = UPTYPE;
       QUAL = UPQUAL;
-      expCheck (LEFT);
-      expCheck (RIGHT);
+      exp_check (LEFT);
+      exp_check (RIGHT);
       konvtype (&LEFT, TYPE, QUAL);
       TYPE = LEFTTYPE;
       if(TOKEN==MUNTIL && TYPE==TINTG && RIGHTTYPE==TREAL)
@@ -336,31 +343,31 @@ static expCheck (re)
       break;
     case MSWITCH:
       TYPE = TLABEL;
-      expCheck (LEFT);
+      exp_check (LEFT);
       TYPE = LEFTTYPE;
-      expCheck (RIGHT);
+      exp_check (RIGHT);
       TYPE = RIGHTTYPE;
       break;
     case MARRAY:
-      expCheck (LEFT);
+      exp_check (LEFT);
       localused = 0;
       TYPE = TINTG;
-      expCheck (RIGHT);
+      exp_check (RIGHT);
       if (localused)
 	SERROR (89);
       break;
     case MARRAYSEP:
       /* Forutsetter at venstre node er en identifier */
-      expCheck (RIGHT);
-      LEFTRD = findGlobal (LEFTVALUE.ident, FALSE);
+      exp_check (RIGHT);
+      LEFTRD = find_global (LEFTVALUE.ident, FALSE);
       if (LEFTRD->categ == CNEW)
 	SERROR (75);
       LEFTTYPE = LEFTRD->type;
       break;
     case MASSIGN:
     case MASSIGNR:
-      expCheck (LEFT);
-      expCheck (RIGHT);
+      exp_check (LEFT);
+      exp_check (RIGHT);
       TYPE = LEFTTYPE;
       if (UPTOKEN != MASSIGN && UPTOKEN != MASSIGNR
 	  && UPTOKEN != MENDASSIGN && UPTOKEN != MCONST)
@@ -391,11 +398,11 @@ static expCheck (re)
 	}
       break;
     case MLABEL:
-      RD = findGlobal (VALUE.ident, TRUE);
+      RD = find_global (VALUE.ident, TRUE);
       break;
     case MIFE:
-      expCheck (LEFT);
-      expCheck (RIGHT);
+      exp_check (LEFT);
+      exp_check (RIGHT);
       if (LEFTTYPE != TBOOL)
 	SERROR (77);
       else
@@ -403,8 +410,8 @@ static expCheck (re)
       QUAL = RIGHTQUAL;
       break;
     case MELSEE:
-      expCheck (LEFT);
-      expCheck (RIGHT);
+      exp_check (LEFT);
+      exp_check (RIGHT);
       sametype (&LEFT, &RIGHT);
       if (LEFTTYPE != RIGHTTYPE)
 	SERROR (92);
@@ -416,8 +423,8 @@ static expCheck (re)
 
       break;
     case MCONC:
-      expCheck (LEFT);
-      expCheck (RIGHT);
+      exp_check (LEFT);
+      exp_check (RIGHT);
       if (LEFTTYPE != TTEXT || RIGHTTYPE != TTEXT)
 	SERROR (109);
       else
@@ -429,15 +436,15 @@ static expCheck (re)
     case MIMP:
     case MOR:
     case MAND:
-      expCheck (LEFT);
-      expCheck (RIGHT);
+      exp_check (LEFT);
+      exp_check (RIGHT);
       if (LEFTTYPE != TBOOL || RIGHTTYPE != TBOOL)
 	SERROR (95);
       else
 	TYPE = TBOOL;
       break;
     case MNOT:
-      expCheck (LEFT);
+      exp_check (LEFT);
       if (LEFTTYPE != TBOOL)
 	SERROR (95);
       else
@@ -449,8 +456,8 @@ static expCheck (re)
     case MLE:
     case MGT:
     case MGE:
-      expCheck (LEFT);
-      expCheck (RIGHT);
+      exp_check (LEFT);
+      exp_check (RIGHT);
       sametype (&LEFT, &RIGHT);
       if (LEFTTYPE != RIGHTTYPE)
 	SERROR (96);
@@ -464,8 +471,8 @@ static expCheck (re)
       break;
     case MNER:
     case MEQR:
-      expCheck (LEFT);
-      expCheck (RIGHT);
+      exp_check (LEFT);
+      exp_check (RIGHT);
       if (LEFTTYPE != RIGHTTYPE)
 	SERROR (96);
       else if (LEFTTYPE != TREF && LEFTTYPE != TTEXT)
@@ -478,8 +485,8 @@ static expCheck (re)
     case MIS:
     case MINS:
       VALUE = RIGHTVALUE;
-      expCheck (LEFT);
-      RIGHTRD = RD = findGlobal (VALUE.ident, FALSE);
+      exp_check (LEFT);
+      RIGHTRD = RD = find_global (VALUE.ident, FALSE);
       if (RIGHTRD->categ == CNEW)
 	SERROR (75);
       if (LEFTTYPE != TREF)
@@ -496,7 +503,7 @@ static expCheck (re)
       break;
     case MUADD:
     case MUSUB:
-      expCheck (LEFT);
+      exp_check (LEFT);
       if (LEFTTYPE != TREAL && LEFTTYPE != TINTG)
 	SERROR (97);
       else if (LEFTTOKEN == MUADD || LEFTTOKEN == MUSUB)
@@ -509,8 +516,8 @@ static expCheck (re)
     case MADD:
     case MSUB:
     case MMUL:
-      expCheck (LEFT);
-      expCheck (RIGHT);
+      exp_check (LEFT);
+      exp_check (RIGHT);
       sametype (&LEFT, &RIGHT);
       TYPE = LEFTTYPE;
       if (LEFTTYPE != RIGHTTYPE ||
@@ -525,16 +532,16 @@ static expCheck (re)
       else
     case MDIV:
 	TYPE = TREAL;
-      expCheck (LEFT);
-      expCheck (RIGHT);
+      exp_check (LEFT);
+      exp_check (RIGHT);
       konvtype (&LEFT, TYPE);
       konvtype (&RIGHT, TYPE);
       if (LEFTTYPE != TYPE || RIGHTTYPE != TYPE)
 	SERROR (97);
       break;
     case MPRIMARY:
-      expCheck (LEFT);
-      expCheck (RIGHT);
+      exp_check (LEFT);
+      exp_check (RIGHT);
       TYPE = TREAL;
       if ((LEFTTYPE == TINTG || LEFTTYPE == TREAL) &&
 	  RIGHTTYPE == TREAL)
@@ -550,7 +557,7 @@ static expCheck (re)
 	SERROR (97);
       break;
     case MNOOP:
-      expCheck (LEFT);
+      exp_check (LEFT);
       TYPE = LEFTTYPE;
       QUAL = LEFTQUAL;
       break;
@@ -575,14 +582,14 @@ static expCheck (re)
       break;
     case MIDENTIFIER:
       if (UPTOKEN == MDOT && ISRIGHT)
-	RD = findLocal (VALUE.ident, UPQUAL, TRUE);
+	RD = find_local (VALUE.ident, UPQUAL, TRUE);
       else if (ISLEFT && (UPTOKEN == MASSIGN | UPTOKEN == MASSIGNR))
-	RD = findGlobal (VALUE.ident, FALSE);	/* Tilordning av
+	RD = find_global (VALUE.ident, FALSE);	/* Tilordning av
 						 * funksjons proc. */
       else if (UPTOKEN == MWHEN)
-	RD = findGlobal (VALUE.ident, FALSE);
+	RD = find_global (VALUE.ident, FALSE);
       else
-	RD = findGlobal (VALUE.ident, TRUE);
+	RD = find_global (VALUE.ident, TRUE);
       if (RD->categ == CNEW)
 	SERROR (75);
       SEENTHROUGH = seenthrough;
@@ -630,7 +637,7 @@ static expCheck (re)
 	      TOKEN = MPROCASSIGN;
 	    else
 	      SERROR (90);
-	  else if (moreParam (firstParam (RD)) == TRUE)
+	  else if (more_param (first_param (RD)) == TRUE)
 	    SERROR (107);
 	  else if (RD->kind == KPROC)
 	    TOKEN = MPROCARG;
@@ -643,6 +650,7 @@ static expCheck (re)
 	  RIGHTLEFT = NULL;
 	  RIGHTRD = NULL;
 	  RIGHTQUAL = NULL;
+	  RIGHT->up = re;
 	}
       else if (RD->categ == CCONST)
 	{
@@ -674,7 +682,7 @@ static expCheck (re)
 	} 
       break;
     case MTHIS:
-      RD = regThis (VALUE.ident);
+      RD = reg_this (VALUE.ident);
       if (RD->categ == CNEW)
 	SERROR (75);
       TYPE = TREF;
@@ -684,7 +692,7 @@ static expCheck (re)
 	SERROR (99);
       break;
     case MDOT:
-      expCheck (LEFT);
+      exp_check (LEFT);
       TYPE = LEFTTYPE;
       QUAL = LEFTQUAL;
       VALUE = LEFTVALUE;
@@ -702,7 +710,7 @@ static expCheck (re)
       if (RIGHTTOKEN != MIDENTIFIER && RIGHTTOKEN != MARGUMENT
 	  && RIGHTTOKEN != MARRAYARG && RIGHTTOKEN != MPROCARG)
 	SERROR (116);
-      expCheck (RIGHT);
+      exp_check (RIGHT);
       if (LEFTTYPE == TREF && RIGHTTYPE == TREF &&
 	  LEFTQUAL->descr->blev < RIGHTQUAL->descr->blev)
 	SERROR (117);
@@ -714,7 +722,7 @@ static expCheck (re)
 	SERROR (8);
       break;
     case MNEWARG:
-      RD = findGlobal (VALUE.ident, FALSE);
+      RD = find_global (VALUE.ident, FALSE);
       if (RD->categ == CNEW)
 	SERROR (75);
       TYPE = TREF;
@@ -722,13 +730,13 @@ static expCheck (re)
       if (RD->kind != KCLASS)
 	SERROR (99);
       set_param (re);
-      expCheck (RIGHT);
+      exp_check (RIGHT);
       if (RIGHTTYPE == TERROR)
 	TYPE = TERROR;
       break;
     case MQUA:
-      expCheck (LEFT);
-      QUAL = findGlobal (VALUE.ident, FALSE);
+      exp_check (LEFT);
+      QUAL = find_global (VALUE.ident, FALSE);
       if (QUAL->categ == CNEW)
 	SERROR (75);
       TYPE = LEFTTYPE;
@@ -747,9 +755,9 @@ static expCheck (re)
       break;
     case MARGUMENT:
       if (UPTOKEN == MDOT && ISRIGHT)
-	RD = findLocal (VALUE.ident, UPQUAL, TRUE);
+	RD = find_local (VALUE.ident, UPQUAL, TRUE);
       else
-	RD = findGlobal (VALUE.ident, TRUE);
+	RD = find_global (VALUE.ident, TRUE);
       if (RD->categ == CNEW)
 	SERROR (75);
       SEENTHROUGH = seenthrough;
@@ -763,7 +771,7 @@ static expCheck (re)
       else
 	SERROR (101);
       set_param (re);
-      expCheck (RIGHT);
+      exp_check (RIGHT);
       if (RIGHTTYPE == TERROR)
 	TYPE = TERROR;
       if (RD == absfunction)
@@ -774,7 +782,7 @@ static expCheck (re)
 	    RD = absfunctionr;
 	  TYPE = RD->type;
 	  set_param (re);
-	  expCheck (RIGHT);
+	  exp_check (RIGHT);
 	  if (RIGHTTYPE == TERROR)
 	    TYPE = TERROR;
 	}
@@ -786,7 +794,7 @@ static expCheck (re)
 	    RD = signfunctionr;
 	  TYPE = RD->type;
 	  set_param (re);
-	  expCheck (RIGHT);
+	  exp_check (RIGHT);
 	  if (RIGHTTYPE == TERROR)
 	    TYPE = TERROR;
 	}
@@ -802,7 +810,7 @@ static expCheck (re)
 	    RD = minfunctionr;
 	  TYPE = RD->type;
 	  set_param (re);
-	  expCheck (RIGHT);
+	  exp_check (RIGHT);
 	  if (RIGHTTYPE == TERROR)
 	    TYPE = TERROR;
 	}
@@ -818,7 +826,7 @@ static expCheck (re)
 	    RD = maxfunctionr;
 	  TYPE = RD->type;
 	  set_param (re);
-	  expCheck (RIGHT);
+	  exp_check (RIGHT);
 	  if (RIGHTTYPE == TERROR)
 	    TYPE = TERROR;
 	}
@@ -829,7 +837,7 @@ static expCheck (re)
       if (RD->type == TVARARGS)
 	{
 	  struct DECL *rdx;
-	  expCheck (LEFT);
+	  exp_check (LEFT);
 	  rdx = RD;
 	  if (RD->categ == CNAME || RD->categ == CVAR)
 	    {
@@ -870,11 +878,11 @@ static expCheck (re)
 				 * prosedyre */
 	  if (LEFTTOKEN == MDOT)
 	    {
-	      expCheck (LEFT->left);
+	      exp_check (LEFT->left);
 	      LEFTRIGHTQUAL = LEFTQUAL = LEFTLEFTQUAL;
 	      LEFTSEENTHROUGH = LEFTLEFTSEENTHROUGH;
 	      LEFTRIGHTRD = LEFTRD =
-		findLocal (LEFTRIGHTVALUE.ident, LEFTQUAL, TRUE);
+		find_local (LEFTRIGHTVALUE.ident, LEFTQUAL, TRUE);
 	      if (LEFTRD->categ == CNEW)
 		SERROR (75);
 	      if (LEFTRD->kind != RD->kind)
@@ -896,18 +904,18 @@ static expCheck (re)
 		      LEFTRD->categ == CCPROC)
 		    argumenterror (111, re);
 		  if (!subordinate (LEFTRD, RD)) argumenterror (112, re);
-		  if (!sameParam (RD->descr, LEFTRD->descr))
+		  if (!same_param (RD->descr, LEFTRD->descr))
 		    argumenterror (112, re);
 		}
 	    }
 	  else if (LEFTTOKEN != MIDENTIFIER)
 	    {
 	      argumenterror (103, re);
-	      expCheck (LEFT);
+	      exp_check (LEFT);
 	    }
 	  else
 	    {
-	      LEFTRD = findGlobal (LEFTVALUE.ident, TRUE);
+	      LEFTRD = find_global (LEFTVALUE.ident, TRUE);
 	      LEFTSEENTHROUGH = seenthrough;
 	      LEFTQUAL = LEFTRD->prefqual;
 	      if (LEFTRD->categ == CNEW)
@@ -931,14 +939,14 @@ static expCheck (re)
 		      LEFTRD->categ == CCPROC)
 		    argumenterror (111, re);
 		  if (!subordinate (LEFTRD, RD)) argumenterror (112, re);
-		  if (!sameParam (RD->descr, LEFTRD->descr))
+		  if (!same_param (RD->descr, LEFTRD->descr))
 		    argumenterror (112, re);
 		}
 	    }
 	}
       else if (RD->kind == KSIMPLE)
 	{			/* Parameteren skal v{re simple */
-	  expCheck (LEFT);
+	  exp_check (LEFT);
 	  if (RD->categ == CNAME)
 	    {
 	      if (TYPE != LEFTTYPE && (TYPE != TINTG & TYPE != TREAL
@@ -964,9 +972,9 @@ static expCheck (re)
       else
 	{
 	  argumenterror (105, re);
-	  expCheck (LEFT);
+	  exp_check (LEFT);
 	}
-      expCheck (RIGHT);
+      exp_check (RIGHT);
       if (RIGHTTYPE == TERROR)
 	TYPE = TERROR;
       break;
@@ -999,11 +1007,12 @@ static expCheck (re)
 }
 
 /******************************************************************************
-                                                           mainExpCheck      */
+                                                           MAIN_EXP_CHECK      */
 
-void mainExpCheck (re) struct EXP *re;
+void 
+main_exp_check (re) struct EXP *re;
 {
-  expCheck (re);
+  exp_check (re);
   computeconst (re);
   setdanger_const (re);
 }

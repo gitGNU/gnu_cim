@@ -31,7 +31,7 @@ void free();
 #define obstack_chunk_alloc xmalloc
 #define obstack_chunk_free free
 
-static struct obstack osMap, osMapstack;
+static struct obstack os_map, os_mapstack;
 
 
 struct map
@@ -60,10 +60,11 @@ static int antmap = 1;
 
 /******************************************************************************
                                                                 MAPLINEINIT  */
-int maplineInit (sourcename, ifdefp) char *sourcename; void *ifdefp;
+int 
+mapline_init (sourcename, ifdefp) char *sourcename; void *ifdefp;
 {
-  obstack_init (&osMap);
-  obstack_init (&osMapstack);
+  obstack_init (&os_map);
+  obstack_init (&os_mapstack);
   mapinit.filename="";
   return pushfilmap (tag (sourcename), ifdefp);
 }
@@ -72,7 +73,7 @@ int maplineInit (sourcename, ifdefp) char *sourcename; void *ifdefp;
 /******************************************************************************
                                                                    NOFILMAP  */
 int
-noFilemap ()
+no_filemap ()
 {
   return mapstackp==NULL;
 }
@@ -119,7 +120,7 @@ pushfilmap (filename, ifdefp)
 
     }
   mapstackp= (struct mapstack *) 
-    obstack_alloc (&osMapstack, sizeof (struct mapstack));
+    obstack_alloc (&os_mapstack, sizeof (struct mapstack));
   mapstackp->line= lineno + 1 + lastmappos->line;
   mapstackp->filename= lastmappos->filename;
   mapstackp->ifdefp= ifdefp;
@@ -132,7 +133,7 @@ pushfilmap (filename, ifdefp)
 /******************************************************************************
                                                                  INCLUDEFILE */
 FILE *
-includeFile ()
+include_file ()
 {
   return mapstackp->file;
 }
@@ -140,7 +141,7 @@ includeFile ()
 /******************************************************************************
                                                              INCLUDEIFDEFNIV */
 void *
-includeIfdefp ()
+include_ifdefp ()
 {
   return mapstackp->ifdefp;
 }
@@ -153,7 +154,7 @@ popfilmap ()
 {
   struct mapstack *prev= mapstackp->prev;
   setfilmap (mapstackp->filename, mapstackp->line);
-  obstack_free (&osMapstack, mapstackp);
+  obstack_free (&os_mapstack, mapstackp);
   mapstackp= prev;
 }
 
@@ -169,7 +170,7 @@ setfilmap (filename, line)
   mappos->line = line - lineno - 1;
   mappos->fromline = lineno + 1;
   mappos = (lastmappos = mappos)->neste 
-    = (struct map *) obstack_alloc (&osMap, sizeof (struct map));
+    = (struct map *) obstack_alloc (&os_map, sizeof (struct map));
   mappos->fromline = MAX_INT;
 }
 

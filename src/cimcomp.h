@@ -18,12 +18,13 @@
 
 #include <stdio.h>
 
-extern char *xmalloc();
 extern char separat_comp;
 
 extern char *includedir;
 extern char *extcodename;
 extern char *mifcodename;
+extern char *sourcename;
+extern char *ccodename;
 extern char *progname;
 
 extern FILE *ccode;
@@ -39,5 +40,14 @@ extern int option_init_poolsize;
 extern int option_max_poolsize;
 extern int option_dyn_poolsize;
 extern int option_bl_in_dir_line;
+extern int option_quiet;
 
-extern struct SENT *mainSent;
+extern int option_lex;
+extern int option_declarations;
+extern int option_input;
+extern int option_dump_build;
+extern int option_dump_check;
+extern int option_dump_trans;
+
+extern struct SENT *main_sent;
+

@@ -24,17 +24,18 @@ void free();
 #define obstack_chunk_alloc xmalloc
 #define obstack_chunk_free free
 
-static struct obstack osMell;
+static struct obstack os_mell;
+static char *first_object_allocated_ptr_mell;
+static char *last_object_allocated_ptr_mell;
 
-static char *mstring,  *mend;
 char *mpointer;
 
 /******************************************************************************
                                                                 MBUILDERINIT */
 
-mbuilderInit()
+mbuilder_init()
 {
-  obstack_init(&osMell);
+  obstack_init(&os_mell);
 }
 
 /******************************************************************************
@@ -42,59 +43,60 @@ mbuilderInit()
 
 mout(x)unsigned char x;
 {
-  obstack_1grow(&osMell, x);
+  obstack_1grow(&os_mell, x);
 }
 
 /******************************************************************************
                                                                     MOUTIVAL */
 
-moutIval(x)long x;
+mout_ival(x)long x;
 {
-  obstack_grow(&osMell, &x, sizeof (long));
+  obstack_grow(&os_mell, &x, sizeof (long));
 }
 
 /******************************************************************************
                                                                     MOUTRVAL */
 
-moutRval(x)double x;
+mout_rval(x)double x;
 {
-  obstack_grow(&osMell, &x,sizeof (double));
+  obstack_grow(&os_mell, &x,sizeof (double));
 }
 
 /******************************************************************************
                                                                     MOUTTVAL */
 
-moutTval(x)char *x;
+mout_tval(x)char *x;
 {
-  obstack_grow(&osMell, &x, sizeof (char *));
+  obstack_grow(&os_mell, &x, sizeof (char *));
 }
 
 /******************************************************************************
                                                                       MOUTID */
 
-moutId(x)char *x;
+mout_id(x)char *x;
 {
-  obstack_grow(&osMell, &x, sizeof (char *));
+  obstack_grow(&os_mell, &x, sizeof (char *));
 }
 
 /******************************************************************************
                                                               MBUILDERREINIT */
 
-mbuilderReinit()
+mbuilder_init_pass2()
 {
   long i;
-  i= obstack_object_size(&osMell);
-  mpointer= mstring= (char *)obstack_finish (&osMell);
-  mend= mpointer+i;
+  i= obstack_object_size(&os_mell);
+  mpointer= first_object_allocated_ptr_mell= (char *)obstack_finish (&os_mell);
+  last_object_allocated_ptr_mell= mpointer+i;
 }
 
 /******************************************************************************
                                                                          MIN */
 
-int min()
+int 
+min()
 {
   unsigned char x;
-  if (mpointer>=mend) return -1;
+  if (mpointer>=last_object_allocated_ptr_mell) return -1;
   x= *(mpointer++);
   return (x);
 }
@@ -102,7 +104,8 @@ int min()
 /******************************************************************************
                                                                      MINIVAL */
 
-long minIval()
+long 
+min_ival()
 {
   long x;
   bcopy (mpointer,&x,sizeof(long));
@@ -113,7 +116,8 @@ long minIval()
 /******************************************************************************
                                                                      MINRVAL */
 
-double minRval()
+double 
+min_rval()
 {
   double x;
   bcopy (mpointer,&x,sizeof (double));
@@ -124,7 +128,8 @@ double minRval()
 /******************************************************************************
                                                                      MINTVAL */
 
-char *minTval()
+char *
+min_tval()
 {
   char *x;
   bcopy(mpointer,&x,sizeof(char *));
@@ -135,7 +140,8 @@ char *minTval()
 /******************************************************************************
                                                                        MINID */
 
-char *minId()
+char *
+min_id()
 {
   char *x;
   bcopy (mpointer,&x,sizeof(char *));
@@ -143,4 +149,17 @@ char *minId()
   return(x);
 }
 
+/******************************************************************************
+                                                                       MINID */
+
+void 
+mbuilder_reinit()
+{
+  if (first_object_allocated_ptr_mell == 0)
+    first_object_allocated_ptr_mell= (char *)obstack_finish (&os_mell);
+
+  obstack_free (&os_mell, first_object_allocated_ptr_mell);
+
+  first_object_allocated_ptr_mell= 0;
+}
 

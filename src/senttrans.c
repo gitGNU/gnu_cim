@@ -23,23 +23,24 @@
 /******************************************************************************
                                                                  SORTPROCARR */
 
-static void sortProcArr (parentSent) struct SENT *parentSent;
+static void 
+sort_proc_arr (parent_sent) struct SENT *parent_sent;
 {
-  int line= parentSent->line;
+  int line= parent_sent->line;
   struct SENT *proc=NULL, *sent, *nextsent, *new;
-  for (sent= parentSent->first; sent!=NULL ;sent= nextsent)
+  for (sent= parent_sent->first; sent!=NULL ;sent= nextsent)
     {
       nextsent= sent->next;
       switch (sent->token)
 	{
 	case MCONST:
-	  removeSent (parentSent, sent);
+	  remove_sent (parent_sent, sent);
 	  break;
 	case MENDSWITCH:
 	case MPROCEDURE:
 	case MCLASS:
-	  removeSent (parentSent, sent);
-	  insertAfterSent (parentSent, proc, sent);
+	  remove_sent (parent_sent, sent);
+	  insert_after_sent (parent_sent, proc, sent);
 	  proc= sent;
 	  break;
 	case MENDARRAY:
@@ -50,32 +51,32 @@ static void sortProcArr (parentSent) struct SENT *parentSent;
 	}
     }
  exit:
-  switch (parentSent->token)
+  switch (parent_sent->token)
     {
     case MBLOCK:
-      new= newSent (MBLOCKENTRY);
+      new= new_sent (MBLOCKENTRY);
       break;
     case MPROCEDURE:
-      new= newSent (MPROCEDUREENTRY);
+      new= new_sent (MPROCEDUREENTRY);
       break;
     default:
-      new= newSent (MENTRY);
+      new= new_sent (MENTRY);
       break;
     }
 
-  new->cblock= parentSent->cblock;
-  insertAfterSent (parentSent, proc, new);
-  if (parentSent->token==MCLASS || parentSent->token==MPRBLOCK)
+  new->cblock= parent_sent->cblock;
+  insert_after_sent (parent_sent, proc, new);
+  if (parent_sent->token==MCLASS || parent_sent->token==MPRBLOCK)
     {
-      new= newSent (MENDDECL);
-      new->cblock= parentSent->cblock;
-      insertBeforeSent (parentSent, sent, new);
+      new= new_sent (MENDDECL);
+      new->cblock= parent_sent->cblock;
+      insert_before_sent (parent_sent, sent, new);
 
-      if (parentSent->token==MCLASS && !cblock->inner)
+      if (parent_sent->token==MCLASS && !cblock->inner)
 	{
-	  new= newSent (MINNER);
-	  new->cblock= parentSent->cblock;
-	  insertBeforeSent (parentSent, NULL, new);
+	  new= new_sent (MINNER);
+	  new->cblock= parent_sent->cblock;
+	  insert_before_sent (parent_sent, NULL, new);
 	}
     }
 }
@@ -83,115 +84,126 @@ static void sortProcArr (parentSent) struct SENT *parentSent;
 /******************************************************************************
                                                                SENTLISTTRANS */
 
-static void sentListTrans (parentSent) struct SENT *parentSent;
+static void 
+sent_list_trans (parent_sent) struct SENT *parent_sent;
 {
   struct SENT *sent;
 
-  for (sent= parentSent->first; sent!=NULL; sent= sent->next)
+  for (sent= parent_sent->first; sent!=NULL; sent= sent->next)
     {
       lineno= sent->line;
       nonetest= sent->nonetest;
       indextest= sent->indextest;
       stripsideeffects= sent->stripsideeffects;
-      sentTrans (sent);
-      cblock= parentSent->cblock;
+      sent_trans (sent);
+      cblock= parent_sent->cblock;
       if (cblock) cblev= cblock->blev;
     }
-  lineno= parentSent->lastLine;
+  lineno= parent_sent->last_line;
 }
 
 /******************************************************************************
                                                                  MODULETRANS */
 
-static void moduleTrans (sent) struct SENT *sent;
+static void 
+module_trans (sent) struct SENT *sent;
 {     
   if (! separat_comp)
-    insertBeforeSent (sent, NULL, newSent (MGOTOSTOP));
-  sentListTrans (sent);
+    insert_before_sent (sent, NULL, new_sent (MGOTOSTOP));
+  sent_list_trans (sent);
 }
 
 /******************************************************************************
                                                                   BLOCKTRANS */
 
-static void blockTrans (sent) struct SENT *sent;
+static void 
+block_trans (sent) struct SENT *sent;
 {
   cblock= sent->cblock;
-  sortProcArr (sent);
-  sentListTrans (sent);
+  sort_proc_arr (sent);
+  sent_list_trans (sent);
 }
 
 /******************************************************************************
                                                                 PRBLOCKTRANS */
 
-static void prblockTrans (sent) struct SENT *sent;
+static void 
+prblock_trans (sent) struct SENT *sent;
 {
   cblock= sent->cblock;
-  sortProcArr (sent);
-  sent->iexp= transcall (sent->exp->up, sent->exp);
-  sentListTrans (sent);
+  sort_proc_arr (sent);
+  sent->iexp= transcall (sent->exp->up, sent->exp, 1, 1, 1);
+  sent_list_trans (sent);
 }
 
 /******************************************************************************
                                                               PROCEDURETRANS */
 
-static void procedureTrans (sent) struct SENT *sent;
+static void 
+procedure_trans (sent) struct SENT *sent;
 {
   cblock= sent->cblock;
-  sortProcArr (sent);
-  sentListTrans (sent);
+  sort_proc_arr (sent);
+  sent_list_trans (sent);
 }
 
 /******************************************************************************
                                                                   CLASSTRANS */
 
-static void classTrans (sent) struct SENT *sent;
+static void 
+class_trans (sent) struct SENT *sent;
 {
   cblock= sent->cblock;
-  sortProcArr (sent);
-  sentListTrans (sent);
+  sort_proc_arr (sent);
+  sent_list_trans (sent);
 }
 
 /******************************************************************************
                                                                 INSPECTTRANS */
 
-static void inspectTrans (sent) struct SENT *sent;
+static void 
+inspect_trans (sent) struct SENT *sent;
 {
   cblock= sent->cblock;
-  sent->iexp= transcall (sent->exp->up, sent->exp); 
-  sentListTrans (sent);
+  sent->iexp= transcall (sent->exp->up, sent->exp, 1, 1, 1); 
+  sent_list_trans (sent);
 }
 
 /******************************************************************************
                                                                      DOTRANS */
 
-static void doTrans (sent) struct SENT *sent;
+static void 
+do_trans (sent) struct SENT *sent;
 {
   cblock= sent->cblock;
-  sentListTrans (sent);
+  sent_list_trans (sent);
 }
 
 /******************************************************************************
                                                                    WHENTRANS */
 
-static void whenTrans (sent) struct SENT *sent;
+static void 
+when_trans (sent) struct SENT *sent;
 {
   cblock= sent->cblock;
-  sentListTrans (sent);
+  sent_list_trans (sent);
 }
 
 /******************************************************************************
                                                               OTHERWISETRANS */
 
-static void otherwiseTrans (sent) struct SENT *sent;
+static void 
+otherwise_trans (sent) struct SENT *sent;
 {
   cblock= sent->cblock;
-  sentListTrans (sent);
+  sent_list_trans (sent);
 }
 
 /******************************************************************************
                                                                 FORELEMTRANS */
 
-static void forelemTrans (re, rex) struct EXP *re, *rex;
+static void 
+forelem_trans (re, rex) struct EXP *re, *rex;
 {
   struct EXP *rey, *red;
   struct EXP *reinit, *retest, *restep;
@@ -207,10 +219,11 @@ static void forelemTrans (re, rex) struct EXP *re, *rex;
 		      rey->right->left->value.ival < 0));
       konst_step = rey->right->left->token == MINTEGERKONST;
 
-      restep= transcall (rey->right, rey->right->left);
-      restep= concexp (restep, transcall (rey->right, rey->right->right));
+      restep= transcall (rey->right, rey->right->left, 1, 1, 1);
+      restep= concexp (restep, transcall (rey->right, rey->right->right, 
+					  1, 1, 1));
 
-      reinit= transcall (rey, rey->left);
+      reinit= transcall (rey, rey->left, 1, 1, 1);
       reinit= concexp (reinit, red= makeexp(MASSIGND,copytree (re->left), 
 				       rey->left));
       red->type= red->right->type;
@@ -230,19 +243,22 @@ static void forelemTrans (re, rex) struct EXP *re, *rex;
       red->type= red->right->type;
 
       rey->left= reinit;
+      rey->left->up= rey;
       rey->right->left= retest;
+      rey->right->left->up= rey->right;
       rey->right->right= restep;
+      rey->right->right->up= rey->right;
       break;
     case MFORWHILE:
-      restep= transcall (rey, rey->left);
+      restep= transcall (rey, rey->left, 1, 1, 1);
       restep= concexp (restep, makeexp (re->left->type==TTEXT?re->token==MFOR?
 					MVALASSIGNT:MREFASSIGNT:MASSIGND, 
 					copytree (re->left),rey->left));
-      restep= concexp (restep, transcall (rey, rey->right));
+      restep= concexp (restep, transcall (rey, rey->right, 1, 1, 1));
       rey->left= restep;
       break;
     default:
-      restep= transcall (rex, rey);
+      restep= transcall (rex, rey, 1, 1, 1);
       restep= concexp (restep, makeexp (re->left->type==TTEXT?re->token==MFOR?
 					MVALASSIGNT:MREFASSIGNT:MASSIGND, 
 					copytree (re->left),rey));
@@ -254,206 +270,214 @@ static void forelemTrans (re, rex) struct EXP *re, *rex;
 /******************************************************************************
                                                                   FORDOTRANS */
 
-static void fordoTrans (sent) struct SENT *sent;
+static void 
+fordo_trans (sent) struct SENT *sent;
 {
   struct EXP *re, *rex;
   cblock= sent->cblock;
   re= sent->exp;
   for (rex = re->right; rex->token != MENDSEP; rex = rex->right)
-    forelemTrans (re, rex);
+    forelem_trans (re, rex);
 
-  sentListTrans (sent);
+  sent_list_trans (sent);
 }
 
 /******************************************************************************
                                                                   WHILETRANS */
 
-static void whileTrans (sent) struct SENT *sent;
+static void 
+while_trans (sent) struct SENT *sent;
 {
-  sent->iexp= transcall (sent->exp->up, sent->exp); 
-  sentListTrans (sent);
+  sent->iexp= transcall (sent->exp->up, sent->exp, 1, 1, 1); 
+  sent_list_trans (sent);
 }
 
 /******************************************************************************
                                                                      IFTRANS */
 
-static void ifTrans (sent) struct SENT *sent;
+static void 
+if_trans (sent) struct SENT *sent;
 {
-  sent->iexp= transcall (sent->exp->up, sent->exp);
-  sentListTrans (sent);
+  sent->iexp= transcall (sent->exp->up, sent->exp, 1, 1, 1);
+  sent_list_trans (sent);
 }
 
 /******************************************************************************
                                                                    ELSETRANS */
 
-static void elseTrans (sent) struct SENT *sent;
+static void 
+else_trans (sent) struct SENT *sent;
 {
-  sentListTrans (sent);
+  sent_list_trans (sent);
 }
 
 /******************************************************************************
                                                                    THENTRANS */
 
-static void thenTrans (sent) struct SENT *sent;
+static void 
+then_trans (sent) struct SENT *sent;
 {
-  sentListTrans (sent);
+  sent_list_trans (sent);
 }
 
 /******************************************************************************
                                                                    GOTOTRANS */
 
-static void gotoTrans (sent) struct SENT *sent;
+static void 
+goto_trans (sent) struct SENT *sent;
 {
-  sent->iexp= transcall (sent->exp->up, sent->exp);
+  sent->iexp= transcall (sent->exp->up, sent->exp, 1, 1, 1);
 }
 
 /******************************************************************************
                                                                   INNERTRANS */
 
-static void innerTrans (sent) struct SENT *sent;
+static void 
+inner_trans (sent) struct SENT *sent;
 {
 }
 
 /******************************************************************************
                                                               ENDSWITCHTRANS */
 
-static void endswitchTrans (sent) struct SENT *sent;
+static void 
+endswitch_trans (sent) struct SENT *sent;
 {
-#if 1
   struct EXP *rex, *rey;
   for (rex = sent->exp->right; rex->token != MENDSEP; rex = rex->right)
     {
-      rey= transcall (rex, rex->left); fprintf (ccode, ";");
+      rey= transcall (rex, rex->left, 1, 1, 1); fprintf (ccode, ";");
       if (rey!=NULL)
 	{
 	  rex->left= makeexp (MSENTCONC, rey, rex->left);
 	  rex->left->up= rex;
 	}
     }
-#endif
 }
 
 /******************************************************************************
                                                               ENDASSIGNTRANS */
 
-static void endassignTrans (sent) struct SENT *sent;
+static void 
+endassign_trans (sent) struct SENT *sent;
 {
-  sent->iexp= transcall (sent->exp->up, sent->exp);
+  sent->iexp= transcall (sent->exp->up, sent->exp, 1, 1, 1);
 }
 
 /******************************************************************************
                                                                ENDARRAYTRANS */
 
-static void endarrayTrans (sent) struct SENT *sent;
+static void 
+endarray_trans (sent) struct SENT *sent;
 {
-  sent->iexp= transcall (sent->exp, sent->exp->right);
+  sent->iexp= transcall (sent->exp, sent->exp->right, 1, 1, 1);
 }
 
 /******************************************************************************
                                                                ENDLABELTRANS */
 
-static void endlabelTrans (sent) struct SENT *sent;
+static void 
+endlabel_trans (sent) struct SENT *sent;
 {
 }
 
 /******************************************************************************
                                                                GOTOSTOPTRANS */
 
-gotoStopTrans (sent) struct SENT *sent;
+goto_stop_trans (sent) struct SENT *sent;
 {
 }
 
 /******************************************************************************
                                                                   THUNKTRANS */
 
-thunkTrans (sent) struct SENT *sent;
+thunk_trans (sent) struct SENT *sent;
 {
   cblock= sent->cblock;
   inthunk= sent->exp->value.thunk.inthunk;
-#if 1
-  sent->iexp= transcall (sent->exp, sent->exp->left);
-#endif
+  sent->iexp= transcall (sent->exp, sent->exp->left, 1, 1, 1);
   inthunk= 0;
 }
 
 /******************************************************************************
                                                                    SENTTRANS */
 
-void sentTrans (sent) struct SENT *sent;
+void 
+sent_trans (sent) struct SENT *sent;
 {
   switch (sent->token)
     {
     case MMODULE:
-      moduleTrans (sent);
+      module_trans (sent);
       break;
     case MCONST:
       break;
     case MBLOCK:
-      blockTrans (sent);
+      block_trans (sent);
       break;
     case MPRBLOCK:
-      prblockTrans (sent);
+      prblock_trans (sent);
       break;
     case MPROCEDURE:
-      procedureTrans (sent);
+      procedure_trans (sent);
       break;
     case MCLASS:
-      classTrans (sent);
+      class_trans (sent);
       break;
     case MINSPECT:
-      inspectTrans (sent);
+      inspect_trans (sent);
       break;
     case MDO:
-      doTrans (sent);
+      do_trans (sent);
       break;
     case MWHEN:
-      whenTrans (sent);
+      when_trans (sent);
       break;
     case MOTHERWISE:
-      otherwiseTrans (sent);
+      otherwise_trans (sent);
       break;
     case MFORDO:
-      fordoTrans (sent);
+      fordo_trans (sent);
       break;
     case MWHILE:
-      whileTrans (sent);
+      while_trans (sent);
       break;
     case MIF:
-      ifTrans (sent);
+      if_trans (sent);
       break;
     case MELSE:
-      elseTrans (sent);
+      else_trans (sent);
       break;
     case MTHEN:
-      thenTrans (sent);
+      then_trans (sent);
       break;
     case MGOTO:
-      gotoTrans (sent);
+      goto_trans (sent);
       break;
     case MINNER:
-      innerTrans (sent);
+      inner_trans (sent);
       break;
     case MENDSWITCH:
-      endswitchTrans (sent);
+      endswitch_trans (sent);
       break;
     case MENDASSIGN:
-      endassignTrans (sent);
+      endassign_trans (sent);
       break;
     case MENDARRAY:
-      endarrayTrans (sent);
+      endarray_trans (sent);
       break;
     case MENDLABEL:
-      endlabelTrans (sent);
+      endlabel_trans (sent);
       break;
     case MGOTOSTOP:
-      gotoStopTrans (sent);
+      goto_stop_trans (sent);
       break;
     case MTHUNKSIMPLEADDRESS:
     case MTHUNKSIMPLEVALUE:
     case MTHUNKLABLE:
     case MTHUNKARRAY:
     case MTHUNKPROCEDURE:
-      thunkTrans (sent);
+      thunk_trans (sent);
       break;
     }
 }

@@ -47,12 +47,6 @@ union val
       short val_entry, ref_entry, txt_entry;
     }
     stack;
-    struct
-    {
-      long n_of_stack_elements;
-      short entry;
-    }
-    combined_stack;
     char *ident;
     struct
     {
@@ -79,17 +73,18 @@ union val
 
 /* Definition of kind */
 
-#define KNOKD   'N'
-#define KSIMPLE 'S'
-#define KARRAY  'A'
-#define KPROC   'P'
-#define KCLASS  'C'
-#define KBLOKK  'B'
-#define KPRBLK  'R'
-#define KFOR    'F'
-#define KINSP   'I'
-#define KCON    'O'
-#define KERROR  'E'
+#define KNOKD    'N'
+#define KSIMPLE  'S'
+#define KARRAY   'A'
+#define KPROC    'P'
+#define KCLASS   'C'
+#define KBLOKK   'B'
+#define KPRBLK   'R'
+#define KFOR     'F'
+#define KFORLIST 'G'
+#define KINSP    'I'
+#define KCON     'O'
+#define KERROR   'E'
 
 /* Definition of categ */
 
@@ -151,7 +146,11 @@ struct BLOCK
       connest;			/* Dybde på nesting av for-løkke og inspect */
     short ent;			/* entringspunkt */
     short navirtlab;
-
+#if ACSTACK_IN_OBJ
+    short maxusedref;
+    short maxusedtxt;
+    short maxusedval;
+#endif
     char *rtname;
 
     char *timestamp;
@@ -189,17 +188,17 @@ struct BLOCK
 #define CCCPROC      8		/* Ekstern C-prosedyre */
 
 
-extern beginBlock ();
-extern endBlock ();
-extern regDecl ();
-extern regInner ();
-extern struct DECL *newDecl ();
+extern begin_block ();
+extern end_block ();
+extern reg_decl ();
+extern reg_inner ();
+extern struct DECL *new_decl ();
 extern struct BLOCK *firstclass ();
-extern inBlock ();
-extern outBlock ();
-extern struct DECL *regThis ();
+extern in_block ();
+extern out_block ();
+extern struct DECL *reg_this ();
 
-extern removeBlock ();
+extern remove_block ();
 
 extern char *prefquantident;
 int localused;
@@ -215,25 +214,27 @@ extern struct DECL *cprevdecl;
 
 extern struct DECL *commonprefiks;
 extern struct DECL *commonqual ();
-extern struct DECL *findGlobal ();
-extern struct DECL *findLocal ();
-extern struct DECL *findDecl ();
+extern struct DECL *find_global ();
+extern struct DECL *find_local ();
+extern struct DECL *find_decl ();
 
-extern struct DECL *firstParam ();
-extern struct DECL *nextParam ();
-extern moreParam ();
+extern struct DECL *first_param ();
+extern struct DECL *next_param ();
+extern more_param ();
 
 extern int arrdim;
-extern struct DECL *lastArray;
-extern setArrayDim ();
-extern char dangerProc ();
+extern struct DECL *last_array;
+extern set_array_dim ();
+extern char danger_proc ();
 
 extern struct BLOCK *seenthrough;
 extern body ();
 extern struct DECL *classtext;
 extern char subordinate ();
-extern sameParam ();
-extern reinit ();
-extern initDecl ();
+extern same_param ();
+extern decl_init ();
+extern decl_init_pass2 ();
+extern decl_init_pass1 ();
+extern decl_reinit ();
 
 extern char yaccerror;

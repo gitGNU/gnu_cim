@@ -37,7 +37,11 @@ static short plevnull;		/* Hvis en blokks prefiksniv} er 0 s} er
 
 static int naref;
 
-static write_decl (rd, type, output_refs)
+/******************************************************************************
+								  WRITE_DECL */
+
+static 
+write_decl (rd, type, output_refs)
      struct DECL *rd; char *type, output_refs; 
 {
   if (!output_refs)
@@ -47,7 +51,11 @@ static write_decl (rd, type, output_refs)
 }
 
 
-static write_refs (rb, rd, atrib, output_refs) 
+/******************************************************************************
+								  WRITE_REFS */
+
+static 
+write_refs (rb, rd, atrib, output_refs) 
      struct BLOCK *rb; struct DECL *rd; char *atrib, output_refs;
 {
 
@@ -68,7 +76,8 @@ static write_refs (rb, rd, atrib, output_refs)
 /******************************************************************************
                                                         DECLSTRUCTURE        */
 
-static declstructure (rd, output_refs)
+static 
+declstructure (rd, output_refs)
      struct DECL *rd;
      char output_refs;
 {
@@ -212,7 +221,8 @@ static declstructure (rd, output_refs)
  * 0,til sin superklasse p} plass n-1,dens superklasse p} plass n-2
  * osv. */
 
-static skrivprefikspp (rd)
+static 
+skrivprefikspp (rd)
      struct DECL *rd;
 {
   if (rd != NULL)
@@ -231,7 +241,8 @@ static skrivprefikspp (rd)
 /******************************************************************************
                                                     BLOCKMAINSTRUCTURE       */
 
-static blockmainstructure (rb, output_refs)
+static 
+blockmainstructure (rb, output_refs)
      struct BLOCK *rb; char output_refs;
 {
   int i;
@@ -250,7 +261,33 @@ static blockmainstructure (rb, output_refs)
       sprintf (s, "c%d", i);
       write_refs (rb, NULL, s, output_refs);
     };
-  
+
+#if ACSTACK_IN_OBJ
+  {
+    int minref= 1, mintxt= 1;
+    if ((rb->quant.kind == KCLASS || rb->quant.kind == KPRBLK) && 
+	rb->quant.plev > 0)
+      {
+	minref= rb->quant.prefqual->descr->maxusedref+1;
+	mintxt= rb->quant.prefqual->descr->maxusedtxt+1; 
+      }
+
+      for (i= minref; i <= rb->maxusedref; i++)
+	{
+	  char s[20];
+	  sprintf (s, "__r%d", i);
+	  write_refs (rb, NULL, s, output_refs);
+	}
+    
+    for (i= mintxt; i <= rb->maxusedtxt; i++)
+      {
+	char s[20];
+	sprintf (s, "__t%d.obj", i);
+	write_refs (rb, NULL, s, output_refs);
+      }
+  }
+#endif
+
   for (rd = rb->parloc; rd != NULL; rd = rd->next)
     declstructure (rd, output_refs);
 }
@@ -258,7 +295,8 @@ static blockmainstructure (rb, output_refs)
 /******************************************************************************
                                                         BLOCKSTRUCTURE       */
 
-static blockstructure (rb)
+static 
+blockstructure (rb)
      struct BLOCK *rb;
 {
   int i;
@@ -373,6 +411,32 @@ static blockstructure (rb)
 	fprintf (ccode, "        short f%d;\n", i);
       for (i = 1; i <= rb->connest; i++)
 	fprintf (ccode, "        __dhp c%d;\n", i);
+
+#if ACSTACK_IN_OBJ
+      {
+	int minval= 1, minref= 1, mintxt= 1;
+	if ((rb->quant.kind == KCLASS || rb->quant.kind == KPRBLK) && 
+	    rb->quant.plev > 0)
+	  {
+	    if (rb->maxusedref < rb->quant.prefqual->descr->maxusedref)
+	      rb->maxusedref= rb->quant.prefqual->descr->maxusedref;
+	    if (rb->maxusedtxt < rb->quant.prefqual->descr->maxusedtxt)
+	      rb->maxusedtxt= rb->quant.prefqual->descr->maxusedtxt;
+	    if (rb->maxusedval < rb->quant.prefqual->descr->maxusedval)
+	      rb->maxusedval= rb->quant.prefqual->descr->maxusedval;
+	    minref= rb->quant.prefqual->descr->maxusedref+1;
+	    mintxt= rb->quant.prefqual->descr->maxusedtxt+1; 
+	    minval= rb->quant.prefqual->descr->maxusedval+1; 
+	  } 
+	for (i= minref; i<=rb->maxusedref; i++) 
+	  fprintf (ccode, "        __dhp __r%d;\n", i);
+	for (i= mintxt; i<=rb->maxusedtxt; i++) 
+	  fprintf (ccode, "        __txt __t%d;\n", i);
+	for (i= minval; i<=rb->maxusedval; i++) 
+	  fprintf (ccode, "        __valuetype __v%d;\n", i);
+      }
+
+#endif
 
       fprintf (ccode, "    } __bs%d;\n", rb->blno);
 
@@ -629,7 +693,8 @@ structure ()
 /******************************************************************************
 								UPDATEGLNULL */
 
-static void doForEachStatPointer (block) struct BLOCK *block;
+static void 
+do_for_each_stat_pointer (block) struct BLOCK *block;
 {
   struct DECL *rd;
   switch (block->quant.kind)
@@ -655,7 +720,7 @@ static void doForEachStatPointer (block) struct BLOCK *block;
 	case KFOR:
 	case KINSP:
 	case KCON:
-	  doForEachStatPointer (rd->descr);
+	  do_for_each_stat_pointer (rd->descr);
 	  break;
 	}
     }
@@ -664,7 +729,8 @@ static void doForEachStatPointer (block) struct BLOCK *block;
 /******************************************************************************
 								UPDATEGLNULL */
 
-static void updateGlNull (block) struct BLOCK *block;
+static void 
+update_gl_null (block) struct BLOCK *block;
 {
   struct DECL *rd;
   switch (block->quant.kind)
@@ -688,7 +754,7 @@ static void updateGlNull (block) struct BLOCK *block;
 	case KFOR:
 	case KINSP:
 	case KCON:
-	  updateGlNull (rd->descr);
+	  update_gl_null (rd->descr);
 	  break;
 	}
     }
@@ -697,7 +763,8 @@ static void updateGlNull (block) struct BLOCK *block;
 /******************************************************************************
 								UPDATEGLOBJ */
 
-static void updateGlObj (block) struct BLOCK *block;
+static void 
+update_gl_obj (block) struct BLOCK *block;
 {
   struct DECL *rd;
   switch (block->quant.kind)
@@ -726,7 +793,7 @@ static void updateGlObj (block) struct BLOCK *block;
 	case KFOR:
 	case KINSP:
 	case KCON:
-	  updateGlObj (rd->descr);
+	  update_gl_obj (rd->descr);
 	  break;
 	}
     }
@@ -747,14 +814,14 @@ stat_pointers ()
 	(ccode, 
 	 "__do_for_each_stat_pointer(doit,doit_notest,force)void(*doit)(),(*doit_notest)();int force;{\n");
 
-      doForEachStatPointer (sblock);
+      do_for_each_stat_pointer (sblock);
 
       fprintf (ccode, "}\n__update_gl_to_obj(){\n");
-      updateGlObj (sblock);
+      update_gl_obj (sblock);
 
 
       fprintf (ccode, "}\n__update_gl_to_null(){\n");
-      updateGlNull (sblock);
+      update_gl_null (sblock);
 
       fprintf (ccode, "}\n");
     }

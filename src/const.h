@@ -53,6 +53,7 @@
 
 /* gen.c */
 #define REALASDOUBLE 1
+#define ACSTACK_IN_OBJ 1
 
 /* Some boolean constants and so on */
 #define ON 	1

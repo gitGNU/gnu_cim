@@ -42,7 +42,8 @@ int anterror;
 
 /******************************************************************************
                                                                   STARTERROR */
-static starterror (line)
+static 
+starterror (line)
      long line;
 {
   anterror++;
@@ -648,7 +649,7 @@ serror (errcode, name, ant)
 /******************************************************************************
                                 				GERROR       */
 
-/* Feil som oppdages av kodeGENERATOREN */
+/* Feil som oppdages av kodegeneratoren */
 
 /*VARARGS1 */
 gerror (errcode, name)

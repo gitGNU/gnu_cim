@@ -1,6 +1,6 @@
-/* $Id: clex.c,v 1.15 1997/02/14 16:33:00 cim Exp $ */
+/* $Id: $ */
 
-/* Copyright (C) 1994, 1998 Sverre Hvammen Johansen,
+/* Copyright (C) 1998 Sverre Hvammen Johansen,
  * Department of Informatics, University of Oslo.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -16,14 +16,5 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA. */
 
-extern char external;
-extern long lineno;
-extern char nameasvar;
-extern char sensitive;
-extern char staticblock;
-
-extern yylex ();
-extern lex_init ();
-extern lex_init_pass1 ();
-extern lex_reinit ();
-extern scan_and_write_tokens ();
+extern void sent_dump();
+extern void exp_dump();

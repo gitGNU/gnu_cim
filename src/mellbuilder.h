@@ -16,18 +16,20 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA. */
 
-void mbuilderInit();
+void mbuilder_init();
+void mbuilder_init_pass1();
+void mbuilder_init_pass2();
+void mbuilder_reinit();
 void mout();
-void moutIval();
-void moutRval();
-void moutTval();
-void moutId();
-void mbuilderReinit();
+void mout_ival();
+void mout_rval();
+void mout_tval();
+void mout_id();
 int min();
-long minIval();
-double minRval();
-char *minTval();
-char *minId();
+long min_ival();
+double min_rval();
+char *min_tval();
+char *min_id();
 
 char *mpointer;
 

@@ -23,6 +23,8 @@
 #include "const.h"
 #include "lex.h"
 #include "name.h"
+#include "salloc.h"
+#include "cimcomp.h"
 
 #include <stdio.h>
 #include <obstack.h>
@@ -33,8 +35,8 @@ void free();
 #define obstack_chunk_alloc xmalloc
 #define obstack_chunk_free free
 
-static struct obstack osDecl;
-static struct obstack osPref;
+static struct obstack os_pref;
+static char *first_object_allocated_ptr_pref;
 
 
 /*****************************************************************************/
@@ -65,8 +67,12 @@ struct BLOCK *sblock; /* First non system block
                          (The outermost block with blev=1)
                          sblock is connected with ssblock through
                          two INSP blocks (sysin and sysout) */
+static struct BLOCK *lblock;
 
-struct BLOCK *seenthrough;	/* Settes av findGlobal og findLocal og peker 
+static int cblno;
+
+
+struct BLOCK *seenthrough;	/* Settes av find_global og find_local og peker 
 				 * p}  en utenforliggende inspect blokk(hvis
 				 * den      finnes). Det er fordi jeg onsker
 				 * } vite n}r en variable er sett gjennom
@@ -83,7 +89,7 @@ struct DECL *cprevdecl;
  
 /* Har en peker som peker p} en array deklarasjon som ikke har f}tt
  * satt sin dim verdi. */
-struct DECL *lastArray;
+struct DECL *last_array;
 
 /* Under sjekkingen og innlesingen av deklarasjonene
  * trenger jeg å merke de ulike objektene
@@ -100,26 +106,29 @@ static struct DECL *arrayparam;
 
 /******************************************************************************
 						      PCLEAN, PPUSH and PPOP */
-static ppush(rd)struct DECL *rd;
+static 
+ppush(rd)struct DECL *rd;
 {
-  obstack_ptr_grow (&osPref, rd);
+  obstack_ptr_grow (&os_pref, rd);
 }
 
-static pclean()
+static 
+pclean()
 {
   void *p;
-  p= obstack_finish (&osPref);
-  obstack_free (&osPref, p);
+  p= obstack_finish (&os_pref);
+  obstack_free (&os_pref, p);
 }
 
-static struct DECL *ppop()
+static 
+struct DECL *ppop()
 {
   struct DECL *rd;
-  if (obstack_next_free (&osPref) == obstack_base (&osPref))
+  if (obstack_next_free (&os_pref) == obstack_base (&os_pref))
     return (NULL);
 
-  rd= * ((struct DECL * *) obstack_next_free (&osPref) - 1);
-  obstack_blank (&osPref, - sizeof (void *));
+  rd= * ((struct DECL * *) obstack_next_free (&os_pref) - 1);
+  obstack_blank (&os_pref, - sizeof (void *));
   return (rd);
 }
 
@@ -127,41 +136,51 @@ static struct DECL *ppop()
 						        NEW-DECL/BLOCK       */
 
 
-struct DECL *newDecl()
+struct DECL *
+new_decl()
 {
-  struct DECL *rd;
-  rd= obstack_alloc (&osDecl, sizeof (struct DECL));
-  bzero (rd, sizeof (struct DECL));
-  return rd;
+  return (struct DECL *) salloc (sizeof (struct DECL));
 }
 
-static struct BLOCK *newBlock()
+static struct BLOCK *
+new_block()
 {
   struct BLOCK *rb;
-  rb= obstack_alloc (&osDecl, sizeof (struct BLOCK));
-  bzero (rb, sizeof (struct BLOCK));
+  rb= (struct BLOCK *) salloc (sizeof (struct BLOCK));
   rb->quant.descr = rb;
   return rb;
 }
 
 /******************************************************************************
-                                                                INITDECL     */
+                                                                  DECL_INIT  */
 
-/* InitDecl kalles før selve innlesingen */
+decl_init ()
+{
+  obstack_init(&os_pref);
+  first_object_allocated_ptr_pref= obstack_alloc (&os_pref, 0);
 
-initDecl ()
+  sjekkdeklcalled = new_decl ();
+}
+
+
+/******************************************************************************
+                                                             DECL_INIT_PASS1 */
+
+/* decl_init_pass1 kalles før selve innlesingen */
+
+decl_init_pass1 ()
 {
   struct BLOCK *rb;
   struct DECL *rd;
   
-  obstack_init(&osDecl);
-  obstack_init(&osPref);
   cblev= -1;
-  sjekkdeklcalled = newDecl ();
-  unknowns = newBlock ();
+  unknowns = new_block ();
   unknowns->quant.kind = KERROR;
 
-  beginBlock (KBLOKK);
+  cblno = STARTBLNO;
+  lastunknowns= NULL;
+  lblock= cblock= NULL;
+  begin_block (KBLOKK);
   ssblock=cblock;
 
   /* ssblock->quant.encl= ssblock; Dersom denne er med går kompilatoren inn
@@ -170,78 +189,89 @@ initDecl ()
 
   lesinn_external_spec (tag ("TEXTOBJ*"), "simenvir");
 
-  commonprefiks = findGlobal (tag ("COMMON*"), TRUE);
+  commonprefiks = find_global (tag ("COMMON*"), TRUE);
   commonprefiks->plev = -1;
-  classtext = findGlobal (tag ("TEXTOBJ*"), TRUE);
+  classtext = find_global (tag ("TEXTOBJ*"), TRUE);
 
-  beginBlock (KINSP);
-  beginBlock (KINSP);
-  rd = findGlobal (tag ("MAXLONGREAL"), TRUE);
+  begin_block (KINSP);
+  begin_block (KINSP);
+  rd = find_global (tag ("MAXLONGREAL"), TRUE);
   rd->value.rval = MAX_DOUBLE;
-  rd = findGlobal (tag ("MINLONGREAL"), TRUE);
+  rd = find_global (tag ("MINLONGREAL"), TRUE);
   rd->value.rval = -MAX_DOUBLE;
-  rd = findGlobal (tag ("MAXREAL"), TRUE);
+  rd = find_global (tag ("MAXREAL"), TRUE);
   rd->value.rval = MAX_DOUBLE;
-  rd = findGlobal (tag ("MINREAL"), TRUE);
+  rd = find_global (tag ("MINREAL"), TRUE);
   rd->value.rval = -MAX_DOUBLE;
-  rd = findGlobal (tag ("MAXRANK"), TRUE);
+  rd = find_global (tag ("MAXRANK"), TRUE);
   rd->value.ival = MAXRANK;
-  rd = findGlobal (tag ("MAXINT"), TRUE);
+  rd = find_global (tag ("MAXINT"), TRUE);
   rd->value.ival = MAX_INT;
-  rd = findGlobal (tag ("MININT"), TRUE);
+  rd = find_global (tag ("MININT"), TRUE);
   rd->value.ival = -MAX_INT - 1;
 }
 
 /******************************************************************************
-                                                                REINIT       */
+                                                                DECL_INIT_PASS2  */
 
-/* Reinit kalles før sjekkingen starter */
+/* decl_init_pass2 kalles før sjekkingen starter */
 
-reinit ()
+decl_init_pass2 ()
 {
   struct DECL *rd;
-  endBlock (NULL,CCNO);
-  endBlock (NULL,CCNO);
-  endBlock (NULL,CCNO);
+  end_block (NULL,CCNO);
+  end_block (NULL,CCNO);
+  end_block (NULL,CCNO);
   /* M} gj|re et hack for } f} satt kvalifikasjon p} inspect sysin */
   /* og inspect sysout, da neste blokk ikke er en connection blokk */
-  inBlock ();
-  inBlock (findGlobal (tag ("INFILE"), TRUE));
-  cblock->when = findGlobal (tag ("INFILE"), TRUE);
-  inBlock (findGlobal (tag ("PRINTFILE"), TRUE));
-  cblock->when = findGlobal (tag ("PRINTFILE"), TRUE);
+  lblock= NULL;
+  in_block ();
+  in_block (find_global (tag ("INFILE"), TRUE));
+  cblock->when = find_global (tag ("INFILE"), TRUE);
+  in_block (find_global (tag ("PRINTFILE"), TRUE));
+  cblock->when = find_global (tag ("PRINTFILE"), TRUE);
   sblock = cblock = cblock->next_block;
 
-  switchparam = newDecl ();
+  switchparam = new_decl ();
   switchparam->type = TINTG;
   switchparam->kind = KSIMPLE;
   switchparam->categ = CDEFLT;
   switchparam->encl = unknowns;
 
-  switchparam->next = newDecl ();
+  switchparam->next = new_decl ();
   switchparam->next->type = TINTG;
   switchparam->next->kind = KSIMPLE;
   switchparam->next->categ = CDEFLT;
   switchparam->next->encl = unknowns;
   switchparam->next->next = switchparam->next;
 
-  procparam = newDecl ();
+  procparam = new_decl ();
   procparam->type = TERROR;
   procparam->kind = TERROR;
   procparam->categ = CNAME;
   procparam->encl = unknowns;
   procparam->next = procparam;
 
-  sluttparam = newDecl ();
+  sluttparam = new_decl ();
   sluttparam->encl = unknowns;
   sluttparam->next = sluttparam;
 
-  arrayparam = newDecl ();
+  arrayparam = new_decl ();
   arrayparam->type = TINTG;
   arrayparam->kind = KSIMPLE;
   arrayparam->categ = CDEFLT;
   arrayparam->encl = unknowns;
   arrayparam->next = arrayparam;
+}
+
+/******************************************************************************
+                                                                DECL_REINIT  */
+
+/* Decl_reinit kalles før sjekkingen starter */
+
+decl_reinit ()
+{
+   obstack_free (&os_pref, first_object_allocated_ptr_pref);
 }
 
 /*****************************************************************************/
@@ -251,17 +281,17 @@ reinit ()
 /******************************************************************************
                                                            SETARRAYDIM       */
 
-/* LastArray peker på første array i siste arraydeklarasjon og setArrayDim
+/* Last_array peker på første array i siste arraydeklarasjon og set_array_dim
  * settes disse arrayenes dimensjon (dim). Så lengde next også er en array
  * skal også denne ha dimmensjonen arrdim.( integer array a,b(...); */
 
-setArrayDim (arrdim) int arrdim;
+set_array_dim (arrdim) int arrdim;
 {
-  while (lastArray != NULL)
+  while (last_array != NULL)
     {
-      lastArray->dim = arrdim;
-      lastArray = (lastArray->next == NULL ? NULL :
-	      (lastArray->next->kind == KARRAY ? lastArray->next : NULL));
+      last_array->dim = arrdim;
+      last_array = (last_array->next == NULL ? NULL :
+	      (last_array->next->kind == KARRAY ? last_array->next : NULL));
     }
   arrdim = 0;
 }
@@ -277,9 +307,9 @@ newnotseen (ident)
      char *ident;
 {
   if (lastunknowns == NULL)
-    unknowns->parloc = lastunknowns = newDecl ();
+    unknowns->parloc = lastunknowns = new_decl ();
   else
-    lastunknowns = lastunknowns->next = newDecl ();
+    lastunknowns = lastunknowns->next = new_decl ();
   lastunknowns->ident = ident;
   lastunknowns->type = TERROR;
   lastunknowns->kind = KERROR;
@@ -293,7 +323,7 @@ newnotseen (ident)
 /******************************************************************************
                                                          FINDDECL            */
 
-/* FindDecl leter etter deklarasjonen ident lokalt i blokken og langs
+/* Find_decl leter etter deklarasjonen ident lokalt i blokken og langs
  *  den prefikskjede.Den kalles rekursivt for hvert BLOCK objekt langs 
  *  prefikskjeden.Ved en inspect blokk kalles den for den ispiserte 
  *  klassen og dens prefikser.Finnes den returneres en peker til 
@@ -301,7 +331,7 @@ newnotseen (ident)
  *  HVIS virt==TRUE skal det først letes i evt. virtuell liste */
 
 struct DECL *
-findDecl (ident, rb, virt)
+find_decl (ident, rb, virt)
      char *ident;
      struct BLOCK *rb;
      char virt;
@@ -310,7 +340,7 @@ findDecl (ident, rb, virt)
   if ((rb->quant.kind == KINSP) && (rb->when != NULL))
     {
       seenthrough = rb;
-      if ((rd = findDecl (ident, rb->when->descr, virt)) != NULL
+      if ((rd = find_decl (ident, rb->when->descr, virt)) != NULL
 	  && rd->type != TLABEL)
 	return (rd);
       seenthrough = NULL;
@@ -330,7 +360,7 @@ findDecl (ident, rb, virt)
   if (rb->quant.kind == KCLASS || rb->quant.kind == KINSP || rb->quant.kind == KPRBLK
       || rb->quant.kind == KFOR || rb->quant.kind == KCON)
     if (rb->quant.plev > -1 && rb->quant.prefqual != NULL)
-      if ((rd = findDecl (ident, rb->quant.prefqual->descr,
+      if ((rd = find_decl (ident, rb->quant.prefqual->descr,
 			  rb->quant.kind == KCLASS | rb->quant.kind == KPRBLK ? FALSE : virt)) != NULL)
 	return (rd);
 
@@ -340,13 +370,13 @@ findDecl (ident, rb, virt)
 /******************************************************************************
                                                                 FINDGLOBAL   */
 
-/* FindGlobal  finner  den deklarasjonen som  svarer til et navn 
+/* Find_global  finner  den deklarasjonen som  svarer til et navn 
  * Den leter for  hvert  blokknivaa, i  prefikskjeden  og lokalt 
  * Stopper ved f\rste forekomst, fins den ikke kalles newnotseen 
  * Hvis virt==true skal det først letes i evt. virtuell liste */
 
 struct DECL *
-findGlobal (ident, virt)
+find_global (ident, virt)
      char *ident;
      char virt;
 {
@@ -355,7 +385,7 @@ findGlobal (ident, virt)
 
   seenthrough = NULL;
   for (rb= cblock; rb; rb= rb->quant.encl)
-    if ((rd= findDecl (ident, rb, virt)) != NULL)
+    if ((rd= find_decl (ident, rb, virt)) != NULL)
       {
 	if (rd->encl->blev == cblock->blev &&
 	    (rd->categ == CLOCAL || rd->categ == CVIRT))
@@ -374,7 +404,7 @@ findGlobal (ident, virt)
 
 /* Sjekker om parameterene er de samme */
 
-sameParam (rb1, rb2)
+same_param (rb1, rb2)
      struct BLOCK *rb1,
       *rb2;
 {
@@ -409,7 +439,7 @@ sameParam (rb1, rb2)
 	    else return (FALSE);
 	}
       if (rd1->kind == KPROC &&
-	  sameParam (rd2->descr, rd1->descr) == FALSE)
+	  same_param (rd2->descr, rd1->descr) == FALSE)
 	return (FALSE);
       rd1 = rd1->next;
       rd2 = rd2->next;
@@ -522,19 +552,15 @@ subordinate (rda, rdb)
 
 /* Kalles fra  syntakssjekkeren hver gang en ny blokk entres */
 
-beginBlock (kind)
+begin_block (kind)
      char kind;
 {
-  static int cblno = STARTBLNO;
-  static struct BLOCK *lblock;
   struct DECL *rd2;
   if (yaccerror)
     return;
 #ifdef DEBUG
   if (option_input)
-    printf (
-	     "beginBlock---line:%ld type:%c kind:%c categ:%c\t"
-	     ,lineno, type, kind, categ);
+    printf ("begin_block---line:%ld kind:%c\t", lineno, kind);
 #endif
 
   {
@@ -547,7 +573,7 @@ beginBlock (kind)
       }
     else
       {
-	cblock = newBlock ();
+	cblock = new_block ();
 	cblock->quant.line = lineno;
 	cblock->quant.kind = kind;
 #if 1
@@ -582,6 +608,7 @@ beginBlock (kind)
 	cblock->stat = TRUE;
       break;
     case KFOR:
+    case KFORLIST:
     case KINSP:
     case KCON:
       cblock->quant.ident = NULL;
@@ -608,10 +635,11 @@ beginBlock (kind)
 	}
       switch (kind)
 	{
-	case KFOR:
-	  cblock->fornest+= 1;
+	case KFORLIST:
+	  cblock->fornest++;
 	  if (cblock->quant.match->descr->fornest < cblock->fornest)
 	    cblock->quant.match->descr->fornest++;
+	  cblock->quant.kind = KFOR;
 	  break;
 	case KINSP:
 	  cblock->connest+= 1;
@@ -650,14 +678,13 @@ beginBlock (kind)
 /* Kalles  fra  syntakssjekkeren hver gang en blokk terminerer */
 
 /*VARARGS0 */
-endBlock (rtname, codeclass)
+end_block (rtname, codeclass)
      char *rtname;
      char codeclass;
 {
 #ifdef DEBUG
   if (option_input)
-    printf ("endBlock---line:%ld type:%c kind:%c categ:%c\t"
-	    ,lineno, type, kind, categ);
+    printf ("end_block---line:%ld\t", lineno);
 #endif
   if (yaccerror)
     return;
@@ -685,17 +712,17 @@ endBlock (rtname, codeclass)
 /******************************************************************************
                                                              REGDECL         */
 
-/* RegDecl kalles fra syntakssjekkeren
+/* Reg_decl kalles fra syntakssjekkeren
  * hver gang  vi leser  en deklarasjon */
 
-regDecl (ident, type, kind, categ)
+reg_decl (ident, type, kind, categ)
      char *ident, type, kind, categ;
 {
   struct DECL *pd,
    *pdx = NULL;
 #ifdef DEBUG
   if (option_input)
-    printf ("regDecl---line:%ld navn:%s type:%c kind:%c categ:%c\n"
+    printf ("reg_decl---line:%ld navn:%s type:%c kind:%c categ:%c\n"
 	    ,lineno, ident, type, kind, categ);
 #endif
   if (yaccerror)
@@ -736,11 +763,11 @@ regDecl (ident, type, kind, categ)
     proceed:
       if (kind == KCLASS || kind == KPROC)
 	{
-	  pd = (struct DECL *) newBlock ();
+	  pd = (struct DECL *) new_block ();
 	}
       else
 	{
-	  pd = newDecl ();
+	  pd = new_decl ();
 	}
       if (cblock->lastparloc == NULL)
 	cprevdecl = cblock->parloc = cblock->lastparloc = pd;
@@ -785,7 +812,7 @@ regDecl (ident, type, kind, categ)
 	  if (kind == KPROC)
 	    {
 	      /* Bytter ut dette objektet med et st|rre */
-	      cprevdecl = &newBlock ()->quant;
+	      cprevdecl = &new_block ()->quant;
 	      if (cblock->lastparloc == pd)
 		cblock->lastparloc = cprevdecl;
 	      makeequal (cprevdecl, pd);
@@ -821,9 +848,9 @@ regDecl (ident, type, kind, categ)
       else
 	{
 	  if (pd == NULL)
-	    cblock->hiprot = pd = newDecl ();
+	    cblock->hiprot = pd = new_decl ();
 	  else
-	    pd = pd->next = newDecl ();
+	    pd = pd->next = new_decl ();
 	  pd->ident = ident;
 	  pd->line = lineno;
 	  pd->type = TNOTY;
@@ -835,11 +862,11 @@ regDecl (ident, type, kind, categ)
     case CVIRT:
       if (kind == KCLASS || kind == KPROC)
 	{
-	  pd = (struct DECL *) newBlock ();
+	  pd = (struct DECL *) new_block ();
 	}
       else
 	{
-	  pd = newDecl ();
+	  pd = new_decl ();
 	}
       if (cblock->lastvirt == NULL)
 	cblock->virt = pd = cblock->lastvirt= pd;
@@ -873,11 +900,11 @@ regDecl (ident, type, kind, categ)
 /* Kalles fra syntakssjekkeren hver gang  
  * inner oppdages, sjekker da lovligheten */
 
-regInner ()
+reg_inner ()
 {
 #ifdef DEBUG
   if (option_input)
-    printf ("regInner---line:%ld cblev:%d\t"
+    printf ("reg_inner---line:%ld cblev:%d\t"
 	    ,lineno, cblev);
 #endif
   if (cblock->quant.kind != KCLASS)
@@ -907,7 +934,8 @@ regInner ()
 
 #ifdef DEBUG
 
-static dumpdekl (rd)
+static 
+dumpdekl (rd)
      struct DECL *rd;
 {
   printf ("        --DECL:%s=%d, k:%c,t:%c,c:%c, plev:%d, dim:%d, virtno:%d, line:%ld", rd->ident, rd->ident, rd->kind, rd->type, rd->categ, rd->plev, rd->dim, rd->virtno, rd->line);
@@ -962,7 +990,7 @@ static dumpdekl (rd)
 /* Dumpblock skriver ut  tilstanden til en blokk
  * Den gjør i sin tur en rekke kall paa dumpdekl */
 
-static dumpblock (rb)
+dumpblock (rb)
      struct BLOCK *rb;
 {
   struct DECL *rd;
@@ -1060,7 +1088,7 @@ static dumpblock (rb)
 /* Dump skriver ut tilstanden til hele strukturen
  * Den gjør et kall på  dumpblock for hver blokk */
 
-static dump ()
+dump ()
 {
   struct BLOCK *rb;
   printf ("BLOKK:Blno,Blev,kind,napar,navirt,navirtlab,");
@@ -1082,7 +1110,8 @@ static dump ()
 
 /* Setter/fjerner protected merket når klasser entres/forlates */
 
-static setprotectedvirt (rb, rd, protected)
+static 
+setprotectedvirt (rb, rd, protected)
      struct BLOCK *rb;
      struct DECL *rd;
      char protected;
@@ -1111,7 +1140,8 @@ static setprotectedvirt (rb, rd, protected)
     }
 }
 
-static setprotected (rb, protected)
+static 
+setprotected (rb, protected)
      struct BLOCK *rb;
      char protected;
 {
@@ -1147,7 +1177,8 @@ static setprotected (rb, protected)
  * Oppdager ulovlig prefiks og feil prefiksnivå 
  * Oppdager ved merking sirkulær prefikskjede */
 
-static setprefchain (rd)
+static 
+setprefchain (rd)
      struct DECL *rd;
 {
   struct DECL *rdx;
@@ -1158,7 +1189,7 @@ static setprefchain (rd)
     }
   else
     {
-      rdx = findGlobal (rd->identqual, FALSE);
+      rdx = find_global (rd->identqual, FALSE);
       rd->identqual=NULL;
       rd->plev = 0;
       if (rdx->categ == CNEW)
@@ -1229,7 +1260,7 @@ setqualprefchain (rd, param)
 	return (rd);
       if (rd->type == TREF)
 	{
-	  rdx = findGlobal (rd->identqual, FALSE);
+	  rdx = find_global (rd->identqual, FALSE);
 	  rd->plev = 0;
 	  if (rdx->categ == CNEW)
 	    {
@@ -1259,7 +1290,8 @@ setqualprefchain (rd, param)
  * Prefikskjeden og kvalifikasjoner settes ved kall på setqualprefchain 
  * den sjekker også konsistensen for type kind og categ */
 
-static sjekkdekl (rb)
+static 
+sjekkdekl (rb)
      struct BLOCK *rb;
 {
   struct DECL *rd = NULL,
@@ -1337,11 +1369,11 @@ static sjekkdekl (rb)
 		  rd->categ != CNAME && rd->categ != CVAR)
 		{
 		  char *s;
-		  obstack_grow (&osDecl, "__", 2);
-		  obstack_grow0 (&osDecl, rdx->ident, strlen(rdx->ident));
-		  s= obstack_finish(&osDecl);
+		  obstack_grow (&os_pref, "__", 2);
+		  obstack_grow0 (&os_pref, rdx->ident, strlen(rdx->ident));
+		  s= obstack_finish(&os_pref);
 		  rdx->ident = tag (s);
-		  obstack_free (&osDecl, s);
+		  obstack_free (&os_pref, s);
 		}
 	      else
 		d2error (55, rd);
@@ -1443,9 +1475,9 @@ static sjekkdekl (rb)
 	     vc != NULL; vc = vc->next)
 	  {
 	    if (va == NULL)
-	      va = vb = newDecl ();
+	      va = vb = new_decl ();
 	    else
-	      vb = vb->next = newDecl ();
+	      vb = vb->next = new_decl ();
 	    makeequal (vb, vc);
 	    vb->encl = rb;
 	    vb->dim = 0;
@@ -1553,7 +1585,7 @@ static sjekkdekl (rb)
 	      || (vc->type == TLABEL && va->type == TLABEL 
 		  && vc->kind == va->kind)
 	  || (vc->kind == KPROC && va->kind == KPROC && subordinate (va, vc)
-	      && sameParam (vc->descr, va->descr)))
+	      && same_param (vc->descr, va->descr)))
 	    {
 	      vc->match = va;
 	      vc->type = va->type;
@@ -1570,7 +1602,7 @@ static sjekkdekl (rb)
       /* Listen av hidden og protected sjekkes og match settes opp */
       for (rd = rb->hiprot; rd != NULL; rd = rd->next)
 	{
-	  rdx = findLocal (rd->ident, &rb->quant, TRUE);
+	  rdx = find_local (rd->ident, &rb->quant, TRUE);
 	  if (rdx->categ == CNEW)
 	    {
 	      d2error (74, rd);
@@ -1640,11 +1672,9 @@ firstclass ()
 /******************************************************************************
                                                                    INBLOCK   */
 
-/* InBlock kalles fra sjekkeren hver  gang en  blokk  entres */
+/* In_block kalles fra sjekkeren hver  gang en  blokk  entres */
 nextblock ()
 {
-  static struct BLOCK *lblock;
-
   if (lblock == NULL)
     lblock = ssblock;
   else
@@ -1660,7 +1690,7 @@ nextblock ()
   cblock= lblock;
 }
 
-inBlock ()
+in_block ()
 {
   nextblock ();
   cblev = cblock->blev;
@@ -1673,9 +1703,9 @@ inBlock ()
 /******************************************************************************
                                                              OUTBLOCK        */
 
-/* OutBlock kalles fra sjekkeren hver gang  en blokk  forlates */
+/* Out_block kalles fra sjekkeren hver gang  en blokk  forlates */
 
-outBlock ()
+out_block ()
 {
   if (cblock->quant.kind == KCLASS || cblock->quant.kind == KPRBLK)
     setprotected (cblock, TRUE);
@@ -1711,7 +1741,7 @@ reginsp (rb, rd) struct BLOCK *rb; struct DECL *rd;
   if (rd == NULL)
     {
       d2error (73, &rb->quant);
-      rd = findGlobal (tag ("Noqual"), FALSE);
+      rd = find_global (tag ("Noqual"), FALSE);
       rd->categ = CERROR;
     }
   rb->virt = rd;
@@ -1724,7 +1754,7 @@ reginsp (rb, rd) struct BLOCK *rb; struct DECL *rd;
  * sjekker da lovligheten */
 
 struct DECL *
-regThis (ident)
+reg_this (ident)
      char *ident;
 {
   struct DECL *rd,
@@ -1733,7 +1763,7 @@ regThis (ident)
   struct BLOCK *rb;
 #ifdef DEBUG
   if (option_input)
-    printf ("regThis---line:%ld cblev:%d\t"
+    printf ("reg_this---line:%ld cblev:%d\t"
 	    ,lineno, cblev);
 #endif
   for (rb = cblock; rb->blev > 0; rb= rb->quant.encl)	/* Skal det v}re i>=0 .(Omgivelsene) */
@@ -1776,30 +1806,30 @@ regThis (ident)
   if (option_input)
     printf ("---end\n");
 #endif
-  d2error (79, rd = findGlobal (ident, FALSE));
+  d2error (79, rd = find_global (ident, FALSE));
   return (rd);
 }
 
 /******************************************************************************
                                                                 FINDLOCAL    */
 
-/* FindLocal  finner  den  deklarasjonen som  svarer til  et navn 
+/* Find_local  finner  den  deklarasjonen som  svarer til  et navn 
  * Den leter lokalt i den lista den har fåt og dens prefikskjede 
- * Har den ikke  fåt noen liste  leter den slik  findGlobal gjør 
+ * Har den ikke  fåt noen liste  leter den slik  find_global gjør 
  * Den registrerer også localused 
  * Hvis virt==TRUE skal det først letes i evt. virtuell liste */
 
 struct DECL *
-findLocal (ident, rd, virt)
+find_local (ident, rd, virt)
      char *ident;
      struct DECL *rd;
      char virt;
 {
   seenthrough = NULL;
   if (rd != NULL && rd->descr != NULL)
-    rd = findDecl (ident, rd->descr, virt);
+    rd = find_decl (ident, rd->descr, virt);
   else
-    return (findGlobal (ident, virt));
+    return (find_global (ident, virt));
   if (rd != NULL)
     return (rd);
   for (rd = unknowns->parloc; rd != NULL; rd = rd->next)
@@ -1816,7 +1846,7 @@ findLocal (ident, rd, virt)
  * Får som input forrige parameter */
 
 struct DECL *
-nextParam (rd)
+next_param (rd)
      struct DECL *rd;
 {
   struct DECL *rdx;
@@ -1872,7 +1902,7 @@ firstclassparam (rd)
 
 
 struct DECL *
-firstParam (rd)
+first_param (rd)
      struct DECL *rd;
 {
   struct DECL *rdx;
@@ -1911,7 +1941,7 @@ firstParam (rd)
 
 /* Forlanges det flere parametere */
 
-moreParam (rd)
+more_param (rd)
      struct DECL *rd;
 {
   if (rd == sluttparam)
@@ -1966,7 +1996,7 @@ body (rd)
 /* Er prosedyren farlig og m] isoleres i uttrykk */
 
 char 
-dangerProc (rd)
+danger_proc (rd)
      struct DECL *rd;
 {
   switch (rd->descr->codeclass)
@@ -1988,7 +2018,7 @@ dangerProc (rd)
 /*****************************************************************************
                                                                 REMOVEBLOCK */
 
-removeBlock (rb) struct BLOCK *rb;
+remove_block (rb) struct BLOCK *rb;
 {
   struct DECL *rd;
   if (rb->quant.encl->parloc->descr == rb) 

@@ -10,7 +10,7 @@ typedef struct /*  */
         __dhp c1;
         __dhp c2;
     } __bs0;
-__bs0 __blokk0SIMSET;
+extern __bs0 __blokk0FILE;
 extern __ptyp __p0FILE;
 typedef struct /* FILE */
     {
@@ -158,18 +158,20 @@ typedef struct /* FOLLOW */
     {
         __dh h;
 	__dhp  PTR;
+        __dhp __r1;
     } __bs213;
-short __rl213SIMSET[1]={(short)((char *)&((__bs213 *)0)->PTR-(char *)0),};
+short __rl213SIMSET[2]={(short)((char *)&((__bs213 *)0)->__r1-(char *)0),(short)((char *)&((__bs213 *)0)->PTR-(char *)0),};
 extern __ptyp __p213SIMSET;__pty   __pl213SIMSET[1]={&__p213SIMSET};
-__ptyp __p213SIMSET={'P',0,4,sizeof(__bs213),15,__m_SIMSET,0,0,1,0,__rl213SIMSET,0,__pl213SIMSET,__NULL};
+__ptyp __p213SIMSET={'P',0,4,sizeof(__bs213),15,__m_SIMSET,0,0,2,0,__rl213SIMSET,0,__pl213SIMSET,__NULL};
 typedef struct /* PRECEDE */
     {
         __dh h;
 	__dhp  PTR;
+        __dhp __r1;
     } __bs214;
-short __rl214SIMSET[1]={(short)((char *)&((__bs214 *)0)->PTR-(char *)0),};
+short __rl214SIMSET[2]={(short)((char *)&((__bs214 *)0)->__r1-(char *)0),(short)((char *)&((__bs214 *)0)->PTR-(char *)0),};
 extern __ptyp __p214SIMSET;__pty   __pl214SIMSET[1]={&__p214SIMSET};
-__ptyp __p214SIMSET={'P',0,4,sizeof(__bs214),16,__m_SIMSET,0,0,1,0,__rl214SIMSET,0,__pl214SIMSET,__NULL};
+__ptyp __p214SIMSET={'P',0,4,sizeof(__bs214),16,__m_SIMSET,0,0,2,0,__rl214SIMSET,0,__pl214SIMSET,__NULL};
 typedef struct /* INTO */
     {
         __dh h;
@@ -223,10 +225,11 @@ typedef struct /* CLEAR */
         __dh h;
 	__dhp  PTR;
 	__dhp  PTRSUC;
+        __dhp __r1;
     } __bs221;
-short __rl221SIMSET[2]={(short)((char *)&((__bs221 *)0)->PTR-(char *)0),(short)((char *)&((__bs221 *)0)->PTRSUC-(char *)0),};
+short __rl221SIMSET[3]={(short)((char *)&((__bs221 *)0)->__r1-(char *)0),(short)((char *)&((__bs221 *)0)->PTR-(char *)0),(short)((char *)&((__bs221 *)0)->PTRSUC-(char *)0),};
 extern __ptyp __p221SIMSET;__pty   __pl221SIMSET[1]={&__p221SIMSET};
-__ptyp __p221SIMSET={'P',0,4,sizeof(__bs221),25,__m_SIMSET,0,0,2,0,__rl221SIMSET,0,__pl221SIMSET,__NULL};
+__ptyp __p221SIMSET={'P',0,4,sizeof(__bs221),25,__m_SIMSET,0,0,3,0,__rl221SIMSET,0,__pl221SIMSET,__NULL};
 void __m_SIMSET(){goto __s;goto __ll0;/* START CLASS SIMSET *//* START CLASS LINKAGE *//* START PROCEDURE SUC */__l8:
 # 31 "./simset.sim"
 
@@ -265,7 +268,7 @@ __sl=__lb->sl;__rcpp(&__p212SIMSET);__rcpb(26,__m_SIMSET);goto __sw;__l26:;;
 # 56 "./simset.sim"
 ;((__bs207 *)__lb->sl)->zzsuc=((__bs207 *)((__bp=((__bs213 *)__lb)->PTR)==__NULL?(__dhp)__rerror(__errnone):__bp))->zzsuc;
 # 57 "./simset.sim"
-(__r[1]=(((__bs207 *)__lb->sl)->zzsuc));((__bs207 *)((__bp=__r[1])==__NULL?(__dhp)__rerror(__errnone):__bp))->zzpred=((__bs207 *)((__bp=((__bs213 *)__lb)->PTR)==__NULL?(__dhp)__rerror(__errnone):__bp))->zzsuc=__lb->sl;
+(((__bs213 *)__lb)->__r1=(((__bs207 *)__lb->sl)->zzsuc));((__bs207 *)((__bp=((__bs213 *)__lb)->__r1)==__NULL?(__dhp)__rerror(__errnone):__bp))->zzpred=((__bs207 *)((__bp=((__bs213 *)__lb)->PTR)==__NULL?(__dhp)__rerror(__errnone):__bp))->zzsuc=__lb->sl;
 # 58 "./simset.sim"
 __ll2:__repp();goto __sw;/* SLUTT PROCEDURE FOLLOW *//* START PROCEDURE PRECEDE */__l16:
 # 60 "./simset.sim"
@@ -279,11 +282,11 @@ __sl=__lb->sl;__rcpp(&__p212SIMSET);__rcpb(27,__m_SIMSET);goto __sw;__l27:;;
 # 64 "./simset.sim"
 ;((__bs207 *)__lb->sl)->zzpred=((__bs207 *)((__bp=((__bs214 *)__lb)->PTR)==__NULL?(__dhp)__rerror(__errnone):__bp))->zzpred;
 # 65 "./simset.sim"
-(__r[1]=(((__bs207 *)__lb->sl)->zzpred));((__bs207 *)((__bp=__r[1])==__NULL?(__dhp)__rerror(__errnone):__bp))->zzsuc=((__bs207 *)((__bp=((__bs214 *)__lb)->PTR)==__NULL?(__dhp)__rerror(__errnone):__bp))->zzpred=__lb->sl;
+(((__bs214 *)__lb)->__r1=(((__bs207 *)__lb->sl)->zzpred));((__bs207 *)((__bp=((__bs214 *)__lb)->__r1)==__NULL?(__dhp)__rerror(__errnone):__bp))->zzsuc=((__bs207 *)((__bp=((__bs214 *)__lb)->PTR)==__NULL?(__dhp)__rerror(__errnone):__bp))->zzpred=__lb->sl;
 # 66 "./simset.sim"
 __ll3:__repp();goto __sw;/* SLUTT PROCEDURE PRECEDE *//* START PROCEDURE INTO */__l17:
 # 68 "./simset.sim"
-(((__bp=((__bs215 *)__lb)->S)!=__NULL && (__bp->pp->pref[1]!= &__p216SIMSET))?(__dhp)__rerror(__errqual):__bp);__sl=__lb->sl;__rcpp(&__p214SIMSET);;((__bs214 *)__pb)->PTR=((__bs215 *)__lb)->S;__rcpb(28,__m_SIMSET);goto __sw;__l28:;;__repp();goto __sw;/* SLUTT PROCEDURE INTO */__l11:
+(((__bp=((__bs215 *)__lb)->S)!=__NULL && (__bp->pp->pref[1]!= &__p216SIMSET))?(__dhp)__rerror(__errqual):__bp);__sl=__lb->sl;__rcpp(&__p214SIMSET);((__bs214 *)__pb)->PTR=((__bs215 *)__lb)->S;__rcpb(28,__m_SIMSET);goto __sw;__l28:;;__repp();goto __sw;/* SLUTT PROCEDURE INTO */__l11:
 # 42 "./simset.sim"
 __renddecl(1);goto __sw;__l12:__rinner(1);goto __sw;__l13:
 # 70 "./simset.sim"
@@ -321,7 +324,7 @@ __ll6:;if(!((((__bs221 *)__lb)->PTR!=__lb->sl)))goto __ll7;
 # 110 "./simset.sim"
 ;((__bs221 *)__lb)->PTRSUC=((__bs207 *)((__bp=((__bs221 *)__lb)->PTR)==__NULL?(__dhp)__rerror(__errnone):__bp))->zzsuc;
 # 111 "./simset.sim"
-(__r[1]=(((__bs221 *)__lb)->PTR));((__bs207 *)((__bp=__r[1])==__NULL?(__dhp)__rerror(__errnone):__bp))->zzsuc=((__bs207 *)((__bp=((__bs221 *)__lb)->PTR)==__NULL?(__dhp)__rerror(__errnone):__bp))->zzpred=__NULL;
+(((__bs221 *)__lb)->__r1=(((__bs221 *)__lb)->PTR));((__bs207 *)((__bp=((__bs221 *)__lb)->__r1)==__NULL?(__dhp)__rerror(__errnone):__bp))->zzsuc=((__bs207 *)((__bp=((__bs221 *)__lb)->PTR)==__NULL?(__dhp)__rerror(__errnone):__bp))->zzpred=__NULL;
 # 112 "./simset.sim"
 ;((__bs221 *)__lb)->PTR=((__bs221 *)__lb)->PTRSUC;
 # 113 "./simset.sim"
@@ -331,13 +334,15 @@ goto __ll6;__ll7:
 # 73 "./simset.sim"
 __renddecl(1);goto __sw;__l19:
 # 118 "./simset.sim"
-;((__bs207 *)__lb)->zzsuc=((__bs207 *)__lb)->zzpred=__lb;__rinner(1);goto __sw;__l20:__rendclass(1);goto __sw;/* SLUTT CLASS HEAD */__l2:
+;((__bs207 *)__lb)->zzsuc=((__bs207 *)__lb)->zzpred=__lb;
+# 73 "./simset.sim"
+__rinner(1);goto __sw;__l20:
+# 118 "./simset.sim"
+__rendclass(1);goto __sw;/* SLUTT CLASS HEAD */__l2:
 # 25 "./simset.sim"
 __renddecl(0);goto __sw;__l3:__rinner(0);goto __sw;__l4:
 # 120 "./simset.sim"
-__rendclass(0);goto __sw;/* SLUTT CLASS SIMSET */__ll0:
-/* THUNKS */
-__sw:if(__goto.ment!=(void (*)())__m_SIMSET)return;__s:switch(__goto.ent){case 2: goto __l2;
+__rendclass(0);goto __sw;/* SLUTT CLASS SIMSET */__ll0:__sw:if(__goto.ment!=(void (*)())__m_SIMSET)return;__s:switch(__goto.ent){case 2: goto __l2;
 case 3: goto __l3;
 case 4: goto __l4;
 case 5: goto __l5;

@@ -18,6 +18,7 @@
 
 /* Main for kompilatoren. */
 
+#include "passes.h"
 #include <stdio.h>
 #include "const.h"
 #include "name.h"
@@ -45,18 +46,18 @@
 
 #include "getopt.h"
 
-struct SENT *mainSent;
+struct SENT *main_sent;
 
 FILE *ccode;
 
 char *extcodename;
 char *mifcodename;
+char *sourcename;
+char *ccodename;
 
 static char *outputname = "";
 static char *exekname;
-static char *sourcename;
 static char *listname;
-static char *ccodename;
 static char *ocodename;
 static char *shlname;
 
@@ -79,6 +80,7 @@ int option_init_poolsize;
 int option_dyn_poolsize;
 int option_max_poolsize;
 int option_bl_in_dir_line;
+int option_quiet;
 
 static int option_static;
 static int option_pic;
@@ -89,15 +91,14 @@ static int option_nocc;
 static int option_checkdif;
 static int option_notempdel;
 static int option_noexecdel;
-static int option_quiet;
 static int option_sscheck;
 #ifdef DEBUG
-static int option_lex,
-static int option_gen_test;
-static int option_declarations;
-static int option_expressions;
-static int option_msymbols;
-static int option_input;
+int option_lex;
+int option_declarations;
+int option_input;
+int option_dump_build;
+int option_dump_check;
+int option_dump_trans;
 #endif
 
 #ifdef DEBUG
@@ -107,22 +108,6 @@ char separat_comp;		/* Sier om kj|ringen er en separat
 				 * kompilering eller ikke */
 
 char *progname;
-
-/******************************************************************************
-                                                                     XMALLOC */
-
-char *
-xmalloc (size)
-     unsigned int size;
-{
-  char *ptr = malloc (size);
-  if (! ptr)
-    {
-      fprintf (stderr, "%s: virtual memory exhausted\n", progname);
-      exit (1);
-    }
-  return ptr;
-}
 
 /******************************************************************************
                                                                TRAP-ROUTINES */
@@ -201,7 +186,8 @@ static init_trap_routines()
 
 #if HAVE_GETENV
 extern char *getenv ();
-static xgetenv (name, var)
+static 
+xgetenv (name, var)
      char *name;
      char **var;
 {
@@ -212,7 +198,8 @@ static xgetenv (name, var)
 }
 #endif
 
-static get_all_env()
+static 
+get_all_env()
 {
 #if HAVE_GETENV
   xgetenv ("CIMLIBDIR", &systemlibdir);
@@ -220,85 +207,6 @@ static get_all_env()
   xgetenv ("TMPDIR", &tmpdir);
   xgetenv ("CIMTMPDIR", &tmpdir);
 #endif
-}
-
-/******************************************************************************
-                                                                     SIMCOMP */
-static simcomp ()
-{
-  mbuilderInit();
-
-  if (initLex (sourcename)) return (TRUE);
-  if (option_write_tokens)
-    {
-      scan_and_write_tokens ();
-      return (FALSE);
-    }
-#ifdef DEBUG
-  if (option_declarations || option_expressions
-      || option_msymbols || option_input || option_lex)
-    {
-      s_out = dup (stdout->_file);
-      if (freopen (listname, "w", stdout) == NULL)
-	{
-	  perror (newstrcat3 (progname, ": ", listname));
-	  return (TRUE);
-	}
-    }
-#endif
-  if ((ccode = fopen (ccodename, "w")) == NULL)
-    {
-      perror (newstrcat3 (progname, ": ", ccodename));
-      return (TRUE);
-    }
-  if (!option_quiet)
-    fprintf (stderr, "Compiling %s:\n", sourcename);
-
-  /* PASS 1 */
-
-  initExtspec ();
-  init_parser ();
-  initDecl ();
-  yyparse ();
-
-  /* PASS 2 AV KOMPILATOREN */
-
-  if (anterror == 0)
-    {
-      mbuilderReinit();
-      ebuilderInit();
-      sbuilderInit();
-      mainSent= sbuild();
-      reinit ();
-      expCheckerInit ();
-      genInit ();
-      sentCheck (mainSent, TRUE);
-      if (anterror == 0)
-	{
-	  sentTrans (mainSent);
-	  sentGen (mainSent);
-	}
-      if (separat_comp && (anterror == 0 || option_atr))
-	write_all_ext ();
-#ifdef DEBUG
-      if (option_declarations)
-	dump ();
-#endif
-    }
-  fclose (ccode);
-#ifdef DEBUG
-  if (option_declarations || option_expressions
-      || option_msymbols || option_input || option_lex)
-    {
-      fclose (stdout);
-      fdopen (s_out, "w");
-      dup2 (s_out, fileno (stdout));
-    }
-#endif
-  if (anterror != 0)
-    return (TRUE);
-  else
-    return (FALSE);
 }
 
 /******************************************************************************
@@ -339,7 +247,8 @@ basename (str) char *str;
 /******************************************************************************
                                                                   PRINT_HELP */
 
-static int print_help(status)int status;
+static int 
+print_help(status)int status;
 {
   fprintf(stderr,"Usage: %s"
 	  " [-a] [--atr]"
@@ -395,7 +304,8 @@ static int print_help(status)int status;
 
 /******************************************************************************
                                                                 PARSEOPTIONS */
-static parseoptions (argc, argv)
+static 
+parseoptions (argc, argv)
      int argc;
      char *argv[];
 {
@@ -441,12 +351,12 @@ static parseoptions (argc, argv)
 	  {"version", 0, 0, 'V'},
 	  {"no-warn", 0, 0, 'w'},
 #ifdef DEBUG
-	  {"dd", 0, &option_declarations, 1},
-	  {"de", 0, &option_expressions, 1},
-	  {"dm", 0, &option_msymbols, 1},
-	  {"di", 0, &option_input, 1},
-	  {"dl", 0, &option_lex, 1},
-	  {"dg", 0, &option_gen, 1},
+	  {"debug-declarations", 0, &option_declarations, 1},
+	  {"debug-input", 0, &option_input, 1},
+	  {"debug-lex", 0, &option_lex, 1},
+	  {"debug-dump-build", 0, &option_dump_build, 1},
+	  {"debug-dump-check", 0, &option_dump_check, 1},
+	  {"debug-dump-trans", 0, &option_dump_trans, 1},
 #endif
 	  {"oc", 1, 0, 'b'},
 	  {"ol", 1, 0, 'B'},
@@ -491,7 +401,7 @@ static parseoptions (argc, argv)
 	  option_reuse_timestamp = TRUE;
 	  break;
 	case 'D':
-	  defineName (tag (stringtoupper (optarg)), TRUE);
+	  define_name (tag (stringtoupper (optarg)), TRUE);
 	  break;
 	case 'e':
 	  option_static = TRUE;
@@ -596,7 +506,7 @@ static parseoptions (argc, argv)
 	  option_bl_in_dir_line = TRUE;
 	  break;
 	case 'U':
-	  defineName (tag (stringtoupper (optarg)), FALSE);
+	  define_name (tag (stringtoupper (optarg)), FALSE);
 	  break;
 	case 'v':
 	  option_verbose = TRUE;
@@ -691,8 +601,8 @@ main (argc, argv, envp)
 
   progname = argv[0];
 
-  initNewstr ();
-  initFilelist ();
+  init_newstr ();
+  init_filelist ();
 
   ccomp = newstrcat3 (SCC, " ", SCFLAGS);
 
@@ -702,7 +612,7 @@ main (argc, argv, envp)
   
   insert_name_in_dirlist (systemlibdir);
 
-  initName ();
+  init_name ();
 
   if (parseoptions (argc, argv))
     return (1);
@@ -731,7 +641,7 @@ main (argc, argv, envp)
       rename (ccodename, newstrcat2 (ccodename, ".old")); 
     }
 
-  if (!option_nosim && simcomp ())
+  if (!option_nosim && passes_do ())
     {
       unlink (ccodename);
 
@@ -741,6 +651,14 @@ main (argc, argv, envp)
 	}
       return (1);
     }
+
+#if 0
+  /* Følgende skal ikke gjøre skade. 
+     Må få dette til å virke før cim
+     kan gjøre mer enn en kompilering. */
+
+  simcomp ();
+#endif
 
   if (option_write_tokens)
     return (0);
@@ -900,6 +818,7 @@ main (argc, argv, envp)
       fclose (shlfile);
       system (newstrcat2 ("chmod +x ", shlname));
     }
+  fflush (stdout);
   argv[0]= shlname;
   execve (shlname, argv, envp);
 }

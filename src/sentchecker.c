@@ -26,20 +26,21 @@
 /******************************************************************************
                                                                    SENTCHECK */
 
-void sentCheck (parentSent, resLabels) struct SENT *parentSent; char resLabels;
+void 
+sent_check (parent_sent, res_labels) struct SENT *parent_sent; char res_labels;
 {
-  struct SENT *sent, *nextSent, *whenSent;
-  char removeWhenClauses=FALSE;
+  struct SENT *sent, *next_sent, *when_sent;
+  char remove_when_clauses=FALSE;
 
-  for (sent= parentSent->first; sent!=NULL; sent= nextSent)
+  for (sent= parent_sent->first; sent!=NULL; sent= next_sent)
     {
-      nextSent= sent->next;
+      next_sent= sent->next;
       lineno= sent->line;
       switch (sent->token)
 	{
 	case MCONST:
 	  sent->cblock=cblock;
-	  mainExpCheck (sent->exp);
+	  main_exp_check (sent->exp);
 	  {
 
 	    /* TBD Har ikke implementert fremoverreferanser for konstant deklarasjoner */ 
@@ -54,16 +55,16 @@ void sentCheck (parentSent, resLabels) struct SENT *parentSent; char resLabels;
 	  sent->exp->left->rd->categ = CCONST;
 	  break;
 	case MBLOCK:
-	  inBlock ();
+	  in_block ();
 	  sent->cblock=cblock;
-	  sentCheck (sent, resLabels);
-	  outBlock ();
+	  sent_check (sent, res_labels);
+	  out_block ();
 	  break;
 	case MPRBLOCK:
-	  mainExpCheck (sent->exp);
-	  inBlock ();
+	  main_exp_check (sent->exp);
+	  in_block ();
 	  sent->cblock=cblock;
-	  if (resLabels) 
+	  if (res_labels) 
 	    {
 	      sent->cblock->ent = newlabel ();
 	      newlabel ();
@@ -71,128 +72,128 @@ void sentCheck (parentSent, resLabels) struct SENT *parentSent; char resLabels;
 	  if (sent->exp->type != TERROR &&
 	      (sent->exp->token != MARGUMENT || sent->exp->rd->kind != KCLASS))
 	    serror (3);
-	  sentCheck (sent, resLabels);
-	  outBlock ();
+	  sent_check (sent, res_labels);
+	  out_block ();
 	  break;
 	case MPROCEDURE:
-	  inBlock ();
+	  in_block ();
 	  sent->cblock=cblock;
-	  if (resLabels) sent->cblock->ent = newlabel ();
-	  sentCheck (sent, resLabels);
-	  outBlock ();
+	  if (res_labels) sent->cblock->ent = newlabel ();
+	  sent_check (sent, res_labels);
+	  out_block ();
 	  break;
 	case MCLASS:
-	  inBlock ();
+	  in_block ();
 	  sent->cblock=cblock;
-	  if (resLabels) 
+	  if (res_labels) 
 	    {
 	      sent->cblock->ent = newlabel ();
 	      newlabel ();		/* Label etter dekl. del */
 	      newlabel ();		/* Etter kall p} rinner  */
 	    }
-	  sentCheck (sent, resLabels);
-	  outBlock ();
+	  sent_check (sent, res_labels);
+	  out_block ();
 	  break;
 	case MINSPECT:
-	  mainExpCheck (sent->exp);
+	  main_exp_check (sent->exp);
 	  if (sent->exp->type != TREF && sent->exp->type != TERROR)
 	    serror (73, token);
-	  inBlock ();
+	  in_block ();
 	  sent->cblock=cblock;
           reginsp (sent->cblock, sent->exp->qual);
-	  sentCheck (sent, resLabels);
-	  if (sent->last==NULL || sent->last->token != MOTHERWISE) outBlock ();
+	  sent_check (sent, res_labels);
+	  if (sent->last==NULL || sent->last->token != MOTHERWISE) out_block ();
 	  break;
 	case MDO:
-	  inBlock ();
+	  in_block ();
 	  sent->cblock=cblock;
-	  regwhen (sent->cblock, parentSent->cblock->virt);
-	  sentCheck (sent, resLabels);
-	  outBlock ();
+	  regwhen (sent->cblock, parent_sent->cblock->virt);
+	  sent_check (sent, res_labels);
+	  out_block ();
 	  break;
 	case MWHEN:
-	  mainExpCheck (sent->exp);
-	  inBlock ();
+	  main_exp_check (sent->exp);
+	  in_block ();
 	  sent->cblock=cblock;
 	  {
-	    char notRemoved=TRUE;
+	    char not_removed=TRUE;
 	    /* Sjekker om rd er samme klasse eller en subklasse til * klassen 
 	     * som inspiseres,eller omvendt */
-	    if (!subclass (sent->exp->rd, parentSent->cblock->virt)
-		&& !subclass (parentSent->cblock->virt, sent->exp->rd))
+	    if (!subclass (sent->exp->rd, parent_sent->cblock->virt)
+		&& !subclass (parent_sent->cblock->virt, sent->exp->rd))
 	      {
 		serror (83, sent->exp->rd->ident);
 		/* Trenger ikke å legge ut kode for denne WHEN grenen */
-		removeBlock (sent->cblock);
-		removeSent (parentSent, sent); 
-		notRemoved= FALSE;
+		remove_block (sent->cblock);
+		remove_sent (parent_sent, sent); 
+		not_removed= FALSE;
 	      }
-	    else if (subclass (parentSent->cblock->virt, sent->exp->rd) &&
+	    else if (subclass (parent_sent->cblock->virt, sent->exp->rd) &&
 		     sent->prev == NULL)
 	      {
 		serror (82, sent->exp->rd->ident);
 	      }
 	    else
 	      {
-		for (whenSent=parentSent->first; whenSent != sent; 
-		     whenSent= whenSent->next)
+		for (when_sent=parent_sent->first; when_sent != sent; 
+		     when_sent= when_sent->next)
 		  {
-		    if (subclass (sent->exp->rd, whenSent->exp->rd))
+		    if (subclass (sent->exp->rd, when_sent->exp->rd))
 		      {
 			serror (83, sent->exp->rd->ident);
 			/* Ingen kode for denne WHEN grenen */
-			removeBlock (sent->cblock);
-			removeSent (parentSent, sent);
-			notRemoved= FALSE;
+			remove_block (sent->cblock);
+			remove_sent (parent_sent, sent);
+			not_removed= FALSE;
 			break;
 		      }
 		  }
 	      }
 	    regwhen (sent->cblock, sent->exp->rd);
-	    sentCheck (sent, notRemoved);
+	    sent_check (sent, not_removed);
 	  }
-	  outBlock ();
+	  out_block ();
 	  break;
 	case MOTHERWISE:
-	  outBlock ();
+	  out_block ();
 	  sent->cblock=cblock;
-	  sentCheck (sent, resLabels);
+	  sent_check (sent, res_labels);
 	  break;
 	case MFORDO:
-	  inBlock ();
+	  in_block ();
 	  sent->cblock=cblock;
-	  mainExpCheck (sent->exp);
+	  main_exp_check (sent->exp);
 	  if (sent->first == NULL) serror (81);
-	  sentCheck (sent, resLabels);
-	  outBlock ();
+	  sent_check (sent, res_labels);
+	  out_block ();
 	  break;
 	case MWHILE:
 	  sent->cblock=cblock;
-	  mainExpCheck (sent->exp);
+	  main_exp_check (sent->exp);
 	  if (sent->exp->type != TBOOL && sent->exp->type != TERROR)
 	    serror (77, token);
 	  if (sent->first == NULL) serror (81);
-	  sentCheck (sent, resLabels);
+	  sent_check (sent, res_labels);
 	  break;
 	case MIF:
 	  sent->cblock=cblock;
-	  mainExpCheck (sent->exp);
+	  main_exp_check (sent->exp);
 	  if (sent->exp->type != TBOOL)
 	    if (sent->exp->type != TERROR)
 	      serror (77, token);
-	  sentCheck (sent, resLabels);
+	  sent_check (sent, res_labels);
 	  break;
 	case MELSE:
 	  sent->cblock=cblock;
-	  sentCheck (sent, resLabels);
+	  sent_check (sent, res_labels);
 	  break;
 	case MTHEN:
 	  sent->cblock=cblock;
-	  sentCheck (sent, resLabels);
+	  sent_check (sent, res_labels);
 	  break;
 	case MGOTO:
 	  sent->cblock=cblock;
-	  mainExpCheck (sent->exp);
+	  main_exp_check (sent->exp);
 	  if (sent->exp->type != TLABEL && sent->exp->type != TERROR)
 	    serror (108, token);
 	  break;
@@ -201,11 +202,11 @@ void sentCheck (parentSent, resLabels) struct SENT *parentSent; char resLabels;
 	  break;
 	case MENDSWITCH:
 	  sent->cblock=cblock;
-	  mainExpCheck (sent->exp);
+	  main_exp_check (sent->exp);
 	  break;
 	case MENDASSIGN:
 	  sent->cblock=cblock;
-	  mainExpCheck (sent->exp);
+	  main_exp_check (sent->exp);
 	  if (sent->exp->token != MPROCARG && sent->exp->token != MNEWARG &&
 	      sent->exp->token != MASSIGN && sent->exp->token != MREFASSIGNT &&
 	      sent->exp->token != MASSIGNR && sent->exp->token != MVALASSIGNT &&
@@ -215,11 +216,11 @@ void sentCheck (parentSent, resLabels) struct SENT *parentSent; char resLabels;
 	  break;
 	case MENDARRAY:
 	  sent->cblock=cblock;
-	  mainExpCheck (sent->exp);
+	  main_exp_check (sent->exp);
 	  break;
 	case MENDLABEL:
 	  sent->cblock=cblock;
-	  mainExpCheck (sent->exp);
+	  main_exp_check (sent->exp);
 	  break;
 	}
     }

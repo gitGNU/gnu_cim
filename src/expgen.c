@@ -35,7 +35,7 @@ int inthunk;			/* Brukes i forbindelse med uttrykk i
 gen (re)
      struct EXP *re;
 {
-  genvalue (transcall (re->up, re));
+  genvalue (transcall (re->up, re, 1, 1, 1));
   gen_sent_marker();
   genvalue (re);
   gen_sent_marker();
@@ -194,6 +194,133 @@ genmodulemark(maintimestamp) char *maintimestamp;
 }
 
 /******************************************************************************
+                                                           GEN_STACK_OBJECT  */
+
+#if ACSTACK_IN_OBJ
+static struct BLOCK *
+find_stack_object ()
+{
+  switch (cblock->quant.kind)
+    {
+    case KFOR:
+    case KINSP:
+    case KCON:
+      return cblock->quant.match->descr;
+      break;
+    default:
+      return cblock;
+    }
+}
+
+gen_stack_object_val (i) int i;
+{
+  struct BLOCK *rb= find_stack_object ();
+
+  if ((rb->quant.kind == KCLASS || rb->quant.kind == KPRBLK) && 
+      rb->quant.plev > 0)
+    {
+      while (rb->quant.plev >0 && rb->quant.prefqual->descr->maxusedval >= i)
+	rb= rb->quant.prefqual->descr;
+    }
+  genchain (rb, TRUE);
+}
+
+gen_stack_object_ref (i) int i;
+{
+  struct BLOCK *rb= find_stack_object ();
+
+  if ((rb->quant.kind == KCLASS || rb->quant.kind == KPRBLK) && 
+      rb->quant.plev > 0)
+    {
+      while (rb->quant.plev >0 && rb->quant.prefqual->descr->maxusedref >= i)
+	rb= rb->quant.prefqual->descr;
+    }
+  genchain (rb, TRUE);
+}
+
+gen_stack_object_txt (i) int i;
+{
+  struct BLOCK *rb= find_stack_object ();
+
+  if ((rb->quant.kind == KCLASS || rb->quant.kind == KPRBLK) && 
+      rb->quant.plev > 0)
+    {
+      while (rb->quant.plev >0 && rb->quant.prefqual->descr->maxusedtxt >= i)
+	rb= rb->quant.prefqual->descr;
+    }
+  genchain (rb, TRUE);
+}
+#endif
+
+/******************************************************************************
+                                                              GEN_INT_STACK  */
+
+gen_int_stack (i) int i;
+{
+#if ACSTACK_IN_OBJ
+  gen_stack_object_val (i);
+  fprintf (ccode, "__v%d.i", i);
+#else
+  fprintf (ccode, "__v[%d].i", i);
+#endif
+}
+
+
+/******************************************************************************
+                                                              GEN_REA_STACK  */
+
+gen_rea_stack (i) int i;
+{
+#if ACSTACK_IN_OBJ
+  gen_stack_object_val (i);
+  fprintf (ccode, "__v%d.f", i);
+#else
+  fprintf (ccode, "__v[%d].f", i);
+#endif
+}
+
+
+/******************************************************************************
+                                                              GEN_CHA_STACK  */
+
+gen_cha_stack (i) int i;
+{
+#if ACSTACK_IN_OBJ
+  gen_stack_object_val (i);
+  fprintf (ccode, "__v%d.c", i);
+#else
+  fprintf (ccode, "__v[%d].c", i);
+#endif
+}
+
+
+/******************************************************************************
+                                                              GEN_TXT_STACK  */
+
+gen_txt_stack (i) int i;
+{
+#if ACSTACK_IN_OBJ
+  gen_stack_object_txt (i);
+  fprintf (ccode, "__t%d", i);
+#else
+  fprintf (ccode, "__t[%d]", i);
+#endif
+}
+
+/******************************************************************************
+                                                              GEN_REF_STACK  */
+
+gen_ref_stack (i) int i;
+{
+#if ACSTACK_IN_OBJ
+  gen_stack_object_ref (i);
+  fprintf (ccode, "__r%d", i);
+#else
+  fprintf (ccode, "__r[%d]", i);
+#endif
+}
+
+/******************************************************************************
                                                                 GENVALUE     */
 
 genvalue (re)
@@ -302,7 +429,7 @@ genvalue (re)
 	    fprintf (ccode, ");");
 	  else
 	    fprintf (ccode, ",%ldL);", 
-		     re->value.combined_stack.n_of_stack_elements);
+		     re->value.n_of_stack_elements);
 
 	  /* Kaller p} genprocparam som genererer kode for parameter-
 	   * overf|ringen. */
@@ -342,7 +469,6 @@ genvalue (re)
 	  switch (re->type)
 	    {
 	    case TREF:
-	      fprintf (ccode, "__r[%d]=__er;", re->value.combined_stack.entry);
 	      if (re->rd->categ == CVAR || re->rd->categ == CNAME)
 		{
 		  fprintf (ccode, "__bp=");
@@ -355,44 +481,30 @@ genvalue (re)
 
 		}
 	      break;
-	    case TTEXT:
-	      fprintf (ccode, "__t[%d]=__et;", re->value.combined_stack.entry);
-	      break;
 	    case TREAL:
 	      if (re->rd->categ == CVAR || re->rd->categ == CNAME)
 		{			/* Tre muligheter : ingen, int -> real,
 					 * real->int->real */
-		  fprintf (ccode, "__v[%d].f=((__conv=", 
-			   re->value.combined_stack.entry);
+		  fprintf (ccode, "if ((__conv=");
 		  gensl (re, TRUE, ON);
-		  fprintf (ccode, "%s.conv)==__NOCONV?__ev.f:__conv==__INTREAL?"
-			   "(double)__ev.i:(double)__rintrea(__ev.f));",
+		  fprintf (ccode, "%s.conv)!=__NOCONV)",
 			   re->rd->ident);
+		  fprintf (ccode, "__ev.f= __conv==__INTREAL?(double)__ev.i:"
+			   "(double)__rintrea(__ev.f);");
 		}
-	      else
-		fprintf (ccode, "__v[%d].f=__ev.f;", 
-			 re->value.combined_stack.entry);
 	      break;
 	    case TINTG:
 	      if (re->rd->categ == CNAME || re->rd->categ == CVAR)
 		{	           /* To muligheter : ingen konvertering eller
 			            * real->int */
-		  fprintf (ccode, "__v[%d].i=(", 
-			   re->value.combined_stack.entry);
+		  fprintf (ccode, "if (");
 		  gensl (re, TRUE, ON);
-		  fprintf (ccode, "%s.conv==__NOCONV?",
+		  fprintf (ccode, "%s.conv!=__NOCONV)",
 			   re->rd->ident);
-		  fprintf (ccode, "__ev.i:__rintrea(__ev.f));");
+		  fprintf (ccode, "__ev.i= __rintrea(__ev.f);");
 		}
-	      else
-		fprintf (ccode, "__v[%d].i=__ev.i;", 
-			 re->value.combined_stack.entry );
-	      break;
-	    case TNOTY:
 	      break;
 	    default:
-	      fprintf (ccode, "__v[%d].c=__ev.c;", 
-		       re->value.combined_stack.entry);
 	      break;
 	    }
 
@@ -410,11 +522,12 @@ genvalue (re)
 	  {
 	    fprintf (ccode, "__ctext= ");
 	    gencproccall (re);
-	      fprintf (ccode, ";__t[%d]= *__rblanks(%ldL,strlen(__ctext));"
-		       "(void)strcpy(__t[%d].obj->string,__ctext);",
-		       re->value.combined_stack.entry, 
-		       re->value.combined_stack.n_of_stack_elements, 
-		       re->value.combined_stack.entry);
+	    fprintf (ccode, ";");
+	    fprintf (ccode, "__rblanks(%ldL,strlen(__ctext));"
+		     "(void)strcpy(", 
+		     re->value.n_of_stack_elements);
+	    fprintf (ccode, "__et.obj->string,__ctext);");
+
 	  }
 	else
 	  gencproccall (re);
@@ -623,9 +736,8 @@ genvalue (re)
       fprintf (ccode, ")");
       break;
     case MCONC:
-      fprintf (ccode, "__t[%d]= *__rconc(%ldL,",
-	       re->value.combined_stack.entry, 
-	       re->value.combined_stack.n_of_stack_elements);
+      fprintf (ccode, "__rconc(%ldL,",
+	       re->value.n_of_stack_elements);
       genvalue (re->left);
       fprintf (ccode, ",");
       genvalue (re->right);
@@ -665,21 +777,22 @@ genvalue (re)
       switch (re->type)
 	{
 	case TREF:
-	  fprintf (ccode, "__r[%d]", re->value.entry);
+	  gen_ref_stack (re->value.entry);
 	  break;
 	case TINTG:
-	  fprintf (ccode, "__v[%d].i", re->value.entry);
+	  gen_int_stack (re->value.entry);
 	  break;
 	case TREAL:
-	  fprintf (ccode, "__v[%d].f", re->value.entry);
+	  gen_rea_stack (re->value.entry);
 	  break;
 	case TTEXT:
-	  fprintf (ccode, "&__t[%d]", re->value.entry);
+	  fprintf (ccode, "&");
+	  gen_txt_stack (re->value.entry);
 	  break;
 	case TNOTY:
 	  break;
 	default:
-	  fprintf (ccode, "__v[%d].c", re->value.entry);
+	  gen_cha_stack (re->value.entry);
 	  break;
 	}
       break;
@@ -755,12 +868,16 @@ genvalue (re)
 		      fprintf (ccode, "((");
 		      gensl (re, TRUE, ON);
 		      fprintf (ccode, "%s)->conv==__NOCONV?"
-			       " *(long *)(((char *)__r[%d])+__v[%d].i):"
-			       "__rintrea("
-			       " *(double *)(((char *)__r[%d])+__v[%d].i)))",
-			       re->rd->ident,
-			       re->value.stack.ref_entry, re->value.stack.val_entry,
-			       re->value.stack.ref_entry, (int) re->value.stack.val_entry);
+			       " *(long *)(((char *)", re->rd->ident);
+		      gen_ref_stack (re->value.stack.ref_entry);
+		      fprintf (ccode, "+");
+		      gen_int_stack (re->value.stack.val_entry);
+		      fprintf (ccode, "):"
+			       "__rintrea( *(double *)(((char *)");
+		      gen_ref_stack (re->value.stack.ref_entry);
+		      fprintf (ccode, ")+");
+		      gen_int_stack (re->value.stack.val_entry);
+		      fprintf (ccode, ")))");
 		    }
 		  else
 		    {       /* Tre muligheter : ingen,int ->
@@ -768,15 +885,21 @@ genvalue (re)
 		      fprintf (ccode, "((__nvp= &(");
 		      gensl (re, TRUE, ON);
 		      fprintf (ccode, "%s))->conv==__NOCONV?"
-			       " *(double *)(((char *)__r[%d])+__v[%d].i):"
-			       "(__nvp->conv==__INTREAL?(double)"
-			       " *(long *)(((char *)__r[%d])+__v[%d].i):"
-			       "(double)__rintrea( *(double *)"
-			       "(((char *)__r[%d])+__v[%d].i))))",
-			       re->rd->ident,
-			       re->value.stack.ref_entry, re->value.stack.val_entry,
-			       re->value.stack.ref_entry, re->value.stack.val_entry,
-			       re->value.stack.ref_entry, re->value.stack.val_entry);
+			       " *(double *)(((char *)", re->rd->ident);
+		      gen_ref_stack (re->value.stack.ref_entry);
+		      fprintf (ccode, ")+");
+		      gen_int_stack (re->value.stack.val_entry);
+		      fprintf (ccode, "):(__nvp->conv==__INTREAL?(double)"
+			       " *(long *)(((char *)");
+		      gen_ref_stack (re->value.stack.ref_entry);
+		      fprintf (ccode, ")+");
+		      gen_int_stack (re->value.stack.val_entry);
+		      fprintf (ccode, "):(double)__rintrea( *(double *)"
+			       "(((char *)");
+		      gen_ref_stack (re->value.stack.ref_entry);
+		      fprintf (ccode, ")+");
+		      gen_int_stack (re->value.stack.val_entry);
+		      fprintf (ccode, "))))");
 		    }
 		}
 	      else if (re->type == TREF && re->rd->categ == CVAR &&
@@ -891,7 +1014,7 @@ genvalue (re)
 		  gensl (re, FALSE, ON);
 		  fprintf (ccode, ");");
 		  fprintf (ccode, "if((__pp=__lb");
-		}
+		} 
 	      else
 		{
 		  fprintf (ccode, "if((__pp=");
@@ -935,7 +1058,8 @@ genvalue (re)
 
 	  if (re->rd->categ != CNAME)	/* Name er behandlet ovenfor */
 	    {
-	      fprintf (ccode, "__r[%d]=(__dhp)", re->value.stack.ref_entry);
+	      gen_ref_stack (re->value.stack.ref_entry);
+	      fprintf (ccode, "=(__dhp)");
 	      gensl (re, TRUE, ON);
 	      fprintf (ccode, "%s;", re->rd->ident);
 	    }
@@ -949,8 +1073,10 @@ genvalue (re)
 		dim++;
 
 	      fprintf 
-		(ccode, "((__arrp)__r[%d])->h.dim!=%d?__rerror(__errarr):1;", 
-		 re->value.stack.ref_entry, dim, re->rd->ident);
+		(ccode, "((__arrp)");
+	      gen_ref_stack (re->value.stack.ref_entry);
+	      fprintf (ccode, ")->h.dim!=%d?__rerror(__errarr):1;", 
+		 dim, re->rd->ident);
 	    }
 	  dim= 0;
 	  for (rex = re->right; rex->token != MENDSEP; rex = rex->right)
@@ -959,25 +1085,28 @@ genvalue (re)
 		gerror (85);
 	      fprintf (ccode, "__h[%d]=", dim++);
 	      genvalue (rex->left);
-	      fprintf (ccode, "-((__arrp)__r[%d])->limits[%d].low;", 
-		       re->value.stack.ref_entry, dim - 1);
+	      fprintf (ccode, "-((__arrp)");
+	      gen_ref_stack (re->value.stack.ref_entry);
+	      fprintf (ccode, ")->limits[%d].low;", 
+		       dim - 1);
 	    }
 	  fprintf (ccode, "if(");
 	  for (i = 0; i < dim; i++)
 	    {
-	      fprintf (ccode, "__h[%d]<0 || __h[%d]>=((__arrp)"
-		       "__r[%d])->limits[%d].size",
-		       i, i, re->value.stack.ref_entry, i);
+	      fprintf (ccode, "__h[%d]<0 || __h[%d]>=((__arrp)", i, i);
+	      gen_ref_stack (re->value.stack.ref_entry);
+	      fprintf (ccode, ")->limits[%d].size", i);
 	      if (i < dim - 1)
 		fprintf (ccode, " ||   ");
 	    }
-	  fprintf (ccode, ")__rerror(__errbound);"
-		   "__v[%d].i=sizeof(__ah)+sizeof(__arrlimit)*%d+((",
-		   re->value.stack.val_entry, dim);
+	  fprintf (ccode, ")__rerror(__errbound);");
+	  gen_int_stack (re->value.stack.val_entry);
+	  fprintf (ccode, "=sizeof(__ah)+sizeof(__arrlimit)*%d+((", dim);
 	  for (i = dim - 1; i > 0; i--)
 	    {
-	      fprintf (ccode, "((__arrp)__r[%d])->limits[%d].size*(",
-		       re->value.stack.ref_entry, i);
+	      fprintf (ccode, "((__arrp)");
+	      gen_ref_stack (re->value.stack.ref_entry);
+	      fprintf (ccode, ")->limits[%d].size*(", i);
 	    }
 
 	  fprintf (ccode, "__h[0])");
@@ -1036,14 +1165,23 @@ genvalue (re)
       fprintf (ccode, "switch (");
       gensl (re, TRUE, ON);
       fprintf (ccode, "%s.namekind){"
-	       "case __ADDRESS_THUNK: case __ADDRESS_NOTHUNK: "
-	       "__v[%d].i=__ev.i;__r[%d]=__er;" 
-	       "break; case __VALUE_THUNK: case __VALUE_NOTHUNK: "
-	       "__t[%d]=__et;__r[%d] = __NULL;"
-	       "__v[%d].i = ((char *)&__t[%d])-((char *) 0);}",
-	       re->rd->ident, re->value.stack.val_entry, re->value.stack.ref_entry,
-	       re->value.stack.txt_entry, re->value.stack.ref_entry,
-	       re->value.stack.val_entry, re->value.stack.txt_entry);
+	       "case __ADDRESS_THUNK: case __ADDRESS_NOTHUNK: ",
+	       re->rd->ident);
+      gen_int_stack (re->value.stack.val_entry);
+      fprintf (ccode, "=__ev.i;");
+      gen_ref_stack (re->value.stack.ref_entry);
+      fprintf (ccode, "=__er;" 
+	       "break; case __VALUE_THUNK: case __VALUE_NOTHUNK: ");
+      gen_txt_stack (re->value.stack.txt_entry);
+      fprintf (ccode, "=__et;");
+      gen_ref_stack (re->value.stack.ref_entry);
+      fprintf (ccode, "= __NULL;"
+	       "");
+      fprintf (ccode, "");
+      gen_int_stack (re->value.stack.val_entry);
+      fprintf (ccode, "= ((char *)&");
+      gen_txt_stack (re->value.stack.txt_entry);
+      fprintf (ccode, ")-((char *) 0);}");
       break;
     case MPROCASSIGN:
       if (re->type == TNOTY)
@@ -1157,8 +1295,11 @@ genvalue (re)
       else
 	fprintf (ccode, " (*(");
       gentype (re);
-      fprintf (ccode, " *)(((char *)__r[%d])+__v[%d].i))", 
-	       re->value.stack.ref_entry, re->value.stack.val_entry);
+      fprintf (ccode, " *)(((char *)");
+      gen_ref_stack (re->value.stack.ref_entry);
+      fprintf (ccode, ")+");
+      gen_int_stack (re->value.stack.val_entry);
+      fprintf (ccode, "))");
       break;
     case MREFASSIGNT:
       fprintf (ccode, "__rtextassign(");
@@ -1175,15 +1316,17 @@ genvalue (re)
       fprintf (ccode, ")");
       break;
     case MASSIGND:
-       genvalue (re->left);
-       fprintf(ccode, "= ");
-       genvalue (re->right);
-       break;
+      if (re->type == TTEXT) fprintf(ccode, "* ");
+      genvalue (re->left);
+      fprintf(ccode, "= ");
+      if (re->type == TTEXT) fprintf(ccode, "* ");
+      genvalue (re->right);
+      break;
     case MASSIGNADD:
-       genvalue (re->left);
-       fprintf(ccode, "+= ");
-       genvalue (re->right);
-       break;
+      genvalue (re->left);
+      fprintf(ccode, "+= ");
+      genvalue (re->right);
+      break;
     case MASSIGN:
       if (re->right->token == MASSIGN)
 	{
@@ -1278,14 +1421,16 @@ genvalue (re)
 		  fprintf (ccode, "if(");
 		  gensl (re->left, TRUE, ON);
 		  fprintf (ccode, "%s.conv==__NOCONV)"
-			   " *(long *)(((char *)__r[%d])+__v[%d].i)=__ev.i;"
-			   "else *(double *)(((char *)__r[%d])+__v[%d].i)="
-			   "__ev.i",
-			   re->left->rd->ident,
-			   re->left->value.stack.ref_entry, 
-			   re->left->value.stack.val_entry,
-			   re->left->value.stack.ref_entry, 
-			   re->left->value.stack.val_entry);
+			   " *(long *)(((char *)", re->left->rd->ident);
+		  gen_ref_stack (re->left->value.stack.ref_entry);
+		  fprintf (ccode, ")+");
+		  gen_int_stack (re->left->value.stack.val_entry);
+		  fprintf (ccode, ")=__ev.i;"
+			   "else *(double *)(((char *)");
+		  gen_ref_stack (re->left->value.stack.ref_entry);
+		  fprintf (ccode, ")+");
+		  gen_int_stack (re->left->value.stack.val_entry);
+		  fprintf (ccode, ")=__ev.i");
 		}
 	      else
 		{		/* Tre muligheter : ingen, int -> real og
@@ -1293,20 +1438,23 @@ genvalue (re)
 		  fprintf (ccode, "if((__nvp= &");
 		  gensl (re->left, TRUE, ON);
 		  fprintf (ccode, "%s)->conv==__NOCONV)"
-			   " *(double *)(((char *)__r[%d])+"
-			   "__v[%d].i)=__ev.f;else "
+			   " *(double *)(((char *)",
+			   re->left->rd->ident);
+		  gen_ref_stack (re->left->value.stack.ref_entry);
+		  fprintf (ccode, ")+");
+		  gen_int_stack (re->left->value.stack.val_entry);
+		  fprintf (ccode, ")=__ev.f;else "
 			   "if(__nvp->conv==__INTREAL)"
-			   " *(long *)(((char *)__r[%d])+"
-			   "__v[%d].i)=__ev.f;else "
-			   " *(double *)(((char *)__r[%d])+"
-			   "__v[%d].i)=__rintrea(__ev.f)",
-			   re->left->rd->ident,
-			   re->left->value.stack.ref_entry, 
-			   re->left->value.stack.val_entry,
-			   re->left->value.stack.ref_entry, 
-			   re->left->value.stack.val_entry,
-			   re->left->value.stack.ref_entry, 
-			   re->left->value.stack.val_entry);
+			   " *(long *)(((char *)");
+		  gen_ref_stack (re->left->value.stack.ref_entry);
+		  fprintf (ccode, ")+");
+		  gen_int_stack (re->left->value.stack.val_entry);
+		  fprintf (ccode, ")=__ev.f;else "
+			   " *(double *)(((char *)");
+		  gen_ref_stack (re->left->value.stack.ref_entry);
+		  fprintf (ccode, ")+");
+		  gen_int_stack (re->left->value.stack.val_entry);
+		  fprintf (ccode, ")=__rintrea(__ev.f)");
 		}
 	    }
 	}
@@ -1419,13 +1567,8 @@ genvalue (re)
 	  fprintf (ccode, "/");
 	  break;
 	default:
-#ifdef DEBUG
-	  fprintf (stderr, "Illegal token:%s\n"
-			  ,texttoken (re->token));
-#else
 	  fprintf (stderr, "Illegal token:%d\n"
 			  ,re->token);
-#endif
 	  break;
 	}
       if (re->left->type == TCHAR)

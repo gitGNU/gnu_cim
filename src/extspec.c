@@ -57,7 +57,8 @@ void free();
 
 #define obstack_chunk_alloc xmalloc
 #define obstack_chunk_free free
-static struct obstack osExtspec;
+static struct obstack os_extspec;
+static char *first_object_allocated_ptr_extspec;
 
 /* HUSK AT REKKEF\LGEN SKAL V[RE categ,type,kind 
  *
@@ -66,7 +67,8 @@ static struct obstack osExtspec;
  * Deklarasjon av en klasse:
  *
  * <categ><type><kind><navn><blank><'!'<prefiks navn><blank> | '&'>
- * <fornest><blank><connest><blank><blno><blank><ent>
+ * <fornest><blank><connest><blank><maxusedref><blank>
+ * <maxusedtxt><blank><maxusedval><blank><blno><blank><ent>
  * <param.spec><virt. spec><hidden og protected spec><deklarasjoner><LF>
  *
  * Deklarasjon og spesifisering av prosedyre:
@@ -105,25 +107,32 @@ static struct obstack osExtspec;
 
 /******************************************************************************
                                                               INITEXTSPEC    */
-void initExtspec ()
+extspec_init ()
 {
-  obstack_init (&osExtspec);
+  obstack_init (&os_extspec);
+  first_object_allocated_ptr_extspec= obstack_alloc (&os_extspec, 0);
+}
+
+extspec_reinit ()
+{
+  obstack_free (&os_extspec, first_object_allocated_ptr_extspec);
 }
 
 /******************************************************************************
                                                                   GETNAME    */
 
-static char * getname (f) FILE *f;
+static char * 
+getname (f) FILE *f;
 {
   int c;
   char *s, *sx;
   for (c= getc (f); c !=EOF && c != '\n' && c!= ' '; c= getc (f))
-    obstack_1grow (&osExtspec, c);
+    obstack_1grow (&os_extspec, c);
 
-  obstack_1grow (&osExtspec, 0);
-  s= obstack_finish (&osExtspec);
+  obstack_1grow (&os_extspec, 0);
+  s= obstack_finish (&os_extspec);
   sx= tag (s);
-  obstack_free (&osExtspec, s);
+  obstack_free (&os_extspec, s);
   return sx;
 }
 
@@ -148,11 +157,12 @@ static char timestampchars[63] =
 /******************************************************************************
                                                           GETTIMESTAMP       */
 
-void gettimestamp ()
+void 
+gettimestamp ()
 {
 #if GET_TIME_OF_DAY
-  static struct timeval tp;
-  static struct timezone tzp;
+  struct timeval tp;
+  struct timezone tzp;
 #endif
 
   FILE *f;
@@ -189,16 +199,16 @@ void gettimestamp ()
 #endif
       th /= 252;
 
-      obstack_1grow (&osExtspec, timestampchars[th - th / 63 * 63]);
+      obstack_1grow (&os_extspec, timestampchars[th - th / 63 * 63]);
       th /= 63;
-      obstack_1grow (&osExtspec, timestampchars[th - th / 63 * 63]);
+      obstack_1grow (&os_extspec, timestampchars[th - th / 63 * 63]);
       while (t != 0)
 	{
-	  obstack_1grow (&osExtspec, timestampchars[t - t / 63 * 63]);
+	  obstack_1grow (&os_extspec, timestampchars[t - t / 63 * 63]);
 	  t /= 63;
 	}
-      obstack_1grow (&osExtspec, 0);
-      timestamp= obstack_finish (&osExtspec);
+      obstack_1grow (&os_extspec, 0);
+      timestamp= obstack_finish (&os_extspec);
     }
 }
 
@@ -211,15 +221,15 @@ genatrfilenamefromid (ident)
 {
   int i;
   char *s, *sx;
-  obstack_grow (&osExtspec, ident, strlen (ident));
-  obstack_grow0 (&osExtspec, ".atr", 4);
-  s= obstack_finish (&osExtspec);
+  obstack_grow (&os_extspec, ident, strlen (ident));
+  obstack_grow0 (&os_extspec, ".atr", 4);
+  s= obstack_finish (&os_extspec);
 
   for (i = strlen (s) - 5; i >= 0; i--)
     if (s[i] >= 'A' && s[i] <= 'Z')
       s[i] += 32;		/* LOWERCASE */
   sx= tag (s);
-  obstack_free (&osExtspec, s);
+  obstack_free (&os_extspec, s);
   return sx;
 }
 
@@ -237,14 +247,14 @@ char *filename;
     return (tag (filename));
       
   if (len >=4 && !strcmp (&filename[len - 4], ".sim"))
-    obstack_grow (&osExtspec, filename, len - 4);
+    obstack_grow (&os_extspec, filename, len - 4);
   else
-    obstack_grow (&osExtspec, filename, len);
+    obstack_grow (&os_extspec, filename, len);
 
-  obstack_grow0 (&osExtspec, ".atr", 4);
-  s= obstack_finish (&osExtspec);
+  obstack_grow0 (&os_extspec, ".atr", 4);
+  s= obstack_finish (&os_extspec);
   sx= tag (s);
-  obstack_free (&osExtspec, s);
+  obstack_free (&os_extspec, s);
   return sx;
 }
 
@@ -273,7 +283,8 @@ external_is_in (ident, kind)
 
 static char *lesinn ();
 
-static nextdecl (f, filename, timestamp)
+static 
+nextdecl (f, filename, timestamp)
      FILE *f; char *filename, *timestamp;
 {
   char type, kind, categ;
@@ -291,18 +302,18 @@ static nextdecl (f, filename, timestamp)
     return (FALSE);
   else if (categ == START_NEW_EXTERNAL_SPEC)
     {
-      char *localTimestamp;
-      char *localFilename;
+      char *local_timestamp;
+      char *local_filename;
       type = getc (f);
       kind = getc (f);
 
       ident = getname (f);	/* Leser navnet */
-      localTimestamp= getname (f); /* tidsmerket   */
-      localFilename= getname (f);    /* filnavnet    */
+      local_timestamp= getname (f); /* tidsmerket   */
+      local_filename= getname (f);    /* filnavnet    */
 
       if (!external_is_in (ident, kind))
 	{
-	  if (localTimestamp != lesinn (localFilename))
+	  if (local_timestamp != lesinn (local_filename))
 	    merror (4, filename);
 	}
       return (TRUE);
@@ -344,8 +355,8 @@ static nextdecl (f, filename, timestamp)
 		codeclass = CCCPROC;
 	    }
 	}
-      regDecl (ident, type, kind, categ);
-      beginBlock (kind);
+      reg_decl (ident, type, kind, categ);
+      begin_block (kind);
 
       cblock->timestamp= timestamp;
       cblock->filename= filename;
@@ -354,6 +365,11 @@ static nextdecl (f, filename, timestamp)
 	{
 	  getval (f, cblock->fornest);
 	  getval (f, cblock->connest);
+#if ACSTACK_IN_OBJ
+	  getval (f, cblock->maxusedref);
+	  getval (f, cblock->maxusedtxt);
+	  getval (f, cblock->maxusedval);
+#endif
 	}
       getval (f, cblock->ptypno);
       if (getc (f) == '%')
@@ -361,7 +377,7 @@ static nextdecl (f, filename, timestamp)
       getval (f, cblock->ent);
       /* Les inn parametere, virtuelle, hidden, protected og deklarasjoner */
       while (nextdecl (f, filename, timestamp));
-      endBlock (rtname, codeclass);
+      end_block (rtname, codeclass);
       break;
     default:
       if (type == TREF)
@@ -371,7 +387,7 @@ static nextdecl (f, filename, timestamp)
       switch (categ)
 	{
 	case CCONST:
-	  regDecl (ident, type, kind, categ);
+	  reg_decl (ident, type, kind, categ);
 	  if (type == TTEXT)
 	    {
 	      int i;
@@ -392,7 +408,7 @@ static nextdecl (f, filename, timestamp)
 	    }
 	  break;
 	default:
-	  regDecl (ident, type, kind, categ);
+	  reg_decl (ident, type, kind, categ);
 	  if (type == TLABEL)
 	    getconst (f, cprevdecl->plev);
 	  break;
@@ -406,7 +422,8 @@ static nextdecl (f, filename, timestamp)
 /******************************************************************************
                                                                       LESINN */
 
-static char *lesinn (filename)
+static char *
+lesinn (filename)
      char *filename;
 {
   struct stamp *st;
@@ -434,7 +451,7 @@ static char *lesinn (filename)
   for (st = first_stamp; st != NULL; st = st->next)
     if (st->timestamp == timestamp)
       goto found;
-  st = (struct stamp *) obstack_alloc (&osExtspec, sizeof (struct stamp));
+  st = (struct stamp *) obstack_alloc (&os_extspec, sizeof (struct stamp));
   st->timestamp = timestamp;
   st->next = first_stamp;
   st->lest_inn = FALSE;
@@ -447,21 +464,21 @@ found:
   /* Leser inn liste med tidsmerker */
   while (getc (f) == ' ')
     {
-      char *localTimestamp= getname (f);
-      char *localFilename= getname (f);
+      char *local_timestamp= getname (f);
+      char *local_filename= getname (f);
 
       for (st = first_stamp; st != NULL; st = st->next)
-	if (st->timestamp == localTimestamp)
+	if (st->timestamp == local_timestamp)
 	  goto find_next;
-      st = (struct stamp *) obstack_alloc (&osExtspec, sizeof (struct stamp));
-      st->timestamp = localTimestamp;
+      st = (struct stamp *) obstack_alloc (&os_extspec, sizeof (struct stamp));
+      st->timestamp = local_timestamp;
       st->next = first_stamp;
       st->lest_inn = FALSE;
-      st->filename = localFilename;
+      st->filename = local_filename;
       first_stamp = st;
     find_next:;
-      if (st->filename != localFilename)
-	merror (11, localFilename);
+      if (st->filename != local_filename)
+	merror (11, local_filename);
     }
 
   while (nextdecl (f, filename, timestamp));
@@ -524,7 +541,8 @@ write_indentation (f, level) FILE *f; int level;
 
 /******************************************************************************
                                                               WRITE_CHAR_MIF */
-static write_char_mif (f, c) FILE *f; unsigned char c;
+static 
+write_char_mif (f, c) FILE *f; unsigned char c;
 {
   if ((isprint (c)
 #if ISO_LATIN
@@ -538,7 +556,8 @@ static write_char_mif (f, c) FILE *f; unsigned char c;
 
 /******************************************************************************
                                                               WRITE_TEXT_MIF */
-static write_text_mif (f, s) FILE *f; unsigned char *s;
+static 
+write_text_mif (f, s) FILE *f; unsigned char *s;
 {
   int i;
   fprintf (f, "= \"");
@@ -562,7 +581,8 @@ static write_text_mif (f, s) FILE *f; unsigned char *s;
 /******************************************************************************
                                                               WRITE_DECL_MIF */
 
-static write_decl_mif (f, rd, level)
+static 
+write_decl_mif (f, rd, level)
        FILE *f; struct DECL *rd; int level;
 {
   if (rd->kind == KBLOKK || rd->kind == KPRBLK || rd->kind == KFOR || 
@@ -693,8 +713,13 @@ static write_decl_mif (f, rd, level)
 #if 0
       /* Fornest,Connest,blno,ent */
       if (rb->quant.kind == KCLASS)
-	fprintf (f, "\n%% f_c_b_e %d %d %d %d",
-			rb->fornest, rb->connest, rb->blno, rb->ent);
+	{
+	  fprintf (f, "\n%% f_c_b_e %d %d ", rb->fornest, rb->connest);
+#if ACSTACK_IN_OBJ
+	  fprintf (f, "%d %d %d ", rb->fornest, rb->connest, rb->maxusedret);
+#endif
+	  fprintf (f, "%d %d", rb->blno, rb->ent);
+	}
 #endif
 
       if (rb->quant.kind == KCLASS)
@@ -835,7 +860,8 @@ write_all_mif ()
 /******************************************************************************
                                                               WRITE_DECL_EXT */
 
-static write_decl_ext (f, rd)
+static 
+write_decl_ext (f, rd)
        FILE *f; struct DECL *rd;
 {
   if (rd->kind == KBLOKK || rd->kind == KPRBLK || rd->kind == KFOR || 
@@ -865,7 +891,12 @@ static write_decl_ext (f, rd)
 
       /* Fornest,Connest,blno,ent */
       if (rb->quant.kind == KCLASS)
-	fprintf (f, "%d %d ", rb->fornest, rb->connest);
+	{
+	  fprintf (f, "%d %d ", rb->fornest, rb->connest);
+#if ACSTACK_IN_OBJ
+	  fprintf (f, "%d %d %d ", rb->fornest, rb->connest, rb->maxusedref);
+#endif
+	}
       fprintf (f, "%d %d", rb->blno, rb->ent);
 
       /* evt. parametere */
@@ -980,7 +1011,7 @@ more_modules ()
 {
   FILE *f;
   struct stamp *st;
-  char *localTimestamp;
+  char *local_timestamp;
   for (st = first_stamp; st != NULL; st = st->next)
     if (st->lest_inn == FALSE && (f = fopen (st->filename,
 #if OPEN_FILE_IN_BINARY_MODE
@@ -1001,8 +1032,8 @@ more_modules ()
 	
 	/* Leser tidsmerke */
 
-	localTimestamp= getname (f);
-	if (localTimestamp == st->timestamp)
+	local_timestamp= getname (f);
+	if (local_timestamp == st->timestamp)
 	  {
 	    if (option_verbose)
 	      fprintf (stderr, "Reading atr-file %s\n", st->filename);

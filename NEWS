@@ -23,10 +23,22 @@ Version 2:
   details.
 
 
-Version: 3.29
+Version: 4.0
 
-* Fixed a bug which caused segmentation fault when running programs
-  containing gotos to non-local virtual labels.
+* Rearranged some of the code in the compiler program
+
+* Implemented an alternative where the accumulator stack is placed
+  inside the block objects, instead of a global accumulator stack which
+  must be saved in acst-objects. The run-time system can also be
+  simplified.
+
+* MPROCARG and MCONC objects no longer save to stack-elements.
+  An MSTACK object is introduced instead.
+
+* -DDEBUG works when compiling the compiler program. Implemented
+  some new debug options.
+
+* Only reserve a for-list-element index variable when necessary.
 
 
 Version: 3.28

@@ -6,6 +6,7 @@ typedef union {
 	char *ident;
 	char *tval;
 	char stat_decl;
+  	char kind;
        } YYSTYPE;
 #define	HACTIVATE	258
 #define	HAFTER	259

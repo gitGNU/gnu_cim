@@ -24,7 +24,8 @@
 /******************************************************************************
                                                               GEN_CONV_AND_Q */
 
-static gen_conv_and_q (rex, procedure, transported, copied_all)
+static 
+gen_conv_and_q (rex, procedure, transported, copied_all)
      struct EXP *rex;
      char procedure,
        transported,
@@ -150,7 +151,8 @@ static gen_conv_and_q (rex, procedure, transported, copied_all)
 /******************************************************************************
                                                                GEN_ARIT_CONV */
 
-static gen_arit_conv (rex, transported, copied_all)
+static 
+gen_arit_conv (rex, transported, copied_all)
      struct EXP *rex;
      char transported,
        copied_all;
@@ -183,7 +185,8 @@ static gen_arit_conv (rex, transported, copied_all)
 /******************************************************************************
                                                                     GEN_CONV */
 
-static gen_conv (rex, procedure, copied_all)
+static 
+gen_conv (rex, procedure, copied_all)
      struct EXP *rex;
      char procedure,
        copied_all;
@@ -215,7 +218,8 @@ static gen_conv (rex, procedure, copied_all)
  * til den formelle nameparameter structen ved generering av thunker for
  * den aktuelle parameteren. */
 
-static send_to_formal_par (rex, addressthunk)
+static 
+send_to_formal_par (rex, addressthunk)
      struct EXP *rex;
      char addressthunk;
 {
@@ -261,9 +265,11 @@ gen_thunk_simple_address (rex)
     {
     case MARRAYARG:
     case MARRAYADR:
-      fprintf (ccode, "__er=__r[%d];__ev.i=__v[%d].i;", 
-	       (int) rex->left->value.stack.ref_entry,
-	       (int) rex->left->value.stack.val_entry);
+      fprintf (ccode, "__er=");
+      gen_ref_stack (rex->left->value.stack.ref_entry);
+      fprintf (ccode, ";__ev.i=");
+      gen_int_stack (rex->left->value.stack.val_entry);
+      fprintf (ccode, ";");
       break;
     default:
       fprintf (ccode, "__er=");
@@ -371,7 +377,8 @@ gen_thunk_simple_value (rex)
 /******************************************************************************
                                                        GENSIMPLEPAR          */
 
-static gensimplepar (rex)
+static 
+gensimplepar (rex)
      struct EXP *rex;
 {
   int i;
@@ -384,7 +391,7 @@ static gensimplepar (rex)
       /* T E X T  V A L U E  P A R A M E T E R */
       fprintf (ccode, "((__bs%d *)__pb)->%s= *__rcopy(%ldL,",
 	       rex->rd->encl->blno, rex->rd->ident,
-	       ant_stack (rex, rex->left));
+	       ant_stack (rex, rex->left, 1, 1, 1)); /* TBD Skal ikke dette gjøres anderledes, hvordan skal det i tilfelle gjøres */
       genvalue (rex->left);
       fprintf (ccode, ");");
     }
@@ -455,7 +462,7 @@ static gensimplepar (rex)
 	      break;
 	    case MARRAYADR:
 	      /* Peker til array ligger p} stakken */
-	      fprintf (ccode, "__r[%d]", rex->left->value.stack.ref_entry);
+	      gen_ref_stack (rex->left->value.stack.ref_entry);
 	      break;
 	    case MIDENTIFIER:
 	      gensl (rex->left, FALSE, ON);
@@ -465,7 +472,10 @@ static gensimplepar (rex)
 		   rex->rd->encl->blno,rex->rd->ident);
 
 	  if (rex->left->token == MARRAYADR)
-	    fprintf (ccode, "__v[%d].i;", rex->left->value.stack.val_entry);
+	    {
+	      gen_int_stack (rex->left->value.stack.val_entry);
+	      fprintf (ccode, ";");
+	    }
 	  else
 	    fprintf (ccode, "((char *)&((__bs%d *)__p)->%s)"
 		     "-(char *)__p;",
@@ -601,12 +611,13 @@ static gensimplepar (rex)
 	  /* ARRAY HVOR ALLE INDEKSENE BEST]R AV KONSTANTER  ADDRESS
 	   * NOTHUNK  Tilordner den formelle name-parameterens bp og ofs */
 
-	  fprintf (ccode, "((__bs%d *)__pb)->%s.bp=__r[%d];"
-		   "((__bs%d *)__pb)->%s.v.ofs=__v[%d].i;",
-		   rex->rd->encl->blno, rex->rd->ident,
-		   (int) rex->left->value.stack.ref_entry,
-		   rex->rd->encl->blno, rex->rd->ident,
-		   (int) rex->left->value.stack.val_entry);
+	  fprintf (ccode, "((__bs%d *)__pb)->%s.bp=",
+		   rex->rd->encl->blno, rex->rd->ident);
+	  gen_ref_stack (rex->left->value.stack.ref_entry);
+	  fprintf (ccode, ";((__bs%d *)__pb)->%s.v.ofs=",
+		   rex->rd->encl->blno, rex->rd->ident);
+	  gen_ref_stack (rex->left->value.stack.val_entry);
+	  fprintf (ccode, ";");
 #if ADDNOTH
 	  fprintf (ccode, "((__bs%d *)__pb)->%s.namekind"
 		   "=__ADDRESS_NOTHUNK;",
@@ -623,7 +634,8 @@ static gensimplepar (rex)
 /******************************************************************************
                                                               GENLABELPAREXP */
 
-static genlabelparexp (rex, formellpar, thunk)
+static 
+genlabelparexp (rex, formellpar, thunk)
      struct EXP *rex,
       *formellpar;
      char thunk;
@@ -708,7 +720,8 @@ gen_thunk_lable (rex)
 /******************************************************************************
                                                            GENLABELSWITCHPAR */
 
-static genlabelswitchpar (rex)
+static 
+genlabelswitchpar (rex)
      struct EXP *rex;
 {
   int i;
@@ -839,7 +852,8 @@ gen_thunk_array (rex)
 /******************************************************************************
                                                                  GENARRAYPAR */
 
-static genarraypar (rex)
+static 
+genarraypar (rex)
      struct EXP *rex;
 {
   int i;
@@ -940,7 +954,8 @@ gen_thunk_procedure (rex)
 /******************************************************************************
                                                              GENPROCEDUREPAR */
 
-static genprocedurepar (rex)
+static 
+genprocedurepar (rex)
      struct EXP *rex;
 {
   int i;
@@ -1113,30 +1128,7 @@ genpredefproccall (re)
   /* Hvis danger = TRUE s} skal returverdien legges p} stakken */
   
   struct EXP *rex;
-  
-  if (re->danger)
-    {
-      switch (re->type)
-	{
-	case TREF:
-	  fprintf (ccode, "__r[%d]=(__dhp)", re->value.combined_stack.entry);
-	  break;
-	case TNOTY:
-	  break;		/* Skal ikke forekomme som 'danger' */
-	case TTEXT:
-	  fprintf (ccode, "__t[%d]= *", re->value.combined_stack.entry);
-	  break;
-	case TREAL:
-	  fprintf (ccode, "__v[%d].f=", re->value.combined_stack.entry);
-	  break;
-	case TINTG:
-	  fprintf (ccode, "__v[%d].i=", re->value.combined_stack.entry);
-	  break;
-	default:
-	  fprintf (ccode, "__v[%d].c=", re->value.combined_stack.entry);
-	}
-    }			/* END-if(danger */
-  
+
   if (re->rd->descr->codeclass != CCEXIT)
     fprintf (ccode, "%s(", re->rd->descr->rtname);
   
@@ -1188,7 +1180,7 @@ genpredefproccall (re)
       break;
     case CCBLANKSCOPY:
     case CCFILEBLANKSCOPY:
-      fprintf (ccode, "%ldL", re->value.combined_stack.n_of_stack_elements);
+      fprintf (ccode, "%ldL", re->value.n_of_stack_elements);
       if (re->right->token != MENDSEP 
 	  || re->rd->descr->codeclass == CCFILEBLANKSCOPY)
 	fprintf (ccode, ",");
@@ -1257,7 +1249,8 @@ getfirstclassattribut (rd) struct DECL *rd;
  * rex->left->rd angir den aktuelle parameteren, mens rex->rd angir den
  * formelle. */
 
-static par_to_cproc (rex) struct EXP *rex;
+static 
+par_to_cproc (rex) struct EXP *rex;
 {
   struct DECL *rd;
   switch (rex->rd->kind)

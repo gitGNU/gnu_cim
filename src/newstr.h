@@ -17,11 +17,11 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA. */
 
 
-extern void initNewstr();
-extern void newstrGrown();
-extern void newstrGrow1();
-extern void newstrGrow2();
-extern char *newstrFinish();
+extern void init_newstr();
+extern void newstr_grown();
+extern void newstr_grow1();
+extern void newstr_grow2();
+extern char *newstr_finish();
 extern char * newstrcat1();
 extern char * newstrcat2();
 extern char * newstrcat3();

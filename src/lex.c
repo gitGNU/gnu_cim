@@ -42,9 +42,11 @@ void free();
 #define obstack_chunk_alloc xmalloc
 #define obstack_chunk_free free
 
-static struct obstack osLex, osIfdef;
+static struct obstack os_lex, os_ifdef;
+static char *first_object_allocated_ptr_lex;
+static char *first_object_allocated_ptr_ifdef;
 
-#define unput(c) {ungetc (c, includeFile ());}
+#define unput(c) {ungetc (c, include_file ());}
 static int notintext = TRUE;
 
 #define  newlexchar (lexchar=input())
@@ -105,7 +107,7 @@ input ()
   else
     do
       {
-	yytchar = getc (includeFile ());
+	yytchar = getc (include_file ());
       }
     while (yytchar == 0L);
   if (iscntrl (yytchar) && !isspace (yytchar) && yytchar != '\b'
@@ -169,7 +171,7 @@ input ()
 /******************************************************************************
                                                              PRINT_LEXSYMBOL */
 
-static print_lexsymbol (lextok, yylvalp)
+print_lexsymbol (lextok, yylvalp)
      int lextok;
      YYSTYPE *yylvalp;
 {
@@ -531,36 +533,39 @@ radix (r, t)
 /******************************************************************************
 				                    SCANNAME & SCANNOWS      */
 
-static scanNows ()
+static 
+scan_nows ()
 {
-  obstack_free (&osLex, yytext);
+  obstack_free (&os_lex, yytext);
   while (lexchar != '\n' && lexchar != EOF 
 	 && lexchar != ' ' && lexchar != '\t')
     {
-      obstack_1grow (&osLex, lexchar);
+      obstack_1grow (&os_lex, lexchar);
       newlexchar;
     }
-  obstack_1grow (&osLex, 0);
-  yytext= obstack_finish (&osLex);
+  obstack_1grow (&os_lex, 0);
+  yytext= obstack_finish (&os_lex);
 }
 
-static scanName ()
+static 
+scan_name ()
 {
-  obstack_free (&osLex, yytext);
+  obstack_free (&os_lex, yytext);
   while ((isalnum (lexchar) || lexchar == '_'))
     {
-      obstack_1grow (&osLex, lexchar);
+      obstack_1grow (&os_lex, lexchar);
       newlexchar;
     }
-  obstack_1grow (&osLex, 0);
-  yytext= obstack_finish (&osLex);
+  obstack_1grow (&os_lex, 0);
+  yytext= obstack_finish (&os_lex);
 }
 
 
 /******************************************************************************
 				                              SCANIFDEF      */
 
-static scanIfdef ()
+static 
+scan_ifdef ()
 {
   char scan;
   char elsedef;
@@ -570,11 +575,11 @@ static scanIfdef ()
     {
       if (!strcmp (yytext, "ENDIF"))
 	{
-	  if (ifdefp == includeIfdefp ()) lerror (23);
+	  if (ifdefp == include_ifdefp ()) lerror (23);
 	  else 
 	    {
 	      struct ifdefstack *prev= ifdefp->prev;
-	      obstack_free (&osIfdef, ifdefp);
+	      obstack_free (&os_ifdef, ifdefp);
 	      ifdefp= prev;
 	    }
 	}
@@ -615,7 +620,7 @@ static scanIfdef ()
 		newlexchar;
 	      if (isalpha (lexchar) || lexchar == '_')
 		{
-		  scanName ();
+		  scan_name ();
 	      
 		  if (elsedef == TRUE)
 		    {
@@ -630,12 +635,12 @@ static scanIfdef ()
 		    {
 		      struct ifdefstack *prev= ifdefp;
 		      ifdefp= (struct ifdefstack *)
-			obstack_alloc (&osIfdef, sizeof (struct ifdefstack));
+			obstack_alloc (&os_ifdef, sizeof (struct ifdefstack));
 		      ifdefp->prev= prev;
 		      ifdefp->ifdef= 0;
 		      scan = FALSE;
 		    }
-		  ifdefp->ifdef = ifdefName (tag (yytext)) | IFGREN | scan;
+		  ifdefp->ifdef = ifdef_name (tag (yytext)) | IFGREN | scan;
 		}
 	      else 
 		{
@@ -651,7 +656,7 @@ static scanIfdef ()
 		ifdefp->ifdef++;
 	    }
 	}
-      if ((ifdefp->prev != includeIfdefp ()) && (ifdefp != includeIfdefp ()))
+      if ((ifdefp->prev != include_ifdefp ()) && (ifdefp != include_ifdefp ()))
 	{
 	  if (!((ifdefp->prev->ifdef == (IFGREN | TRUE)) ||
 		(ifdefp->prev->ifdef == (ELSEGREN | FALSE))))
@@ -673,7 +678,7 @@ static scanIfdef ()
 	       (newlexchar, bl_in_dir_line = TRUE) :
 	       ((bl_in_dir_line = FALSE), TRUE)) && isalpha (lexchar))
 	    {
-	      scanName ();
+	      scan_name ();
 	      break;
 	    }
 	}
@@ -683,13 +688,14 @@ static scanIfdef ()
 /******************************************************************************
 				                              SCANDIRFLAGS   */
 
-static scanDirflags ()
+static 
+scan_dirflags ()
 {
   while (lexchar == ' ' | lexchar == '\t')
     newlexchar;
   if (isalpha (lexchar))
     {
-      scanName ();
+      scan_name ();
 
       if (lexchar == '\n' | lexchar == EOF
 	  | lexchar == ' ' | lexchar == '\t')
@@ -730,7 +736,8 @@ static scanDirflags ()
 /******************************************************************************
                                                                    DIRLINE   */
 
-static scanDirline ()
+static 
+scan_dirline ()
 {
   FILE *file;
   lineno += antnewline;
@@ -746,7 +753,7 @@ static scanDirline ()
     bl_in_dir_line = FALSE;
   if (isalpha (lexchar))
     {
-      scanName ();
+      scan_name ();
       if (lexchar == '\n' | lexchar == EOF
 	  | lexchar == ' ' | lexchar == '\t')
 	{
@@ -756,7 +763,7 @@ static scanDirline ()
 	      if (!strcmp (yytext, "CASESENSITIVE"))
 		{
 		  flag = &sensitive;
-		  scanDirflags ();
+		  scan_dirflags ();
 		}
 	      else if (!strcmp (yytext, "COMMENT"))
 		{
@@ -774,7 +781,7 @@ static scanDirline ()
 			    option_bl_in_dir_line) ? newlexchar : 0, TRUE) 
 			  && isalpha (lexchar))
 			{
-			  scanName ();
+			  scan_name ();
 			  
 			  if (!strcmp (yytext, "COMMENT"))
 			    comlev++;
@@ -792,9 +799,9 @@ static scanDirline ()
 		    newlexchar;
 		  if (isalpha (lexchar) | lexchar == '_')
 		    {
-		      scanName ();
+		      scan_name ();
 		      
-		      defineName (tag (yytext), TRUE);
+		      define_name (tag (yytext), TRUE);
 		    }
 		  else if (!bl_in_dir_line) lerror (8);
 		}
@@ -803,29 +810,29 @@ static scanDirline ()
 	    case 'E':
 	      if (!strcmp (yytext, "EOF"))
 		{
-		  fclose (includeFile ());
+		  fclose (include_file ());
 		  end_of_file = 2;
 		  return;
 		}
-	      else if (!strcmp (yytext, "ELSE")) scanIfdef ();
-	      else if (!strcmp (yytext, "ELSEDEF")) scanIfdef ();
-	      else if (!strcmp (yytext, "ELSENOTDEF")) scanIfdef ();
-	      else if (!strcmp (yytext, "ENDIF")) scanIfdef ();
+	      else if (!strcmp (yytext, "ELSE")) scan_ifdef ();
+	      else if (!strcmp (yytext, "ELSEDEF")) scan_ifdef ();
+	      else if (!strcmp (yytext, "ELSENOTDEF")) scan_ifdef ();
+	      else if (!strcmp (yytext, "ENDIF")) scan_ifdef ();
 	      else if (!strcmp (yytext, "ENDCOMMENT")) lerror (15);
 	      else if (!bl_in_dir_line) lerror (8);
 	      break;
 	    case 'I':
-	      if (!strcmp (yytext, "IFDEF")) scanIfdef ();
-	      else if (!strcmp (yytext, "IFNOTDEF")) scanIfdef ();
+	      if (!strcmp (yytext, "IFDEF")) scan_ifdef ();
+	      else if (!strcmp (yytext, "IFNOTDEF")) scan_ifdef ();
 	      else if (!strcmp (yytext, "INCLUDE"))
 		{
 		  notintext = FALSE;
-		  defineName (tag ("INCLUDED"), TRUE);
+		  define_name (tag ("INCLUDED"), TRUE);
 		  while (lexchar == ' ' | lexchar == '\t')
 		    newlexchar;
 		  if (lexchar != '\n' | lexchar != EOF)
 		    {
-		      scanNows ();
+		      scan_nows ();
 		      
 		      notintext = TRUE;
 
@@ -837,7 +844,7 @@ static scanDirline ()
 		{
 		  flag = &flaggpass2;
 		  mellflag = MINDEXTEST;
-		  scanDirflags ();
+		  scan_dirflags ();
 		}
 	      else if (!bl_in_dir_line) lerror (8);
 	      break;
@@ -850,14 +857,14 @@ static scanDirline ()
 		    newlexchar;
 		  if (isdigit (lexchar))
 		    {
-		      obstack_free (&osLex, yytext);
+		      obstack_free (&os_lex, yytext);
 		      while (isalnum (lexchar) || lexchar == '_')
 			{
-			  if (lexchar != '_') obstack_1grow (&osLex, lexchar);
+			  if (lexchar != '_') obstack_1grow (&os_lex, lexchar);
 			  newlexchar;
 			}
-		      obstack_1grow (&osLex, 0);
-		      yytext= obstack_finish (&osLex);
+		      obstack_1grow (&os_lex, 0);
+		      yytext= obstack_finish (&os_lex);
 		  
 		      nylinje = radix (10, yytext);
 		      notintext = FALSE;
@@ -865,7 +872,7 @@ static scanDirline ()
 			newlexchar;
 		      if (lexchar != '\n' & lexchar != EOF)
 			{
-			  scanNows ();
+			  scan_nows ();
 		      
 			  setfilmap (tag (yytext), nylinje);
 			}
@@ -884,10 +891,10 @@ static scanDirline ()
 		    newlexchar;
 		  if (isalpha (lexchar) | lexchar == '_')
 		    {
-		      scanName ();
+		      scan_name ();
 
 		      mainroutine= yytext;
-		      yytext= obstack_finish (&osLex);
+		      yytext= obstack_finish (&os_lex);
 		    }
 		  else if (!bl_in_dir_line) lerror (8);
 		}
@@ -899,13 +906,13 @@ static scanDirline ()
 	      else if (!strcmp (yytext, "NAMEASVAR"))
 		{
 		  flag = &nameasvar;
-		  scanDirflags ();
+		  scan_dirflags ();
 		}
 	      else if (!strcmp (yytext, "NONETEST"))
 		{
 		  flag = &flaggpass2;
 		  mellflag = MNONETEST;
-		  scanDirflags ();
+		  scan_dirflags ();
 		}
 	      else if (!bl_in_dir_line) lerror (8);
 	      break;
@@ -918,12 +925,12 @@ static scanDirline ()
 		{
 		  flag = &flaggpass2;
 		  mellflag = MSTRIPSIDEEFFECTS;
-		  scanDirflags ();
+		  scan_dirflags ();
 		}
 	      else if (!strcmp (yytext, "STATICBLOCK"))
 		{
 		  flag = &staticblock;
-		  scanDirflags ();
+		  scan_dirflags ();
 		}
 	      else if (!bl_in_dir_line) lerror (8);
 	      break;
@@ -934,10 +941,10 @@ static scanDirline ()
 		    newlexchar;
 		  if (isalpha (lexchar) | lexchar == '_')
 		    {
-		      scanName ();
+		      scan_name ();
 		  
 		      directive_timestamp= yytext;
-		      yytext= obstack_finish (&osLex);
+		      yytext= obstack_finish (&os_lex);
 		    }
 		  else if (!bl_in_dir_line) lerror (8);
 		}
@@ -951,9 +958,9 @@ static scanDirline ()
 		    newlexchar;
 		  if (isalpha (lexchar) | lexchar == '_')
 		    {
-		      scanName ();
+		      scan_name ();
 
-		      defineName (tag (yytext), FALSE);
+		      define_name (tag (yytext), FALSE);
 		    }
 		  else if (!bl_in_dir_line) lerror (8);
 		}
@@ -980,22 +987,35 @@ static scanDirline ()
 /******************************************************************************
                                                                    INITLEX   */
 
-int initLex (sourcename) char *sourcename;
+lex_init ()
 {
-  obstack_init (&osLex);
-  yytext= obstack_finish (&osLex);
-  obstack_init (&osIfdef);
-  ifdefp= obstack_alloc (&osIfdef, sizeof (struct ifdefstack));
+  obstack_init (&os_lex);
+  first_object_allocated_ptr_lex= obstack_alloc (&os_lex, 0);
+
+  obstack_init (&os_ifdef);
+  first_object_allocated_ptr_ifdef= obstack_alloc (&os_ifdef, 0);
+}
+
+int 
+lex_init_pass1 (sourcename) char *sourcename;
+{
+  yytext= obstack_finish (&os_lex);
+  ifdefp= obstack_alloc (&os_ifdef, sizeof (struct ifdefstack));
   ifdefp->prev= NULL;
   ifdefp->ifdef= 0;
-  if (maplineInit (sourcename, ifdefp)) return (TRUE);
+  if (mapline_init (sourcename, ifdefp)) return (TRUE);
   lineno = 1L;
   while (newlexchar == '%')
-    scanDirline ();
+    scan_dirline ();
   unput (lexchar);
   return FALSE;
 }
 
+lex_reinit ()
+{
+  obstack_free (&os_lex, first_object_allocated_ptr_lex);
+  obstack_free (&os_ifdef, first_object_allocated_ptr_ifdef);
+}
 /******************************************************************************
   						          PUTCHARACTER       */
 
@@ -1022,12 +1042,13 @@ putcharacter (character)
  *  for } bygge opp et konstant-tekstobjekt.
  *  Denne rutinen kalles for hvert tegn som skal inn i tekst-objektet. */
 
-static putchartext (character)
+static 
+putchartext (character)
      unsigned char character;
 {
   char *s;
   s = putcharacter (character);
-  obstack_grow (&osLex, s, strlen (s));
+  obstack_grow (&os_lex, s, strlen (s));
 }
 
 /******************************************************************************
@@ -1048,11 +1069,11 @@ gettext ()
 {
   char *s;
 
-  if (obstack_object_size (&osLex) >= MAX_TEXT_CHAR)
+  if (obstack_object_size (&os_lex) >= MAX_TEXT_CHAR)
     lerror (44);
-  obstack_1grow (&osLex, 0);
-  s= obstack_finish (&osLex);
-  yytext= obstack_finish (&osLex);
+  obstack_1grow (&os_lex, 0);
+  s= obstack_finish (&os_lex);
+  yytext= obstack_finish (&os_lex);
   leerror = FALSE;
   return (s);
 }
@@ -1065,7 +1086,7 @@ gettext ()
 int 
 yylex ()
 {
-  char firstLexchar;
+  char first_lexchar;
   int reported;
 
   while (TRUE)
@@ -1085,7 +1106,7 @@ yylex ()
       }
     if (isalpha (newlexchar))
       {
-	scanName ();
+	scan_name ();
 	
 	unput (lexchar);
 	switch (yytext[0])
@@ -1139,7 +1160,7 @@ yylex ()
 			{
 			  antnewline++;
 			  while (newlexchar == '%')
-			    scanDirline ();
+			    scan_dirline ();
 			  notintext = TRUE;
 			}
 		      else if (lexchar == EOF)
@@ -1449,36 +1470,36 @@ yylex ()
 	  {
 	  dotdigit:
 	    /* Behandling av tall som starter med tegnet '.' */
-	    obstack_free (&osLex, yytext);
+	    obstack_free (&os_lex, yytext);
 	    lexradix = 10;
 	  digitsdot:
-	    obstack_1grow (&osLex, '.');
+	    obstack_1grow (&os_lex, '.');
 	    if (lexchar >= '0' & lexchar <= '9')
-	      obstack_1grow (&osLex, lexchar);
+	      obstack_1grow (&os_lex, lexchar);
 	    while (newlexchar >= '0' && lexchar <= '9' || lexchar == '_')
 	      if (lexchar != '_')
-		obstack_1grow (&osLex, lexchar);
+		obstack_1grow (&os_lex, lexchar);
 	    if (lexchar == '&')
 	      {
 		newlexchar;
 	      digitsexp:
 		if (lexchar == '&')
 		  newlexchar;
-		obstack_1grow (&osLex, 'e');
+		obstack_1grow (&os_lex, 'e');
 		if (lexchar == '-')
 		  {
-		    obstack_1grow (&osLex, '-');
+		    obstack_1grow (&os_lex, '-');
 		    newlexchar;
 		  }
 		else if (lexchar == '+')
 		  newlexchar;
 		if (lexchar >= '0' & lexchar <= '9')
-		  obstack_1grow (&osLex, lexchar);
+		  obstack_1grow (&os_lex, lexchar);
 		while (newlexchar >= '0' && lexchar <= '9' || lexchar == '_')
-		  obstack_1grow (&osLex, lexchar);
+		  obstack_1grow (&os_lex, lexchar);
 	      }
-	    obstack_1grow (&osLex, 0);
-	    yytext= obstack_finish (&osLex);
+	    obstack_1grow (&os_lex, 0);
+	    yytext= obstack_finish (&os_lex);
 
 	    unput (lexchar);
 
@@ -1526,8 +1547,8 @@ yylex ()
 	  {
 	    lexradix = 10;
 
-	    obstack_free (&osLex, yytext);
-	    obstack_1grow (&osLex, '1');
+	    obstack_free (&os_lex, yytext);
+	    obstack_1grow (&os_lex, '1');
 
 	    goto digitsexp;
 	  }
@@ -1540,7 +1561,7 @@ yylex ()
 	  {
 	    antnewline++;
 	    while (newlexchar == '%')
-	      scanDirline ();
+	      scan_dirline ();
 	    unput (lexchar);
 	  }
 	if (lexchar != ';')
@@ -1631,7 +1652,7 @@ yylex ()
 	notintext = TRUE;
 	return (HCHARACTERKONST);
       case '\"':
-	obstack_free (&osLex, yytext);
+	obstack_free (&os_lex, yytext);
 	notintext = FALSE;
 	newlexchar;
 	while (TRUE)
@@ -1777,25 +1798,25 @@ yylex ()
       case '8':
       case '9':
 	lexradix = 10;
-	firstLexchar= lexchar;
+	first_lexchar= lexchar;
 
-	obstack_free (&osLex, yytext);
-	obstack_1grow (&osLex, lexchar);
-	if (newlexchar == 'R' && (firstLexchar == '2' | firstLexchar == '4' 
-				  | firstLexchar == '8'))
+	obstack_free (&os_lex, yytext);
+	obstack_1grow (&os_lex, lexchar);
+	if (newlexchar == 'R' && (first_lexchar == '2' | first_lexchar == '4' 
+				  | first_lexchar == '8'))
 	  {
-	    lexradix = firstLexchar - '0';
-	    yytext= obstack_finish (&osLex);
-	    obstack_free (&osLex, yytext);
+	    lexradix = first_lexchar - '0';
+	    yytext= obstack_finish (&os_lex);
+	    obstack_free (&os_lex, yytext);
 	  }
-	else if (firstLexchar == '1' && lexchar == '6')
+	else if (first_lexchar == '1' && lexchar == '6')
 	  {
-	    obstack_1grow (&osLex, lexchar);
+	    obstack_1grow (&os_lex, lexchar);
 	    if (newlexchar == 'R')
 	      {
 		lexradix = 16;
-		yytext= obstack_finish (&osLex);
-		obstack_free (&osLex, yytext);
+		yytext= obstack_finish (&os_lex);
+		obstack_free (&os_lex, yytext);
 	      }
 	    else
 	      unput (lexchar);
@@ -1806,9 +1827,9 @@ yylex ()
 	       || lexchar == '_')
 	  if (lexchar == '_');
 	  else if (isdigit (lexchar))
-	    obstack_1grow (&osLex, lexchar);
+	    obstack_1grow (&os_lex, lexchar);
 	  else
-	    obstack_1grow (&osLex, lexchar + ('9' + 1 - 'A'));
+	    obstack_1grow (&os_lex, lexchar + ('9' + 1 - 'A'));
 	if (lexchar == '.' && lexradix == 10)
 	  {
 	    newlexchar;
@@ -1819,31 +1840,31 @@ yylex ()
 	    newlexchar;
 	    goto digitsexp;
 	  }
-	obstack_1grow (&osLex, 0);
-	yytext= obstack_finish (&osLex);
+	obstack_1grow (&os_lex, 0);
+	yytext= obstack_finish (&os_lex);
 
 	unput (lexchar);
 	yylval.ival = radix (lexradix, yytext);
 	return (HINTEGERKONST);
 
       case EOF:
-	if (ifdefp != includeIfdefp ())
+	if (ifdefp != include_ifdefp ())
 	  {
 	    lerror (24);
-	    ifdefp = (struct ifdefstack *) includeIfdefp ();
+	    ifdefp = (struct ifdefstack *) include_ifdefp ();
 	  }
-	fclose (includeFile ());	
+	fclose (include_file ());	
 	popfilmap ();
-	if (noFilemap ())
+	if (no_filemap ())
 	  return (NOSYMBOL);
-	defineName (tag ("INCLUDED"), FALSE);
+	define_name (tag ("INCLUDED"), FALSE);
 	/* Ingen break her */
       case '\n':			/* NL (LF) */
 	lineno++;
 	if (!option_write_tokens)
 	  mout (MNEWLINE);
 	while (newlexchar == '%')
-	  scanDirline ();
+	  scan_dirline ();
 	unput (lexchar);
 	break;
       case ' ':

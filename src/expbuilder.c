@@ -22,6 +22,7 @@
 #include "const.h"
 #include "mellbuilder.h"
 #include "builder.h"
+#include "salloc.h"
 
 char *xmalloc();
 void free();
@@ -31,27 +32,31 @@ void free();
 
 int token;
 
-static struct obstack osStack;
-static struct obstack osExpr;
+static struct obstack os_stack;
 
 /******************************************************************************
 								EBUILDERINIT */
 
-ebuilderInit()
+ebuilder_init ()
 {
-  obstack_init(&osStack);
-  obstack_init(&osExpr);
-  lineno= 1;
+  obstack_init(&os_stack);
+}
+
+
+
+ebuilder_init_pass2 ()
+{
+  lineno=1;
 }
 
 /******************************************************************************
  								      NEWEXP */
 
-struct EXP *newexp()
+struct EXP *
+newexp()
 {
   struct EXP *re;
-  re= obstack_alloc (&osExpr, sizeof (struct EXP));
-  bzero (re, sizeof (struct EXP));
+  re= (struct EXP *) salloc (sizeof (struct EXP));
   re->line= lineno;
   return re;
 }
@@ -59,7 +64,8 @@ struct EXP *newexp()
 /******************************************************************************
 								     MAKEEXP */
 
-struct EXP *makeexp (token, left, right) int token; struct EXP *left, *right;
+struct EXP *
+makeexp (token, left, right) int token; struct EXP *left, *right;
 {
   struct EXP *re;
   re= newexp();
@@ -77,7 +83,8 @@ struct EXP *makeexp (token, left, right) int token; struct EXP *left, *right;
 /******************************************************************************
 								     CONCEXP */
 
-struct EXP * concexp (left, right) struct EXP *left, *right;
+struct EXP *
+concexp (left, right) struct EXP *left, *right;
 {
   if (left==NULL) return right;
   if (right==NULL) return left;
@@ -87,7 +94,8 @@ struct EXP * concexp (left, right) struct EXP *left, *right;
 /******************************************************************************
 								 REPLACENODE */
 
-struct EXP *replacenode (rep, token) struct EXP **rep; int token;
+struct EXP *
+replacenode (rep, token) struct EXP **rep; int token;
 {
   struct EXP *rex;
   rex= newexp ();
@@ -97,6 +105,7 @@ struct EXP *replacenode (rep, token) struct EXP **rep; int token;
   remove_dot (rep);
   if (rex->right) rex->right->up=rex;
   if (rex->left) rex->left->up=rex;
+  (*rep)->right= (*rep)->left= NULL;
   (*rep)->token= token;
   return (rex);
 }
@@ -155,38 +164,42 @@ remove_dot (rep)
 /******************************************************************************
 								      ECLEAN */
 
-static eclean()
+static 
+eclean()
 {
   void *p;
-  p= obstack_finish (&osStack);
-  obstack_free (&osStack, p);
+  p= obstack_finish (&os_stack);
+  obstack_free (&os_stack, p);
 }
 
 /******************************************************************************
 								       EPUSH */
 
-static epush(re)struct EXP *re;
+static 
+epush(re)struct EXP *re;
 {
-  obstack_ptr_grow (&osStack, re);
+  obstack_ptr_grow (&os_stack, re);
 }
 
 /******************************************************************************
 								        EPOP */
 
-static struct EXP *epop()
+static 
+struct EXP *epop()
 {
   struct EXP *re;
-  re= * ((struct EXP * *)obstack_next_free (&osStack) - 1);
-  obstack_blank (&osStack, - sizeof (void *));
+  re= * ((struct EXP * *)obstack_next_free (&os_stack) - 1);
+  obstack_blank (&os_stack, - sizeof (void *));
   return (re);
 }
 
 /******************************************************************************
 								       ELOOK */
 
-struct EXP *elook()
+struct EXP *
+elook()
 {
-  return *((struct EXP * *)obstack_next_free (&osStack) - 1);
+  return *((struct EXP * *)obstack_next_free (&os_stack) - 1);
 }
 
 
@@ -234,15 +247,11 @@ ebuild ()
 	  goto newtoken;
 	  break;
 	case MFLAG:
-	  setFlag ();
+	  set_flag ();
 	  break;
 	default:
 	  if (setntokens (token) || token == MERROR || token == MSTOP)
 	    {
-#ifdef DEBUG
-	      if (token == MERROR)
-		dumpexp ();
-#endif
 	      re= elook()->up= makeexp(token, NULL, NULL);
 	      re->up= re;
 	      return;
@@ -254,19 +263,19 @@ ebuild ()
 	  }
 	}
       if (expridtokens (token))
-	re->value.ival= (long) minId();
+	re->value.ival= (long) min_id();
 	  else
 	if (token == MTEXTKONST)
 	  {
-	    re->value.tval.txt= minTval();
+	    re->value.tval.txt= min_tval();
 	    re->value.tval.id= NOTEXT;
 	  }
 	    else
 	  if (token == MREALKONST)
-	    re->value.rval= minRval();
+	    re->value.rval= min_rval();
 	      else
 	    if (exprvaltokens (token))
-	      re->value.ival= minIval();
+	      re->value.ival= min_ival();
     newtoken:
       token= min();
     }

@@ -1,16 +1,16 @@
 /*Cim_atr*/
 FILE
 
-XNCFILE &0 0 1 1VTSfilename LISfile LCSopen LCSshared LCSappend LCScreate LCSreadwrite LCSre_wind LCSpurge LTPFILENAME ^__rfilename =0 0
+XNCFILE &0 0 0 0 0 1 1VTSfilename LISfile LCSopen LCSshared LCSappend LCScreate LCSreadwrite LCSre_wind LCSpurge LTPFILENAME ^__rfilename =0 0
 LBPISOPEN ^__risopen 30 0
 LBPSETACCESS ^__rsetaccess 30 0DTSv110 
 
-XNCIMAGEFILE !FILE 0 0 2 4LTSIMAGE LPPSETPOS !IMAGEFILE ^__rsetpos 90 0DISv111 
+XNCIMAGEFILE !FILE 0 0 0 0 0 2 4LTSIMAGE LPPSETPOS !IMAGEFILE ^__rsetpos 90 0DISv111 
 LIPPOS ^__rpos 30 0
 LBPMORE ^__rmore 30 0
 LIPLENGTH ^__rlength 30 0
 
-XNCOUTFILE !IMAGEFILE 0 0 3 7LBPOPEN ^__roopen 30 0DTSv112 
+XNCOUTFILE !IMAGEFILE 0 0 0 0 0 3 7LBPOPEN ^__roopen 30 0DTSv112 
 LBPCLOSE ^__roclose 30 0
 LPPOUTIMAGE !OUTFILE ^__rooutimage 90 0
 LPPOUTRECORD !OUTFILE ^__rooutrecord 90 0
@@ -23,7 +23,7 @@ LPPOUTFIX !OUTFILE ^__rooutfix 90 0DRSv117 DISv118 DISv119
 LPPOUTREAL !OUTFILE ^__rooutreal 90 0DRSv120 DISv121 DISv122 
 LPPOUTFRAC !OUTFILE ^__rooutfrac 90 0DISv123 DISv124 DISv125 
 
-XNCINFILE !IMAGEFILE 0 0 4 10LCSendfile LBPENDFILE ^__riendfile 30 0
+XNCINFILE !IMAGEFILE 0 0 0 0 0 4 10LCSendfile LBPENDFILE ^__riendfile 30 0
 LBPOPEN ^__riopen 30 0DTSv126 
 LBPCLOSE ^__riclose 30 0
 LPPINIMAGE !INFILE ^__riinimage 90 0
@@ -35,7 +35,7 @@ LIPININT ^__riinint 30 0
 LRPINREAL ^__riinreal 30 0
 LIPINFRAC ^__riinfrac 30 0
 
-XNCDIRECTFILE !IMAGEFILE 0 0 5 13LISloc LISmaxloc LISminwriteloc LISimagelength LCSendfile LCSlocked LCSlastop LCSwriteonly LIPLOCATION ^__rdlocation 30 0
+XNCDIRECTFILE !IMAGEFILE 0 0 0 0 0 5 13LISloc LISmaxloc LISminwriteloc LISimagelength LCSendfile LCSlocked LCSlastop LCSwriteonly LIPLOCATION ^__rdlocation 30 0
 LBPENDFILE ^__rdendfile 30 0
 LBPLOCKED ^__rdlocked 30 0
 LBPOPEN ^__rdopen 30 0DTSv128 
@@ -62,7 +62,7 @@ LPPOUTFIX !DIRECTFILE ^__rooutfix 90 0DRSv138 DISv139 DISv140
 LPPOUTREAL !DIRECTFILE ^__rooutreal 90 0DRSv141 DISv142 DISv143 
 LPPOUTFRAC !DIRECTFILE ^__rooutfrac 90 0DISv144 DISv145 DISv146 
 
-XNCPRINTFILE !OUTFILE 0 0 6 16LISline LISlines_per_page LISspacing LISpage LIPLINE ^__rpline 30 0
+XNCPRINTFILE !OUTFILE 0 0 0 0 0 6 16LISline LISlines_per_page LISspacing LISpage LIPLINE ^__rpline 30 0
 LIPPAGE ^__rppage 30 0
 LBPOPEN ^__rpopen 30 0DTSv147 
 LBPCLOSE ^__rpclose 30 0
@@ -72,21 +72,21 @@ LPPEJECT !PRINTFILE ^__rpeject 90 0DISv150
 LPPOUTIMAGE !PRINTFILE ^__rpoutimage 90 0
 LPPOUTRECORD !PRINTFILE ^__rpoutrecord 90 0
 
-XNCBYTEFILE !FILE 0 0 7 19LCSendfile LCSbytesize LIPBYTESIZE ^__rbytesize 30 0
+XNCBYTEFILE !FILE 0 0 0 0 0 7 19LCSendfile LCSbytesize LIPBYTESIZE ^__rbytesize 30 0
 
-XNCINBYTEFILE !BYTEFILE 0 0 8 22LBPENDFILE ^__ribendfile 30 0
+XNCINBYTEFILE !BYTEFILE 0 0 0 0 0 8 22LBPENDFILE ^__ribendfile 30 0
 LBPOPEN ^__ribopen 30 0
 LBPCLOSE ^__ribclose 30 0
 LIPINBYTE ^__ribinbyte 30 0
 LTPINTEXT ^__ribintext 30 0DTSv151 
 
-XNCOUTBYTEFILE !BYTEFILE 0 0 9 25LBPOPEN ^__robopen 30 0
+XNCOUTBYTEFILE !BYTEFILE 0 0 0 0 0 9 25LBPOPEN ^__robopen 30 0
 LBPCLOSE ^__robclose 30 0
 LPPOUTBYTE !OUTBYTEFILE ^__roboutbyte 90 0DISv152 
 LPPOUTTEXT !OUTBYTEFILE ^__robouttext 90 0DTSv153 
 LBPCHECKPOINT ^__rdcheckpoint 30 0
 
-XNCDIRECTBYTEFILE !BYTEFILE 0 0 10 28LISloc LISmaxloc LISminwriteloc LCSlocked LCSlastop LCSwriteonly LBPENDFILE ^__rdbendfile 30 0
+XNCDIRECTBYTEFILE !BYTEFILE 0 0 0 0 0 10 28LISloc LISmaxloc LISminwriteloc LCSlocked LCSlastop LCSwriteonly LBPENDFILE ^__rdbendfile 30 0
 LIPLOCATION ^__rdblocation 30 0
 LIPMAXLOC ^__rdbmaxloc 30 0
 LBPLOCKED ^__rdblocked 30 0

@@ -50,7 +50,8 @@
  *  MIFE:         Samme som ovenfor
  *  MELSE:        Samme som ovenfor */
 
-char setdanger_const (re)
+char 
+setdanger_const (re)
      struct EXP *re;
 {
   char sub_danger;
@@ -67,7 +68,7 @@ char setdanger_const (re)
       DANGER = TRUE;
       break;
     case MPROCARG:
-      DANGER = dangerProc (RD);
+      DANGER = danger_proc (RD);
       if (DANGER == FALSE)
 	{
 	  struct EXP *rex;

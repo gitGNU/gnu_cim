@@ -86,5 +86,5 @@ extern int newlabel();
 
 /* sentgen.c */
 
-extern void sentGen ();
+extern void sent_gen ();
 

@@ -36,7 +36,7 @@ void free();
 #define obstack_chunk_alloc xmalloc
 #define obstack_chunk_free free
 
-static struct obstack osName;
+static struct obstack os_name;
 
 static void *hashlist[NAMEPRIMEVALUE];
 
@@ -64,10 +64,10 @@ tag (t)
       prevlist = list;
     }
 
-  obstack_ptr_grow(&osName, NULL);
-  obstack_grow0 (&osName, t, leng);
-  obstack_1grow (&osName, FALSE);
-  list= obstack_finish (&osName);
+  obstack_ptr_grow(&os_name, NULL);
+  obstack_grow0 (&os_name, t, leng);
+  obstack_1grow (&os_name, FALSE);
+  list= obstack_finish (&os_name);
 
   if (prevlist == NULL)
     hashlist[hash] = list;
@@ -80,7 +80,7 @@ tag (t)
 /******************************************************************************
                                                     DEFINENAME & IFDEFNAME   */
 
-defineName (t, d) char *t; char d;
+define_name (t, d) char *t; char d;
 {
   while (*t != 0) t++;
   t++;
@@ -88,7 +88,7 @@ defineName (t, d) char *t; char d;
 }
 
 char
-ifdefName (t) char *t;
+ifdef_name (t) char *t;
 {
   while (*t != 0) t++;
   t++;
@@ -99,16 +99,16 @@ ifdefName (t) char *t;
 /******************************************************************************
                                                                     INITNAME */
 
-initName ()
+init_name ()
 {
-  obstack_init(&osName);
-  defineName (tag ("CIM"), TRUE);
+  obstack_init(&os_name);
+  define_name (tag ("CIM"), TRUE);
 #if INT_64
-  defineName (tag ("INTEGER_64"), TRUE);
+  define_name (tag ("INTEGER_64"), TRUE);
 #endif
 
-  defineName (tag (CPU_TYPE), TRUE);
-  defineName (tag (MANUFACTURER), TRUE);
-  defineName (tag (OS_TYPE), TRUE);
-  defineName (tag (OS_TYPE_VERSION), TRUE);
+  define_name (tag (CPU_TYPE), TRUE);
+  define_name (tag (MANUFACTURER), TRUE);
+  define_name (tag (OS_TYPE), TRUE);
+  define_name (tag (OS_TYPE_VERSION), TRUE);
 }

@@ -1,6 +1,6 @@
-# Makefile.in generated automatically by automake 1.3 from Makefile.am
+# Makefile.in generated automatically by automake 1.4 from Makefile.am
 
-# Copyright (C) 1994, 1995, 1996, 1997, 1998 Free Software Foundation, Inc.
+# Copyright (C) 1994, 1995-8, 1999 Free Software Foundation, Inc.
 # This Makefile.in is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
 # with or without modifications, as long as this notice is preserved.
@@ -29,7 +29,7 @@
 # Ranlib should not be run when creating libcim-atr.a
 
 
-SHELL = /bin/sh
+SHELL = @SHELL@
 
 srcdir = @srcdir@
 top_srcdir = @top_srcdir@
@@ -50,7 +50,7 @@ mandir = @mandir@
 includedir = @includedir@
 oldincludedir = /usr/include
 
-DISTDIR =
+DESTDIR =
 
 pkgdatadir = $(datadir)/@PACKAGE@
 pkglibdir = $(libdir)/@PACKAGE@
@@ -64,7 +64,7 @@ AUTOMAKE = @AUTOMAKE@
 AUTOHEADER = @AUTOHEADER@
 
 INSTALL = @INSTALL@
-INSTALL_PROGRAM = @INSTALL_PROGRAM@
+INSTALL_PROGRAM = @INSTALL_PROGRAM@ $(AM_INSTALL_PROGRAM_FLAGS)
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 transform = @program_transform_name@
@@ -96,7 +96,7 @@ PERL = @PERL@
 VERSION = @VERSION@
 YACC = @YACC@
 
-RANLIB=:
+RANLIB = :
 
 CIM = $(top_builddir)/src/cim
 CIMFLAGS = -H -L -L$(srcdir) -I$(srcdir) -S
@@ -105,68 +105,31 @@ lib_LIBRARIES = libcim-atr.a
 
 libcim_atr_a_SOURCES = 
 
-libcim_atr_a_LIBADD = $(srcdir)/simenvir.atr $(srcdir)/simfile.atr \
-                      $(srcdir)/simset.sim $(srcdir)/simulation.sim \
-                      $(srcdir)/simset.atr $(srcdir)/simulation.atr
+libcim_atr_a_LIBADD = $(srcdir)/simenvir.atr $(srcdir)/simfile.atr                       $(srcdir)/simset.sim $(srcdir)/simulation.sim                       $(srcdir)/simset.atr $(srcdir)/simulation.atr
+
 
 lib_LTLIBRARIES = libcim.la
 
 libcim_la_LDFLAGS = -version-info @LIB_CURRENT@:@LIB_REVISION@:@LIB_AGE@
 
-libcim_la_SOURCES = sysin.c sysout.c syserr.c copytexttoc.c addroffirstchar.c \
-              addroffirstelem.c copytextarrtoc.c copyarrtoc.c mod.c rem.c \
-              signr.c signdr.c signi.c signdi.c signdx.c entier.c intrea.c \
-              powii.c powri.c pow.c addepsilon.c subepsilon.c absr.c absi.c \
-              sqrt.c sin.c cos.c tan.c cotan.c arcsin.c arccos.c arctan.c \
-              arctan2.c sinh.c cosh.c tanh.c ln.c log10.c exp.c mint.c \
-              minc.c minr.c mini.c maxt.c maxc.c maxr.c maxi.c simulaid.c \
-              datetime.c cputime.c clocktime.c lowerbound.c upperbound.c \
-              draw.c randint.c uniform.c normal.c negexp.c poisson.c \
-              erlang.c discrete.c linear.c histd.c histo.c terror.c \
-              filename.c isopen.c setaccess.c leftshift.c field.c setpos.c \
-              pos.c more.c length.c dlocation.c dendfile.c dlocked.c \
-              dcheckpoint.c dunlock.c dlock.c dopen.c dclose.c dlocate.c \
-              dlastloc.c dmaxloc.c dinimage.c doutimage.c ddeleteimage.c \
-              iendfile.c iopen.c iclose.c iinimage.c iinrecord.c iinchar.c \
-              ilastitem.c iintext.c iinint.c iinreal.c iinfrac.c oopen.c \
-              oclose.c ooutimage.c ooutrecord.c obreakoutimage.c ooutchar.c \
-              oouttext.c ooutint.c ooutfix.c ooutreal.c ooutfrac.c pline.c \
-              ppage.c popen.c pclose.c plinesperpage.c pspacing.c peject.c \
-              poutimage.c poutrecord.c bytesize.c ibendfile.c ibopen.c \
-              ibclose.c ibinbyte.c ibintext.c obopen.c obclose.c \
-              oboutbyte.c obouttext.c dbendfile.c dblocation.c dbmaxloc.c \
-              dblocked.c dbunlock.c dblock.c dbopen.c dbclose.c dblastloc.c \
-              dblocate.c dbinbyte.c dboutbyte.c dbintext.c dbouttext.c \
-              tsglob.c start.c printfilline.c error.c warning.c trace.c \
-              systemerror.c initier.c ss.c rs.c cp.c cpp.c cpb.c ccb.c ep.c \
-              epp.c oa.c cprb.c cprbb.c b.c be.c resume.c exchange.c \
-              detach.c call.c goto.c enddecl.c inner.c endclass.c ca.c in.c \
-              rin.c is.c gbc.c ct.c eth.c getav.c getcbv.c getrv.c getta.c \
-              gettv.c getproc.c getlab.c geta.c getsa.c dump.c argc.c \
-              argv.c return.c tconstant.c tstart.c tlength.c tmain.c \
-              tpos.c tmore.c tsub.c tstrip.c tsetpos.c tgetchar.c tgetint.c \
-              tgetreal.c tgetfrac.c tputchar.c tputint.c tputfix.c \
-              tputreal.c tputfrac.c copy.c conc.c blanks.c textvalassign.c \
-              textassign.c eqrtext.c eqtext.c lttext.c letext.c char.c \
-              isochar.c rank.c isorank.c digit.c letter.c lowten.c \
-              decimalmark.c upcase.c lowcase.c simfile.c simenvir.c \
-              xmalloc.c simset.c simulation.c
+libcim_la_SOURCES = sysin.c sysout.c syserr.c copytexttoc.c addroffirstchar.c               addroffirstelem.c copytextarrtoc.c copyarrtoc.c mod.c rem.c               signr.c signdr.c signi.c signdi.c signdx.c entier.c intrea.c               powii.c powri.c pow.c addepsilon.c subepsilon.c absr.c absi.c               sqrt.c sin.c cos.c tan.c cotan.c arcsin.c arccos.c arctan.c               arctan2.c sinh.c cosh.c tanh.c ln.c log10.c exp.c mint.c               minc.c minr.c mini.c maxt.c maxc.c maxr.c maxi.c simulaid.c               datetime.c cputime.c clocktime.c lowerbound.c upperbound.c               draw.c randint.c uniform.c normal.c negexp.c poisson.c               erlang.c discrete.c linear.c histd.c histo.c terror.c               filename.c isopen.c setaccess.c leftshift.c field.c setpos.c               pos.c more.c length.c dlocation.c dendfile.c dlocked.c               dcheckpoint.c dunlock.c dlock.c dopen.c dclose.c dlocate.c               dlastloc.c dmaxloc.c dinimage.c doutimage.c ddeleteimage.c               iendfile.c iopen.c iclose.c iinimage.c iinrecord.c iinchar.c               ilastitem.c iintext.c iinint.c iinreal.c iinfrac.c oopen.c               oclose.c ooutimage.c ooutrecord.c obreakoutimage.c ooutchar.c               oouttext.c ooutint.c ooutfix.c ooutreal.c ooutfrac.c pline.c               ppage.c popen.c pclose.c plinesperpage.c pspacing.c peject.c               poutimage.c poutrecord.c bytesize.c ibendfile.c ibopen.c               ibclose.c ibinbyte.c ibintext.c obopen.c obclose.c               oboutbyte.c obouttext.c dbendfile.c dblocation.c dbmaxloc.c               dblocked.c dbunlock.c dblock.c dbopen.c dbclose.c dblastloc.c               dblocate.c dbinbyte.c dboutbyte.c dbintext.c dbouttext.c               tsglob.c start.c printfilline.c error.c warning.c trace.c               systemerror.c initier.c ss.c rs.c cp.c cpp.c cpb.c ccb.c ep.c               epp.c oa.c cprb.c cprbb.c b.c be.c resume.c exchange.c               detach.c call.c goto.c enddecl.c inner.c endclass.c ca.c in.c               rin.c is.c gbc.c ct.c eth.c getav.c getcbv.c getrv.c getta.c               gettv.c getproc.c getlab.c geta.c getsa.c dump.c argc.c               argv.c return.c tconstant.c tstart.c tlength.c tmain.c               tpos.c tmore.c tsub.c tstrip.c tsetpos.c tgetchar.c tgetint.c               tgetreal.c tgetfrac.c tputchar.c tputint.c tputfix.c               tputreal.c tputfrac.c copy.c conc.c blanks.c textvalassign.c               textassign.c eqrtext.c eqtext.c lttext.c letext.c char.c               isochar.c rank.c isorank.c digit.c letter.c lowten.c               decimalmark.c upcase.c lowcase.c simfile.c simenvir.c               xmalloc.c simset.c simulation.c
+
 
 BUILT_SOURCES = simset.c simulation.c
 
 CLEANFILES = simset.shl simulation.shl simset.mif simulation.mif
-MAINTAINER_CLEANFILES = simset.c simset.atr \
-                        simulation.c simulation.atr
+MAINTAINER_CLEANFILES = simset.c simset.atr                         simulation.c simulation.atr
 
-noinst_HEADERS = epsilon.h file.h random.h text.h trigno.h align.h \
-                 simfile.h
+
+noinst_HEADERS = epsilon.h file.h random.h text.h trigno.h align.h                  simfile.h
+
 
 include_HEADERS = cim.h
 
 INCLUDES = -I$(top_srcdir)
 
-EXTRA_DIST = simset.sim simulation.sim simfile.atr simenvir.atr \
-             simulation.atr simset.atr libcim-atr.a
+EXTRA_DIST = simset.sim simulation.sim simfile.atr simenvir.atr              simulation.atr simset.atr libcim-atr.a
+
 
 SUFFIXES = .sim .atr
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
@@ -225,9 +188,10 @@ lttext.lo letext.lo char.lo isochar.lo rank.lo isorank.lo digit.lo \
 letter.lo lowten.lo decimalmark.lo upcase.lo lowcase.lo simfile.lo \
 simenvir.lo xmalloc.lo simset.lo simulation.lo
 CFLAGS = @CFLAGS@
-COMPILE = $(CC) $(DEFS) $(INCLUDES) $(CPPFLAGS) $(CFLAGS)
-LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(INCLUDES) $(CPPFLAGS) $(CFLAGS)
-LINK = $(LIBTOOL) --mode=link $(CC) $(CFLAGS) $(LDFLAGS) -o $@
+COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+CCLD = $(CC)
+LINK = $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(LDFLAGS) -o $@
 HEADERS =  $(include_HEADERS) $(noinst_HEADERS)
 
 DIST_COMMON =  Makefile.am Makefile.in
@@ -235,16 +199,15 @@ DIST_COMMON =  Makefile.am Makefile.in
 
 DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
-TAR = tar
-GZIP = --best
+TAR = gtar
+GZIP_ENV = --best
 SOURCES = $(libcim_atr_a_SOURCES) $(libcim_la_SOURCES)
 OBJECTS = $(libcim_atr_a_OBJECTS) $(libcim_la_OBJECTS)
 
-all: Makefile $(LIBRARIES) $(LTLIBRARIES) $(HEADERS)
-
+all: all-redirect
 .SUFFIXES:
 .SUFFIXES: .S .atr .c .lo .o .s .sim
-$(srcdir)/Makefile.in: Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4)
+$(srcdir)/Makefile.in: Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) 
 	cd $(top_srcdir) && $(AUTOMAKE) --gnu --include-deps lib/Makefile
 
 Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status
@@ -259,7 +222,7 @@ distclean-libLIBRARIES:
 install-libLIBRARIES: $(lib_LIBRARIES)
 	@$(NORMAL_INSTALL)
 	$(mkinstalldirs) $(DESTDIR)$(libdir)
-	list='$(lib_LIBRARIES)'; for p in $$list; do \
+	@list='$(lib_LIBRARIES)'; for p in $$list; do \
 	  if test -f $$p; then \
 	    echo " $(INSTALL_DATA) $$p $(DESTDIR)$(libdir)/$$p"; \
 	    $(INSTALL_DATA) $$p $(DESTDIR)$(libdir)/$$p; \
@@ -336,8 +299,8 @@ install-libLTLIBRARIES: $(lib_LTLIBRARIES)
 	$(mkinstalldirs) $(DESTDIR)$(libdir)
 	@list='$(lib_LTLIBRARIES)'; for p in $$list; do \
 	  if test -f $$p; then \
-	    echo "$(LIBTOOL)  --mode=install $(INSTALL_DATA) $$p $(DESTDIR)$(libdir)/$$p"; \
-	    $(LIBTOOL)  --mode=install $(INSTALL_DATA) $$p $(DESTDIR)$(libdir)/$$p; \
+	    echo "$(LIBTOOL)  --mode=install $(INSTALL) $$p $(DESTDIR)$(libdir)/$$p"; \
+	    $(LIBTOOL)  --mode=install $(INSTALL) $$p $(DESTDIR)$(libdir)/$$p; \
 	  else :; fi; \
 	done
 
@@ -368,8 +331,12 @@ uninstall-includeHEADERS:
 tags: TAGS
 
 ID: $(HEADERS) $(SOURCES) $(LISP)
+	list='$(SOURCES) $(HEADERS)'; \
+	unique=`for i in $$list; do echo $$i; done | \
+	  awk '    { files[$$0] = 1; } \
+	       END { for (i in files) print i; }'`; \
 	here=`pwd` && cd $(srcdir) \
-	  && mkid -f$$here/ID $(SOURCES) $(HEADERS) $(LISP)
+	  && mkid -f$$here/ID $$unique $(LISP)
 
 TAGS:  $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) $(LISP)
 	tags=; \
@@ -397,67 +364,84 @@ subdir = lib
 distdir: $(DISTFILES)
 	@for file in $(DISTFILES); do \
 	  d=$(srcdir); \
-	  test -f $(distdir)/$$file \
-	  || ln $$d/$$file $(distdir)/$$file 2> /dev/null \
-	  || cp -p $$d/$$file $(distdir)/$$file; \
+	  if test -d $$d/$$file; then \
+	    cp -pr $$/$$file $(distdir)/$$file; \
+	  else \
+	    test -f $(distdir)/$$file \
+	    || ln $$d/$$file $(distdir)/$$file 2> /dev/null \
+	    || cp -p $$d/$$file $(distdir)/$$file || :; \
+	  fi; \
 	done
-info:
-dvi:
-check: all
-	$(MAKE)
-installcheck:
-install-exec: install-libLIBRARIES install-libLTLIBRARIES
-	@$(NORMAL_INSTALL)
+simset.lo simset.o : simset.c ./cim.h
+simulation.lo simulation.o : simulation.c ./cim.h
 
-install-data: install-includeHEADERS
-	@$(NORMAL_INSTALL)
+info-am:
+info: info-am
+dvi-am:
+dvi: dvi-am
+check-am: all-am
+check: check-am
+installcheck-am:
+installcheck: installcheck-am
+install-exec-am: install-libLIBRARIES install-libLTLIBRARIES
+install-exec: install-exec-am
 
-install: install-exec install-data all
-	@:
+install-data-am: install-includeHEADERS
+install-data: install-data-am
 
-uninstall: uninstall-libLIBRARIES uninstall-libLTLIBRARIES uninstall-includeHEADERS
-
+install-am: all-am
+	@$(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am
+install: install-am
+uninstall-am: uninstall-libLIBRARIES uninstall-libLTLIBRARIES \
+		uninstall-includeHEADERS
+uninstall: uninstall-am
+all-am: Makefile $(LIBRARIES) $(LTLIBRARIES) $(HEADERS)
+all-redirect: all-am
 install-strip:
-	$(MAKE) INSTALL_PROGRAM='$(INSTALL_PROGRAM) -s' INSTALL_SCRIPT='$(INSTALL_PROGRAM)' install
+	$(MAKE) $(AM_MAKEFLAGS) AM_INSTALL_PROGRAM_FLAGS=-s install
 installdirs:
-	$(mkinstalldirs)  $(DATADIR)$(libdir) $(DATADIR)$(libdir) \
-		$(DATADIR)$(includedir)
+	$(mkinstalldirs)  $(DESTDIR)$(libdir) $(DESTDIR)$(libdir) \
+		$(DESTDIR)$(includedir)
 
 
 mostlyclean-generic:
-	-test -z "$(MOSTLYCLEANFILES)" || rm -f $(MOSTLYCLEANFILES)
 
 clean-generic:
 	-test -z "$(CLEANFILES)" || rm -f $(CLEANFILES)
 
 distclean-generic:
-	-rm -f Makefile $(DISTCLEANFILES)
+	-rm -f Makefile $(CONFIG_CLEAN_FILES)
 	-rm -f config.cache config.log stamp-h stamp-h[0-9]*
-	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
 
 maintainer-clean-generic:
-	-test -z "$(MAINTAINERCLEANFILES)" || rm -f $(MAINTAINERCLEANFILES)
 	-test -z "$(BUILT_SOURCES)" || rm -f $(BUILT_SOURCES)
-mostlyclean:  mostlyclean-libLIBRARIES mostlyclean-compile \
+mostlyclean-am:  mostlyclean-libLIBRARIES mostlyclean-compile \
 		mostlyclean-libtool mostlyclean-libLTLIBRARIES \
 		mostlyclean-tags mostlyclean-generic
 
-clean:  clean-libLIBRARIES clean-compile clean-libtool \
-		clean-libLTLIBRARIES clean-tags clean-generic \
-		mostlyclean
+mostlyclean: mostlyclean-am
 
-distclean:  distclean-libLIBRARIES distclean-compile distclean-libtool \
-		distclean-libLTLIBRARIES distclean-tags \
-		distclean-generic clean
-	-rm -f config.status
+clean-am:  clean-libLIBRARIES clean-compile clean-libtool \
+		clean-libLTLIBRARIES clean-tags clean-generic \
+		mostlyclean-am
+
+clean: clean-am
+
+distclean-am:  distclean-libLIBRARIES distclean-compile \
+		distclean-libtool distclean-libLTLIBRARIES \
+		distclean-tags distclean-generic clean-am
 	-rm -f libtool
 
-maintainer-clean:  maintainer-clean-libLIBRARIES \
+distclean: distclean-am
+
+maintainer-clean-am:  maintainer-clean-libLIBRARIES \
 		maintainer-clean-compile maintainer-clean-libtool \
 		maintainer-clean-libLTLIBRARIES maintainer-clean-tags \
-		maintainer-clean-generic distclean
+		maintainer-clean-generic distclean-am
 	@echo "This command is intended for maintainers to use;"
 	@echo "it deletes files that may require special tools to rebuild."
+
+maintainer-clean: maintainer-clean-am
 
 .PHONY: mostlyclean-libLIBRARIES distclean-libLIBRARIES \
 clean-libLIBRARIES maintainer-clean-libLIBRARIES uninstall-libLIBRARIES \
@@ -468,9 +452,11 @@ mostlyclean-libLTLIBRARIES distclean-libLTLIBRARIES \
 clean-libLTLIBRARIES maintainer-clean-libLTLIBRARIES \
 uninstall-libLTLIBRARIES install-libLTLIBRARIES \
 uninstall-includeHEADERS install-includeHEADERS tags mostlyclean-tags \
-distclean-tags clean-tags maintainer-clean-tags distdir info dvi \
-installcheck install-exec install-data install uninstall all \
-installdirs mostlyclean-generic distclean-generic clean-generic \
+distclean-tags clean-tags maintainer-clean-tags distdir info-am info \
+dvi-am dvi check check-am installcheck-am installcheck install-exec-am \
+install-exec install-data-am install-data install-am install \
+uninstall-am uninstall all-redirect all-am all installdirs \
+mostlyclean-generic distclean-generic clean-generic \
 maintainer-clean-generic clean mostlyclean distclean maintainer-clean
 
 

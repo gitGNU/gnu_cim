@@ -18,7 +18,7 @@
 
 #include <stdio.h>
 
-extern void initFilelist ();
+extern void init_filelist ();
 char insert_name_in_dirlist ();
 char insert_name_in_archlist ();
 char insert_name_in_linklist ();

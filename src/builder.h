@@ -47,7 +47,7 @@ struct EXP
   };
 
 extern int token;
-extern int buildLineno;
+extern int build_lineno;
 
 extern struct EXP *copytree ();
 
@@ -62,16 +62,16 @@ struct SENT
   struct EXP *exp;
   struct SENT *prev, *next;
   struct SENT *first,*last;
-  int lastLine;
+  int last_line;
 };
 
 extern void insert_thunk ();
-extern void insertAfterSent ();
-extern void insertBeforeSent ();
-extern void removeSent ();
-struct SENT *newSent();
+extern void insert_after_sent ();
+extern void insert_before_sent ();
+extern void remove_sent ();
+struct SENT *new_sent();
 struct SENT *sbuild();
-void setFlag ();
+void set_flag ();
 
 extern char nonetest;
 extern char indextest;

@@ -2,7 +2,7 @@
 SIMENVIR
  FILE simfile.atr
 
-LNCTEXTOBJ* &0 0 0 0LBPCONSTANT ^__rtconstant 20 0
+LNCTEXTOBJ* &0 0 0 0 0 0 0LBPCONSTANT ^__rtconstant 20 0
 LIPSTART ^__rtstart 20 0
 LIPLENGTH ^__rtlength 20 0
 LTPMAIN ^__rtmain <0 0
@@ -44,7 +44,7 @@ LCPLOWTEN ^__rlowten ;0 0DCS*32
 LCPDECIMALMARK ^__rdecimalmark ;0 0DCS*33 
 LTPUPCASE ^__rupcase :0 0DTS*34 
 LTPLOWCASE ^__rlowcase :0 0DTS*35 
-LNCCOMMON* &0 0 0 0LNPDETACH ^__rdetach 40 0
+LNCCOMMON* &0 0 0 0 0 0 0LNPDETACH ^__rdetach 40 0
 
 LNPCALL ^__rcall 50 0DPS*36 COMMON* 
 LNPRESUME ^__rresume 50 0DPS*37 COMMON* 

@@ -31,7 +31,7 @@ void free();
 #define obstack_chunk_alloc xmalloc
 #define obstack_chunk_free free
 
-static struct obstack osFilelist;
+static struct obstack os_filelist;
 
 typedef struct _filelist filelist_t;
 typedef struct _fileelem fileelem_t;
@@ -55,9 +55,10 @@ static filelist_t dirlist, archlist, linklist;
 /******************************************************************************
                                                                 INITFILELIST */
 
-void initFilelist ()
+void 
+init_filelist ()
 {
-  obstack_init (&osFilelist);
+  obstack_init (&os_filelist);
 }
 
 
@@ -71,7 +72,8 @@ clear_list (listp) filelist_t *listp;
 /******************************************************************************
                                                                      IS_NAME */
 
-char is_name (listp, name) filelist_t *listp; char *name;
+char 
+is_name (listp, name) filelist_t *listp; char *name;
 {
   fileelem_t *elem;
   for (elem= listp->first; elem!=NULL; elem= elem->next)
@@ -82,20 +84,22 @@ char is_name (listp, name) filelist_t *listp; char *name;
 /******************************************************************************
                                                                    GET_NAMES */
 
-char *get_names (listp) filelist_t *listp;
+char *
+get_names (listp) filelist_t *listp;
 {
   fileelem_t *elem;
   for (elem= listp->first; elem!=NULL; elem= elem->next)
     {
-      newstrGrow2 (elem->name, " ");
+      newstr_grow2 (elem->name, " ");
     }
-  return newstrFinish ();
+  return newstr_finish ();
 }
 
 /******************************************************************************
                                                        GET_NAMES_IN_LINKLIST */
 
-char * get_names_in_linklist ()
+char * 
+get_names_in_linklist ()
 {
   return get_names(&linklist);
 }
@@ -103,10 +107,11 @@ char * get_names_in_linklist ()
 /******************************************************************************
                                                                  INSERT_NAME */
 
-char insert_name (listp, name, first) filelist_t *listp; char *name, first;
+char 
+insert_name (listp, name, first) filelist_t *listp; char *name, first;
 {
   fileelem_t *new;
-  new= (fileelem_t *) obstack_alloc (&osFilelist, sizeof (fileelem_t));
+  new= (fileelem_t *) obstack_alloc (&os_filelist, sizeof (fileelem_t));
   new->next= NULL;
   new->name= name;
 
@@ -134,7 +139,8 @@ char insert_name (listp, name, first) filelist_t *listp; char *name, first;
 /******************************************************************************
                                                       INSERT_NAME_IN_DIRLIST */
 
-char insert_name_in_dirlist (name) char *name;
+char 
+insert_name_in_dirlist (name) char *name;
 {
   if (name==NULL)
     {
@@ -150,7 +156,8 @@ char insert_name_in_dirlist (name) char *name;
 /******************************************************************************
                                                      INSERT_NAME_IN_ARCHLIST */
 
-char insert_name_in_archlist (name) char *name;
+char 
+insert_name_in_archlist (name) char *name;
 {
   return insert_name (&archlist, name, FALSE);
 }
@@ -158,7 +165,8 @@ char insert_name_in_archlist (name) char *name;
 /******************************************************************************
                                                      INSERT_NAME_IN_LINKLIST */
 
-char insert_name_in_linklist (name, first) char *name, first;
+char 
+insert_name_in_linklist (name, first) char *name, first;
 {
   return insert_name (&linklist, name, first);
 }
@@ -166,18 +174,20 @@ char insert_name_in_linklist (name, first) char *name, first;
 /******************************************************************************
                                                               TRANSFORM_NAME */
 
-char * transform_name(name, fromsuffix, tosuffix) 
+char * 
+transform_name(name, fromsuffix, tosuffix) 
   char *name, *fromsuffix, *tosuffix;
 {
-  newstrGrown (name, strlen(name) - strlen(fromsuffix));
-  newstrGrow1 (tosuffix);
-  return newstrFinish ();
+  newstr_grown (name, strlen(name) - strlen(fromsuffix));
+  newstr_grow1 (tosuffix);
+  return newstr_finish ();
 }
 
 /******************************************************************************
                                                                    OPEN_NAME */
 
-FILE *open_name (dirlist, linklist, name, link) 
+FILE *
+open_name (dirlist, linklist, name, link) 
   filelist_t *dirlist, *linklist; char *name; char link;
 {
   FILE *f;
@@ -185,10 +195,10 @@ FILE *open_name (dirlist, linklist, name, link)
   char *str;
   for (elem= dirlist->first; elem!=NULL; elem= elem->next)
     {
-      obstack_grow (&osFilelist, elem->name, strlen (elem->name));
-      obstack_1grow (&osFilelist, '/');
-      obstack_grow0 (&osFilelist, name, strlen (name));
-      str= obstack_finish (&osFilelist);
+      obstack_grow (&os_filelist, elem->name, strlen (elem->name));
+      obstack_1grow (&os_filelist, '/');
+      obstack_grow0 (&os_filelist, name, strlen (name));
+      str= obstack_finish (&os_filelist);
 #if OPEN_FILE_IN_BINARY_MODE
       if ((f = fopen (str, "rb"))!= NULL)
 #else
@@ -199,7 +209,7 @@ FILE *open_name (dirlist, linklist, name, link)
 	    insert_name (linklist, transform_name (str, ".atr", ".o"), TRUE);
 	  return (f);
 	}
-      obstack_free (&osFilelist, str);
+      obstack_free (&os_filelist, str);
     }
   return (NULL);
 }
@@ -207,7 +217,8 @@ FILE *open_name (dirlist, linklist, name, link)
 /******************************************************************************
                                                              SHORT_FILE_NAME */
 
-char * short_file_name (f)
+char * 
+short_file_name (f)
      FILE *f;
 {
   int i,
@@ -232,7 +243,8 @@ char * short_file_name (f)
 /******************************************************************************
                                                  OPEN_AND_POSITION_ARCH_NAME */
 
-FILE *open_and_position_arch_name (archname, name) char *archname, *name;
+FILE *
+open_and_position_arch_name (archname, name) char *archname, *name;
 {
   FILE *f;
   char *string_table=NULL;
@@ -279,10 +291,10 @@ FILE *open_and_position_arch_name (archname, name) char *archname, *name;
 	      char c;
 	      c = getc (f);
 	      if (c == '/' || c == '\n')
-		obstack_1grow (&osFilelist, 0);
-	      else obstack_1grow (&osFilelist, c);
+		obstack_1grow (&os_filelist, 0);
+	      else obstack_1grow (&os_filelist, c);
 	    }
-	  string_table= (char *) obstack_finish (&osFilelist);
+	  string_table= (char *) obstack_finish (&os_filelist);
 	} else
 	  {
 #if NO_SEEK_IN_AR
@@ -296,14 +308,15 @@ FILE *open_and_position_arch_name (archname, name) char *archname, *name;
   fclose (f);
   f= NULL;
  found:
-  if (string_table) obstack_free (&osFilelist, string_table);
+  if (string_table) obstack_free (&os_filelist, string_table);
   return f;
 }
 
 /******************************************************************************
                                              SEARC_AND_OPEN_NAME_IN_ARCHLIST */
 
-FILE *searc_and_open_name_in_archlist (name, link)
+FILE *
+searc_and_open_name_in_archlist (name, link)
 char *name; char link;
 {
   FILE *f;
@@ -330,7 +343,8 @@ char *name; char link;
 /******************************************************************************
                                                        SEARC_AND_INSERT_NAME */
 
-char searc_and_insert_name (dirlistp, listp, name) 
+char 
+searc_and_insert_name (dirlistp, listp, name) 
   filelist_t *dirlistp, *listp; char *name;
 {
   FILE *f;
@@ -338,17 +352,17 @@ char searc_and_insert_name (dirlistp, listp, name)
   char *str;
   for (elem= dirlistp->first; elem!=NULL; elem= elem->next)
     {
-      obstack_grow (&osFilelist, elem->name, strlen (elem->name));
-      obstack_1grow (&osFilelist, '/');
-      obstack_grow0 (&osFilelist, name, strlen (name));
-      str= obstack_finish (&osFilelist);
+      obstack_grow (&os_filelist, elem->name, strlen (elem->name));
+      obstack_1grow (&os_filelist, '/');
+      obstack_grow0 (&os_filelist, name, strlen (name));
+      str= obstack_finish (&os_filelist);
       if ((f = fopen (str, "r")) != NULL)
 	{
 	  insert_name (listp, str, FALSE);
 	  fclose(f);
 	  return TRUE;
 	}
-      obstack_free (&osFilelist, str);
+      obstack_free (&os_filelist, str);
     }
   return FALSE;
 }
@@ -360,7 +374,8 @@ char searc_and_insert_name (dirlistp, listp, name)
 #define LIBSUFFIX ".a"
 #define LIBARCHSUFFIX "-atr.a"
 
-void new_lib (name) 
+void 
+new_lib (name) 
   char *name;
 {
   searc_and_insert_name (&dirlist, &archlist, 
