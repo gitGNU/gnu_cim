@@ -597,7 +597,7 @@ static gensimplepar (rex)
 	      gen_conv (rex, FALSE, FALSE);
 	    }
 	  break;
-	case MARRAYARG:
+	case MARRAYADR:
 	  /* ARRAY HVOR ALLE INDEKSENE BEST]R AV KONSTANTER  ADDRESS
 	   * NOTHUNK  Tilordner den formelle name-parameterens bp og ofs */
 

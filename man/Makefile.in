@@ -79,7 +79,9 @@ host_alias = @host_alias@
 host_triplet = @host@
 target_alias = @target_alias@
 target_triplet = @target@
+AS = @AS@
 CC = @CC@
+DLLTOOL = @DLLTOOL@
 LD = @LD@
 LIBTOOL = @LIBTOOL@
 LIB_AGE = @LIB_AGE@
@@ -88,6 +90,7 @@ LIB_REVISION = @LIB_REVISION@
 LN_S = @LN_S@
 MAKEINFO = @MAKEINFO@
 NM = @NM@
+OBJDUMP = @OBJDUMP@
 PACKAGE = @PACKAGE@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PERL = @PERL@
@@ -109,7 +112,7 @@ DIST_COMMON =  Makefile.am Makefile.in
 
 DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
-TAR = gtar
+TAR = tar
 GZIP_ENV = --best
 all: all-redirect
 .SUFFIXES:

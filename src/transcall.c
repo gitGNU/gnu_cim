@@ -417,6 +417,7 @@ transparam (re) struct EXP *re;
 		    
 		    if (!index_is_const)
 		      insert_thunk (rex,  MTHUNKSIMPLEADDRESS);
+		    else goto trcall;
 		    break;
 		  case MDOT:
 		    /* Dersom det er et dot'et prosedyre-kall, 
@@ -448,6 +449,7 @@ transparam (re) struct EXP *re;
 	}
       else
 	{
+	trcall:
 	  rey= transcall (rex, rex->left);
 	  if (rey!=NULL)
 	    {
@@ -662,7 +664,6 @@ struct EXP *transcall (ret, re)
 	}
       reconc= concexp (reconc, transcall (ret, re->right));
       re->left= NULL;
-
       reconc= concexp (reconc, replacenode (&re, MARRAYADR));
       break;
     case MIDENTIFIER:
