@@ -921,7 +921,7 @@ fi
 
 PACKAGE=cim
 
-VERSION=3.31
+VERSION=3.32
 
 if test "`cd $srcdir && pwd`" != "`pwd`" && test -f $srcdir/config.status; then
   { echo "configure: error: source directory already configured; run "make distclean" there first" 1>&2; exit 1; }
@@ -3469,8 +3469,8 @@ if eval "test \"`echo '$''{'cim_cv_wl_flag'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   
-eval `grep wl= libtool`
-cim_cv_wl_flag=$pic_flag
+eval `grep wl= libtool|head -1`
+cim_cv_wl_flag=$wl
 
 fi
 
@@ -3487,7 +3487,7 @@ if eval "test \"`echo '$''{'cim_cv_link_static_flag'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   
-eval `grep link_static_flag libtool`
+eval `grep link_static_flag libtool|head -1`
 cim_cv_link_static_flag=$link_static_flag
 
 fi
@@ -3505,7 +3505,7 @@ if eval "test \"`echo '$''{'cim_cv_pic_flag'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   
-eval `grep pic_flag libtool`
+eval `grep pic_flag libtool|head -1`
 cim_cv_pic_flag=$pic_flag
 
 fi

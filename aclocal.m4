@@ -30,7 +30,7 @@ AC_DEFUN(CIM_LINK_STATIC_FLAG,
 [
 AC_MSG_CHECKING(grepping libtool to find link_static_flag)
 AC_CACHE_VAL(cim_cv_link_static_flag,[
-eval `grep link_static_flag libtool`
+eval `grep link_static_flag libtool|head -1`
 cim_cv_link_static_flag=$link_static_flag
 ])
 AC_MSG_RESULT($cim_cv_link_static_flag)
@@ -41,7 +41,7 @@ AC_DEFUN(CIM_PIC_FLAG,
 [
 AC_MSG_CHECKING(grepping libtool to find pic_flag)
 AC_CACHE_VAL(cim_cv_pic_flag,[
-eval `grep pic_flag libtool`
+eval `grep pic_flag libtool|head -1`
 cim_cv_pic_flag=$pic_flag
 ])
 AC_MSG_RESULT($cim_cv_pic_flag)
@@ -52,8 +52,8 @@ AC_DEFUN(CIM_WL_FLAG,
 [
 AC_MSG_CHECKING(grepping libtool to find wl_flag)
 AC_CACHE_VAL(cim_cv_wl_flag,[
-eval `grep wl= libtool`
-cim_cv_wl_flag=$pic_flag
+eval `grep wl= libtool|head -1`
+cim_cv_wl_flag=$wl
 ])
 AC_MSG_RESULT($cim_cv_wl_flag)
 AC_DEFINE_UNQUOTED(WL_FLAG,"$cim_cv_wl_flag")

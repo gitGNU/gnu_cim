@@ -280,9 +280,6 @@ distdir: $(DISTFILES)
 	    || cp -p $$d/$$file $(distdir)/$$file || :; \
 	  fi; \
 	done
-transcall.o: transcall.c ../config.h gen.h const.h ../limit.h \
-	mellbuilder.h cimcomp.h builder.h dekl.h lex.h extspec.h
-
 info-am:
 info: info-am
 dvi-am:
