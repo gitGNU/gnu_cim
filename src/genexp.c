@@ -208,6 +208,9 @@ genvalue (re)
   ree = re;
   switch (re->token)
     {
+    case MARGUMENT:
+      genprocparam (re);
+      break;
     case MNEWARG:
       fprintf (ccode, "__sl=");
       gensl (re, FALSE, ON);

@@ -23,6 +23,12 @@ Version 2:
   details.
 
 
+Version: 3.27
+
+* A really seriouse bug-fix, please upgrade: Transmission of
+  parameters to prefixed blocks was missing i previouse versions.
+
+
 Version: 3.26
 
 * Corrected a tiny bug in the code-generator.

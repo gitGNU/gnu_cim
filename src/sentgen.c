@@ -183,6 +183,7 @@ prblockGen (sent) struct SENT *sent;
   fprintf (ccode, ");");
   /* Sender parameterne */
   genvalue (sent->iexp); fprintf (ccode, ";");
+  genvalue (sent->exp); fprintf (ccode, ";");
   labexit = newlabel ();
   fprintf (ccode, "__rcprbb(%d,", labexit);
   genmodulemark(NULL);
