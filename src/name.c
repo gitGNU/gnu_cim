@@ -1,6 +1,6 @@
 /* $Id: cnavn.c,v 1.6 1994/07/17 10:40:51 cim Exp $ */
 
-/* Copyright (C) 1994 Sverre Hvammen Johansen,
+/* Copyright (C) 1994, 1998 Sverre Hvammen Johansen,
  * Department of Informatics, University of Oslo.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -20,7 +20,7 @@
 
 #include "const.h"
 #include "dekl.h"
-#include "navn.h"
+#include "name.h"
 
 #include <stdio.h>
 
@@ -28,69 +28,87 @@
 #include <stdlib.h>
 #endif
 
-#if HAVE_MALLOC_H
-#include <malloc.h>
-#endif
+#include <obstack.h>
 
-static struct namebuff *hashlist[NAMEPRIMEVALUE];
+char *xmalloc();
+void free();
+
+#define obstack_chunk_alloc xmalloc
+#define obstack_chunk_free free
+
+static struct obstack osName;
+
+static void *hashlist[NAMEPRIMEVALUE];
 
 /******************************************************************************
-                                                                SYSTAG       */
+                                                                   TAG       */
 
-struct namebuff *
-systag (t, leng)
+char *
+tag (t)
      unsigned char t[];
-     int leng;
 {
+  int leng;
   long hash;
-  struct namebuff *list,
-   *prevlist = NULL;
+  void * * list, * *prevlist = NULL;
+
+  leng= strlen (t);
   if (leng > 3)
     hash = t[0] + 8 * t[1] + 64 * t[2] + 512L * t[leng - 1] + leng;
   else
     hash = t[0] + 512L * t[leng - 1] + leng;
   hash = hash % NAMEPRIMEVALUE;
-  for (list = hashlist[hash]; list != NULL; list = list->next)
+  for (list= hashlist[hash]; list != NULL; list= * list)
     {
-      if (!strcmp (list->text, t))
-	return (list);
+      if (!strcmp ((char *) (list+1), t))
+	return (char *) (list+1);
       prevlist = list;
     }
-  (void) strcpy ((list = (struct namebuff *) 
-		  xmalloc (sizeof (struct namebuff *) 
-			  + sizeof (long) + leng + 1))->text, t);
-  list->next = NULL;
+
+  obstack_ptr_grow(&osName, NULL);
+  obstack_grow0 (&osName, t, leng);
+  obstack_1grow (&osName, FALSE);
+  list= obstack_finish (&osName);
+
   if (prevlist == NULL)
     hashlist[hash] = list;
   else
-    prevlist->next = list;
-  list->definition = FALSE;
-  return (list);
+    *prevlist = list;
+
+  return (char *) (list + 1);
 }
 
 /******************************************************************************
-                                                                TAG          */
+                                                    DEFINENAME & IFDEFNAME   */
 
-char *
-tag (t, leng)
-     unsigned char t[];
-     int leng;
+defineName (t, d) char *t; char d;
 {
-  return (systag (t, leng)->text);
+  while (*t != 0) t++;
+  t++;
+  *t= d;
 }
 
-/******************************************************************************
-                                                                 INIT_DEFINE */
-
-init_define ()
+char
+ifdefName (t) char *t;
 {
-  systag ("CIM", 3)->definition = TRUE;
+  while (*t != 0) t++;
+  t++;
+  return *t;
+}
+
+
+/******************************************************************************
+                                                                    INITNAME */
+
+initName ()
+{
+  obstack_init(&osName);
+  defineName (tag ("CIM"), TRUE);
 #if INT_64
-  systag ("INTEGER_64", 10)->definition = TRUE;
+  defineName (tag ("INTEGER_64"), TRUE);
 #endif
 
-  systag (CPU_TYPE, strlen (CPU_TYPE))->definition = TRUE;
-  systag (MANUFACTURER, strlen (MANUFACTURER))->definition = TRUE;
-  systag (OS_TYPE, strlen (OS_TYPE))->definition = TRUE;
-  systag (OS_TYPE_VERSION, strlen (OS_TYPE_VERSION))->definition = TRUE;
+  defineName (tag (CPU_TYPE), TRUE);
+  defineName (tag (MANUFACTURER), TRUE);
+  defineName (tag (OS_TYPE), TRUE);
+  defineName (tag (OS_TYPE_VERSION), TRUE);
 }

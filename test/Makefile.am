@@ -17,7 +17,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-CIM=../src/cim
+CIM=$(top_builddir)/src/cim
 CIMFLAGS=-L -L$(top_srcdir)/lib -I$(top_srcdir)/lib 
 
 TESTS = test

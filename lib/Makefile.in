@@ -1,8 +1,14 @@
-# Makefile.in generated automatically by automake 1.2 from Makefile.am
+# Makefile.in generated automatically by automake 1.3 from Makefile.am
 
-# Copyright (C) 1994, 1995, 1996, 1997 Free Software Foundation, Inc.
+# Copyright (C) 1994, 1995, 1996, 1997, 1998 Free Software Foundation, Inc.
 # This Makefile.in is free software; the Free Software Foundation
-# gives unlimited permission to copy, distribute and modify it.
+# gives unlimited permission to copy and/or distribute it,
+# with or without modifications, as long as this notice is preserved.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY, to the extent permitted by law; without
+# even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+# PARTICULAR PURPOSE.
 
 # Copyright (C) 1997 Sverre Hvammen Johansen,
 # Department of Informatics, University of Oslo.
@@ -44,6 +50,8 @@ mandir = @mandir@
 includedir = @includedir@
 oldincludedir = /usr/include
 
+DISTDIR =
+
 pkgdatadir = $(datadir)/@PACKAGE@
 pkglibdir = $(libdir)/@PACKAGE@
 pkgincludedir = $(includedir)/@PACKAGE@
@@ -61,12 +69,12 @@ INSTALL_DATA = @INSTALL_DATA@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 transform = @program_transform_name@
 
-NORMAL_INSTALL = true
-PRE_INSTALL = true
-POST_INSTALL = true
-NORMAL_UNINSTALL = true
-PRE_UNINSTALL = true
-POST_UNINSTALL = true
+NORMAL_INSTALL = :
+PRE_INSTALL = :
+POST_INSTALL = :
+NORMAL_UNINSTALL = :
+PRE_UNINSTALL = :
+POST_UNINSTALL = :
 build_alias = @build_alias@
 build_triplet = @build@
 host_alias = @host_alias@
@@ -74,11 +82,14 @@ host_triplet = @host@
 target_alias = @target_alias@
 target_triplet = @target@
 CC = @CC@
-EXEEXT = @EXEEXT@
 LD = @LD@
 LIBTOOL = @LIBTOOL@
+LIB_AGE = @LIB_AGE@
+LIB_CURRENT = @LIB_CURRENT@
+LIB_REVISION = @LIB_REVISION@
 LN_S = @LN_S@
 MAKEINFO = @MAKEINFO@
+NM = @NM@
 PACKAGE = @PACKAGE@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PERL = @PERL@
@@ -87,13 +98,20 @@ YACC = @YACC@
 
 RANLIB=:
 
-CIM = ../src/cim
+CIM = $(top_builddir)/src/cim
 CIMFLAGS = -H -L -L$(srcdir) -I$(srcdir) -S
 
 lib_LIBRARIES = libcim-atr.a
+
+libcim_atr_a_SOURCES = 
+
+libcim_atr_a_LIBADD = $(srcdir)/simenvir.atr $(srcdir)/simfile.atr \
+                      $(srcdir)/simset.sim $(srcdir)/simulation.sim \
+                      $(srcdir)/simset.atr $(srcdir)/simulation.atr
+
 lib_LTLIBRARIES = libcim.la
 
-libcim_la_LDFLAGS = -version-info 1:0:0
+libcim_la_LDFLAGS = -version-info @LIB_CURRENT@:@LIB_REVISION@:@LIB_AGE@
 
 libcim_la_SOURCES = sysin.c sysout.c syserr.c copytexttoc.c addroffirstchar.c \
               addroffirstelem.c copytextarrtoc.c copyarrtoc.c mod.c rem.c \
@@ -137,17 +155,11 @@ libcim_la_SOURCES = sysin.c sysout.c syserr.c copytexttoc.c addroffirstchar.c \
 BUILT_SOURCES = simset.c simulation.c
 
 CLEANFILES = simset.shl simulation.shl simset.mif simulation.mif
-MAINTAINER_CLEANFILES = simset.c simset.h simset.atr \
-                        simulation.c simulation.h simulation.atr
-
-libcim_atr_a_SOURCES = 
-
-libcim_atr_a_LIBADD = $(srcdir)/simenvir.atr $(srcdir)/simfile.atr \
-                      $(srcdir)/simset.sim $(srcdir)/simulation.sim \
-                      $(srcdir)/simset.atr $(srcdir)/simulation.atr
+MAINTAINER_CLEANFILES = simset.c simset.atr \
+                        simulation.c simulation.atr
 
 noinst_HEADERS = epsilon.h file.h random.h text.h trigno.h align.h \
-                 simset.h simulation.h
+                 simfile.h
 
 include_HEADERS = cim.h
 
@@ -228,14 +240,14 @@ GZIP = --best
 SOURCES = $(libcim_atr_a_SOURCES) $(libcim_la_SOURCES)
 OBJECTS = $(libcim_atr_a_OBJECTS) $(libcim_la_OBJECTS)
 
-default: all
+all: Makefile $(LIBRARIES) $(LTLIBRARIES) $(HEADERS)
 
 .SUFFIXES:
-.SUFFIXES: .atr .c .lo .o .sim
-$(srcdir)/Makefile.in: Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) 
+.SUFFIXES: .S .atr .c .lo .o .s .sim
+$(srcdir)/Makefile.in: Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4)
 	cd $(top_srcdir) && $(AUTOMAKE) --gnu --include-deps lib/Makefile
 
-Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
+Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status
 	cd $(top_builddir) \
 	  && CONFIG_FILES=$(subdir)/$@ CONFIG_HEADERS= $(SHELL) ./config.status
 
@@ -246,62 +258,74 @@ distclean-libLIBRARIES:
 
 install-libLIBRARIES: $(lib_LIBRARIES)
 	@$(NORMAL_INSTALL)
-	$(mkinstalldirs) $(libdir)
+	$(mkinstalldirs) $(DESTDIR)$(libdir)
 	list='$(lib_LIBRARIES)'; for p in $$list; do \
 	  if test -f $$p; then \
-	    echo " $(INSTALL_DATA) $$p $(libdir)/$$p"; \
-	    $(INSTALL_DATA) $$p $(libdir)/$$p; \
+	    echo " $(INSTALL_DATA) $$p $(DESTDIR)$(libdir)/$$p"; \
+	    $(INSTALL_DATA) $$p $(DESTDIR)$(libdir)/$$p; \
 	  else :; fi; \
 	done
 	@$(POST_INSTALL)
 	@list='$(lib_LIBRARIES)'; for p in $$list; do \
 	  if test -f $$p; then \
-	    echo " $(RANLIB) $(libdir)/$$p"; \
-	    $(RANLIB) $(libdir)/$$p; \
+	    echo " $(RANLIB) $(DESTDIR)$(libdir)/$$p"; \
+	    $(RANLIB) $(DESTDIR)$(libdir)/$$p; \
 	  else :; fi; \
 	done
 
 uninstall-libLIBRARIES:
-	$(NORMAL_UNINSTALL)
+	@$(NORMAL_UNINSTALL)
 	list='$(lib_LIBRARIES)'; for p in $$list; do \
-	  rm -f $(libdir)/$$p; \
+	  rm -f $(DESTDIR)$(libdir)/$$p; \
 	done
 
 .c.o:
 	$(COMPILE) -c $<
 
+.s.o:
+	$(COMPILE) -c $<
+
+.S.o:
+	$(COMPILE) -c $<
+
 mostlyclean-compile:
-	rm -f *.o core
+	-rm -f *.o core *.core
 
 clean-compile:
 
 distclean-compile:
-	rm -f *.tab.c
+	-rm -f *.tab.c
 
 maintainer-clean-compile:
 
 .c.lo:
 	$(LIBTOOL) --mode=compile $(COMPILE) -c $<
 
+.s.lo:
+	$(LIBTOOL) --mode=compile $(COMPILE) -c $<
+
+.S.lo:
+	$(LIBTOOL) --mode=compile $(COMPILE) -c $<
+
 mostlyclean-libtool:
-	rm -f *.lo
+	-rm -f *.lo
 
 clean-libtool:
-	rm -rf .libs
+	-rm -rf .libs _libs
 
 distclean-libtool:
 
 maintainer-clean-libtool:
 
 libcim-atr.a: $(libcim_atr_a_OBJECTS) $(libcim_atr_a_DEPENDENCIES)
-	rm -f libcim-atr.a
+	-rm -f libcim-atr.a
 	$(AR) cru libcim-atr.a $(libcim_atr_a_OBJECTS) $(libcim_atr_a_LIBADD)
 	$(RANLIB) libcim-atr.a
 
 mostlyclean-libLTLIBRARIES:
 
 clean-libLTLIBRARIES:
-	test -z "$(lib_LTLIBRARIES)" || rm -f $(lib_LTLIBRARIES)
+	-test -z "$(lib_LTLIBRARIES)" || rm -f $(lib_LTLIBRARIES)
 
 distclean-libLTLIBRARIES:
 
@@ -309,18 +333,18 @@ maintainer-clean-libLTLIBRARIES:
 
 install-libLTLIBRARIES: $(lib_LTLIBRARIES)
 	@$(NORMAL_INSTALL)
-	$(mkinstalldirs) $(libdir)
+	$(mkinstalldirs) $(DESTDIR)$(libdir)
 	@list='$(lib_LTLIBRARIES)'; for p in $$list; do \
 	  if test -f $$p; then \
-	    echo "$(LIBTOOL)  --mode=install $(INSTALL_PROGRAM) $$p $(libdir)/$$p"; \
-	    $(LIBTOOL)  --mode=install $(INSTALL_PROGRAM) $$p $(libdir)/$$p; \
+	    echo "$(LIBTOOL)  --mode=install $(INSTALL_DATA) $$p $(DESTDIR)$(libdir)/$$p"; \
+	    $(LIBTOOL)  --mode=install $(INSTALL_DATA) $$p $(DESTDIR)$(libdir)/$$p; \
 	  else :; fi; \
 	done
 
 uninstall-libLTLIBRARIES:
-	$(NORMAL_UNINSTALL)
+	@$(NORMAL_UNINSTALL)
 	list='$(lib_LTLIBRARIES)'; for p in $$list; do \
-	  $(LIBTOOL)  --mode=uninstall rm -f $(libdir)/$$p; \
+	  $(LIBTOOL)  --mode=uninstall rm -f $(DESTDIR)$(libdir)/$$p; \
 	done
 
 libcim.la: $(libcim_la_OBJECTS) $(libcim_la_DEPENDENCIES)
@@ -328,35 +352,41 @@ libcim.la: $(libcim_la_OBJECTS) $(libcim_la_DEPENDENCIES)
 
 install-includeHEADERS: $(include_HEADERS)
 	@$(NORMAL_INSTALL)
-	$(mkinstalldirs) $(includedir)
+	$(mkinstalldirs) $(DESTDIR)$(includedir)
 	@list='$(include_HEADERS)'; for p in $$list; do \
-	  echo " $(INSTALL_DATA) $(srcdir)/$$p $(includedir)/$$p"; \
-	  $(INSTALL_DATA) $(srcdir)/$$p $(includedir)/$$p; \
+	  if test -f "$$p"; then d= ; else d="$(srcdir)/"; fi; \
+	  echo " $(INSTALL_DATA) $$d$$p $(DESTDIR)$(includedir)/$$p"; \
+	  $(INSTALL_DATA) $$d$$p $(DESTDIR)$(includedir)/$$p; \
 	done
 
 uninstall-includeHEADERS:
-	$(NORMAL_UNINSTALL)
+	@$(NORMAL_UNINSTALL)
 	list='$(include_HEADERS)'; for p in $$list; do \
-	  rm -f $(includedir)/$$p; \
+	  rm -f $(DESTDIR)$(includedir)/$$p; \
 	done
 
 tags: TAGS
 
-ID: $(HEADERS) $(SOURCES)
-	here=`pwd` && cd $(srcdir) && mkid -f$$here/ID $(SOURCES) $(HEADERS)
+ID: $(HEADERS) $(SOURCES) $(LISP)
+	here=`pwd` && cd $(srcdir) \
+	  && mkid -f$$here/ID $(SOURCES) $(HEADERS) $(LISP)
 
-TAGS:  $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES)
+TAGS:  $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) $(LISP)
 	tags=; \
 	here=`pwd`; \
-	test -z "$(ETAGS_ARGS)$(SOURCES)$(HEADERS)$$tags" \
-	  || (cd $(srcdir) && etags $(ETAGS_ARGS) $$tags  $(SOURCES) $(HEADERS) -o $$here/TAGS)
+	list='$(SOURCES) $(HEADERS)'; \
+	unique=`for i in $$list; do echo $$i; done | \
+	  awk '    { files[$$0] = 1; } \
+	       END { for (i in files) print i; }'`; \
+	test -z "$(ETAGS_ARGS)$$unique$(LISP)$$tags" \
+	  || (cd $(srcdir) && etags $(ETAGS_ARGS) $$tags  $$unique $(LISP) -o $$here/TAGS)
 
 mostlyclean-tags:
 
 clean-tags:
 
 distclean-tags:
-	rm -f TAGS ID
+	-rm -f TAGS ID
 
 maintainer-clean-tags:
 
@@ -371,241 +401,245 @@ distdir: $(DISTFILES)
 	  || ln $$d/$$file $(distdir)/$$file 2> /dev/null \
 	  || cp -p $$d/$$file $(distdir)/$$file; \
 	done
-absi.o absi.lo: absi.c cim.h
-absr.o absr.lo: absr.c cim.h ../config.h
-addepsilon.o addepsilon.lo: addepsilon.c epsilon.h cim.h ../config.h
-addroffirstchar.o addroffirstchar.lo: addroffirstchar.c cim.h
-addroffirstelem.o addroffirstelem.lo: addroffirstelem.c cim.h
-arccos.o arccos.lo: arccos.c cim.h trigno.h ../config.h
-arcsin.o arcsin.lo: arcsin.c cim.h trigno.h ../config.h
-arctan.o arctan.lo: arctan.c cim.h trigno.h ../config.h
-arctan2.o arctan2.lo: arctan2.c cim.h ../config.h
-argc.o argc.lo: argc.c cim.h
-argv.o argv.lo: argv.c cim.h
-b.o b.lo: b.c cim.h
-be.o be.lo: be.c cim.h align.h ../config.h
-blanks.o blanks.lo: blanks.c cim.h ../limit.h ../config.h
-bytesize.o bytesize.lo: bytesize.c cim.h
-ca.o ca.lo: ca.c cim.h
-call.o call.lo: call.c cim.h
-ccb.o ccb.lo: ccb.c cim.h
-char.o char.lo: char.c cim.h
-clocktime.o clocktime.lo: clocktime.c cim.h ../config.h
-conc.o conc.lo: conc.c cim.h ../limit.h ../config.h
-copy.o copy.lo: copy.c cim.h
-copyarrtoc.o copyarrtoc.lo: copyarrtoc.c cim.h
-copytextarrtoc.o copytextarrtoc.lo: copytextarrtoc.c cim.h
-copytexttoc.o copytexttoc.lo: copytexttoc.c cim.h
-cos.o cos.lo: cos.c cim.h trigno.h ../config.h
-cosh.o cosh.lo: cosh.c cim.h trigno.h ../config.h
-cotan.o cotan.lo: cotan.c cim.h trigno.h ../config.h
-cp.o cp.lo: cp.c cim.h
-cpb.o cpb.lo: cpb.c cim.h
-cpp.o cpp.lo: cpp.c cim.h
-cprb.o cprb.lo: cprb.c cim.h
-cprbb.o cprbb.lo: cprbb.c cim.h
-cputime.o cputime.lo: cputime.c cim.h ../config.h
-ct.o ct.lo: ct.c cim.h
-datetime.o datetime.lo: datetime.c cim.h ../config.h
-dbclose.o dbclose.lo: dbclose.c cim.h
-dbendfile.o dbendfile.lo: dbendfile.c cim.h
-dbinbyte.o dbinbyte.lo: dbinbyte.c cim.h
-dbintext.o dbintext.lo: dbintext.c cim.h
-dblastloc.o dblastloc.lo: dblastloc.c cim.h
-dblocate.o dblocate.lo: dblocate.c cim.h
-dblocation.o dblocation.lo: dblocation.c cim.h
-dblock.o dblock.lo: dblock.c cim.h ../config.h
-dblocked.o dblocked.lo: dblocked.c cim.h
-dbmaxloc.o dbmaxloc.lo: dbmaxloc.c cim.h
-dbopen.o dbopen.lo: dbopen.c file.h ../config.h cim.h
-dboutbyte.o dboutbyte.lo: dboutbyte.c cim.h
-dbouttext.o dbouttext.lo: dbouttext.c cim.h
-dbunlock.o dbunlock.lo: dbunlock.c cim.h
-dcheckpoint.o dcheckpoint.lo: dcheckpoint.c cim.h
-dclose.o dclose.lo: dclose.c cim.h
-ddeleteimage.o ddeleteimage.lo: ddeleteimage.c file.h ../config.h cim.h
-decimalmark.o decimalmark.lo: decimalmark.c cim.h
-dendfile.o dendfile.lo: dendfile.c cim.h
-detach.o detach.lo: detach.c cim.h
-digit.o digit.lo: digit.c cim.h
-dinimage.o dinimage.lo: dinimage.c file.h ../config.h cim.h
-discrete.o discrete.lo: discrete.c random.h ../config.h cim.h
-dlastloc.o dlastloc.lo: dlastloc.c cim.h
-dlocate.o dlocate.lo: dlocate.c cim.h
-dlocation.o dlocation.lo: dlocation.c cim.h
-dlock.o dlock.lo: dlock.c cim.h ../config.h
-dlocked.o dlocked.lo: dlocked.c cim.h
-dmaxloc.o dmaxloc.lo: dmaxloc.c cim.h
-dopen.o dopen.lo: dopen.c file.h ../config.h cim.h
-doutimage.o doutimage.lo: doutimage.c file.h ../config.h cim.h
-draw.o draw.lo: draw.c random.h ../config.h cim.h
-dump.o dump.lo: dump.c ../config.h
-dunlock.o dunlock.lo: dunlock.c cim.h
-endclass.o endclass.lo: endclass.c cim.h
-enddecl.o enddecl.lo: enddecl.c cim.h
-entier.o entier.lo: entier.c cim.h ../config.h
-ep.o ep.lo: ep.c cim.h align.h ../config.h
-epp.o epp.lo: epp.c cim.h align.h ../config.h
-eqrtext.o eqrtext.lo: eqrtext.c cim.h
-eqtext.o eqtext.lo: eqtext.c cim.h
-erlang.o erlang.lo: erlang.c random.h ../config.h cim.h trigno.h
-error.o error.lo: error.c file.h ../config.h cim.h
-eth.o eth.lo: eth.c cim.h align.h ../config.h
-exchange.o exchange.lo: exchange.c cim.h
-exp.o exp.lo: exp.c cim.h trigno.h ../config.h
-field.o field.lo: field.c cim.h
-filename.o filename.lo: filename.c cim.h
-gbc.o gbc.lo: gbc.c cim.h align.h ../config.h
-geta.o geta.lo: geta.c cim.h
-getav.o getav.lo: getav.c cim.h
-getcbv.o getcbv.lo: getcbv.c cim.h
-getlab.o getlab.lo: getlab.c cim.h
-getproc.o getproc.lo: getproc.c cim.h
-getrv.o getrv.lo: getrv.c cim.h
-getsa.o getsa.lo: getsa.c cim.h
-getta.o getta.lo: getta.c cim.h
-gettv.o gettv.lo: gettv.c cim.h
-goto.o goto.lo: goto.c cim.h
-histd.o histd.lo: histd.c random.h ../config.h cim.h
-histo.o histo.lo: histo.c random.h ../config.h cim.h
-ibclose.o ibclose.lo: ibclose.c cim.h
-ibendfile.o ibendfile.lo: ibendfile.c cim.h
-ibinbyte.o ibinbyte.lo: ibinbyte.c cim.h
-ibintext.o ibintext.lo: ibintext.c cim.h
-ibopen.o ibopen.lo: ibopen.c file.h ../config.h cim.h
-iclose.o iclose.lo: iclose.c cim.h
-iendfile.o iendfile.lo: iendfile.c file.h ../config.h cim.h
-iinchar.o iinchar.lo: iinchar.c cim.h
-iinfrac.o iinfrac.lo: iinfrac.c cim.h
-iinimage.o iinimage.lo: iinimage.c file.h ../config.h cim.h
-iinint.o iinint.lo: iinint.c cim.h
-iinreal.o iinreal.lo: iinreal.c cim.h ../config.h
-iinrecord.o iinrecord.lo: iinrecord.c file.h ../config.h cim.h
-iintext.o iintext.lo: iintext.c cim.h
-ilastitem.o ilastitem.lo: ilastitem.c cim.h
-in.o in.lo: in.c cim.h
-initier.o initier.lo: initier.c cim.h
-inner.o inner.lo: inner.c cim.h
-intrea.o intrea.lo: intrea.c cim.h ../config.h
-iopen.o iopen.lo: iopen.c file.h ../config.h cim.h
-is.o is.lo: is.c cim.h
-isochar.o isochar.lo: isochar.c cim.h
-isopen.o isopen.lo: isopen.c cim.h
-isorank.o isorank.lo: isorank.c cim.h
-leftshift.o leftshift.lo: leftshift.c cim.h
-length.o length.lo: length.c cim.h
-letext.o letext.lo: letext.c cim.h
-letter.o letter.lo: letter.c cim.h
-linear.o linear.lo: linear.c random.h ../config.h cim.h
-ln.o ln.lo: ln.c cim.h trigno.h ../config.h
-log10.o log10.lo: log10.c cim.h trigno.h ../config.h
-lowcase.o lowcase.lo: lowcase.c cim.h
-lowerbound.o lowerbound.lo: lowerbound.c cim.h
-lowten.o lowten.lo: lowten.c cim.h
-lttext.o lttext.lo: lttext.c cim.h
-maxc.o maxc.lo: maxc.c cim.h
-maxi.o maxi.lo: maxi.c cim.h
-maxr.o maxr.lo: maxr.c cim.h ../config.h
-maxt.o maxt.lo: maxt.c cim.h
-minc.o minc.lo: minc.c cim.h
-mini.o mini.lo: mini.c cim.h
-minr.o minr.lo: minr.c cim.h ../config.h
-mint.o mint.lo: mint.c cim.h
-mod.o mod.lo: mod.c cim.h
-more.o more.lo: more.c cim.h
-negexp.o negexp.lo: negexp.c random.h ../config.h cim.h trigno.h
-normal.o normal.lo: normal.c random.h ../config.h cim.h trigno.h
-oa.o oa.lo: oa.c cim.h align.h ../config.h
-obclose.o obclose.lo: obclose.c cim.h
-obopen.o obopen.lo: obopen.c file.h ../config.h cim.h
-oboutbyte.o oboutbyte.lo: oboutbyte.c cim.h
-obouttext.o obouttext.lo: obouttext.c cim.h
-obreakoutimage.o obreakoutimage.lo: obreakoutimage.c file.h ../config.h \
-	cim.h
-oclose.o oclose.lo: oclose.c cim.h
-oopen.o oopen.lo: oopen.c file.h ../config.h cim.h
-ooutchar.o ooutchar.lo: ooutchar.c cim.h
-ooutfix.o ooutfix.lo: ooutfix.c cim.h ../config.h
-ooutfrac.o ooutfrac.lo: ooutfrac.c cim.h
-ooutimage.o ooutimage.lo: ooutimage.c file.h ../config.h cim.h
-ooutint.o ooutint.lo: ooutint.c cim.h
-ooutreal.o ooutreal.lo: ooutreal.c cim.h ../config.h
-ooutrecord.o ooutrecord.lo: ooutrecord.c file.h ../config.h cim.h
-oouttext.o oouttext.lo: oouttext.c cim.h
-pclose.o pclose.lo: pclose.c file.h ../config.h cim.h
-peject.o peject.lo: peject.c cim.h
-pline.o pline.lo: pline.c cim.h
-plinesperpage.o plinesperpage.lo: plinesperpage.c cim.h ../config.h
-poisson.o poisson.lo: poisson.c random.h ../config.h cim.h trigno.h
-popen.o popen.lo: popen.c file.h ../config.h cim.h
-pos.o pos.lo: pos.c cim.h
-poutimage.o poutimage.lo: poutimage.c file.h ../config.h cim.h
-poutrecord.o poutrecord.lo: poutrecord.c file.h ../config.h cim.h
-pow.o pow.lo: pow.c cim.h trigno.h ../config.h
-powii.o powii.lo: powii.c cim.h
-powri.o powri.lo: powri.c cim.h ../config.h
-ppage.o ppage.lo: ppage.c cim.h
-printfilline.o printfilline.lo: printfilline.c file.h ../config.h cim.h
-pspacing.o pspacing.lo: pspacing.c cim.h
-randint.o randint.lo: randint.c random.h ../config.h cim.h
-rank.o rank.lo: rank.c cim.h
-rem.o rem.lo: rem.c cim.h
-resume.o resume.lo: resume.c cim.h
-return.o return.lo: return.c cim.h
-rin.o rin.lo: rin.c cim.h
-rs.o rs.lo: rs.c cim.h align.h ../config.h
-setaccess.o setaccess.lo: setaccess.c cim.h
-setpos.o setpos.lo: setpos.c cim.h
-signdi.o signdi.lo: signdi.c cim.h
-signdr.o signdr.lo: signdr.c cim.h ../config.h
-signdx.o signdx.lo: signdx.c cim.h
-signi.o signi.lo: signi.c cim.h
-signr.o signr.lo: signr.c cim.h ../config.h
-simenvir.o simenvir.lo: simenvir.c
-simfile.o simfile.lo: simfile.c ../config.h cim.h
-simset.o simset.lo: simset.c ./cim.h simset.h
-simulaid.o simulaid.lo: simulaid.c cim.h ../config.h
-simulation.o simulation.lo: simulation.c ./cim.h simulation.h
-sin.o sin.lo: sin.c cim.h trigno.h ../config.h
-sinh.o sinh.lo: sinh.c cim.h trigno.h ../config.h
-sqrt.o sqrt.lo: sqrt.c cim.h trigno.h ../config.h
-ss.o ss.lo: ss.c cim.h
-start.o start.lo: start.c file.h ../config.h cim.h
-subepsilon.o subepsilon.lo: subepsilon.c epsilon.h cim.h ../config.h
-syserr.o syserr.lo: syserr.c cim.h
-sysin.o sysin.lo: sysin.c cim.h
-sysout.o sysout.lo: sysout.c cim.h
-systemerror.o systemerror.lo: systemerror.c file.h ../config.h cim.h
-tan.o tan.lo: tan.c cim.h trigno.h ../config.h
-tanh.o tanh.lo: tanh.c cim.h trigno.h ../config.h
-tconstant.o tconstant.lo: tconstant.c cim.h
-terror.o terror.lo: terror.c cim.h
-textassign.o textassign.lo: textassign.c cim.h
-textvalassign.o textvalassign.lo: textvalassign.c cim.h
-tgetchar.o tgetchar.lo: tgetchar.c cim.h
-tgetfrac.o tgetfrac.lo: tgetfrac.c text.h cim.h ../limit.h ../config.h
-tgetint.o tgetint.lo: tgetint.c text.h cim.h ../limit.h ../config.h
-tgetreal.o tgetreal.lo: tgetreal.c text.h cim.h ../limit.h ../config.h
-tlength.o tlength.lo: tlength.c cim.h
-tmain.o tmain.lo: tmain.c cim.h
-tmore.o tmore.lo: tmore.c cim.h
-tpos.o tpos.lo: tpos.c cim.h
-tputchar.o tputchar.lo: tputchar.c cim.h
-tputfix.o tputfix.lo: tputfix.c cim.h ../config.h
-tputfrac.o tputfrac.lo: tputfrac.c cim.h
-tputint.o tputint.lo: tputint.c cim.h
-tputreal.o tputreal.lo: tputreal.c cim.h ../config.h
-trace.o trace.lo: trace.c file.h ../config.h cim.h
-tsetpos.o tsetpos.lo: tsetpos.c cim.h
-tsglob.o tsglob.lo: tsglob.c cim.h ../config.h ../limit.h
-tstart.o tstart.lo: tstart.c cim.h
-tstrip.o tstrip.lo: tstrip.c cim.h
-tsub.o tsub.lo: tsub.c cim.h
-uniform.o uniform.lo: uniform.c random.h ../config.h cim.h
-upcase.o upcase.lo: upcase.c cim.h
-upperbound.o upperbound.lo: upperbound.c cim.h
-warning.o warning.lo: warning.c file.h ../config.h cim.h
-xmalloc.o xmalloc.lo: xmalloc.c cim.h
+absi.lo absi.o: absi.c cim.h
+absr.lo absr.o: absr.c cim.h ../config.h
+addepsilon.lo addepsilon.o: addepsilon.c epsilon.h cim.h ../config.h
+addroffirstchar.lo addroffirstchar.o: addroffirstchar.c cim.h
+addroffirstelem.lo addroffirstelem.o: addroffirstelem.c cim.h
+arccos.lo arccos.o: arccos.c cim.h trigno.h ../config.h
+arcsin.lo arcsin.o: arcsin.c cim.h trigno.h ../config.h
+arctan.lo arctan.o: arctan.c cim.h trigno.h ../config.h
+arctan2.lo arctan2.o: arctan2.c cim.h ../config.h
+argc.lo argc.o: argc.c cim.h
+argv.lo argv.o: argv.c cim.h
+b.lo b.o: b.c cim.h
+be.lo be.o: be.c cim.h align.h ../config.h
+blanks.lo blanks.o: blanks.c cim.h ../limit.h ../config.h
+bytesize.lo bytesize.o: bytesize.c cim.h simfile.h
+ca.lo ca.o: ca.c cim.h
+call.lo call.o: call.c cim.h
+ccb.lo ccb.o: ccb.c cim.h
+char.lo char.o: char.c cim.h
+clocktime.lo clocktime.o: clocktime.c cim.h ../config.h
+conc.lo conc.o: conc.c cim.h ../limit.h ../config.h
+copy.lo copy.o: copy.c cim.h
+copyarrtoc.lo copyarrtoc.o: copyarrtoc.c cim.h
+copytextarrtoc.lo copytextarrtoc.o: copytextarrtoc.c cim.h
+copytexttoc.lo copytexttoc.o: copytexttoc.c cim.h
+cos.lo cos.o: cos.c cim.h trigno.h ../config.h
+cosh.lo cosh.o: cosh.c cim.h trigno.h ../config.h
+cotan.lo cotan.o: cotan.c cim.h trigno.h ../config.h
+cp.lo cp.o: cp.c cim.h
+cpb.lo cpb.o: cpb.c cim.h
+cpp.lo cpp.o: cpp.c cim.h
+cprb.lo cprb.o: cprb.c cim.h
+cprbb.lo cprbb.o: cprbb.c cim.h
+cputime.lo cputime.o: cputime.c cim.h ../config.h
+ct.lo ct.o: ct.c cim.h
+datetime.lo datetime.o: datetime.c cim.h ../config.h
+dbclose.lo dbclose.o: dbclose.c cim.h simfile.h
+dbendfile.lo dbendfile.o: dbendfile.c cim.h simfile.h
+dbinbyte.lo dbinbyte.o: dbinbyte.c cim.h simfile.h
+dbintext.lo dbintext.o: dbintext.c cim.h simfile.h
+dblastloc.lo dblastloc.o: dblastloc.c cim.h simfile.h
+dblocate.lo dblocate.o: dblocate.c cim.h simfile.h
+dblocation.lo dblocation.o: dblocation.c cim.h simfile.h
+dblock.lo dblock.o: dblock.c cim.h ../config.h simfile.h
+dblocked.lo dblocked.o: dblocked.c cim.h simfile.h
+dbmaxloc.lo dbmaxloc.o: dbmaxloc.c cim.h simfile.h
+dbopen.lo dbopen.o: dbopen.c file.h ../config.h cim.h simfile.h
+dboutbyte.lo dboutbyte.o: dboutbyte.c cim.h simfile.h
+dbouttext.lo dbouttext.o: dbouttext.c cim.h simfile.h
+dbunlock.lo dbunlock.o: dbunlock.c cim.h simfile.h
+dcheckpoint.lo dcheckpoint.o: dcheckpoint.c cim.h simfile.h
+dclose.lo dclose.o: dclose.c cim.h simfile.h
+ddeleteimage.lo ddeleteimage.o: ddeleteimage.c file.h ../config.h cim.h \
+	simfile.h
+decimalmark.lo decimalmark.o: decimalmark.c cim.h
+dendfile.lo dendfile.o: dendfile.c cim.h simfile.h
+detach.lo detach.o: detach.c cim.h simfile.h
+digit.lo digit.o: digit.c cim.h
+dinimage.lo dinimage.o: dinimage.c file.h ../config.h cim.h simfile.h
+discrete.lo discrete.o: discrete.c random.h ../config.h cim.h
+dlastloc.lo dlastloc.o: dlastloc.c cim.h simfile.h
+dlocate.lo dlocate.o: dlocate.c cim.h simfile.h
+dlocation.lo dlocation.o: dlocation.c cim.h simfile.h
+dlock.lo dlock.o: dlock.c cim.h ../config.h simfile.h
+dlocked.lo dlocked.o: dlocked.c cim.h simfile.h
+dmaxloc.lo dmaxloc.o: dmaxloc.c cim.h simfile.h
+dopen.lo dopen.o: dopen.c file.h ../config.h cim.h simfile.h
+doutimage.lo doutimage.o: doutimage.c file.h ../config.h cim.h simfile.h
+draw.lo draw.o: draw.c random.h ../config.h cim.h
+dump.lo dump.o: dump.c ../config.h
+dunlock.lo dunlock.o: dunlock.c cim.h simfile.h
+endclass.lo endclass.o: endclass.c cim.h
+enddecl.lo enddecl.o: enddecl.c cim.h
+entier.lo entier.o: entier.c cim.h ../config.h
+ep.lo ep.o: ep.c cim.h align.h ../config.h
+epp.lo epp.o: epp.c cim.h align.h ../config.h
+eqrtext.lo eqrtext.o: eqrtext.c cim.h
+eqtext.lo eqtext.o: eqtext.c cim.h
+erlang.lo erlang.o: erlang.c random.h ../config.h cim.h trigno.h
+error.lo error.o: error.c file.h ../config.h cim.h
+eth.lo eth.o: eth.c cim.h align.h ../config.h
+exchange.lo exchange.o: exchange.c cim.h
+exp.lo exp.o: exp.c cim.h trigno.h ../config.h
+field.lo field.o: field.c cim.h simfile.h
+filename.lo filename.o: filename.c cim.h simfile.h
+gbc.lo gbc.o: gbc.c cim.h align.h ../config.h simfile.h
+geta.lo geta.o: geta.c cim.h
+getav.lo getav.o: getav.c cim.h
+getcbv.lo getcbv.o: getcbv.c cim.h
+getlab.lo getlab.o: getlab.c cim.h
+getproc.lo getproc.o: getproc.c cim.h
+getrv.lo getrv.o: getrv.c cim.h
+getsa.lo getsa.o: getsa.c cim.h
+getta.lo getta.o: getta.c cim.h
+gettv.lo gettv.o: gettv.c cim.h
+goto.lo goto.o: goto.c cim.h simfile.h
+histd.lo histd.o: histd.c random.h ../config.h cim.h
+histo.lo histo.o: histo.c random.h ../config.h cim.h
+ibclose.lo ibclose.o: ibclose.c cim.h simfile.h
+ibendfile.lo ibendfile.o: ibendfile.c cim.h simfile.h
+ibinbyte.lo ibinbyte.o: ibinbyte.c cim.h simfile.h
+ibintext.lo ibintext.o: ibintext.c cim.h simfile.h
+ibopen.lo ibopen.o: ibopen.c file.h ../config.h cim.h simfile.h
+iclose.lo iclose.o: iclose.c cim.h simfile.h
+iendfile.lo iendfile.o: iendfile.c file.h ../config.h cim.h simfile.h
+iinchar.lo iinchar.o: iinchar.c cim.h simfile.h
+iinfrac.lo iinfrac.o: iinfrac.c cim.h simfile.h
+iinimage.lo iinimage.o: iinimage.c file.h ../config.h cim.h simfile.h
+iinint.lo iinint.o: iinint.c cim.h simfile.h
+iinreal.lo iinreal.o: iinreal.c cim.h ../config.h simfile.h
+iinrecord.lo iinrecord.o: iinrecord.c file.h ../config.h cim.h simfile.h
+iintext.lo iintext.o: iintext.c cim.h simfile.h
+ilastitem.lo ilastitem.o: ilastitem.c cim.h simfile.h
+in.lo in.o: in.c cim.h
+initier.lo initier.o: initier.c cim.h
+inner.lo inner.o: inner.c cim.h
+intrea.lo intrea.o: intrea.c cim.h ../config.h
+iopen.lo iopen.o: iopen.c file.h ../config.h cim.h simfile.h
+is.lo is.o: is.c cim.h
+isochar.lo isochar.o: isochar.c cim.h
+isopen.lo isopen.o: isopen.c cim.h simfile.h
+isorank.lo isorank.o: isorank.c cim.h
+leftshift.lo leftshift.o: leftshift.c cim.h
+length.lo length.o: length.c cim.h simfile.h
+letext.lo letext.o: letext.c cim.h
+letter.lo letter.o: letter.c cim.h
+linear.lo linear.o: linear.c random.h ../config.h cim.h
+ln.lo ln.o: ln.c cim.h trigno.h ../config.h
+log10.lo log10.o: log10.c cim.h trigno.h ../config.h
+lowcase.lo lowcase.o: lowcase.c cim.h
+lowerbound.lo lowerbound.o: lowerbound.c cim.h
+lowten.lo lowten.o: lowten.c cim.h
+lttext.lo lttext.o: lttext.c cim.h
+maxc.lo maxc.o: maxc.c cim.h
+maxi.lo maxi.o: maxi.c cim.h
+maxr.lo maxr.o: maxr.c cim.h ../config.h
+maxt.lo maxt.o: maxt.c cim.h
+minc.lo minc.o: minc.c cim.h
+mini.lo mini.o: mini.c cim.h
+minr.lo minr.o: minr.c cim.h ../config.h
+mint.lo mint.o: mint.c cim.h
+mod.lo mod.o: mod.c cim.h
+more.lo more.o: more.c cim.h simfile.h
+negexp.lo negexp.o: negexp.c random.h ../config.h cim.h trigno.h
+normal.lo normal.o: normal.c random.h ../config.h cim.h trigno.h
+oa.lo oa.o: oa.c cim.h align.h ../config.h
+obclose.lo obclose.o: obclose.c cim.h simfile.h
+obopen.lo obopen.o: obopen.c file.h ../config.h cim.h simfile.h
+oboutbyte.lo oboutbyte.o: oboutbyte.c cim.h simfile.h
+obouttext.lo obouttext.o: obouttext.c cim.h simfile.h
+obreakoutimage.lo obreakoutimage.o: obreakoutimage.c file.h ../config.h \
+	cim.h simfile.h
+oclose.lo oclose.o: oclose.c cim.h simfile.h
+oopen.lo oopen.o: oopen.c file.h ../config.h cim.h simfile.h
+ooutchar.lo ooutchar.o: ooutchar.c cim.h simfile.h
+ooutfix.lo ooutfix.o: ooutfix.c cim.h ../config.h simfile.h
+ooutfrac.lo ooutfrac.o: ooutfrac.c cim.h simfile.h
+ooutimage.lo ooutimage.o: ooutimage.c file.h ../config.h cim.h simfile.h
+ooutint.lo ooutint.o: ooutint.c cim.h simfile.h
+ooutreal.lo ooutreal.o: ooutreal.c cim.h ../config.h simfile.h
+ooutrecord.lo ooutrecord.o: ooutrecord.c file.h ../config.h cim.h \
+	simfile.h
+oouttext.lo oouttext.o: oouttext.c cim.h simfile.h
+pclose.lo pclose.o: pclose.c file.h ../config.h cim.h simfile.h
+peject.lo peject.o: peject.c cim.h simfile.h
+pline.lo pline.o: pline.c cim.h simfile.h
+plinesperpage.lo plinesperpage.o: plinesperpage.c cim.h ../config.h \
+	simfile.h
+poisson.lo poisson.o: poisson.c random.h ../config.h cim.h trigno.h
+popen.lo popen.o: popen.c file.h ../config.h cim.h simfile.h
+pos.lo pos.o: pos.c cim.h simfile.h
+poutimage.lo poutimage.o: poutimage.c file.h ../config.h cim.h simfile.h
+poutrecord.lo poutrecord.o: poutrecord.c file.h ../config.h cim.h \
+	simfile.h
+pow.lo pow.o: pow.c cim.h trigno.h ../config.h
+powii.lo powii.o: powii.c cim.h
+powri.lo powri.o: powri.c cim.h ../config.h
+ppage.lo ppage.o: ppage.c cim.h simfile.h
+printfilline.lo printfilline.o: printfilline.c file.h ../config.h cim.h
+pspacing.lo pspacing.o: pspacing.c cim.h simfile.h
+randint.lo randint.o: randint.c random.h ../config.h cim.h
+rank.lo rank.o: rank.c cim.h
+rem.lo rem.o: rem.c cim.h
+resume.lo resume.o: resume.c cim.h simfile.h
+return.lo return.o: return.c cim.h
+rin.lo rin.o: rin.c cim.h
+rs.lo rs.o: rs.c cim.h align.h ../config.h
+setaccess.lo setaccess.o: setaccess.c cim.h simfile.h
+setpos.lo setpos.o: setpos.c cim.h simfile.h
+signdi.lo signdi.o: signdi.c cim.h
+signdr.lo signdr.o: signdr.c cim.h ../config.h
+signdx.lo signdx.o: signdx.c cim.h
+signi.lo signi.o: signi.c cim.h
+signr.lo signr.o: signr.c cim.h ../config.h
+simenvir.lo simenvir.o: simenvir.c
+simfile.lo simfile.o: simfile.c ../config.h cim.h ../limit.h simfile.h
+simset.lo simset.o: simset.c ./cim.h
+simulaid.lo simulaid.o: simulaid.c cim.h ../config.h
+simulation.lo simulation.o: simulation.c ./cim.h
+sin.lo sin.o: sin.c cim.h trigno.h ../config.h
+sinh.lo sinh.o: sinh.c cim.h trigno.h ../config.h
+sqrt.lo sqrt.o: sqrt.c cim.h trigno.h ../config.h
+ss.lo ss.o: ss.c cim.h
+start.lo start.o: start.c file.h ../config.h cim.h simfile.h
+subepsilon.lo subepsilon.o: subepsilon.c epsilon.h cim.h ../config.h
+syserr.lo syserr.o: syserr.c cim.h simfile.h
+sysin.lo sysin.o: sysin.c cim.h simfile.h
+sysout.lo sysout.o: sysout.c cim.h simfile.h
+systemerror.lo systemerror.o: systemerror.c file.h ../config.h cim.h
+tan.lo tan.o: tan.c cim.h trigno.h ../config.h
+tanh.lo tanh.o: tanh.c cim.h trigno.h ../config.h
+tconstant.lo tconstant.o: tconstant.c cim.h
+terror.lo terror.o: terror.c cim.h
+textassign.lo textassign.o: textassign.c cim.h
+textvalassign.lo textvalassign.o: textvalassign.c cim.h
+tgetchar.lo tgetchar.o: tgetchar.c cim.h
+tgetfrac.lo tgetfrac.o: tgetfrac.c text.h cim.h ../limit.h ../config.h
+tgetint.lo tgetint.o: tgetint.c text.h cim.h ../limit.h ../config.h
+tgetreal.lo tgetreal.o: tgetreal.c text.h cim.h ../limit.h ../config.h
+tlength.lo tlength.o: tlength.c cim.h
+tmain.lo tmain.o: tmain.c cim.h
+tmore.lo tmore.o: tmore.c cim.h
+tpos.lo tpos.o: tpos.c cim.h
+tputchar.lo tputchar.o: tputchar.c cim.h
+tputfix.lo tputfix.o: tputfix.c cim.h ../config.h
+tputfrac.lo tputfrac.o: tputfrac.c cim.h
+tputint.lo tputint.o: tputint.c cim.h
+tputreal.lo tputreal.o: tputreal.c cim.h ../config.h
+trace.lo trace.o: trace.c file.h ../config.h cim.h
+tsetpos.lo tsetpos.o: tsetpos.c cim.h
+tsglob.lo tsglob.o: tsglob.c cim.h ../config.h ../limit.h simfile.h
+tstart.lo tstart.o: tstart.c cim.h
+tstrip.lo tstrip.o: tstrip.c cim.h
+tsub.lo tsub.o: tsub.c cim.h
+uniform.lo uniform.o: uniform.c random.h ../config.h cim.h
+upcase.lo upcase.o: upcase.c cim.h
+upperbound.lo upperbound.o: upperbound.c cim.h
+warning.lo warning.o: warning.c file.h ../config.h cim.h
+xmalloc.lo xmalloc.o: xmalloc.c cim.h
 
 info:
 dvi:
@@ -623,28 +657,27 @@ install: install-exec install-data all
 
 uninstall: uninstall-libLIBRARIES uninstall-libLTLIBRARIES uninstall-includeHEADERS
 
-all: Makefile $(LIBRARIES) $(LTLIBRARIES) $(HEADERS)
-
 install-strip:
 	$(MAKE) INSTALL_PROGRAM='$(INSTALL_PROGRAM) -s' INSTALL_SCRIPT='$(INSTALL_PROGRAM)' install
 installdirs:
-	$(mkinstalldirs)  $(libdir) $(libdir) $(includedir)
+	$(mkinstalldirs)  $(DATADIR)$(libdir) $(DATADIR)$(libdir) \
+		$(DATADIR)$(includedir)
 
 
 mostlyclean-generic:
-	test -z "$(MOSTLYCLEANFILES)" || rm -f $(MOSTLYCLEANFILES)
+	-test -z "$(MOSTLYCLEANFILES)" || rm -f $(MOSTLYCLEANFILES)
 
 clean-generic:
-	test -z "$(CLEANFILES)" || rm -f $(CLEANFILES)
+	-test -z "$(CLEANFILES)" || rm -f $(CLEANFILES)
 
 distclean-generic:
-	rm -f Makefile $(DISTCLEANFILES)
-	rm -f config.cache config.log stamp-h stamp-h[0-9]*
-	test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
+	-rm -f Makefile $(DISTCLEANFILES)
+	-rm -f config.cache config.log stamp-h stamp-h[0-9]*
+	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
 
 maintainer-clean-generic:
-	test -z "$(MAINTAINERCLEANFILES)" || rm -f $(MAINTAINERCLEANFILES)
-	test -z "$(BUILT_SOURCES)" || rm -f $(BUILT_SOURCES)
+	-test -z "$(MAINTAINERCLEANFILES)" || rm -f $(MAINTAINERCLEANFILES)
+	-test -z "$(BUILT_SOURCES)" || rm -f $(BUILT_SOURCES)
 mostlyclean:  mostlyclean-libLIBRARIES mostlyclean-compile \
 		mostlyclean-libtool mostlyclean-libLTLIBRARIES \
 		mostlyclean-tags mostlyclean-generic
@@ -656,8 +689,8 @@ clean:  clean-libLIBRARIES clean-compile clean-libtool \
 distclean:  distclean-libLIBRARIES distclean-compile distclean-libtool \
 		distclean-libLTLIBRARIES distclean-tags \
 		distclean-generic clean
-	rm -f config.status
-	rm -f libtool
+	-rm -f config.status
+	-rm -f libtool
 
 maintainer-clean:  maintainer-clean-libLIBRARIES \
 		maintainer-clean-compile maintainer-clean-libtool \
@@ -666,7 +699,7 @@ maintainer-clean:  maintainer-clean-libLIBRARIES \
 	@echo "This command is intended for maintainers to use;"
 	@echo "it deletes files that may require special tools to rebuild."
 
-.PHONY: default mostlyclean-libLIBRARIES distclean-libLIBRARIES \
+.PHONY: mostlyclean-libLIBRARIES distclean-libLIBRARIES \
 clean-libLIBRARIES maintainer-clean-libLIBRARIES uninstall-libLIBRARIES \
 install-libLIBRARIES mostlyclean-compile distclean-compile \
 clean-compile maintainer-clean-compile mostlyclean-libtool \
@@ -681,8 +714,11 @@ installdirs mostlyclean-generic distclean-generic clean-generic \
 maintainer-clean-generic clean mostlyclean distclean maintainer-clean
 
 
-maintainer-clean-libLIBRARIES:
-	test -z "$(lib_LIBRARIES)" || rm -f $(lib_LIBRARIES)
+simulation.c simulation.atr: simulation.sim simset.atr
+	$(CIM) $(CIMFLAGS) $(srcdir)/simulation.sim
+
+simset.c simset.atr: simset.sim cim.h simfile.atr simenvir.atr
+	$(CIM) $(CIMFLAGS) $(srcdir)/simset.sim
 
 clean-libLIBRARIES:
 
@@ -690,12 +726,6 @@ clean-libLIBRARIES:
 
 maintainer-clean-libLIBRARIES:
 	test -z "$(lib_LIBRARIES)" || rm -f $(lib_LIBRARIES)
-
-simulation.c simulation.h simulation.atr: simulation.sim simset.atr
-	cd $(srcdir); $(CIM) $(CIMFLAGS) $(srcdir)/simulation.sim
-
-simset.c simset.h simset.atr: simset.sim cim.h simfile.atr simenvir.atr
-	cd $(srcdir); $(CIM) $(CIMFLAGS) $(srcdir)/simset.sim
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

@@ -19,6 +19,7 @@
 
 #include "cim.h"
 #include <stdio.h>
+#include "simfile.h"
 
 /******************************************************************************
                                                 BOOLEAN PROCEDURE SETACCESS  */

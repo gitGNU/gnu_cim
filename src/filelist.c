@@ -1,6 +1,6 @@
 /* $Id: cextspec.c,v 1.17 1997/01/26 14:30:17 cim Exp $ */
 
-/* Copyright (C) 1994 Sverre Hvammen Johansen,
+/* Copyright (C) 1994, 1998  Sverre Hvammen Johansen,
  * Department of Informatics, University of Oslo.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -19,7 +19,19 @@
 
 #include "config.h"
 #include "const.h"
+#include "newstr.h"
 #include "filelist.h"
+
+#include <stdio.h>
+#include <obstack.h>
+
+char *xmalloc();
+void free();
+
+#define obstack_chunk_alloc xmalloc
+#define obstack_chunk_free free
+
+static struct obstack osFilelist;
 
 typedef struct _filelist filelist_t;
 typedef struct _fileelem fileelem_t;
@@ -34,11 +46,20 @@ struct _filelist
 {
   fileelem_t *first;
   fileelem_t *last;
-  int max_strlen;
-  int total_strlen; /* Total strlen including one ws between each emement */
 };
 
 static filelist_t dirlist, archlist, linklist;
+
+
+
+/******************************************************************************
+                                                                INITFILELIST */
+
+void initFilelist ()
+{
+  obstack_init (&osFilelist);
+}
+
 
 /******************************************************************************
                                                                   CLEAR_LIST */
@@ -46,8 +67,6 @@ static filelist_t dirlist, archlist, linklist;
 clear_list (listp) filelist_t *listp;
 {
   listp->first=listp->last=0;
-  listp->max_strlen=0;
-  listp->total_strlen=0;
 }
 /******************************************************************************
                                                                      IS_NAME */
@@ -66,15 +85,11 @@ char is_name (listp, name) filelist_t *listp; char *name;
 char *get_names (listp) filelist_t *listp;
 {
   fileelem_t *elem;
-  char *str;
-  str = (char *) xmalloc (listp->total_strlen + 1);
-  strcpy (str, "\0");
   for (elem= listp->first; elem!=NULL; elem= elem->next)
     {
-      strcat (str, elem->name);
-      if (elem->next != NULL) strcat (str, " ");
+      newstrGrow2 (elem->name, " ");
     }
-  return str;
+  return newstrFinish ();
 }
 
 /******************************************************************************
@@ -91,7 +106,7 @@ char * get_names_in_linklist ()
 char insert_name (listp, name, first) filelist_t *listp; char *name, first;
 {
   fileelem_t *new;
-  new= (fileelem_t *) xmalloc(sizeof (fileelem_t));
+  new= (fileelem_t *) obstack_alloc (&osFilelist, sizeof (fileelem_t));
   new->next= NULL;
   new->name= name;
 
@@ -100,17 +115,9 @@ char insert_name (listp, name, first) filelist_t *listp; char *name, first;
   if (listp->first == NULL)
     {
       listp->first= listp->last= new;
-      listp->max_strlen= listp->total_strlen= strlen(name);
     }
   else
     {
-      int this_strlen;
-
-
-      this_strlen= strlen(name);
-      listp->total_strlen+= this_strlen+1;
-      if (this_strlen > listp->max_strlen) listp->max_strlen= this_strlen;
-
       if (first)
 	{
 	  new->next= listp->first;
@@ -129,17 +136,13 @@ char insert_name (listp, name, first) filelist_t *listp; char *name, first;
 
 char insert_name_in_dirlist (name) char *name;
 {
-  char *str;
   if (name==NULL)
     {
       clear_list (&dirlist);
     }
   else
     {
-      str= (char *) xmalloc (strlen (name) + 3);
-      strcpy (str, "-L");
-      strcat (str, name);
-      insert_name (&linklist, str, FALSE);
+      insert_name (&linklist, newstrcat2 ("-L", name), FALSE);
       return insert_name (&dirlist, name, FALSE);
     }
 }
@@ -166,15 +169,9 @@ char insert_name_in_linklist (name, first) char *name, first;
 char * transform_name(name, fromsuffix, tosuffix) 
   char *name, *fromsuffix, *tosuffix;
 {
-  char *str;
-  int name_len= strlen(name);
-  int fromsuffix_len= strlen(fromsuffix);
-  int tosuffix_len= strlen(tosuffix);
-  str = (char *) xmalloc(name_len-fromsuffix_len+tosuffix_len+1);
-  strncpy (str, name, name_len-fromsuffix_len);
-  str[name_len-fromsuffix_len]= '\0';
-  strcat (str, tosuffix);
-  return (str);
+  newstrGrown (name, strlen(name) - strlen(fromsuffix));
+  newstrGrow1 (tosuffix);
+  return newstrFinish ();
 }
 
 /******************************************************************************
@@ -186,22 +183,23 @@ FILE *open_name (dirlist, linklist, name, link)
   FILE *f;
   fileelem_t *elem;
   char *str;
-  str = (char *) xmalloc (dirlist->max_strlen + strlen(name) + 2);
   for (elem= dirlist->first; elem!=NULL; elem= elem->next)
     {
-      strcpy (str, elem->name);
-      strcat (str, "/");
-      strcat (str, name);
+      obstack_grow (&osFilelist, elem->name, strlen (elem->name));
+      obstack_1grow (&osFilelist, '/');
+      obstack_grow0 (&osFilelist, name, strlen (name));
+      str= obstack_finish (&osFilelist);
 #if OPEN_FILE_IN_BINARY_MODE
-      if ((f = fopen (str, "rb")) != NULL)
+      if ((f = fopen (str, "rb"))!= NULL)
 #else
-      if ((f = fopen (str, "r")) != NULL)
+      if ((f = fopen (str, "r"))!= NULL)
 #endif
 	{
 	  if (link) 
 	    insert_name (linklist, transform_name (str, ".atr", ".o"), TRUE);
 	  return (f);
 	}
+      obstack_free (&osFilelist, str);
     }
   return (NULL);
 }
@@ -237,8 +235,7 @@ char * short_file_name (f)
 FILE *open_and_position_arch_name (archname, name) char *archname, *name;
 {
   FILE *f;
-  static char *string_table;
-  static int string_table_length;
+  char *string_table=NULL;
   int i,
     sl;
   long l;
@@ -251,56 +248,56 @@ FILE *open_and_position_arch_name (archname, name) char *archname, *name;
 #endif
   if (f == NULL)
     merror (6, archname);
-  (void) fscanf (f, "%7s", s1);
+  fscanf (f, "%7s", s1);
   getc (f);
   if (strcmp (s1, "!<arch>"))
     merror (7, archname);
   while ((s2 = short_file_name (f)) != NULL)
     {
-      (void) fscanf (f, "%12ld", &l);
-      (void) fscanf (f, "%6ld", &l);
-      (void) fscanf (f, "%6ld", &l);
-      (void) fscanf (f, "%8ld", &l);
-      (void) fscanf (f, "%10ld", &l);
+      fscanf (f, "%12ld", &l);
+      fscanf (f, "%6ld", &l);
+      fscanf (f, "%6ld", &l);
+      fscanf (f, "%8ld", &l);
+      fscanf (f, "%10ld", &l);
       while ((c = getc (f)) != '`' && c != EOF);
       if (c != '`' || getc (f) != '\n')
 	merror (8, archname);
-      if (!strcmp (s2, name))
-	return (f);
+      if (!strcmp (s2, name)) goto found;
+
       if (s2[0] == '/' && isdigit(s2[1]))
 	{
 	  long pos;
 	  sscanf(&s2[1],"%ld",&pos);
-	  if (!strcmp(&string_table[pos], name))
-	    return (f);
+	  if (!strcmp(&string_table[pos], name)) goto found;
 	}
       if (l & 1)
 	l++;
       if(!strcmp(s2,"/"))
 	{
-	  int pos;
-	  if (string_table_length<l)
-	    string_table = (char *) xmalloc (l);
-	  for (pos=0; pos<l; pos++)
+	  while (l-- >0)
 	    {
 	      char c;
 	      c = getc (f);
 	      if (c == '/' || c == '\n')
-		string_table[pos] = '\0';
-	      else string_table[pos] = c;
+		obstack_1grow (&osFilelist, 0);
+	      else obstack_1grow (&osFilelist, c);
 	    }
+	  string_table= (char *) obstack_finish (&osFilelist);
 	} else
 	  {
 #if NO_SEEK_IN_AR
 	    while (l-- > 0)
 	      getc (f);
 #else
-	    (void) fseek (f, l, 1);
+	    fseek (f, l, 1);
 #endif
 	  }
     }
-  (void) fclose (f);
-  return (NULL);
+  fclose (f);
+  f= NULL;
+ found:
+  if (string_table) obstack_free (&osFilelist, string_table);
+  return f;
 }
 
 /******************************************************************************
@@ -339,18 +336,19 @@ char searc_and_insert_name (dirlistp, listp, name)
   FILE *f;
   fileelem_t *elem;
   char *str;
-  str = (char *) xmalloc (dirlistp->max_strlen + strlen(name) + 2);
   for (elem= dirlistp->first; elem!=NULL; elem= elem->next)
     {
-      strcpy (str, elem->name);
-      strcat (str, "/");
-      strcat (str, name);
+      obstack_grow (&osFilelist, elem->name, strlen (elem->name));
+      obstack_1grow (&osFilelist, '/');
+      obstack_grow0 (&osFilelist, name, strlen (name));
+      str= obstack_finish (&osFilelist);
       if ((f = fopen (str, "r")) != NULL)
 	{
 	  insert_name (listp, str, FALSE);
 	  fclose(f);
 	  return TRUE;
 	}
+      obstack_free (&osFilelist, str);
     }
   return FALSE;
 }
@@ -365,21 +363,12 @@ char searc_and_insert_name (dirlistp, listp, name)
 void new_lib (name) 
   char *name;
 {
-  char *str;
-  str= (char *) 
-    xmalloc (strlen(name) + strlen(LIBPREFIX) + strlen (LIBSUFFIX) + 1);
-  strcpy (str, LIBPREFIX);
-  strcat (str, name);
-  strcat (str, LIBSUFFIX);
-
-  searc_and_insert_name (&dirlist, &archlist, transform_name (str, LIBSUFFIX, LIBARCHSUFFIX));
-#if 0
-  searc_and_insert_name (&dirlist, &linklist, str);
-#else
-  strcpy (str, "-l");
-  strcat (str, name);
-  insert_name (&linklist, str, FALSE);
-#endif
+  searc_and_insert_name (&dirlist, &archlist, 
+			 transform_name (newstrcat3 (LIBPREFIX, name, 
+						     LIBSUFFIX), 
+					 LIBSUFFIX, LIBARCHSUFFIX));
+					 
+  insert_name (&linklist, newstrcat2 ("-l", name), FALSE);
 }
 
 

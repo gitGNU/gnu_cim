@@ -1,6 +1,6 @@
 /* $Id: cim.c,v 1.18 1997/01/26 14:30:21 cim Exp $ */
 
-/* Copyright (C) 1987-1997 Sverre Hvammen Johansen,
+/* Copyright (C) 1987-1998 Sverre Hvammen Johansen,
  * Department of Informatics, University of Oslo.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -16,15 +16,69 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA. */
 
+#include <stdio.h>
+#include <obstack.h>
+
+char *xmalloc();
+void free();
+
+#define obstack_chunk_alloc xmalloc
+#define obstack_chunk_free free
+
+static struct obstack osNewstr;
+
 /******************************************************************************
-                                                                  NEWSTRCAT */
+                                                                  INITNEWSTR */
+void initNewstr ()
+{
+  obstack_init(&osNewstr);
+}
+
+/******************************************************************************
+                                                                 NEWSTRGROW1 */
+
+void newstrGrown(s1, n)
+     char *s1; int n;
+{
+  obstack_grow (&osNewstr, s1, n);
+}
+
+/******************************************************************************
+                                                                 NEWSTRGROW1 */
+
+void newstrGrow1(s1)
+     char *s1;
+{
+  obstack_grow (&osNewstr, s1, strlen(s1));
+}
+
+/******************************************************************************
+                                                                 NEWSTRGROW1 */
+
+void newstrGrow2(s1, s2)
+     char *s1, *s2;
+{
+  obstack_grow (&osNewstr, s1, strlen(s1));
+  obstack_grow (&osNewstr, s2, strlen(s2));
+}
+
+/******************************************************************************
+                                                                NEWSTRFINISH */
+
+char *newstrFinish()
+{
+  obstack_1grow (&osNewstr, 0);
+  return obstack_finish (&osNewstr);;
+}
+
+/******************************************************************************
+                                                                  NEWSTRCAT1 */
 
 char * newstrcat1(s1)
      char *s1;
 {
-  char *str= (char *) xmalloc (strlen(s1) + 1);
-  strcpy (str, s1);
-  return str;
+  obstack_grow0 (&osNewstr, s1, strlen(s1));
+  return obstack_finish (&osNewstr);;
 }
 
 /******************************************************************************
@@ -33,10 +87,9 @@ char * newstrcat1(s1)
 char * newstrcat2(s1, s2)
      char *s1, *s2;
 {
-  char *str= (char *) xmalloc (strlen(s1) + strlen(s2) + 1);
-  strcpy (str, s1);
-  strcat (str, s2);
-  return str;
+  obstack_grow (&osNewstr, s1, strlen(s1));
+  obstack_grow0 (&osNewstr, s2, strlen(s2));
+  return obstack_finish (&osNewstr);;
 }
 
 /******************************************************************************
@@ -45,11 +98,10 @@ char * newstrcat2(s1, s2)
 char * newstrcat3(s1, s2, s3)
      char *s1, *s2, *s3;
 {
-  char *str= (char *) xmalloc (strlen(s1) + strlen(s2) + strlen(s3) + 1);
-  strcpy (str, s1);
-  strcat (str, s2);
-  strcat (str, s3);
-  return str;
+  obstack_grow (&osNewstr, s1, strlen(s1));
+  obstack_grow (&osNewstr, s2, strlen(s2));
+  obstack_grow0 (&osNewstr, s3, strlen(s3));
+  return obstack_finish (&osNewstr);;
 }
 
 /******************************************************************************
@@ -58,13 +110,11 @@ char * newstrcat3(s1, s2, s3)
 char * newstrcat4(s1, s2, s3, s4)
      char *s1, *s2, *s3, *s4;
 {
-  char *str= (char *) xmalloc (strlen(s1) + strlen(s2) + strlen(s3) +
-			       strlen(s4) + 1);
-  strcpy (str, s1);
-  strcat (str, s2);
-  strcat (str, s3);
-  strcat (str, s4);
-  return str;
+  obstack_grow (&osNewstr, s1, strlen(s1));
+  obstack_grow (&osNewstr, s2, strlen(s2));
+  obstack_grow (&osNewstr, s3, strlen(s3));
+  obstack_grow0 (&osNewstr, s4, strlen(s4));
+  return obstack_finish (&osNewstr);;
 }
 
 /******************************************************************************
@@ -73,14 +123,12 @@ char * newstrcat4(s1, s2, s3, s4)
 char * newstrcat5(s1, s2, s3, s4, s5)
      char *s1, *s2, *s3, *s4, *s5;
 {
-  char *str= (char *) xmalloc (strlen(s1) + strlen(s2) + strlen(s3) +
-			       strlen(s4) + strlen(s5) + 1);
-  strcpy (str, s1);
-  strcat (str, s2);
-  strcat (str, s3);
-  strcat (str, s4);
-  strcat (str, s5);
-  return str;
+  obstack_grow (&osNewstr, s1, strlen(s1));
+  obstack_grow (&osNewstr, s2, strlen(s2));
+  obstack_grow (&osNewstr, s3, strlen(s3));
+  obstack_grow (&osNewstr, s4, strlen(s4));
+  obstack_grow0 (&osNewstr, s5, strlen(s5));
+  return obstack_finish (&osNewstr);;
 }
 
 /******************************************************************************
@@ -89,172 +137,11 @@ char * newstrcat5(s1, s2, s3, s4, s5)
 char * newstrcat6(s1, s2, s3, s4, s5, s6)
      char *s1, *s2, *s3, *s4, *s5, *s6;
 {
-  char *str= (char *) xmalloc (strlen(s1) + strlen(s2) + strlen(s3) +
-			       strlen(s4) + strlen(s5) + strlen(s6) + 1);
-  strcpy (str, s1);
-  strcat (str, s2);
-  strcat (str, s3);
-  strcat (str, s4);
-  strcat (str, s5);
-  strcat (str, s6);
-  return str;
+  obstack_grow (&osNewstr, s1, strlen(s1));
+  obstack_grow (&osNewstr, s2, strlen(s2));
+  obstack_grow (&osNewstr, s3, strlen(s3));
+  obstack_grow (&osNewstr, s4, strlen(s4));
+  obstack_grow0 (&osNewstr, s6, strlen(s6));
+  return obstack_finish (&osNewstr);;
 }
 
-/******************************************************************************
-                                                                  NEWSTRCAT7 */
-
-char * newstrcat7(s1, s2, s3, s4, s5, s6, s7)
-     char *s1, *s2, *s3, *s4, *s5, *s6, *s7;
-{
-  char *str= (char *) xmalloc (strlen(s1) + strlen(s2) + strlen(s3) +
-			       strlen(s4) + strlen(s5) + strlen(s6) + 
-			       strlen(s7) + 1);
-  strcpy (str, s1);
-  strcat (str, s2);
-  strcat (str, s3);
-  strcat (str, s4);
-  strcat (str, s5);
-  strcat (str, s6);
-  strcat (str, s7);
-  return str;
-}
-
-/******************************************************************************
-                                                                  NEWSTRCAT8 */
-
-char * newstrcat8(s1, s2, s3, s4, s5, s6, s7, s8)
-     char *s1, *s2, *s3, *s4, *s5, *s6, *s7, *s8;
-{
-  char *str= (char *) xmalloc (strlen(s1) + strlen(s2) + strlen(s3) +
-			       strlen(s4) + strlen(s5) + strlen(s6) + 
-			       strlen(s7) + strlen(s8) + 1);
-  strcpy (str, s1);
-  strcat (str, s2);
-  strcat (str, s3);
-  strcat (str, s4);
-  strcat (str, s5);
-  strcat (str, s6);
-  strcat (str, s7);
-  strcat (str, s8);
-  return str;
-}
-
-/******************************************************************************
-                                                                  NEWSTRCAT9 */
-
-char * newstrcat9(s1, s2, s3, s4, s5, s6, s7, s8, s9)
-     char *s1, *s2, *s3, *s4, *s5, *s6, *s7, *s8, *s9;
-{
-  char *str= (char *) xmalloc (strlen(s1) + strlen(s2) + strlen(s3) +
-			       strlen(s4) + strlen(s5) + strlen(s6) + 
-			       strlen(s7) + strlen(s8) + strlen(s9) + 1);
-  strcpy (str, s1);
-  strcat (str, s2);
-  strcat (str, s3);
-  strcat (str, s4);
-  strcat (str, s5);
-  strcat (str, s6);
-  strcat (str, s7);
-  strcat (str, s8);
-  strcat (str, s9);
-  return str;
-}
-
-/******************************************************************************
-                                                                 NEWSTRCAT10 */
-
-char * newstrcat10(s1, s2, s3, s4, s5, s6, s7, s8, s9, s10)
-     char *s1, *s2, *s3, *s4, *s5, *s6, *s7, *s8, *s9, *s10;
-{
-  char *str= (char *) xmalloc (strlen(s1) + strlen(s2) + strlen(s3) +
-			       strlen(s4) + strlen(s5) + strlen(s6) + 
-			       strlen(s7) + strlen(s8) + strlen(s9) + 
-			       strlen(s10)+ 1);
-  strcpy (str, s1);
-  strcat (str, s2);
-  strcat (str, s3);
-  strcat (str, s4);
-  strcat (str, s5);
-  strcat (str, s6);
-  strcat (str, s7);
-  strcat (str, s8);
-  strcat (str, s9);
-  strcat (str, s10);
-  return str;
-}
-
-/******************************************************************************
-                                                                 NEWSTRCAT11 */
-
-char * newstrcat11(s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11)
-     char *s1, *s2, *s3, *s4, *s5, *s6, *s7, *s8, *s9, *s10, *s11;
-{
-  char *str= (char *) xmalloc (strlen(s1) + strlen(s2) + strlen(s3) +
-			       strlen(s4) + strlen(s5) + strlen(s6) + 
-			       strlen(s7) + strlen(s8) + strlen(s9) + 
-			       strlen(s10)+ strlen(s11)+ 1);
-  strcpy (str, s1);
-  strcat (str, s2);
-  strcat (str, s3);
-  strcat (str, s4);
-  strcat (str, s5);
-  strcat (str, s6);
-  strcat (str, s7);
-  strcat (str, s8);
-  strcat (str, s9);
-  strcat (str, s10);
-  strcat (str, s11);
-  return str;
-}
-
-/******************************************************************************
-                                                                 NEWSTRCAT12 */
-
-char * newstrcat12(s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11, s12)
-     char *s1, *s2, *s3, *s4, *s5, *s6, *s7, *s8, *s9, *s10, *s11, *s12;
-{
-  char *str= (char *) xmalloc (strlen(s1) + strlen(s2) + strlen(s3) +
-			       strlen(s4) + strlen(s5) + strlen(s6) + 
-			       strlen(s7) + strlen(s8) + strlen(s9) + 
-			       strlen(s10)+ strlen(s11)+ strlen(s12)+ 1);
-  strcpy (str, s1);
-  strcat (str, s2);
-  strcat (str, s3);
-  strcat (str, s4);
-  strcat (str, s5);
-  strcat (str, s6);
-  strcat (str, s7);
-  strcat (str, s8);
-  strcat (str, s9);
-  strcat (str, s10);
-  strcat (str, s11);
-  strcat (str, s12);
-  return str;
-}
-
-/******************************************************************************
-                                                                 NEWSTRCAT13 */
-
-char * newstrcat13(s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11, s12, s13)
-     char *s1, *s2, *s3, *s4, *s5, *s6, *s7, *s8, *s9, *s10, *s11, *s12, *s13;
-{
-  char *str= (char *) xmalloc (strlen(s1) + strlen(s2) + strlen(s3) +
-			       strlen(s4) + strlen(s5) + strlen(s6) + 
-			       strlen(s7) + strlen(s8) + strlen(s9) + 
-			       strlen(s10)+ strlen(s11)+ strlen(s12)+ 
-			       strlen(s13)+ 1);
-  strcpy (str, s1);
-  strcat (str, s2);
-  strcat (str, s3);
-  strcat (str, s4);
-  strcat (str, s5);
-  strcat (str, s6);
-  strcat (str, s7);
-  strcat (str, s8);
-  strcat (str, s9);
-  strcat (str, s10);
-  strcat (str, s11);
-  strcat (str, s12);
-  strcat (str, s13);
-  return str;
-}

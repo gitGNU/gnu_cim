@@ -1,6 +1,6 @@
 /* $Id: cextspec.c,v 1.17 1997/01/26 14:30:17 cim Exp $ */
 
-/* Copyright (C) 1994 Sverre Hvammen Johansen,
+/* Copyright (C) 1994, 1998 Sverre Hvammen Johansen,
  * Department of Informatics, University of Oslo.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -18,6 +18,7 @@
 
 #include <stdio.h>
 
+extern void initFilelist ();
 char insert_name_in_dirlist ();
 char insert_name_in_archlist ();
 char insert_name_in_linklist ();

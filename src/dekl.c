@@ -1,6 +1,6 @@
 /* $Id: cdekl.c,v 1.10 1997/01/08 09:49:13 cim Exp $ */
 
-/* Copyright (C) 1994 Sverre Hvammen Johansen,
+/* Copyright (C) 1994, 1998 Sverre Hvammen Johansen,
  * Department of Informatics, University of Oslo.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -22,16 +22,26 @@
 #include "dekl.h"
 #include "const.h"
 #include "lex.h"
-#include "navn.h"
+#include "name.h"
 
 #include <stdio.h>
+#include <obstack.h>
+
+char *xmalloc();
+void free();
+
+#define obstack_chunk_alloc xmalloc
+#define obstack_chunk_free free
+
+static struct obstack osDecl;
+static struct obstack osPref;
+
 
 /*****************************************************************************/
 /*                            INITIELT                                       */
 /*****************************************************************************/
 
 
-#define new(X) ((struct X *)xmalloc(sizeof(struct X)))
 
 /* KONTAKT MED YACC, LEX OG FEILSYSTEMET */
 
@@ -42,19 +52,21 @@
 char yaccerror;
 
 char *prefquantident;
-char type;
-char kind;
-char categ;
 int localused;
 int arrdim;
 
-/* Arraypekere som  peker paa  blokkobjektene
- * Display inneholder alle de aktive blokkene */
-static struct BLOCK *last_block;
-struct BLOCK *display[DECLTABSIZE];
-struct BLOCK *cblock;
-struct BLOCK *sblock;
-struct BLOCK *seenthrough;	/* Settes av findglobal og findlocal og peker 
+
+struct BLOCK *ssblock; /* First system block 
+                          (The outermost system block with blev=0) 
+                          the system environment is conected to this block */
+
+struct BLOCK *cblock; /* Current block */
+struct BLOCK *sblock; /* First non system block 
+                         (The outermost block with blev=1)
+                         sblock is connected with ssblock through
+                         two INSP blocks (sysin and sysout) */
+
+struct BLOCK *seenthrough;	/* Settes av findGlobal og findLocal og peker 
 				 * p}  en utenforliggende inspect blokk(hvis
 				 * den      finnes). Det er fordi jeg onsker
 				 * } vite n}r en variable er sett gjennom
@@ -66,30 +78,12 @@ struct DECL *classtext;
 
 
 int cblev;
-static int crblev;
 
-/* Arraypekere som peker på aktive blokker som er
- * forskjellig fra en inspekt, conn eller for blokk
- * Forn og conn er dybden paa n\sting av disse blokkene */
-static short forn[DECLTABSIZE];
-static short conn[DECLTABSIZE];
-static int cdisbl;
-
-static struct DECL *prefdisplay[DECLTABSIZE];
-
-/* Hvert blokkobjekt har lister av deklarasjoner
- * Hver   ny   deklarasjon   skal   hektes   på
- * slutten  av en  liste,  Trenger  da en  peker
- * til siste  deklarasjon  for hver  aktiv blokk */
-static struct DECL *lastdecl[DECLTABSIZE];
-struct DECL *clastdecl;
 struct DECL *cprevdecl;
-static struct DECL *lastvirt[DECLTABSIZE];
- 
  
 /* Har en peker som peker p} en array deklarasjon som ikke har f}tt
  * satt sin dim verdi. */
-struct DECL *sistearray;
+struct DECL *lastArray;
 
 /* Under sjekkingen og innlesingen av deklarasjonene
  * trenger jeg å merke de ulike objektene
@@ -104,124 +98,97 @@ static struct DECL *procparam;
 static struct DECL *sluttparam;
 static struct DECL *arrayparam;
 
-char insert_with_codeclass;
-
 /******************************************************************************
-                                                        NULLBLOCK & NULLDEKL */
-
-/* Nullblock og nulldekl renser objekter */
-
-static nulldekl (rd)
-     struct DECL *rd;
+						      PCLEAN, PPUSH and PPOP */
+static ppush(rd)struct DECL *rd;
 {
-  rd->ident = NULL;
-  rd->line = 0L;
-  rd->type = 0;
-  rd->kind = 0;
-  rd->categ = 0;
-  rd->encl = NULL;
-  rd->protected = 0;
-  rd->idplev.plev = 0;
-  rd->dim = 0;
-  rd->virtno = 0;
-  rd->descr = NULL;
-  rd->match = NULL;
-  rd->next = NULL;
-  rd->prefqual = NULL;
+  obstack_ptr_grow (&osPref, rd);
 }
 
-static nullblock (rb)
-     struct BLOCK *rb;
+static pclean()
 {
-  /* Unødig å nullstille last_line, blno, 
-   * blev og kind da de blir tilordnet */
+  void *p;
+  p= obstack_finish (&osPref);
+  obstack_free (&osPref, p);
+}
 
-  nulldekl (&rb->quant);
+static struct DECL *ppop()
+{
+  struct DECL *rd;
+  if (obstack_next_free (&osPref) == obstack_base (&osPref))
+    return (NULL);
+
+  rd= * ((struct DECL * *) obstack_next_free (&osPref) - 1);
+  obstack_blank (&osPref, - sizeof (void *));
+  return (rd);
+}
+
+/******************************************************************************
+						        NEW-DECL/BLOCK       */
+
+
+struct DECL *newDecl()
+{
+  struct DECL *rd;
+  rd= obstack_alloc (&osDecl, sizeof (struct DECL));
+  bzero (rd, sizeof (struct DECL));
+  return rd;
+}
+
+static struct BLOCK *newBlock()
+{
+  struct BLOCK *rb;
+  rb= obstack_alloc (&osDecl, sizeof (struct BLOCK));
+  bzero (rb, sizeof (struct BLOCK));
   rb->quant.descr = rb;
-  rb->inner = 0;
-  rb->ptypno = 0;
-  rb->napar = 0;
-  rb->naloc = 0;
-  rb->navirt = 0;
-  rb->navirtlab = 0;
-  rb->fornest = 0;
-  rb->connest = 0;
-  rb->localclasses = 0;
-  rb->thisused = 0;
-  rb->stat = 0;
-  rb->enddecl = 0;
-  rb->parloc = NULL;
-  rb->virt = NULL;
-  rb->hiprot = NULL;
-  rb->externid = 0;
-  rb->next_block = NULL;
-  rb->ent = 0;
+  return rb;
 }
 
 /******************************************************************************
-                                                                INITDEKL     */
+                                                                INITDECL     */
 
-/* Initdekl kalles før selve innlesingen */
+/* InitDecl kalles før selve innlesingen */
 
-initdekl ()
+initDecl ()
 {
   struct BLOCK *rb;
   struct DECL *rd;
-
-  type = TNOTY;
-  cdisbl = cblev = crblev = -1;
-  sjekkdeklcalled = new (DECL);
-  unknowns = new (BLOCK);
-  nullblock (unknowns);
-  unknowns->quant.line = 0L;
-  unknowns->blno = 0;
-  unknowns->blev = 0;
+  
+  obstack_init(&osDecl);
+  obstack_init(&osPref);
+  cblev= -1;
+  sjekkdeklcalled = newDecl ();
+  unknowns = newBlock ();
   unknowns->quant.kind = KERROR;
 
-  newblck (KBLOKK);
-  lesinn_external_spec (tag ("TEXTOBJ*", 8), "simenvir");
+  beginBlock (KBLOKK);
+  ssblock=cblock;
 
-  commonprefiks = findglobal (tag ("COMMON*", 7), TRUE);
-  commonprefiks->idplev.plev = -1;
-  classtext = findglobal (tag ("TEXTOBJ*", 8), TRUE);
-#if 0
-  (rb = findglobal (tag ("FILE", 4), TRUE)->descr)->blno = 1;
-  rb->ptypno = 1;
-  (rb = findglobal (tag ("IMAGEFILE", 9), TRUE)->descr)->blno = 2;
-  rb->ptypno = 2;
-  (rb = findglobal (tag ("OUTFILE", 7), TRUE)->descr)->blno = 3;
-  rb->ptypno = 3;
-  (rb = findglobal (tag ("INFILE", 6), TRUE)->descr)->blno = 4;
-  rb->ptypno = 4;
-  (rb = findglobal (tag ("DIRECTFILE", 10), TRUE)->descr)->blno = 5;
-  rb->ptypno = 5;
-  (rb = findglobal (tag ("PRINTFILE", 9), TRUE)->descr)->blno = 6;
-  rb->ptypno = 6;
-  (rb = findglobal (tag ("BYTEFILE", 8), TRUE)->descr)->blno = 7;
-  rb->ptypno = 7;
-  (rb = findglobal (tag ("INBYTEFILE", 10), TRUE)->descr)->blno = 8;
-  rb->ptypno = 8;
-  (rb = findglobal (tag ("OUTBYTEFILE", 11), TRUE)->descr)->blno = 9;
-  rb->ptypno = 9;
-  (rb = findglobal (tag ("DIRECTBYTEFILE", 14), TRUE)->descr)->blno = 10;
-  rb->ptypno = 10;
-#endif
+  /* ssblock->quant.encl= ssblock; Dersom denne er med går kompilatoren inn
+     i en evig løkke dersom det er noe som er udeklarert. Er ikke sikker
+     på om å bare kommentere det ut er riktig løsning */
 
-  newblck (KINSP);
-  newblck (KINSP);
-  rd = findglobal (tag ("MAXLONGREAL", 11), TRUE);
+  lesinn_external_spec (tag ("TEXTOBJ*"), "simenvir");
+
+  commonprefiks = findGlobal (tag ("COMMON*"), TRUE);
+  commonprefiks->plev = -1;
+  classtext = findGlobal (tag ("TEXTOBJ*"), TRUE);
+
+  beginBlock (KINSP);
+  beginBlock (KINSP);
+  rd = findGlobal (tag ("MAXLONGREAL"), TRUE);
   rd->value.rval = MAX_DOUBLE;
-  rd = findglobal (tag ("MINLONGREAL", 11), TRUE);
+  rd = findGlobal (tag ("MINLONGREAL"), TRUE);
   rd->value.rval = -MAX_DOUBLE;
-  rd = findglobal (tag ("MAXREAL", 7), TRUE);
+  rd = findGlobal (tag ("MAXREAL"), TRUE);
   rd->value.rval = MAX_DOUBLE;
-  rd = findglobal (tag ("MINREAL", 7), TRUE);
+  rd = findGlobal (tag ("MINREAL"), TRUE);
   rd->value.rval = -MAX_DOUBLE;
-  rd = findglobal (tag ("MAXRANK", 7), TRUE);
+  rd = findGlobal (tag ("MAXRANK"), TRUE);
   rd->value.ival = MAXRANK;
-  rd = findglobal (tag ("MAXINT", 6), TRUE);
+  rd = findGlobal (tag ("MAXINT"), TRUE);
   rd->value.ival = MAX_INT;
-  rd = findglobal (tag ("MININT", 6), TRUE);
+  rd = findGlobal (tag ("MININT"), TRUE);
   rd->value.ival = -MAX_INT - 1;
 }
 
@@ -233,51 +200,43 @@ initdekl ()
 reinit ()
 {
   struct DECL *rd;
-  endblock ();
-  endblock ();
-  endblock ();
+  endBlock (NULL,CCNO);
+  endBlock (NULL,CCNO);
+  endBlock (NULL,CCNO);
   /* M} gj|re et hack for } f} satt kvalifikasjon p} inspect sysin */
   /* og inspect sysout, da neste blokk ikke er en connection blokk */
-  inblock ();
-  inblock (findglobal (tag ("INFILE", 6), TRUE));
-  cblock->parloc = findglobal (tag ("INFILE", 6), TRUE);
-  inblock (findglobal (tag ("PRINTFILE", 9), TRUE));
-  cblock->parloc = findglobal (tag ("PRINTFILE", 9), TRUE);
+  inBlock ();
+  inBlock (findGlobal (tag ("INFILE"), TRUE));
+  cblock->when = findGlobal (tag ("INFILE"), TRUE);
+  inBlock (findGlobal (tag ("PRINTFILE"), TRUE));
+  cblock->when = findGlobal (tag ("PRINTFILE"), TRUE);
   sblock = cblock = cblock->next_block;
-  nulldekl (switchparam = new (DECL));
-  switchparam->ident = 0;
-  switchparam->line = 0L;
+
+  switchparam = newDecl ();
   switchparam->type = TINTG;
   switchparam->kind = KSIMPLE;
   switchparam->categ = CDEFLT;
   switchparam->encl = unknowns;
-  nulldekl (switchparam->next = new (DECL));
-  switchparam->next->ident = 0;
-  switchparam->next->line = 0L;
+
+  switchparam->next = newDecl ();
   switchparam->next->type = TINTG;
   switchparam->next->kind = KSIMPLE;
   switchparam->next->categ = CDEFLT;
   switchparam->next->encl = unknowns;
   switchparam->next->next = switchparam->next;
-  nulldekl (procparam = new (DECL));
-  procparam->ident = 0;
-  procparam->line = 0L;
+
+  procparam = newDecl ();
   procparam->type = TERROR;
   procparam->kind = TERROR;
   procparam->categ = CNAME;
   procparam->encl = unknowns;
   procparam->next = procparam;
-  nulldekl (sluttparam = new (DECL));
-  sluttparam->ident = 0;
-  sluttparam->line = 0L;
-  sluttparam->type = 0;
-  sluttparam->kind = 0;
-  sluttparam->categ = 0;
+
+  sluttparam = newDecl ();
   sluttparam->encl = unknowns;
   sluttparam->next = sluttparam;
-  nulldekl (arrayparam = new (DECL));
-  arrayparam->ident = 0;
-  arrayparam->line = 0L;
+
+  arrayparam = newDecl ();
   arrayparam->type = TINTG;
   arrayparam->kind = KSIMPLE;
   arrayparam->categ = CDEFLT;
@@ -292,17 +251,17 @@ reinit ()
 /******************************************************************************
                                                            SETARRAYDIM       */
 
-/* Sistearray peker på første array i siste arraydeklarasjon og settarraydim
- * settes disse arrayenes dimensjon (dim). Så lengde next også er en array   
+/* LastArray peker på første array i siste arraydeklarasjon og setArrayDim
+ * settes disse arrayenes dimensjon (dim). Så lengde next også er en array
  * skal også denne ha dimmensjonen arrdim.( integer array a,b(...); */
 
-settarraydim ()
+setArrayDim (arrdim) int arrdim;
 {
-  while (sistearray != NULL)
+  while (lastArray != NULL)
     {
-      sistearray->dim = arrdim;
-      sistearray = (sistearray->next == NULL ? NULL :
-	      (sistearray->next->kind == KARRAY ? sistearray->next : NULL));
+      lastArray->dim = arrdim;
+      lastArray = (lastArray->next == NULL ? NULL :
+	      (lastArray->next->kind == KARRAY ? lastArray->next : NULL));
     }
   arrdim = 0;
 }
@@ -318,26 +277,23 @@ newnotseen (ident)
      char *ident;
 {
   if (lastunknowns == NULL)
-    unknowns->parloc = lastunknowns = new (DECL);
+    unknowns->parloc = lastunknowns = newDecl ();
   else
-    lastunknowns = lastunknowns->next = new (DECL);
-  nulldekl (lastunknowns);
+    lastunknowns = lastunknowns->next = newDecl ();
   lastunknowns->ident = ident;
-  lastunknowns->line = 0L;	/* HVA HER */
   lastunknowns->type = TERROR;
   lastunknowns->kind = KERROR;
   lastunknowns->categ = CNEW;
   lastunknowns->dim = 1;
   lastunknowns->encl = unknowns;
   lastunknowns->descr = unknowns;
-  lastunknowns->virtno = unknowns->naloc = unknowns->naloc + 1;
   return (lastunknowns);
 }
 
 /******************************************************************************
                                                          FINDDECL            */
 
-/* Finddecl leter etter deklarasjonen ident lokalt i blokken og langs
+/* FindDecl leter etter deklarasjonen ident lokalt i blokken og langs
  *  den prefikskjede.Den kalles rekursivt for hvert BLOCK objekt langs 
  *  prefikskjeden.Ved en inspect blokk kalles den for den ispiserte 
  *  klassen og dens prefikser.Finnes den returneres en peker til 
@@ -345,16 +301,16 @@ newnotseen (ident)
  *  HVIS virt==TRUE skal det først letes i evt. virtuell liste */
 
 struct DECL *
-finddecl (ident, rb, virt)
+findDecl (ident, rb, virt)
      char *ident;
      struct BLOCK *rb;
      char virt;
 {
   struct DECL *rd;
-  if ((rb->quant.kind == KINSP) && (rb->parloc != NULL))
+  if ((rb->quant.kind == KINSP) && (rb->when != NULL))
     {
       seenthrough = rb;
-      if ((rd = finddecl (ident, rb->parloc->descr, virt)) != NULL
+      if ((rd = findDecl (ident, rb->when->descr, virt)) != NULL
 	  && rd->type != TLABEL)
 	return (rd);
       seenthrough = NULL;
@@ -370,11 +326,11 @@ finddecl (ident, rb, virt)
 	if (rd->ident == ident && rd->protected == FALSE)
 	  return (rd);
     }
-  /* G}r ogs} gjennom prefikskjeden */
+  /* Går også gjennom prefikskjeden */
   if (rb->quant.kind == KCLASS || rb->quant.kind == KINSP || rb->quant.kind == KPRBLK
       || rb->quant.kind == KFOR || rb->quant.kind == KCON)
-    if (rb->quant.idplev.plev > -1 && rb->quant.prefqual != NULL)
-      if ((rd = finddecl (ident, rb->quant.prefqual->descr,
+    if (rb->quant.plev > -1 && rb->quant.prefqual != NULL)
+      if ((rd = findDecl (ident, rb->quant.prefqual->descr,
 			  rb->quant.kind == KCLASS | rb->quant.kind == KPRBLK ? FALSE : virt)) != NULL)
 	return (rd);
 
@@ -384,23 +340,22 @@ finddecl (ident, rb, virt)
 /******************************************************************************
                                                                 FINDGLOBAL   */
 
-/* Findglobal  finner  den deklarasjonen som  svarer til et navn 
+/* FindGlobal  finner  den deklarasjonen som  svarer til et navn 
  * Den leter for  hvert  blokknivaa, i  prefikskjeden  og lokalt 
  * Stopper ved f\rste forekomst, fins den ikke kalles newnotseen 
  * Hvis virt==true skal det først letes i evt. virtuell liste */
 
 struct DECL *
-findglobal (ident, virt)
+findGlobal (ident, virt)
      char *ident;
      char virt;
 {
-  int i;
   struct DECL *rd;
   struct BLOCK *rb;
 
   seenthrough = NULL;
-  for (rb = display[i = cblev]; i >= 0; rb = display[--i])
-    if ((rd = finddecl (ident, rb, virt)) != NULL)
+  for (rb= cblock; rb; rb= rb->quant.encl)
+    if ((rd= findDecl (ident, rb, virt)) != NULL)
       {
 	if (rd->encl->blev == cblock->blev &&
 	    (rd->categ == CLOCAL || rd->categ == CVIRT))
@@ -419,7 +374,7 @@ findglobal (ident, virt)
 
 /* Sjekker om parameterene er de samme */
 
-sameparam (rb1, rb2)
+sameParam (rb1, rb2)
      struct BLOCK *rb1,
       *rb2;
 {
@@ -454,7 +409,7 @@ sameparam (rb1, rb2)
 	    else return (FALSE);
 	}
       if (rd1->kind == KPROC &&
-	  sameparam (rd2->descr, rd1->descr) == FALSE)
+	  sameParam (rd2->descr, rd1->descr) == FALSE)
 	return (FALSE);
       rd1 = rd1->next;
       rd2 = rd2->next;
@@ -473,7 +428,8 @@ static makeequal (rd1, rd2)
 {
   rd1->ident = rd2->ident;
   rd1->line = rd2->line;
-  rd1->idplev = rd2->idplev;
+  rd1->plev = rd2->plev;
+  rd1->identqual = rd2->identqual;
   rd1->dim = rd2->dim;
   rd1->virtno = rd2->virtno;
   rd1->type = rd2->type;
@@ -509,12 +465,12 @@ commonqual (rdx, rdy)
   if (rdx == NULL) return (rdy);
   if (rdy == NULL) return (rdx);
   if (rdx == rdy) return (rdx);
-  while (rdx != NULL && rdx->idplev.plev > rdy->idplev.plev)
+  while (rdx != NULL && rdx->plev > rdy->plev)
     rdx = rdx->prefqual;
   if(rdx == NULL) return(rdy);
-  while (rdy != NULL && rdy->idplev.plev > rdx->idplev.plev)
+  while (rdy != NULL && rdy->plev > rdx->plev)
     rdy = rdy->prefqual;
-  while (rdx != rdy && rdx!=NULL && rdy != NULL && rdx->idplev.plev > 0)
+  while (rdx != rdy && rdx!=NULL && rdy != NULL && rdx->plev > 0)
     {
       rdx = rdx->prefqual;
       rdy = rdy->prefqual;
@@ -535,9 +491,9 @@ subclass (rdx, rdy)
   if (rdx == rdy)
     return (TRUE);
   if (rdx == NULL || rdx == NULL) return(FALSE);
-  if (rdx->idplev.plev < rdy->idplev.plev)
+  if (rdx->plev < rdy->plev)
     return (0);
-  while (rdx != NULL && rdx->idplev.plev > rdy->idplev.plev)
+  while (rdx != NULL && rdx->plev > rdy->plev)
     rdx = rdx->prefqual;
   return (rdx == rdy);
 }
@@ -562,124 +518,126 @@ subordinate (rda, rdb)
 
 
 /******************************************************************************
-                                                             NEWBLCK         */
+                                                             BEGINBLOCK         */
 
 /* Kalles fra  syntakssjekkeren hver gang en ny blokk entres */
 
-newblck (kind)
+beginBlock (kind)
      char kind;
 {
   static int cblno = STARTBLNO;
-  static struct BLOCK *last_block;
-  struct DECL *rd1,
-   *rd2;
+  static struct BLOCK *lblock;
+  struct DECL *rd2;
   if (yaccerror)
     return;
-  if (cblev>= 0) lastdecl[cblev] = clastdecl;
-  if (++cblev > DECLTABSIZE)
-    d1error (31);
 #ifdef DEBUG
   if (option_input)
     printf (
-	     "newblck---line:%ld cblev:%d type:%c kind:%c categ:%c\t"
-	     ,yylineno, cblev, type, kind, categ);
+	     "beginBlock---line:%ld type:%c kind:%c categ:%c\t"
+	     ,lineno, type, kind, categ);
 #endif
-  if (kind == KPROC || kind == KCLASS)
-    {
-      cblock = (struct BLOCK *) cprevdecl;
-      cprevdecl->match = cprevdecl;
-    }
-  else
-    {
-      cblock = new (BLOCK);
-      nullblock (cblock);
-      cblock->quant.line = yylineno;
-      cblock->quant.kind = kind;
-    }
-  display[cblev] = cblock;
 
-  if (sblock == NULL)
-    sblock = cblock;
+  {
+    struct BLOCK *lastcblock= cblock;
 
-  if (last_block != NULL)
-    last_block = last_block->next_block = cblock;
+    if (kind == KPROC || kind == KCLASS)
+      {
+	cblock = (struct BLOCK *) cprevdecl;
+	cprevdecl->match = cprevdecl;
+      }
+    else
+      {
+	cblock = newBlock ();
+	cblock->quant.line = lineno;
+	cblock->quant.kind = kind;
+#if 1
+	if (lastcblock != NULL)
+	  {
+	    if (lastcblock->lastparloc == NULL)
+	      cprevdecl= lastcblock->parloc=lastcblock->lastparloc= 
+		&cblock->quant;
+	    else
+	      cprevdecl= lastcblock->lastparloc= 
+		lastcblock->lastparloc->next= &cblock->quant;
+	    cblock->quant.type= TNOTY;
+	    cblock->quant.categ= CLOCAL;
+	  }
+#endif
+      }
+    cblock->quant.encl= lastcblock;
+  }
+
+  if (lblock != NULL)
+    lblock = lblock->next_block = cblock;
   else
-    last_block = cblock;
+    lblock = cblock;
 
   cblock->blno = cblno++;
   switch (kind)
     {
     case KPROC:
     case KCLASS:
-      crblev++;
-      forn[++cdisbl] = 0;
-      conn[cdisbl] = 0;
-      if (cblev == 0)
-	d1error (32);
-      if (cprevdecl != NULL)
-	{
-	}
+      cblev++;
       if (staticblock && cblock->quant.categ == CLOCAL)
 	cblock->stat = TRUE;
       break;
     case KFOR:
     case KINSP:
     case KCON:
-      rd1 = &cblock->quant;
-      rd1->ident = NULL;
-      rd1->type = rd1->categ = 0;
-      rd1->encl = NULL;
-      rd1->descr = cblock;
-      rd2 = &display[cblev - 1]->quant;
+      cblock->quant.ident = NULL;
+      /*      cblock->quant.encl = NULL;*/
+      cblock->quant.descr = cblock;
+      rd2 = &cblock->quant.encl->quant;
 
-      rd1->prefqual = rd2;
-      rd1->idplev.plev = rd2->idplev.plev + 1;
+      cblock->quant.prefqual = rd2;
+      cblock->quant.plev = rd2->plev + 1;
       if (rd2->kind != KCON && rd2->kind != KINSP &&
 	  rd2->kind != KFOR)
-	rd1->match = rd2;
+	cblock->quant.match = rd2;
       else
-	rd1->match = rd2->match;
-      if (kind == KFOR)
+	cblock->quant.match = rd2->match;
+
+      switch (cblock->quant.prefqual->kind)
 	{
-	  if (rd1->match->descr->fornest < (cblock->fornest = ++forn[cdisbl]))
-	    rd1->match->descr->fornest++;
+	case KFOR:
+	case KCON:
+	case KINSP:
+	  cblock->fornest= cblock->quant.prefqual->descr->fornest;
+	  cblock->connest= cblock->quant.prefqual->descr->connest;
+	  break;
 	}
-      else if (kind == KINSP)
+      switch (kind)
 	{
-	  if (rd1->match->descr->connest < (cblock->connest = ++conn[cdisbl]))
-	    rd1->match->descr->connest++;
+	case KFOR:
+	  cblock->fornest+= 1;
+	  if (cblock->quant.match->descr->fornest < cblock->fornest)
+	    cblock->quant.match->descr->fornest++;
+	  break;
+	case KINSP:
+	  cblock->connest+= 1;
+	  if (cblock->quant.match->descr->connest < cblock->connest)
+	    cblock->quant.match->descr->connest++;
+	  break;
 	}
-      else
-	{
-	  cblock->connest = conn[cdisbl];
-	}
+
       if (staticblock)
 	cblock->stat = TRUE;
       break;
     case KPRBLK:
-      crblev++;
-      forn[++cdisbl] = 0;
-      conn[cdisbl] = 0;
-      rd1 = &cblock->quant;
-      rd1->type = rd1->categ = 0;
-      rd1->ident = tag ("blokk", 5);
-      rd1->encl = display[cblev - 1];
-      rd1->descr = cblock;
-      cblock->quant.idplev.identqual = prefquantident;
+      cblev++;
+      /*      cblock->quant.ident= tag ("blokk");*/
+      cblock->quant.descr= cblock;
+      cblock->quant.identqual= prefquantident;
       if (staticblock)
-	cblock->stat = TRUE;
+	cblock->stat= TRUE;
       break;
     default:
-      crblev++;
-      forn[++cdisbl] = 0;
-      conn[cdisbl] = 0;
+      cblev++;
       if (staticblock)
 	cblock->stat = TRUE;
       break;
     }
-  cblock->blev = crblev;
-  clastdecl = lastdecl[cblev] = NULL;
-  lastvirt[cblev] = NULL;
+  cblock->blev = cblev;
 #ifdef DEBUG
   if (option_input)
     printf ("---end\n");
@@ -692,39 +650,32 @@ newblck (kind)
 /* Kalles  fra  syntakssjekkeren hver gang en blokk terminerer */
 
 /*VARARGS0 */
-endblock (rtname, codeclass)
+endBlock (rtname, codeclass)
      char *rtname;
      char codeclass;
 {
 #ifdef DEBUG
   if (option_input)
-    printf ("endblock---line:%ld type:%c kind:%c categ:%c\t"
-	    ,yylineno, type, kind, categ);
+    printf ("endBlock---line:%ld type:%c kind:%c categ:%c\t"
+	    ,lineno, type, kind, categ);
 #endif
   if (yaccerror)
     return;
-  lastdecl[cblev--] = clastdecl;
-  clastdecl = lastdecl[cblev];
-  if (cblock->quant.kind == KFOR)
-    forn[cdisbl]--;
-  else if (cblock->quant.kind == KINSP)
-    conn[cdisbl]--;
-  else if (cblock->quant.kind == KCON) /* NOTHING */ ;
-  else
+  switch (cblock->quant.kind)
     {
-      if (cblock->quant.kind == KPROC && cblock->quant.categ == CCPROC
-	  || insert_with_codeclass)
+    case KFOR:
+    case KINSP:
+    case KCON:
+      break;
+    default:
+      if (codeclass)
 	{
-	  struct EXINFO *exi;
-	  exi = (exinfop) xmalloc (sizeof (struct EXINFO));
-	  exi->rtname = rtname;
-	  exi->codeclass = insert_with_codeclass ? codeclass : CCCPROC;
-	  cblock->hiprot = (struct DECL *) exi;
+	  cblock->rtname = rtname;
+	  cblock->codeclass = codeclass;
 	}
-      crblev--;
-      cdisbl--;
+      cblev--;
     }
-  cblock = display[cblev];
+  cblock = cblock->quant.encl;
 #ifdef DEBUG
   if (option_input)
     printf ("---end\n");
@@ -732,20 +683,20 @@ endblock (rtname, codeclass)
 }
 
 /******************************************************************************
-                                                             NEWDEKL         */
+                                                             REGDECL         */
 
-/* Newdekl kalles fra syntakssjekkeren
+/* RegDecl kalles fra syntakssjekkeren
  * hver gang  vi leser  en deklarasjon */
 
-newdekl (ident)
-     char *ident;
+regDecl (ident, type, kind, categ)
+     char *ident, type, kind, categ;
 {
   struct DECL *pd,
    *pdx = NULL;
 #ifdef DEBUG
   if (option_input)
-    printf ("newdekl---line:%ld navn:%s type:%c kind:%c categ:%c\n"
-	    ,yylineno, ident, type, kind, categ);
+    printf ("regDecl---line:%ld navn:%s type:%c kind:%c categ:%c\n"
+	    ,lineno, ident, type, kind, categ);
 #endif
   if (yaccerror)
     return;
@@ -758,52 +709,51 @@ newdekl (ident)
 	{
 	  for (pd = cblock->parloc; 
 	       pd != NULL && pd->ident != ident; pd = pd->next);
-	  cprevdecl = pd;
-	  if (pd == NULL)
-	    d1error (34, ident);
-	  else
+	  if (pd != NULL || type != TVARARGS)
 	    {
-	      if (pd->categ != CDEFLT)
-		d1error (35, ident);
-	      pd->categ = categ;
-	      if (categ == CNAME && nameasvar == ON)
-		pd->categ = CVAR;
-	    }
+	      cprevdecl = pd;
+	      if (pd == NULL)
+		d1error (34, ident);
+	      else
+		{
+		  if (pd->categ != CDEFLT)
+		    d1error (35, ident);
+		  pd->categ = categ;
+		  if (categ == CNAME && nameasvar == ON)
+		    pd->categ = CVAR;
+		}
 	  break;
+	    }
 	}
     case CDEFLT:
       cblock->napar++;
-      goto proceed;
     case CLOCAL:
     case CCONSTU:
     case CCONST:
     case CEXTR:
     case CEXTRMAIN:
     case CCPROC:
-      cblock->naloc++;
     proceed:
       if (kind == KCLASS || kind == KPROC)
 	{
-	  pd = (struct DECL *) new (BLOCK);
-	  nullblock ((struct BLOCK *) pd);
+	  pd = (struct DECL *) newBlock ();
 	}
       else
 	{
-	  pd = new (DECL);
-	  nulldekl (pd);
+	  pd = newDecl ();
 	}
-      if (clastdecl == NULL)
-	cprevdecl = cblock->parloc = clastdecl = pd;
+      if (cblock->lastparloc == NULL)
+	cprevdecl = cblock->parloc = cblock->lastparloc = pd;
       else
-	cprevdecl = clastdecl = clastdecl->next = pd;
-      clastdecl->ident = ident;
-      clastdecl->line = yylineno;
-      clastdecl->type = type;
-      clastdecl->kind = kind;
-      clastdecl->categ = categ;
+	cprevdecl = cblock->lastparloc = cblock->lastparloc->next = pd;
+      cblock->lastparloc->ident = ident;
+      cblock->lastparloc->line = lineno;
+      cblock->lastparloc->type = type;
+      cblock->lastparloc->kind = kind;
+      cblock->lastparloc->categ = categ;
       if (categ == CNAME && nameasvar == ON)
-	clastdecl->categ = CVAR;
-      clastdecl->encl = cblock;
+	cblock->lastparloc->categ = CVAR;
+      cblock->lastparloc->encl = cblock;
       if ((type == TREF || kind == KCLASS)
 	  && (categ == CLOCAL || categ == CEXTR		/* ||
 							 * categ==CEXTRMAIN */
@@ -813,7 +763,7 @@ newdekl (ident)
 	{
 	  if (kind == KCLASS && cblock->quant.kind == KCLASS)
 	    cblock->localclasses = TRUE;
-	  clastdecl->idplev.identqual = prefquantident;
+	  cblock->lastparloc->identqual = prefquantident;
 	}
       break;
     case CSPEC:
@@ -830,15 +780,14 @@ newdekl (ident)
 	  pd->kind = kind;
 	  if (type == TREF)
 	    {
-	      pd->idplev.identqual = prefquantident;
+	      pd->identqual = prefquantident;
 	    }
 	  if (kind == KPROC)
 	    {
 	      /* Bytter ut dette objektet med et st|rre */
-	      cprevdecl = &new (BLOCK)->quant;
-	      nullblock ((struct BLOCK *) cprevdecl);
-	      if (clastdecl == pd)
-		clastdecl = cprevdecl;
+	      cprevdecl = &newBlock ()->quant;
+	      if (cblock->lastparloc == pd)
+		cblock->lastparloc = cprevdecl;
 	      makeequal (cprevdecl, pd);
 	      cprevdecl->descr = (struct BLOCK *) cprevdecl;
 	      cprevdecl->next = pd->next;
@@ -872,12 +821,11 @@ newdekl (ident)
       else
 	{
 	  if (pd == NULL)
-	    cblock->hiprot = pd = new (DECL);
+	    cblock->hiprot = pd = newDecl ();
 	  else
-	    pd = pd->next = new (DECL);
-	  nulldekl (pd);
+	    pd = pd->next = newDecl ();
 	  pd->ident = ident;
-	  pd->line = yylineno;
+	  pd->line = lineno;
 	  pd->type = TNOTY;
 	  pd->kind = KNOKD;
 	  pd->categ = categ;
@@ -887,28 +835,26 @@ newdekl (ident)
     case CVIRT:
       if (kind == KCLASS || kind == KPROC)
 	{
-	  pd = (struct DECL *) new (BLOCK);
-	  nullblock ((struct BLOCK *) pd);
+	  pd = (struct DECL *) newBlock ();
 	}
       else
 	{
-	  pd = new (DECL);
-	  nulldekl (pd);
+	  pd = newDecl ();
 	}
-      if (lastvirt[cblev] == NULL)
-	cblock->virt = pd = lastvirt[cblev] = pd;
+      if (cblock->lastvirt == NULL)
+	cblock->virt = pd = cblock->lastvirt= pd;
       else
-	pd = lastvirt[cblev] = lastvirt[cblev]->next = pd;
+	pd = cblock->lastvirt = cblock->lastvirt->next = pd;
       cprevdecl = pd;
       pd->ident = ident;
-      pd->line = yylineno;
+      pd->line = lineno;
       pd->type = type;
       pd->kind = kind;
       pd->categ = categ;
       pd->encl = cblock;
       if (type == TREF)
 	{
-	  pd->idplev.identqual = prefquantident;
+	  pd->identqual = prefquantident;
 	}
       break;
     default:
@@ -927,12 +873,12 @@ newdekl (ident)
 /* Kalles fra syntakssjekkeren hver gang  
  * inner oppdages, sjekker da lovligheten */
 
-reginner ()
+regInner ()
 {
 #ifdef DEBUG
   if (option_input)
-    printf ("reginner---line:%ld cblev:%d\t"
-	    ,yylineno, cblev);
+    printf ("regInner---line:%ld cblev:%d\t"
+	    ,lineno, cblev);
 #endif
   if (cblock->quant.kind != KCLASS)
     d1error (38);
@@ -949,32 +895,6 @@ reginner ()
 #endif
 }
 
-/******************************************************************************
-                                                             REGPRBLOCK      */
-
-/* Kalles for hver prefikset blokk som allokeres */
-
-#if 0
-regprblock (rdi)
-     struct DECL *rdi;
-{
-  char error = FALSE;
-  struct DECL *rd,
-   *rdt;
-  rd = rdi;
-  do
-    {
-      if (rd->descr->thisused == TRUE)
-	{
-	  if (error == FALSE)
-	    d2error (73, rdi);
-	  error = TRUE;
-	}
-    }
-  while (rd = (rdt = rd)->prefqual, rdt->idplev.plev > 0);
-}
-#endif
-
 /*****************************************************************************/
 /*                    SJEKKING AV DEKLARASJONER                              */
 /*****************************************************************************/
@@ -990,48 +910,48 @@ regprblock (rdi)
 static dumpdekl (rd)
      struct DECL *rd;
 {
-  (void) printf ("        --DECL:%s=%d, k:%c,t:%c,c:%c, plev:%d, dim:%d, virtno:%d, line:%ld", rd->ident, rd->ident, rd->kind, rd->type, rd->categ, rd->idplev.plev, rd->dim, rd->virtno, rd->line);
+  printf ("        --DECL:%s=%d, k:%c,t:%c,c:%c, plev:%d, dim:%d, virtno:%d, line:%ld", rd->ident, rd->ident, rd->kind, rd->type, rd->categ, rd->plev, rd->dim, rd->virtno, rd->line);
   if (rd->protected == TRUE)
     printf (" PROTECTED");
-  (void) printf ("\n");
+  printf ("\n");
   if (rd->descr != NULL)
-    (void) printf ("              Blokk:(%d,%d)\n", rd->descr->blno, rd->descr->blev);
+    printf ("              Blokk:(%d,%d)\n", rd->descr->blno, rd->descr->blev);
 
   if (rd->match != NULL && rd->categ == CVIRT)
     {
       if (rd->match != rd)
 	{
 	  if (rd->kind == KPROC)
-	    (void) printf ("              match:Blokk(%d,%d)   navn:%s\n",
+	    printf ("              match:Blokk(%d,%d)   navn:%s\n",
 			   rd->match->descr->blno, rd->match->descr->blev,
 			   rd->match->ident);
 	  else
-	    (void) printf ("               match:%s  i Blokk(%d,%d)\n",
+	    printf ("               match:%s  i Blokk(%d,%d)\n",
 	    rd->match->ident, rd->match->encl->blno, rd->match->encl->blev);
 	}
       else
-	(void) printf ("              match:INGEN MATCH\n");
+	printf ("              match:INGEN MATCH\n");
     }
   else if (rd->match == NULL && rd->categ == CVIRT)
-    (void) printf ("              match:INGEN MATCH\n");
+    printf ("              match:INGEN MATCH\n");
 
   if (rd->prefqual != NULL && rd->type == TREF)
-    (void) printf ("              kvalifikasjon:%s\n", rd->prefqual->ident);
+    printf ("              kvalifikasjon:%s\n", rd->prefqual->ident);
   if (rd->descr != NULL && (rd->categ == CDEFLT || rd->categ == CVIRT))
     {
       if (rd->categ == CVIRT)
 	{
-	  (void) printf ("             Virtuell spec:\n");
-	  (void) printf (">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n");
+	  printf ("             Virtuell spec:\n");
+	  printf (">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n");
 	  dumpblock (rd->descr);
-	  (void) printf ("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n");
+	  printf ("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n");
 	}
       else
 	{
-	  (void) printf ("             Formell procedure spec:\n");
-	  (void) printf (">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n");
+	  printf ("             Formell procedure spec:\n");
+	  printf (">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n");
 	  dumpblock (rd->descr);
-	  (void) printf ("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n");
+	  printf ("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n");
 	}
     }
 }
@@ -1046,52 +966,52 @@ static dumpblock (rb)
      struct BLOCK *rb;
 {
   struct DECL *rd;
-  (void) printf 
-    ("->BLOCK:(%d,%d)  k:%c, np:%d, nl:%d, nv:%d, nvl:%d, f:%d, c:%d, l:%ld, ",
+  printf 
+    ("->BLOCK:(%d,%d)  k:%c, np:%d, nv:%d, nvl:%d, f:%d, c:%d, l:%ld, ",
      rb->blno, rb->blev, rb->quant.kind,
-     rb->napar, rb->naloc, rb->navirt, rb->navirtlab, rb->fornest,
+     rb->napar, rb->navirt, rb->navirtlab, rb->fornest,
      rb->connest, rb->quant.line);
   if (rb->localclasses)
     printf ("l:YES ");
   else
-    (void) printf ("l:NO ");
+    printf ("l:NO ");
   if (rb->thisused)
     printf ("t:YES ");
   else
-    (void) printf ("t:NO ");
-  (void) printf ("\n");
+    printf ("t:NO ");
+  printf ("\n");
 
   if (rb->quant.categ == CEXTR || rb->quant.categ == CEXTRMAIN)
     {
       if (rb->quant.kind == KCLASS)
-	(void) printf ("     Extern klasse %s timestampandfilename:%s\n",
-		       rb->quant.ident, rb->externid);
+	printf ("     Extern klasse %s timestampandfilename:%s %s\n",
+		       rb->quant.ident, rb->timestamp, rb->filename);
       else
-	(void) printf ("     Extern prosedyre %s timestampandfilename:%s\n",
-		       rb->quant.ident, rb->externid);
+	printf ("     Extern prosedyre %s timestampandfilename:%s %s\n",
+		       rb->quant.ident, rb->timestamp, rb->filename);
     }
   else if (rb->quant.categ == CCPROC)
-    (void) printf ("     C-Prosedyre %s\n", ((exinfop) rb->hiprot)->rtname);
+    printf ("     C-Prosedyre %s\n", rb->rtname);
 
-  if (rb->externid != 0)
-    (void) printf ("     I extern modul : timestampandfilename:%s\n",
-		   rb->externid);
+  if (rb->timestamp != 0)
+    printf ("     I extern modul : timestampandfilename:%s %s\n",
+		   rb->timestamp, rb->filename);
 
 
-  (void) printf ("     quant:%s plev:%d\n",
-		 rb->quant.ident, rb->quant.idplev.plev);
+  printf ("     quant:%s plev:%d\n",
+		 rb->quant.ident, rb->quant.plev);
 
   if (rb->quant.prefqual != NULL)
     {
-      (void) printf ("     Prefikskjeden:\n");
+      printf ("     Prefikskjeden:\n");
       for (rd = rb->quant.prefqual; rd != NULL; rd = rd->prefqual)
 	{
-	  (void) printf ("                   Blokk:(%d,%d) ", rd->descr->blno,
+	  printf ("                   Blokk:(%d,%d) ", rd->descr->blno,
 			 rd->descr->blev);
 	  if (rd->ident != 0)
 	    printf (" navn : %s\n", rd->ident);
 	  else
-	    (void) printf ("\n");
+	    printf ("\n");
 	}
 
     }
@@ -1102,13 +1022,13 @@ static dumpblock (rb)
     }
   else if (rb->parloc != NULL)
     {
-      (void) printf ("     Parametere:\n");
+      printf ("     Parametere:\n");
       for (rd = rb->parloc; rd != NULL &&
 	   (rd->categ == CDEFLT || rd->categ == CVALUE ||
 	    rd->categ == CNAME || rd->categ == CVAR);
 	   rd = rd->next)
 	dumpdekl (rd);
-      (void) printf ("     Deklarasjoner:\n");
+      printf ("     Deklarasjoner:\n");
       for (; rd != NULL; rd = rd->next)
 	dumpdekl (rd);
 
@@ -1118,7 +1038,7 @@ static dumpblock (rb)
     }
   else if (rb->virt != NULL)
     {
-      (void) printf ("     Virtuelle:\n");
+      printf ("     Virtuelle:\n");
       for (rd = rb->virt; rd != NULL; rd = rd->next)
 	dumpdekl (rd);
     }
@@ -1127,11 +1047,11 @@ static dumpblock (rb)
     }
   else if (rb->hiprot != NULL)
     {
-      (void) printf ("     Hidden/Protected:\n");
+      printf ("     Hidden/Protected:\n");
       for (rd = rb->hiprot; rd != NULL; rd = rd->next)
 	dumpdekl (rd);
     }
-  (void) printf ("\n");
+  printf ("\n");
 }
 
 /******************************************************************************
@@ -1143,16 +1063,16 @@ static dumpblock (rb)
 static dump ()
 {
   struct BLOCK *rb;
-  (void) printf ("BLOKK:Blno,Blev,kind,napar,naloc,navirt,navirtlab,");
-  (void) printf ("fornest,connest,line1,line2,localclasses,thisused\n\n");
-  (void) printf ("DECL:navn,kind,type,categ,plev,dim,virtno,line\n\n");
+  printf ("BLOKK:Blno,Blev,kind,napar,navirt,navirtlab,");
+  printf ("fornest,connest,line1,line2,localclasses,thisused\n\n");
+  printf ("DECL:navn,kind,type,categ,plev,dim,virtno,line\n\n");
   for (rb = sblock; rb != NULL; rb = rb->next_block)
     if (!(rb->quant.kind == KPROC && (rb->quant.categ == CDEFLT ||
 				      rb->quant.categ == CVIRT)))
       dumpblock (rb);
-  (void) printf ("---UNKNOWNS---\n");
+  printf ("---UNKNOWNS---\n");
   dumpblock (unknowns);
-  (void) fflush (stdout);
+  fflush (stdout);
 }
 
 #endif
@@ -1184,7 +1104,7 @@ static setprotectedvirt (rb, rd, protected)
       rdx->protected = protected;
       if (rdx->match != NULL)
 	rdx->match->protected = protected;
-    neste:if (rbx->quant.idplev.plev > 0)
+    neste:if (rbx->quant.plev > 0)
 	rbx = rbx->quant.prefqual->descr;
       else
 	break;
@@ -1206,7 +1126,7 @@ static setprotected (rb, protected)
 	  rd->match->protected = protected;
       }
   rbx = rb;
-  while (rbx->quant.idplev.plev > 0)
+  while (rbx->quant.plev > 0)
     {
       rbx = rbx->quant.prefqual->descr;
       for (rd = rbx->hiprot; rd != NULL; rd = rd->next)
@@ -1231,20 +1151,16 @@ static setprefchain (rd)
      struct DECL *rd;
 {
   struct DECL *rdx;
-  if (rd->idplev.plev <= 0)
-#if 0
-  /* it's no substitute for a proper fix and obviously
-     won't help on a bigendian 64 bit system anyway.*/
-  if (rd->idplev.plev == -1 || rd->idplev.plev == 0) /* BOGUS!!!! */
-#endif
+  if (rd->plev <= 0 && rd->identqual==NULL)
     {
-      if (rd->idplev.plev == 0)
+      if (rd->plev == 0)
 	rd->prefqual = commonprefiks;
     }
   else
     {
-      rdx = findglobal (rd->idplev.identqual, FALSE);
-      rd->idplev.plev = 0;
+      rdx = findGlobal (rd->identqual, FALSE);
+      rd->identqual=NULL;
+      rd->plev = 0;
       if (rdx->categ == CNEW)
 	{
 	  rdx->categ = CERROR;
@@ -1287,7 +1203,7 @@ static setprefchain (rd)
 	  else
 	    {
 	      rd->prefqual = rdx;
-	      rd->idplev.plev = rdx->idplev.plev + 1;
+	      rd->plev = rdx->plev + 1;
 	    }
 	}
     }
@@ -1313,8 +1229,8 @@ setqualprefchain (rd, param)
 	return (rd);
       if (rd->type == TREF)
 	{
-	  rdx = findglobal (rd->idplev.identqual, FALSE);
-	  rd->idplev.plev = 0;
+	  rdx = findGlobal (rd->identqual, FALSE);
+	  rd->plev = 0;
 	  if (rdx->categ == CNEW)
 	    {
 	      d2error (53, rd);
@@ -1343,10 +1259,8 @@ setqualprefchain (rd, param)
  * Prefikskjeden og kvalifikasjoner settes ved kall på setqualprefchain 
  * den sjekker også konsistensen for type kind og categ */
 
-/*VARARGS1 */
-static sjekkdekl (rb, rdi)
+static sjekkdekl (rb)
      struct BLOCK *rb;
-     struct DECL *rdi;
 {
   struct DECL *rd = NULL,
    *rdx = NULL,
@@ -1364,36 +1278,30 @@ static sjekkdekl (rb, rdi)
       /* Merker at denne klassen er blitt kalt */
       rb->quant.match = sjekkdeklcalled;
       /* Prefiksen maa først alokeres */
-      if (rb->quant.idplev.plev > 0)
+      if (rb->quant.plev > 0)
 	{
 	  rbx = rb->quant.prefqual->descr;
 	  if (rbx->quant.match != sjekkdeklcalled)
 	    {
-	      cblock = display[cblev] = rbx;
+	      cblock = rbx;
 	      sjekkdekl (rbx);
-	      cblock = display[cblev] = rb;
+	      cblock = rb;
 	    }
 	  rb->localclasses |= rbx->localclasses;
 	  rb->napar += rbx->napar;
-	  rb->naloc += rbx->naloc;
 	}
       break;
     case KPRBLK:
       /* Må lete på nivået utenfor prefiksblokken */
       cblev--;
+      cblock= cblock->quant.encl;
       setprefchain (&rb->quant);
       cblev++;
+      cblock= rb;
       if (cblev <= 2 /*|| display[cblev - 1]->stat*/)
 	rb->stat = TRUE;
       break;
     case KINSP:
-      if (rdi == NULL)
-	{
-	  d2error (73, &rb->quant);
-	  rdi = findglobal (tag ("Noqual", 7), FALSE);
-	  rdi->categ = CERROR;
-	}
-      rb->virt = rdi;
 /*      if (rb->quant.prefqual->descr->stat)
 	rb->stat = TRUE;*/
       return;			/* Sjekker blokken som inspiseres ved dens
@@ -1414,22 +1322,30 @@ static sjekkdekl (rb, rdi)
   /* Sjekker alle deklarasjonene til denne blokken */
   for (rd = rb->parloc; rd != NULL; rd = rd->next)
     {
-      /* Sjekker dobbeltdeklarasjoner */
-      for (rdx = rb->parloc; rdx->ident != rd->ident
-	   || rdx->protected == TRUE; rdx = rdx->next);
-      if (rdx != rd)
+      if (rd->ident != NULL)
 	{
-	  if (kind == KPROC && (rdx->categ == CDEFLT || rdx->categ == CVALUE ||
-				rdx->categ == CNAME || rdx->categ == CVAR) &&
-	      rd->categ != CDEFLT && rd->categ != CVALUE &&
-	      rd->categ != CNAME && rd->categ != CVAR)
+	  /* Sjekker dobbeltdeklarasjoner */
+	  for (rdx = rb->parloc; rdx->ident != rd->ident
+		 || rdx->protected == TRUE; rdx = rdx->next);
+	  if (rdx != rd)
 	    {
-	      (void) strcpy (yytext, "__");
-	      (void) strcat (yytext, rdx->ident);
-	      rdx->ident = tag (yytext, strlen (yytext));
+	      if (kind == KPROC && (rdx->categ == CDEFLT || 
+				    rdx->categ == CVALUE ||
+				    rdx->categ == CNAME || 
+				    rdx->categ == CVAR) &&
+		  rd->categ != CDEFLT && rd->categ != CVALUE &&
+		  rd->categ != CNAME && rd->categ != CVAR)
+		{
+		  char *s;
+		  obstack_grow (&osDecl, "__", 2);
+		  obstack_grow0 (&osDecl, rdx->ident, strlen(rdx->ident));
+		  s= obstack_finish(&osDecl);
+		  rdx->ident = tag (s);
+		  obstack_free (&osDecl, s);
+		}
+	      else
+		d2error (55, rd);
 	    }
-	  else
-	    d2error (55, rd);
 	}
       if (rd->kind == KNOKD && rd->type != TVARARGS)
 	d2error (63, rd);
@@ -1457,6 +1373,8 @@ static sjekkdekl (rb, rdi)
 	      if (kind != KPROC || rb->quant.categ != CCPROC)
 		d2error (81, rd);
 	    }
+	  if (rd->type == TLABEL && rb->quant.categ == CCPROC)
+	    d2error (82, rd);
 	  break;
 	case CVALUE:
 	  /* Sjekker om lovlig valueoverføring */
@@ -1476,6 +1394,8 @@ static sjekkdekl (rb, rdi)
 	    }
 	  else
 	    d2error (57, rd);
+	  if (rd->type == TLABEL && rb->quant.categ == CCPROC)
+	    d2error (82, rd);
 	  break;
 	case CVAR:
 	  if (rd->type == TREF && (rd->kind == KSIMPLE | rd->kind == KARRAY))
@@ -1496,6 +1416,8 @@ static sjekkdekl (rb, rdi)
 	      if (kind != KPROC || rb->quant.categ != CCPROC)
 		d2error (81, rd);
 	    }
+	  if (rd->type == TLABEL && rb->quant.categ == CCPROC)
+	    d2error (82, rd);
 	  break;
 	case CEXTR:
 	case CEXTRMAIN:
@@ -1516,14 +1438,14 @@ static sjekkdekl (rb, rdi)
       /* Kopierer opp de akumulerte virtuelle
        * Kjeder disse  sammen i en liste hvor
        * va peker paa første og  vb på siste */
-      if (rb->quant.idplev.plev > 0)
+      if (rb->quant.plev > 0)
 	for (vc = rb->quant.prefqual->descr->virt;
 	     vc != NULL; vc = vc->next)
 	  {
 	    if (va == NULL)
-	      va = vb = new (DECL);
+	      va = vb = newDecl ();
 	    else
-	      vb = vb->next = new (DECL);
+	      vb = vb->next = newDecl ();
 	    makeequal (vb, vc);
 	    vb->encl = rb;
 	    vb->dim = 0;
@@ -1584,40 +1506,41 @@ static sjekkdekl (rb, rdi)
   /* Setter opp kvalifikasjoner og prefiks pekere */
   rd = rb->parloc;
   cblev--;
+  cblock= cblock->quant.encl;
   if (rd != NULL)
     rd = setqualprefchain (rd, 1);	/* FOR PARAMETERE */
   cblev++;
+  cblock= rb;
   if (rdx != NULL)
-    (void) setqualprefchain (rdx, 0);	/* FOR VIRTUELLE */
+    setqualprefchain (rdx, 0);	/* FOR VIRTUELLE */
   if (rd != NULL)
-    (void) setqualprefchain (rd, 0);	/* FOR LOKALE */
+    setqualprefchain (rd, 0);	/* FOR LOKALE */
 
+  cblev++;
   for (rd = rb->parloc; rd != NULL; rd = rd->next)
     /* Sjekker lokal klasse og prosedyre */
     if ((rd->kind == KCLASS && rd->match != sjekkdeklcalled)
      || (rd->kind == KPROC && (rd->categ == CLOCAL || rd->categ == CCPROC)))
       {
-	cblock = display[++cblev] = rd->descr;
+	cblock = rd->descr; 
 	sjekkdekl (rd->descr);
-	cblev--;
       }
     else
       /* SJEKKER PROSEDYRE SOM ER OVERF\RT SOM PARAMETER */
     if (rd->kind == KPROC & rd->descr != NULL)
       {
-	cblock = display[++cblev] = rd->descr;
+	cblock = rd->descr;
 	sjekkdekl (rd->descr);
-	cblev--;
       }
   for (rd = vb; rd != NULL; rd = rd->next)
     /* Sjekker spesifikasjon av virtuell prosedyre */
     if (rd->kind == KPROC & rd->descr != NULL)
       {
-	cblock = display[++cblev] = rd->descr;
+	cblock = rd->descr;
 	sjekkdekl (rd->descr);
-	cblev--;
       }
-  cblock = display[cblev];
+  cblev--;
+  cblock = rb;
   for (vc = rb->virt; vc != NULL; vc = vc->next)
     {
       if (vc->protected)
@@ -1630,7 +1553,7 @@ static sjekkdekl (rb, rdi)
 	      || (vc->type == TLABEL && va->type == TLABEL 
 		  && vc->kind == va->kind)
 	  || (vc->kind == KPROC && va->kind == KPROC && subordinate (va, vc)
-	      && sameparam (vc->descr, va->descr)))
+	      && sameParam (vc->descr, va->descr)))
 	    {
 	      vc->match = va;
 	      vc->type = va->type;
@@ -1647,7 +1570,7 @@ static sjekkdekl (rb, rdi)
       /* Listen av hidden og protected sjekkes og match settes opp */
       for (rd = rb->hiprot; rd != NULL; rd = rd->next)
 	{
-	  rdx = findlocal (rd->ident, &rb->quant, TRUE);
+	  rdx = findLocal (rd->ident, &rb->quant, TRUE);
 	  if (rdx->categ == CNEW)
 	    {
 	      d2error (74, rd);
@@ -1657,7 +1580,7 @@ static sjekkdekl (rb, rdi)
 	    d2error (75, rd);
 	  else if (rd->categ != CHIDEN && rdx->categ == CVIRT)
 	    {
-	      if (rb->quant.idplev.plev == 0)
+	      if (rb->quant.plev == 0)
 		vno = 0;
 	      else if (rdx->kind == KPROC)
 		vno = rb->quant.prefqual->descr->navirt;
@@ -1669,7 +1592,7 @@ static sjekkdekl (rb, rdi)
 		rd->match = rdx;
 	    }
 	  else if (rd->categ == CHIDEN && rdx->categ == CVIRT 
-		   && rb->quant.idplev.plev > 0)
+		   && rb->quant.plev > 0)
 	    {
 	      for (rdy = rb->quant.prefqual->descr->virt;
 		   rdy->virtno != rdx->virtno || rdy->kind != rdx->kind;
@@ -1705,7 +1628,7 @@ firstclass ()
   int i;
   struct BLOCK *rb;
   i = cblev;
-  for (rb = cblock; rb->quant.kind != KCLASS && rb->quant.kind != KPRBLK; rb = display[--i])
+  for (rb = cblock; rb->quant.kind != KCLASS && rb->quant.kind != KPRBLK; rb = rb->quant.encl)
     if ((rb->quant.kind == KFOR || rb->quant.kind == KINSP
 	 || rb->quant.kind == KCON) &&
 	rb->quant.match->kind == KCLASS)
@@ -1717,38 +1640,32 @@ firstclass ()
 /******************************************************************************
                                                                    INBLOCK   */
 
-/* Inblock kalles fra sjekkeren hver  gang en  blokk  entres */
-/*VARARGS0 */
-struct BLOCK *
+/* InBlock kalles fra sjekkeren hver  gang en  blokk  entres */
 nextblock ()
 {
-  struct BLOCK *block;
-  if (last_block == NULL)
-    block = sblock;
-  else
-    block = last_block->next_block;
+  static struct BLOCK *lblock;
 
-  while (block->quant.categ == CDEFLT /* formell proc.spec */  ||
-	 block->quant.categ == CNAME /* formell proc.spec */  ||
-	 block->quant.categ == CVAR /* formell proc.spec */  ||
-	 block->quant.categ == CVIRT /* virtuell proc.spec */  ||
-	 block->quant.categ == CCPROC ||
-	 block->externid != 0)
-    block = block->next_block;
-  return (block);
+  if (lblock == NULL)
+    lblock = ssblock;
+  else
+    lblock = lblock->next_block;
+
+  while (lblock->quant.categ == CDEFLT /* formell proc.spec */  ||
+	 lblock->quant.categ == CNAME /* formell proc.spec */  ||
+	 lblock->quant.categ == CVAR /* formell proc.spec */  ||
+	 lblock->quant.categ == CVIRT /* virtuell proc.spec */  ||
+	 lblock->quant.categ == CCPROC ||
+	 lblock->timestamp != 0)
+    lblock = lblock->next_block;
+  cblock= lblock;
 }
 
-inblock (rd)
-     struct DECL *rd;
+inBlock ()
 {
-  cblock = last_block = nextblock ();
+  nextblock ();
   cblev = cblock->blev;
-  display[cblev] = cblock;
   if (cblock->quant.kind != KPROC && cblock->quant.kind != KCLASS)
-    sjekkdekl (cblock, rd);
-  cblock = display[cblev];
-  if (cblock->quant.kind == KCON)
-    cblock->quant.prefqual->descr->parloc = rd;
+    sjekkdekl (cblock);
   if (cblock->quant.kind == KCLASS || cblock->quant.kind == KPRBLK)
     setprotected (cblock, FALSE);
 }
@@ -1756,19 +1673,48 @@ inblock (rd)
 /******************************************************************************
                                                              OUTBLOCK        */
 
-/* Outblock kalles fra sjekkeren hver gang  en blokk  forlates */
+/* OutBlock kalles fra sjekkeren hver gang  en blokk  forlates */
 
-outblock ()
+outBlock ()
 {
   if (cblock->quant.kind == KCLASS || cblock->quant.kind == KPRBLK)
     setprotected (cblock, TRUE);
   if (cblock->quant.kind == KCON)
-    cblock->quant.prefqual->descr->parloc = NULL;
+    {
+      cblock->quant.prefqual->descr->when = NULL;
+    }
   if (cblock->quant.kind == KFOR || cblock->quant.kind == KINSP 
       || cblock->quant.kind == KCON)
-    cblock = display[cblev] = cblock->quant.prefqual->descr;
+    cblock = cblock->quant.prefqual->descr;
   else
-    cblock = display[--cblev];
+    {
+      cblev--;
+      cblock = cblock->quant.encl;
+    }
+}
+
+/******************************************************************************
+                                                                REGWHEN      */
+
+
+regwhen (rb, rd) struct BLOCK *rb; struct DECL *rd;
+{
+  rb->quant.prefqual->descr->when= rd;
+}
+
+/******************************************************************************
+                                                                REGINSP      */
+
+
+reginsp (rb, rd) struct BLOCK *rb; struct DECL *rd;
+{
+  if (rd == NULL)
+    {
+      d2error (73, &rb->quant);
+      rd = findGlobal (tag ("Noqual"), FALSE);
+      rd->categ = CERROR;
+    }
+  rb->virt = rd;
 }
 
 /******************************************************************************
@@ -1778,28 +1724,28 @@ outblock ()
  * sjekker da lovligheten */
 
 struct DECL *
-regthis (ident)
+regThis (ident)
      char *ident;
 {
   struct DECL *rd,
    *rdt,
    *rdx;
-  int i;
+  struct BLOCK *rb;
 #ifdef DEBUG
   if (option_input)
-    printf ("regthis---line:%ld cblev:%d\t"
-	    ,yylineno, cblev);
+    printf ("regThis---line:%ld cblev:%d\t"
+	    ,lineno, cblev);
 #endif
-  for (i = cblev; i > 0; i--)	/* Skal det v}re i>=0 .(Omgivelsene) */
+  for (rb = cblock; rb->blev > 0; rb= rb->quant.encl)	/* Skal det v}re i>=0 .(Omgivelsene) */
     {
-      rd = &display[i]->quant;
+      rd = &rb->quant;
       do
 	{
 	  rdx = rd;
 	  if (rd->kind == KINSP)
 	    {
 	      seenthrough = rd->descr;
-	      rd = rd->descr->parloc;
+	      rd = rd->descr->when;
 	    }
 	  else
 	    seenthrough = NULL;
@@ -1819,7 +1765,7 @@ regthis (ident)
 		      localused = TRUE;
 		    return (rd);
 		  }
-	      while (rd = (rdt = rd)->prefqual, rdt->idplev.plev > 0);
+	      while (rd = (rdt = rd)->prefqual, rdt->plev > 0);
 	    }
 	  rd = rdx->prefqual;
 	}
@@ -1830,30 +1776,30 @@ regthis (ident)
   if (option_input)
     printf ("---end\n");
 #endif
-  d2error (79, rd = findglobal (ident, FALSE));
+  d2error (79, rd = findGlobal (ident, FALSE));
   return (rd);
 }
 
 /******************************************************************************
                                                                 FINDLOCAL    */
 
-/* Findlocal  finner  den  deklarasjonen som  svarer til  et navn 
+/* FindLocal  finner  den  deklarasjonen som  svarer til  et navn 
  * Den leter lokalt i den lista den har fåt og dens prefikskjede 
- * Har den ikke  fåt noen liste  leter den slik  findglobal gjør 
+ * Har den ikke  fåt noen liste  leter den slik  findGlobal gjør 
  * Den registrerer også localused 
  * Hvis virt==TRUE skal det først letes i evt. virtuell liste */
 
 struct DECL *
-findlocal (ident, rd, virt)
+findLocal (ident, rd, virt)
      char *ident;
      struct DECL *rd;
      char virt;
 {
   seenthrough = NULL;
   if (rd != NULL && rd->descr != NULL)
-    rd = finddecl (ident, rd->descr, virt);
+    rd = findDecl (ident, rd->descr, virt);
   else
-    return (findglobal (ident, virt));
+    return (findGlobal (ident, virt));
   if (rd != NULL)
     return (rd);
   for (rd = unknowns->parloc; rd != NULL; rd = rd->next)
@@ -1870,7 +1816,7 @@ findlocal (ident, rd, virt)
  * Får som input forrige parameter */
 
 struct DECL *
-nextparam (rd)
+nextParam (rd)
      struct DECL *rd;
 {
   struct DECL *rdx;
@@ -1890,8 +1836,7 @@ nextparam (rd)
     }
   if (rd->encl->quant.kind == KCLASS)
     {
-      plev = rd->encl->quant.idplev.plev + 1;
-      for (rd = prefdisplay[plev]; rd != NULL; rd = prefdisplay[++plev])
+      for (rd= ppop (); rd!= NULL; rd= ppop ())
 	if ((rdx = rd->descr->parloc) != NULL &&
 	    (rdx->categ == CDEFLT || rdx->categ == CVALUE
 	     || rdx->categ == CNAME || rdx->categ == CVAR))
@@ -1906,9 +1851,9 @@ firstclassparam (rd)
 {
   struct DECL *rdx,
    *rdy;
-  if (rd->idplev.plev > 0)
+  if (rd->plev > 0)
     {
-      prefdisplay[rd->idplev.plev] = rd;
+      ppush (rd);
       rdy = firstclassparam (rd->prefqual);
     }
   else
@@ -1919,6 +1864,7 @@ firstclassparam (rd)
 	  (rdx->categ == CDEFLT || rdx->categ == CVALUE
 	   || rdx->categ == CNAME || rdx->categ == CVAR))
 	return (rdx);
+      ppop ();
     }
   return (rdy);
 }
@@ -1926,18 +1872,15 @@ firstclassparam (rd)
 
 
 struct DECL *
-firstparam (rd)
+firstParam (rd)
      struct DECL *rd;
 {
   struct DECL *rdx;
   if (rd->kind == KCLASS)
-    if (rd->idplev.plev + 1 >= DECLTABSIZE)
-      d2error (64, rd);
-    else
-      {
-	prefdisplay[rd->idplev.plev + 1] = NULL;
-	return (firstclassparam (rd));
-      }
+    {
+      pclean ();
+      return (firstclassparam (rd));
+    }
   if (rd->kind == KARRAY)
     {
       if (rd->type == TLABEL)
@@ -1968,7 +1911,7 @@ firstparam (rd)
 
 /* Forlanges det flere parametere */
 
-moreparam (rd)
+moreParam (rd)
      struct DECL *rd;
 {
   if (rd == sluttparam)
@@ -2001,19 +1944,18 @@ moreparam (rd)
 body (rd)
      struct DECL *rd;
 {
-  int i;
-  struct BLOCK *rb;
-  i = cblev;
+  struct BLOCK *rb, *rbx;
+  rbx = cblock;
   rb = rd->descr;
-  while (i > 0)
-    {				/* Hvis vi er inne i en inspect blokk eller
-				 * for blokk  */
+  for (rbx= cblock; rbx->blev > 0; rbx= rbx->quant.encl)
+    {				
+      /* Hvis vi er inne i en inspect blokk eller for blokk  */
       /* m} match f|lges for } f} riktig blokk. KAN BARE     */
       /* BRUKES FOR ] UNDERS\KE OM MAN ER INNE I EN PROSEDYRE */
-      if (((display[i]->quant.kind == KCON || display[i]->quant.kind == KFOR) ?
-	   display[i]->quant.match->descr : display[i]) == rb)
+      if (rbx->quant.kind == KCON || rbx->quant.kind == KFOR)
+	rbx= rbx->quant.match->descr;
+      if (rbx == rb)
 	return (TRUE);
-      i--;
     }
   return (FALSE);
 }
@@ -2024,14 +1966,10 @@ body (rd)
 /* Er prosedyren farlig og m] isoleres i uttrykk */
 
 char 
-dangerproc (rd)
+dangerProc (rd)
      struct DECL *rd;
 {
-  exinfop p;
-  if (rd->descr->hiprot == NULL)
-    return (TRUE);
-  p = (exinfop) rd->descr->hiprot;
-  switch (p->codeclass)
+  switch (rd->descr->codeclass)
     {
     case CCCPROC:
       return (rd->type == TTEXT);
@@ -2041,7 +1979,23 @@ dangerproc (rd)
     case CCBLANKSCOPY:
     case CCFILEBLANKSCOPY:
     case CCSIMPLEDANGER:
+    case CCNO:
       return (TRUE);
     }
   return (FALSE);
+}
+
+/*****************************************************************************
+                                                                REMOVEBLOCK */
+
+removeBlock (rb) struct BLOCK *rb;
+{
+  struct DECL *rd;
+  if (rb->quant.encl->parloc->descr == rb) 
+    rb->quant.encl->parloc= rb->quant.encl->parloc->next;
+  else
+    {
+      for (rd= rb->quant.encl->parloc; rd->next->descr != rb; rd= rd->next);
+      rd->next= rd->next->next;
+    }
 }

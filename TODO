@@ -1,0 +1,55 @@
+Reading of tokens etc. in extspec.c need to be done more robust.
+
+Forward references to constant declarations.
+
+Unspecified virtual or formal procedures.
+
+Labels to external C procedures is not allowed.
+
+Thunks should be separated, and placed in SENT objects.
+
+Data-flow analysis with corresponding optimizations:
+
+  which variables are updated by a procedure.
+  which variables need initialization.
+  which initializations can be removed.
+  which procedures are static, recursive, or quasiparalell.
+
+Optimizations:
+
+  array-indexing. Dimensions, static dope-vectors.
+  multiple use of the &-operator
+  more efficient implementation of program flow between different prefix-levels
+  removal of none-tests.
+  Using features of gcc instead of C's switch-statement.
+
+Restructuring genexp and genpar:
+
+  simplifying EXP trees.
+
+Remove BLOCK objects that corespond to blocks that are optimized away.
+
+The following gives the following error if SENT object are optimized away,
+but not the BLOCK-objects:
+
+BEGIN
+
+  CLASS a;;
+
+  a CLASS b;;
+
+  INSPECT NEW b
+  WHEN a DO
+  WHEN b DO
+     BEGIN
+        PROCEDURE p;;
+     END;
+END;
+
+
+Compiling b.sim:
+"b.sim", line 8: Warning: When A will always be executed, unless NONE.
+"b.sim", line 9: Warning: When B will never be executed.
+gcc -g -O2 -c b.c
+b.sim: In function `main':
+b.sim:17: label `__l8' used but not defined

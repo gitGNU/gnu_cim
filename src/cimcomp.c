@@ -1,6 +1,6 @@
 /* $Id: cim.c,v 1.18 1997/01/26 14:30:21 cim Exp $ */
 
-/* Copyright (C) 1987-1997 Sverre Hvammen Johansen,
+/* Copyright (C) 1987-1998 Sverre Hvammen Johansen,
  * Department of Informatics, University of Oslo.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -20,12 +20,16 @@
 
 #include <stdio.h>
 #include "const.h"
-#include "navn.h"
+#include "name.h"
 #include "filelist.h"
 #include "newstr.h"
 #include "cimcomp.h"
-#include "feil.h"
+#include "error.h"
 #include "lex.h"
+#include "mellbuilder.h"
+#include "checker.h"
+#include "gen.h"
+#include "trans.h"
 
 #if HAVE_UNISTD_H
 #include <unistd.h>
@@ -41,18 +45,15 @@
 
 #include "getopt.h"
 
-FILE *scode;
-FILE *mcode;
+struct SENT *mainSent;
+
 FILE *ccode;
-FILE *hcode;
 
 char *extcodename;
 char *mifcodename;
-char *hcodename;
 
 static char *outputname = "";
 static char *exekname;
-static char *mellname;
 static char *sourcename;
 static char *listname;
 static char *ccodename;
@@ -68,10 +69,10 @@ static char *tmpdir;
 char *includedir = INCLUDEDIR;
 
 int option_write_tokens;
+int option_write_mif;
 int option_nowarning;
 int option_atr;
 int option_line;
-int option_gen_trace;
 int option_reuse_timestamp;
 int option_verbose;
 int option_init_poolsize;
@@ -105,7 +106,7 @@ static int s_out;
 char separat_comp;		/* Sier om kj|ringen er en separat
 				 * kompilering eller ikke */
 
-static char *progname;
+char *progname;
 
 /******************************************************************************
                                                                      XMALLOC */
@@ -225,12 +226,9 @@ static get_all_env()
                                                                      SIMCOMP */
 static simcomp ()
 {
-  if ((scode = fopen (sourcename, "r")) == NULL)
-    {
-      perror (newstrcat3 (progname, ": ", sourcename));
-      return (TRUE);
-    }
-  setfilmap (tag (sourcename, strlen (sourcename)), 1L);
+  mbuilderInit();
+
+  if (initLex (sourcename)) return (TRUE);
   if (option_write_tokens)
     {
       scan_and_write_tokens ();
@@ -248,67 +246,55 @@ static simcomp ()
 	}
     }
 #endif
-#if OPEN_FILE_IN_BINARY_MODE
-  if ((mcode = fopen (mellname, "wb")) == NULL)
-#else
-  if ((mcode = fopen (mellname, "w")) == NULL)
-#endif
-    {
-      perror (newstrcat3 (progname, ": ", mellname));
-      return (TRUE);
-    }
   if ((ccode = fopen (ccodename, "w")) == NULL)
     {
       perror (newstrcat3 (progname, ": ", ccodename));
       return (TRUE);
     }
-  if ((hcode = fopen (hcodename, "w")) == NULL)
-    {
-      perror (newstrcat3 (progname, ": ", hcodename));
-      return (TRUE);
-    }
   if (!option_quiet)
-    (void) fprintf (stderr, "Compiling %s:\n", sourcename);
+    fprintf (stderr, "Compiling %s:\n", sourcename);
 
-  /* PASS 1 AV KOMPILATOREN */
+  /* PASS 1 */
+
+  initExtspec ();
   init_parser ();
-  init_structure ();
-  initdekl ();
-  (void) yyparse ();
-  (void) fclose (mcode);
-  (void) fclose (scode);
+  initDecl ();
+  yyparse ();
+
   /* PASS 2 AV KOMPILATOREN */
 
   if (anterror == 0)
     {
-#if OPEN_FILE_IN_BINARY_MODE
-      if ((mcode = fopen (mellname, "rb")) == NULL)
-#else
-      if ((mcode = fopen (mellname, "r")) == NULL)
-#endif
+      mbuilderReinit();
+      ebuilderInit();
+      sbuilderInit();
+      mainSent= sbuild();
+      reinit ();
+      expCheckerInit ();
+      genInit ();
+      sentCheck (mainSent, TRUE);
+      if (anterror == 0)
 	{
-	  perror (newstrcat3 (progname, ": ", mellname));
-	  return (TRUE);
+	  sentTrans (mainSent);
+	  sentGen (mainSent);
 	}
-      sjekker ();
+      if (separat_comp && (anterror == 0 || option_atr))
+	write_all_ext ();
 #ifdef DEBUG
       if (option_declarations)
 	dump ();
 #endif
-      (void) fclose (mcode);
     }
-  (void) fclose (ccode);
-  (void) fclose (hcode);
+  fclose (ccode);
 #ifdef DEBUG
   if (option_declarations || option_expressions
       || option_msymbols || option_input || option_lex)
     {
-      (void) fclose (stdout);
+      fclose (stdout);
       fdopen (s_out, "w");
-      (void) dup2 (s_out, fileno (stdout));
+      dup2 (s_out, fileno (stdout));
     }
 #endif
-  unlink (mellname);
   if (anterror != 0)
     return (TRUE);
   else
@@ -367,42 +353,42 @@ static int print_help(status)int status;
 	  " [-e] [--static]" 
 	  "\n      "
 	  " [-E] [--preprocess]" 
+	  " [-F] [--write-mif]"
 	  " [-g] [--debug]"
-	  " [-G] [--gcc]"
 	  "\n      "
+	  " [-G] [--gcc]"
 	  " [-I DIR] [--includedir=DIR]"
 	  " [-h] [--help]"
+	  "\n      "
 	  " [-H] [--no-lines]"
-	  "\n      "
 	  " [-l LIBRARY] [--library=LIBRARY]"
+	  "\n      "
 	  " [-L DIR] [--library-dir=DIR]"
-	  "\n      "
 	  " [-m [N]] [--memory-pool-size[=N]]"
-	  " [-M N] [--max-memory-pool-size=N]"
 	  "\n      "
+	  " [-M N] [--max-memory-pool-size=N]"
 	  " [-N FILE] [--input=FILE]"
+	  "\n      "
 	  " [-o FILE] [--output=FILE]"
 	  " [-O] [-ON]"
-	  "\n      "
 	  " [--optimize] [--optimize=N]"
+	  "\n      "
 	  " [-p] [--pic]"
 	  " [-P] [--only-link]"
-	  "\n      "
 	  " [-q] [--quiet]"
+	  "\n      "
 	  " [-R] [--preserve-timestamp]"
 	  " [--silent]"
-	  "\n      "
 	  " [-s] [--no-simula-compile]"
+	  "\n      "
 	  " [-S] [--only-simula-compile]"
-	  "\n      "
 	  " [-t] [--dont-remove-temporaries]"
-	  " [-U NAME] [--undefine=NAME]"
 	  "\n      "
+	  " [-U NAME] [--undefine=NAME]"
 	  " [-v] [--verbose]"
 	  " [-V] [--version]"
-	  " [-w] [--no-warn]"
 	  "\n      "
-	  " [-X] [--trace]"
+	  " [-w] [--no-warn]"
 	  " simula-file [file...]\n", progname);
   exit(status);
 }
@@ -429,6 +415,7 @@ static parseoptions (argc, argv)
 	  {"define", 1, 0, 'D'},
 	  {"static", 0, 0, 'e'},
 	  {"preprocess", 0, 0, 'E'},
+	  {"write-mif", 0, 0, 'F'},
 	  {"debug", 0, 0, 'g'},
 	  {"gcc", 0, 0, 'G'},
 	  {"include-dir", 1, 0, 'I'},
@@ -453,7 +440,6 @@ static parseoptions (argc, argv)
 	  {"verbose", 0, 0, 'v'},
 	  {"version", 0, 0, 'V'},
 	  {"no-warn", 0, 0, 'w'},
-	  {"trace", 0, 0, 'X'},
 #ifdef DEBUG
 	  {"dd", 0, &option_declarations, 1},
 	  {"de", 0, &option_expressions, 1},
@@ -467,9 +453,8 @@ static parseoptions (argc, argv)
 	  {0, 0, 0, 0}
 	};
 
-      c = getopt_long_only (argc, argv, 
-			    "ab:B:cC:edD:EgGI:hHl:L::m::M:o:O::pPqRsStTU:vVwX",
-			    long_options, &option_index);
+      c = getopt_long_only (argc, argv, "ab:B:cC:edD:EFgGI:hHl:L::m::M:o:O::pP"
+			    "qRsStTU:vVw", long_options, &option_index);
 
       if (c == EOF) break;
 
@@ -506,14 +491,16 @@ static parseoptions (argc, argv)
 	  option_reuse_timestamp = TRUE;
 	  break;
 	case 'D':
-	  systag (stringtoupper (optarg), 
-		  strlen (optarg))->definition = TRUE;
+	  defineName (tag (stringtoupper (optarg)), TRUE);
 	  break;
 	case 'e':
 	  option_static = TRUE;
 	  break;
 	case 'E':
 	  option_write_tokens = TRUE;
+	  break;
+	case 'F':
+	  option_write_mif = TRUE;
 	  break;
 	case 'g':
 	  break;
@@ -609,8 +596,7 @@ static parseoptions (argc, argv)
 	  option_bl_in_dir_line = TRUE;
 	  break;
 	case 'U':
-	  systag (stringtoupper (optarg), 
-		  strlen (optarg))->definition = FALSE;
+	  defineName (tag (stringtoupper (optarg)), FALSE);
 	  break;
 	case 'v':
 	  option_verbose = TRUE;
@@ -622,9 +608,6 @@ static parseoptions (argc, argv)
 	  break;
 	case 'w':
 	  option_nowarning = TRUE;
-	  break;
-	case 'X':
-	  option_gen_trace = TRUE;
 	  break;
 	case '?':
 	  return (TRUE);
@@ -677,10 +660,8 @@ static parseoptions (argc, argv)
 
   exekname= basename (sourcename);
   listname= newstrcat2 (exekname, ".L");
-  mellname= newstrcat2 (exekname, ".m");
   extcodename= newstrcat2 (exekname, ".atr");
   mifcodename= newstrcat2 (exekname, ".mif");
-  hcodename= newstrcat2 (exekname, ".h");
   ccodename= newstrcat2 (exekname, ".c");
   ocodename= newstrcat2 (exekname, ".o");
   shlname= newstrcat3 ("./", exekname, ".shl");
@@ -710,6 +691,9 @@ main (argc, argv, envp)
 
   progname = argv[0];
 
+  initNewstr ();
+  initFilelist ();
+
   ccomp = newstrcat3 (SCC, " ", SCFLAGS);
 
   init_trap_routines();
@@ -718,7 +702,7 @@ main (argc, argv, envp)
   
   insert_name_in_dirlist (systemlibdir);
 
-  init_define ();
+  initName ();
 
   if (parseoptions (argc, argv))
     return (1);
@@ -727,21 +711,15 @@ main (argc, argv, envp)
 
   if (option_verbose)
     {
-      (void) fprintf 
+      fprintf 
 	(stderr, 
-	 "Cim Compiler (version: %s configuration name: %s).\n", PACKAGE_VERSION, SYSTEM_TYPE);
-      (void) fprintf 
-	(stderr,
-	 "Copyright 1989-1997 by Sverre Hvammen Johansen, Stein Krogdahl and Terje Mjøs.\n");
-      (void) fprintf (stderr,
-      "Department of Informatics, University of Oslo.\n");
-      (void) fprintf (stderr, "Cim comes with ABSOLUTELY NO WARRANTY.\n");
-      (void) fprintf 
-	(stderr,
-	 "This is free software, and you are welcome to redistribute it\n");
-      (void) fprintf 
-	(stderr, 
-	 "under the GNU General Public License; version 2.\n");
+	 "Cim Compiler (version: %s configuration name: %s).\n"
+	 "Copyright 1989-1998 by Sverre Hvammen Johansen, Stein Krogdahl,"
+	 "Terje Mjøs and Free Software Foundation, Inc.\n"
+	 "Cim comes with ABSOLUTELY NO WARRANTY.\n"
+	 "This is free software, and you are welcome to redistribute it\n"
+	 "under the GNU General Public License; version 2.\n", 
+	 PACKAGE_VERSION, SYSTEM_TYPE);
     }
 
   if(option_atr)
@@ -751,18 +729,15 @@ main (argc, argv, envp)
   if(option_checkdiff)
     {
       rename (ccodename, newstrcat2 (ccodename, ".old")); 
-      rename (hcodename, newstrcat2 (hcodename, ".old")); 
     }
 
   if (!option_nosim && simcomp ())
     {
       unlink (ccodename);
-      unlink (hcodename);
 
       if(option_checkdiff)
 	{
 	  rename (ccodename, newstrcat2 (ccodename, ".old")); 
-	  rename (hcodename, newstrcat2 (hcodename, ".old")); 
 	}
       return (1);
     }
@@ -774,7 +749,6 @@ main (argc, argv, envp)
     {
       char status;
       unlink (ccodename);
-      unlink (hcodename);
 
       status = system (newstrcat5 ("cmp -s ", extcodename, " ", 
 				  extcodename, ".old 2>/dev/null"));
@@ -782,7 +756,7 @@ main (argc, argv, envp)
       if (status)
 	{
 	  if (option_verbose)
-	    (void) fprintf (stderr, "Atr file differ\n");
+	    fprintf (stderr, "Atr file differ\n");
 	  return (1);
 	} else return (0);
     }
@@ -878,9 +852,8 @@ main (argc, argv, envp)
 	       "if test -z \"$option_nocc\"; then\n"
 	       "  if test -n \"$option_checkdiff\"; then\n"
 	       "    cmp -s %s %s.old &&\n"
-	       "      cmp -s %s %s.old &&\n"
 	       "      differ=\n"
-	       "    rm -f %s.old %s.old\n"
+	       "    rm -f %s.old\n"
 	       "  fi\n"
 	       "\n"
 	       "  if test -n \"$differ\"; then\n"
@@ -895,17 +868,17 @@ main (argc, argv, envp)
 	       "    touch %s\n"
 	       "  fi\n"
 	       "  if test -z \"$option_notempdel\"; then\n"
-	       "    rm -f %s %s\n"
+	       "    rm -f %s\n"
 	       "  fi\n"
 	       "fi\n"
 	       "\n",
 	       ccomp, "", SLDFLAGS,
 	       WL_FLAG, LINK_STATIC_FLAG, PIC_FLAG,
-	       ccodename, ccodename, hcodename, hcodename, 
-	       ccodename, hcodename,
+	       ccodename, ccodename,
+	       ccodename,
 	       ccodename, ccodename,
 	       ocodename, ocodename,
-	       ccodename, hcodename);
+	       ccodename);
 
       if (!separat_comp)
 	{
@@ -921,6 +894,9 @@ main (argc, argv, envp)
 		   outputname, ocodename, get_names_in_linklist (),
 		   outputname, ocodename, get_names_in_linklist (), SLIBS);
 	}
+      if (!((option_nolink && !separat_comp) 
+	    || option_nocc || option_notempdel))
+	fprintf (shlfile, "rm -f %s\n",shlname);
       fclose (shlfile);
       system (newstrcat2 ("chmod +x ", shlname));
     }

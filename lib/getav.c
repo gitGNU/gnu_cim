@@ -54,7 +54,7 @@ __rgetav (ftype, p, as, ret, mret)
      void (*mret) ();
 {
   char tconv;
-  switch (p->h.namekind)
+  switch (p->namekind)
     {
     case __VALUE_THUNK:
     case __ADDRESS_THUNK:
@@ -63,8 +63,8 @@ __rgetav (ftype, p, as, ret, mret)
 				 * lenger peker riktig, leses disse
 				 * verdiene f|r kallet. */
 
-      __goto = p->h.adr;	
-      __sl = p->h.sl;
+      __goto = p->adr;	
+      __sl = p->sl;
       __rct (as);		/* Oppretter objektet */
       ((__thunkp) __pb)->conv = tconv;
       ((__thunkp) __pb)->ftype = ftype;	/* Overf|rer den formelle
@@ -76,14 +76,14 @@ __rgetav (ftype, p, as, ret, mret)
     case __ADDRESS_NOTHUNK:
       if (ftype == __TINTG)
 	__ev.i = (p->conv == __NOCONV 
-		  ? *(long *) (((char *) p->h.bp) + p->h.v.ofs) :
-		  (long) *(double *) (((char *) p->h.bp) + p->h.v.ofs));
+		  ? *(long *) (((char *) p->bp) + p->v.ofs) :
+		  (long) *(double *) (((char *) p->bp) + p->v.ofs));
       else
 	__ev.f = (p->conv == __NOCONV 
-		  ? *(double *) (((char *) p->h.bp) + p->h.v.ofs) :
+		  ? *(double *) (((char *) p->bp) + p->v.ofs) :
 		  p->conv == __INTREAL 
-		  ? (double) *(long *) (((char *) p->h.bp) + p->h.v.ofs) :
-	     (double) (long) *(double *) (((char *) p->h.bp) + p->h.v.ofs));
+		  ? (double) *(long *) (((char *) p->bp) + p->v.ofs) :
+	     (double) (long) *(double *) (((char *) p->bp) + p->v.ofs));
 #if SPLIT_MODUL
       __goto.ent = ret;
       __goto.ment = mret;
@@ -91,10 +91,10 @@ __rgetav (ftype, p, as, ret, mret)
       return (__FALSE);
     case __VALUE_NOTHUNK:
       if (ftype == __TINTG)
-	__ev.i = (p->conv == __NOCONV ? p->h.v.i : (long) (double) p->h.v.f);
+	__ev.i = (p->conv == __NOCONV ? p->v.i : (long) (double) p->v.f);
       else
-	__ev.f = (p->conv == __NOCONV ? p->h.v.f : p->conv == __INTREAL ?
-		  (double) p->h.v.i : (double) (long) p->h.v.f);
+	__ev.f = (p->conv == __NOCONV ? p->v.f : p->conv == __INTREAL ?
+		  (double) p->v.i : (double) (long) p->v.f);
 #if SPLIT_MODUL
       __goto.ent = ret;
       __goto.ment = mret;

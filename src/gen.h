@@ -1,6 +1,6 @@
 /* $Id: cgen.h,v 1.4 1994/12/24 21:04:02 cim Exp $ */
 
-/* Copyright (C) 1994 Sverre Hvammen Johansen and Terje Mjøs,
+/* Copyright (C) 1994, 1998 Sverre Hvammen Johansen and Terje Mjøs,
  * Department of Informatics, University of Oslo.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -17,38 +17,29 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA. */
 
 #include "const.h"
-#include "mell.h"
+#include "mellbuilder.h"
 #include "cimcomp.h"
-#include "sjekker.h"
-
-#define genchainrdencl(x,y) gensl(x,y,ON)
-
-#define newexp (cexpr==MAXEXPBUFFER?((sjerror?0:(sjerror=TRUE,serror(70)))\
-,&owerflowbuffer):&expbuffer[++cexpr])
-
-#define pop stakk[cur--]
-#define push stakk[(cur<MAXLABELSTAKK)?++cur:(gerror(84),1)]
-#define look stakk[cur]
+#include "builder.h"
+#include "lex.h"
 
 #define USEDREF 1
 #define USEDTXT 2
 #define USEDVAL 4
 #define MAXUSED 8
 
-#define is_after_dot(re) (re->up->token==MDOT && re->up->right==re)
 #define seen_th_insp(re) (re->seenthrough!=NULL && re->seenthrough->quant.kind==KINSP)
+
+#define gen_sent_marker() fprintf (ccode, ";");
 
 extern int inthunk;
 
-extern char mainroutine[MAINROUTINELENGTH + 1];
+extern char *mainroutine;
 
-extern int stakk[MAXLABELSTAKK];
-extern int cur;
+extern char not_reached;
+
+extern int lediglabel;
 
 /* gen.c */
-
-extern initgen();
-extern fingen();
 
 extern newlabel();
 extern typelabel();
@@ -63,74 +54,37 @@ extern gotollabel();
 
 extern genline();
 
-extern skrivenddecl();
-
-extern gblock();
-extern gendblock();
-
-extern gprblock();
-extern gendprblock();
-
-extern gprocedure();
-extern gendprocedure();
-
-extern gclass();
-extern gendclass();
-
-extern ginspect();
-extern gendinspect();
-
-extern gdo();
-extern genddo();
-
-extern gwhen();
-extern gendwhen();
-
-extern gotherwise();
-extern gendotherwise();
-
-extern gfor();
-extern gfordo();
-extern gendfordo();
-
-extern gwhile();
-extern gendwhile();
-
-extern gif();
-extern gelse();
-extern gendif();
-
-extern glabel();
-extern ggoto();
-
-extern ginner();
-
-extern genarray();
-extern genswitch();
+/* transcall.c */
+extern int findallentry();
+extern struct EXP *transcall();
+extern long ant_stack();
 
 /* genexp.c */
-extern int findallentry();
+extern gen();
 extern gensl();
 extern genchain();
 extern gentype ();
 
+extern genmodulemark();
 extern gen_adr_prot();
-extern gen_ant_stack();
 
-extern remove_dot();
-
-extern gen();
-extern short savepar();
-
-extern gencall();
 extern genvalue();
 
 /* genpar.c */
 extern genprocparam ();
 extern genpredefproccall ();
 extern gencproccall ();
-extern genctextproccall ();
+extern gen_thunk_simple_address ();
+extern gen_thunk_simple_value ();
+extern gen_thunk_lable ();
+extern gen_thunk_array ();
+extern gen_thunk_procedure ();
 
-/* genstr.c*/
+/* genstr.c */
 extern init_structure();
 extern int newlabel();
+
+/* sentgen.c */
+
+extern void sentGen ();
+

@@ -18,6 +18,7 @@
  */
 
 #include "cim.h"
+#include "simfile.h"
 
 /******************************************************************************
                                            INTEGER PROCEDURE INFRAC          */

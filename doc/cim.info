@@ -318,10 +318,6 @@ Options
 `--no-warn'
      Do not print warnings.
 
-`-X'
-`--trace'
-     Trace execution for this module.
-
 
 File: cim.info,  Node: Arguments,  Next: Files,  Prev: Options,  Up: Compiling
 
@@ -456,7 +452,7 @@ Implementation dependent characteristics
           give a warning message.  But this can be useful as the
           following example shows.  In this implementation formal
           procedures must be specified, but that should not be done in
-          standard simula (`Standard Simula, SS 636114.  The Simula
+          Standard Simula (`Standard Simula, SS 636114.  The Simula
           Standards Group, August 1986').  This will work both on LSH
           (`Simula implementation from Lund Software House AB, Sweden')
           and Cim:
@@ -603,8 +599,7 @@ Implementation defined characteristics
 
    * SYSIN, SYSOUT and SYSERR are connected to standard input, standard
      output and standard error.  If they are closed and reopened they
-     are connected to `/dev/tty' under UNIX, AIX, LINUX and MINIX and
-     `sys$input' and `sys$output' under VMS.
+     are connected to `/dev/tty' under UNIX, AIX, LINUX and MINIX.
 
    * The relative value ranges of real are as double in C and ranges of
      integer are as long.
@@ -655,37 +650,8 @@ File: cim.info,  Node: Limitations,  Next: Extension,  Prev: Defined characteris
 Capacity limitations
 ====================
 
-   The compiler have the following logical limitations:
-
-   * The maximal number of Simula-libraries that the compiler can search
-     is 100 libraries.
-
-   * Length of a token in the input stream is restricted to about 1000
-     characters.
-
-   * The nesting of compiler directives is limited to 100.
-
-   * The level of nesting of include files must not exceed 10.
-
-   * The parser is written i YACC and the parser stack have a size
-     equal 1500 elements.
-
-   * Block nesting level is limited to 100.
-
-   * The compiler builds an expression tree for each Simula-expression,
-     and one tree is limited to 1000 nodes.
-
-   * The code generator have a stack of labels with 1000 elements.
-
-   * Temporary expressions may not consist of more than 100 value-type,
-     100 text, or 100 ref-type elements.
-
-   * The nesting of temporary expressions may not be deeper than 100
-     levels.
-
-   * The maximum number of dimensions for arrays is 100.
-
-   * Text objects may not contain more than about 64K characters.
+   * The logical limitations of the compiler is documented in the
+     header file limit.h.
 
    * Some other limitations that are based on the underlying hardware,
      the operating system or the C Compiler, which are not checked by
@@ -736,14 +702,14 @@ Node: Introduction1477
 Node: A simple example3220
 Node: Compiling4153
 Node: Options5074
-Node: Arguments10046
-Node: Files10606
-Node: Implementation Aspects11679
-Node: Restrictions12197
-Node: Allowed restrictions12632
-Node: Dependent characteristics13055
-Node: Defined characteristics20147
-Node: Limitations22362
-Node: Extension23696
+Node: Arguments9992
+Node: Files10552
+Node: Implementation Aspects11625
+Node: Restrictions12143
+Node: Allowed restrictions12578
+Node: Dependent characteristics13001
+Node: Defined characteristics20093
+Node: Limitations22260
+Node: Extension22674
 
 End Tag Table

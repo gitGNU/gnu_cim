@@ -1,6 +1,6 @@
 /* $Id: cdekl.h,v 1.9 1997/01/08 09:49:15 cim Exp $ */
 
-/* Copyright (C) 1994 Sverre Hvammen Johansen,
+/* Copyright (C) 1994, 1998 Sverre Hvammen Johansen,
  * Department of Informatics, University of Oslo.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -40,13 +40,24 @@ union val
 	int id;
       }
     tval;
+    int entry;
+    long n_of_stack_elements;
     struct
-      {
-	long i1;
-	long i2;
-      }
-    rasiival;
+    {
+      short val_entry, ref_entry, txt_entry;
+    }
+    stack;
+    struct
+    {
+      long n_of_stack_elements;
+      short entry;
+    }
+    combined_stack;
     char *ident;
+    struct
+    {
+      short label, inthunk;
+    } thunk;
   };
 
 /* Definition of type */
@@ -62,6 +73,7 @@ union val
 #define TLABEL   'L'
 #define TTEXT    'T'
 #define TREF     'P'
+#define TVOIDP   'O'
 #define TERROR   'E'
 #define TVARARGS 'V'
 
@@ -103,12 +115,8 @@ union val
 struct DECL
   {
     char *ident;		/* Navnet til deklarasjonen */
-    union
-      {
-	long plev;		/* Prefix nivå, kan fjernes */
-	char *identqual;	/* Navnet til kvalifikasjonen */
-      }
-    idplev;
+    long plev;			/* Prefix nivå, kan fjernes */
+    char *identqual;		/* Navnet til kvalifikasjonen */
     struct BLOCK *encl;		/* Omslutningen til deklarasjonen */
     struct BLOCK *descr;	/* Representasjonen av deklarasjonen */
     struct DECL *match;		/* Matsjende deklarasjoner (virtual) */
@@ -127,46 +135,39 @@ struct DECL
 struct BLOCK
   {
     struct DECL quant;		/* Deklarasjonen til denne blokken */
-    char inner,
-      enddecl;			/* Om inner og enddekl */
+    char inner;
     char localclasses,
-      thisused;			/* To boolske */
+      thisused;
     char stat;
+    char structure_written;
+
+    char codeclass;
     short navirt;		/* Antall virtuelle bindinger proc - lab/swi */
+    short ptypno;
     short blno,
       blev;			/* Blokknommer og blokknivaa */
-    short napar,
-      naloc;			/* Antall parametere og lokale deklarasjoner */
+    short napar;		/* Antall parametere */
     short fornest,
       connest;			/* Dybde på nesting av for-løkke og inspect */
     short ent;			/* entringspunkt */
-    short ptypno;		/* For eksterne. angir prototypenummer
-				 * i ekstern modul. Brukes ogs} for } merke
-				 * hvilke klasser/prosedyrer som er kallbar 
-				 * utenifra den ytre omsluttende klassen som
-				 * separat kompileres.Denne merkingen gj|res
-				 * i write_all_ext (extspec.c) og   
-				 * brukes i structure (struct.c). */
     short navirtlab;
-    char *externid;		/* Er konkateneringen av timestamp,blank og
-				 * hashet. For eksterne moduler. Lengden  
-				 * av tidsmerket er bestemt av konstanten 
-				 * TIMESTAMPLENGTH i filen CONST.H  */
+
+    char *rtname;
+
+    char *timestamp;
+    char *filename;
+    struct DECL *when;
     struct DECL *parloc;	/* Parametere og lokale deklarasjoner */
+    struct DECL *lastparloc;
     struct DECL *virt;		/* Blokkens virtuelle bindinger */
+    struct DECL *lastvirt;
     struct DECL *hiprot;	/* Blokkens protections */
     struct BLOCK *next_block;	/* Neste blokk i sekvensen */
   };
 
-struct EXINFO
-  {
-    char *rtname;
-    short codeclass;
-  };
-typedef struct EXINFO *exinfop;
-
 /* Kodeklasser */
-#define CCSIMPLE     0		/* Ingen ekstra parametere mod, rem, abs
+#define CCNO         0
+#define CCSIMPLE     11		/* Ingen ekstra parametere mod, rem, abs
 				 * o.s.v. */
 #define CCSIMPLEDANGER 10
 #define CCBLANKSCOPY 1		/* Kall p} Blanks eller Copy. Kan starte GBC.
@@ -188,52 +189,51 @@ typedef struct EXINFO *exinfop;
 #define CCCPROC      8		/* Ekstern C-prosedyre */
 
 
-extern newblck ();
-extern endblock ();
-extern newdekl ();
-extern reginner ();
+extern beginBlock ();
+extern endBlock ();
+extern regDecl ();
+extern regInner ();
+extern struct DECL *newDecl ();
 extern struct BLOCK *firstclass ();
-extern inblock ();
-extern outblock ();
-extern struct DECL *regthis ();
+extern inBlock ();
+extern outBlock ();
+extern struct DECL *regThis ();
+
+extern removeBlock ();
 
 extern char *prefquantident;
-extern char type;
-extern char kind;
-extern char categ;
 int localused;
 
-extern struct BLOCK *sblock;
 extern struct BLOCK *cblock;
+extern struct BLOCK *ssblock;
+extern struct BLOCK *sblock;
+extern struct BLOCK *eblock;
 extern int cblev;
-extern struct BLOCK *display[DECLTABSIZE];
 extern char subclass ();
 extern char insert_with_codeclass;
-extern struct DECL *clastdecl;
 extern struct DECL *cprevdecl;
 
 extern struct DECL *commonprefiks;
 extern struct DECL *commonqual ();
-extern struct DECL *findglobal ();
-extern struct DECL *findlocal ();
-extern struct DECL *finddecl ();
+extern struct DECL *findGlobal ();
+extern struct DECL *findLocal ();
+extern struct DECL *findDecl ();
 
-extern struct DECL *firstparam ();
-extern struct DECL *nextparam ();
-
-extern moreparam ();
+extern struct DECL *firstParam ();
+extern struct DECL *nextParam ();
+extern moreParam ();
 
 extern int arrdim;
-extern struct DECL *sistearray;
-extern settarraydim ();
-extern char dangerproc ();
+extern struct DECL *lastArray;
+extern setArrayDim ();
+extern char dangerProc ();
 
 extern struct BLOCK *seenthrough;
 extern body ();
 extern struct DECL *classtext;
 extern char subordinate ();
-extern sameparam ();
+extern sameParam ();
 extern reinit ();
-extern initdekl ();
+extern initDecl ();
 
 extern char yaccerror;

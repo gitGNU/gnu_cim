@@ -18,6 +18,7 @@
  */
 
 #include "file.h"
+#include "simfile.h"
 
 /* RUNTIME rutiner for klassen outfile  skrevet i c. */
 

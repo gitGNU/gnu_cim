@@ -1,6 +1,6 @@
 /* $Id: clex.c,v 1.15 1997/02/14 16:33:00 cim Exp $ */
 
-/* Copyright (C) 1994 Sverre Hvammen Johansen,
+/* Copyright (C) 1994, 1998 Sverre Hvammen Johansen,
  * Department of Informatics, University of Oslo.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -18,13 +18,16 @@
 
 /* Scanner for Simula */
 
+#include <stdio.h>
+
 #include <ctype.h>
 #include "gen.h"
 #include "parser.h"
-#include "navn.h"
+#include "name.h"
 #include "filelist.h"
-#include "feil.h"
+#include "error.h"
 #include "extspec.h"
+#include "mapline.h"
 
 #ifdef STDC_HEADERS
 #include <stdlib.h>
@@ -32,31 +35,34 @@
 double strtod ();
 #endif
 
-#define unput(c) {(void)ungetc(c,filstack[fillev]);}
-static int notintext = TRUE;
+#include <obstack.h>
+char *xmalloc();
+void free();
 
-static FILE *filstack[INCLUDELEV];
-static int fillev;
+#define obstack_chunk_alloc xmalloc
+#define obstack_chunk_free free
+
+static struct obstack osLex, osIfdef;
+
+#define unput(c) {ungetc (c, includeFile ());}
+static int notintext = TRUE;
 
 #define  newlexchar (lexchar=input())
 static int newsymbole;
-long yylineno;
+long lineno;
 static int antnewline;
 static int lexradix;
 static int i;
-static int yyleng;
 static int lexchar;
 static unsigned char firstchar;
 static unsigned char secondchar;
 static unsigned char thirdchar;
-unsigned char yytext[YYTEXTLENGTH];
+static unsigned char *yytext;
 
 static int pardeep = 0;
 static int antsimchar = 0;
 static int antchar = 0;
 static char leerror = FALSE;
-static char *str;
-static int str_length;
 
 static char end_of_file;
 
@@ -65,30 +71,27 @@ char external = FALSE;	/* Har man sett "EXTERNAL PROC/CLASS =" angir
 				 * som ikke skal behandles som
 				 * en text-konstant. */
 
-static int ifdefniv;
+struct ifdefstack
+{
+  char ifdef;
+  struct ifdefstack *prev;
+}  *ifdefp;
 
-static char ifdef[IFDEFMAXNIV];
-static char includeif[INCLUDELEV + 1];
-
-static char scan;
-static char elsedef;
-static char notdef;
+char *flag, mellflag, bl_in_dir_line;
 
 /* Brytere som kan slåes AV/P} ved hjelp av kompilator-direktiver */
-char nonetest = ON;
-char indextest = ON;
-char stripsideeffects = OFF;
 char nameasvar = OFF;
 char sensitive = OFF;
 static char flaggpass2;
 char staticblock = OFF;
+
 
 /******************************************************************************
                                                                        INPUT */
 
 /* Egen definisjon  på input for å  gjøre små  bokstaver om  til store
  * Samt fjerne ^@ fra input
- * Dette skal dog ikke gj\res innenfor text eller karakter -konstanter */
+ * Dette skal dog ikke gjøres innenfor text eller karakter -konstanter */
 
 static int 
 input ()
@@ -102,7 +105,7 @@ input ()
   else
     do
       {
-	yytchar = getc (filstack[fillev]);
+	yytchar = getc (includeFile ());
       }
     while (yytchar == 0L);
   if (iscntrl (yytchar) && !isspace (yytchar) && yytchar != '\b'
@@ -170,6 +173,7 @@ static print_lexsymbol (lextok, yylvalp)
      int lextok;
      YYSTYPE *yylvalp;
 {
+  int yyleng;
   switch (lextok)
     {
     case HACTIVATE:
@@ -525,19 +529,214 @@ radix (r, t)
 }
 
 /******************************************************************************
+				                    SCANNAME & SCANNOWS      */
+
+static scanNows ()
+{
+  obstack_free (&osLex, yytext);
+  while (lexchar != '\n' && lexchar != EOF 
+	 && lexchar != ' ' && lexchar != '\t')
+    {
+      obstack_1grow (&osLex, lexchar);
+      newlexchar;
+    }
+  obstack_1grow (&osLex, 0);
+  yytext= obstack_finish (&osLex);
+}
+
+static scanName ()
+{
+  obstack_free (&osLex, yytext);
+  while ((isalnum (lexchar) || lexchar == '_'))
+    {
+      obstack_1grow (&osLex, lexchar);
+      newlexchar;
+    }
+  obstack_1grow (&osLex, 0);
+  yytext= obstack_finish (&osLex);
+}
+
+
+/******************************************************************************
+				                              SCANIFDEF      */
+
+static scanIfdef ()
+{
+  char scan;
+  char elsedef;
+  char notdef;
+
+  while (lexchar != EOF)
+    {
+      if (!strcmp (yytext, "ENDIF"))
+	{
+	  if (ifdefp == includeIfdefp ()) lerror (23);
+	  else 
+	    {
+	      struct ifdefstack *prev= ifdefp->prev;
+	      obstack_free (&osIfdef, ifdefp);
+	      ifdefp= prev;
+	    }
+	}
+      else
+	{
+	  if (!strcmp (yytext, "ELSE"))
+	    {
+	      if (!(ifdefp->ifdef & IFGREN))
+		lerror (22);
+	      notdef = FALSE;
+	      ifdefp->ifdef &= TRUE;
+	    }
+	  else
+	    {
+	      if (!strcmp (yytext, "ELSEDEF"))
+		{
+		  elsedef = TRUE;
+		  notdef = FALSE;
+		}
+	      else if (!strcmp (yytext, "ELSENOTDEF"))
+		{
+		  elsedef = TRUE;
+		  notdef = TRUE;
+		}
+	      else if (!strcmp (yytext, "IFDEF"))
+		{
+		  elsedef = FALSE;
+		  notdef = FALSE;
+		}
+	      else if (!strcmp (yytext, "IFNOTDEF"))
+		{
+		  elsedef = FALSE;
+		  notdef = TRUE;
+		} 
+	      else goto proceed;
+
+	      while (lexchar == ' ' | lexchar == '\t')
+		newlexchar;
+	      if (isalpha (lexchar) || lexchar == '_')
+		{
+		  scanName ();
+	      
+		  if (elsedef == TRUE)
+		    {
+		      if (!(ifdefp->ifdef & IFGREN))
+			lerror (21);
+		      if (ifdefp->ifdef & (TRUE | SCAN))
+			scan = SCAN;
+		      else
+			scan = FALSE;
+		    }
+		  else
+		    {
+		      struct ifdefstack *prev= ifdefp;
+		      ifdefp= (struct ifdefstack *)
+			obstack_alloc (&osIfdef, sizeof (struct ifdefstack));
+		      ifdefp->prev= prev;
+		      ifdefp->ifdef= 0;
+		      scan = FALSE;
+		    }
+		  ifdefp->ifdef = ifdefName (tag (yytext)) | IFGREN | scan;
+		}
+	      else 
+		{
+		  if (!bl_in_dir_line) lerror (8);
+		  goto proceed;
+		}
+	    }
+	  if (notdef)
+	    {
+	      if ((ifdefp->ifdef & TRUE) == TRUE)
+		ifdefp->ifdef--;
+	      else
+		ifdefp->ifdef++;
+	    }
+	}
+      if ((ifdefp->prev != includeIfdefp ()) && (ifdefp != includeIfdefp ()))
+	{
+	  if (!((ifdefp->prev->ifdef == (IFGREN | TRUE)) ||
+		(ifdefp->prev->ifdef == (ELSEGREN | FALSE))))
+	    ifdefp->ifdef |= SCAN;
+	}
+      if ((ifdefp->ifdef == (IFGREN | TRUE)) ||
+	  (ifdefp->ifdef == (ELSEGREN | FALSE)))
+	break;
+      
+    proceed:
+      while (lexchar != EOF)
+	{
+	  while (lexchar != '\n' && lexchar != EOF) newlexchar;
+	  lineno++;
+	  if (!option_write_tokens)
+	    mout (MNEWLINE);
+	  if (newlexchar == '%' && 
+	      ((newlexchar == ' ' && option_bl_in_dir_line) ?
+	       (newlexchar, bl_in_dir_line = TRUE) :
+	       ((bl_in_dir_line = FALSE), TRUE)) && isalpha (lexchar))
+	    {
+	      scanName ();
+	      break;
+	    }
+	}
+    }
+}
+
+/******************************************************************************
+				                              SCANDIRFLAGS   */
+
+static scanDirflags ()
+{
+  while (lexchar == ' ' | lexchar == '\t')
+    newlexchar;
+  if (isalpha (lexchar))
+    {
+      scanName ();
+
+      if (lexchar == '\n' | lexchar == EOF
+	  | lexchar == ' ' | lexchar == '\t')
+	{
+	  if (!strcmp (yytext, "ON"))
+	    {
+	      if (flag != &flaggpass2)
+		*flag = ON;
+	      else
+		{
+		  if (!option_write_tokens)
+		    {
+		      mout (MFLAG);
+		      mout (mellflag + 1);
+		    }
+		}
+	    }
+	  else if (!strcmp (yytext, "OFF"))
+	    {
+	      if (flag != &flaggpass2)
+		*flag = OFF;
+	      else
+		{
+		  if (!option_write_tokens)
+		    {
+		      mout (MFLAG);
+		      mout (mellflag);
+		    }
+		}
+	    }
+	  else if (!bl_in_dir_line) lerror (8);
+	}
+      else if (!bl_in_dir_line) lerror (8);
+    }
+  else if (!bl_in_dir_line) lerror (8);
+}
+
+/******************************************************************************
                                                                    DIRLINE   */
 
-static dirline ()
+static scanDirline ()
 {
-  static char dirtext[DIRTEXTLENGTH];
-  int dirpos = 0;
-  char *flag,
-    mellflag,
-    bl_in_dir_line;
-  yylineno += antnewline;
+  FILE *file;
+  lineno += antnewline;
   for (; antnewline; antnewline--)
     if (!option_write_tokens)
-      (void) putc (MNEWLINE, mcode);
+      mout(MNEWLINE);
   if (newlexchar == ' ' && option_bl_in_dir_line)
     {
       bl_in_dir_line = TRUE;
@@ -547,585 +746,260 @@ static dirline ()
     bl_in_dir_line = FALSE;
   if (isalpha (lexchar))
     {
-      while (isalnum (lexchar) || lexchar == '_')
+      scanName ();
+      if (lexchar == '\n' | lexchar == EOF
+	  | lexchar == ' ' | lexchar == '\t')
 	{
-	  dirtext[dirpos++] = lexchar;
-	  if (dirpos == DIRTEXTLENGTH)
+	  switch (yytext[0])
 	    {
-	      if (!bl_in_dir_line)
-		lerror (8);
-	      goto skipline;
-	    }
-	  newlexchar;
-	}
-      dirtext[dirpos] = '\0';
-      if (lexchar != '\n' && lexchar != EOF
-	  && lexchar != ' ' && lexchar != '\t')
-	{
-	  if (!bl_in_dir_line)
-	    lerror (8);
-	  goto skipline;
-	}
-      switch (dirtext[0])
-	{
-	case 'C':
-	  if (!strcmp (dirtext, "CASESENSITIVE"))
-	    {
-	      flag = &sensitive;
-	      goto dirflags;
-	    }
-	  if (!strcmp (dirtext, "COMMENT"))
-	    {
-	      int comlev = 1;
-	      while (comlev)
+	    case 'C':
+	      if (!strcmp (yytext, "CASESENSITIVE"))
 		{
-		  while (lexchar != '\n' && lexchar != EOF)
-		    newlexchar;
-		  if (lexchar == EOF)
+		  flag = &sensitive;
+		  scanDirflags ();
+		}
+	      else if (!strcmp (yytext, "COMMENT"))
+		{
+		  int comlev = 1;
+		  while (comlev && lexchar !=EOF)
 		    {
-		      lerror (19);
-		      goto skipline;
+		      while (lexchar != '\n' && lexchar != EOF)
+			newlexchar;
+		      if (lexchar == EOF) lerror (19);
+		      
+		      lineno++;
+		      if (!option_write_tokens) mout (MNEWLINE);
+		      if (newlexchar == '%' && 
+			  ((newlexchar == ' ' &&
+			    option_bl_in_dir_line) ? newlexchar : 0, TRUE) 
+			  && isalpha (lexchar))
+			{
+			  scanName ();
+			  
+			  if (!strcmp (yytext, "COMMENT"))
+			    comlev++;
+			  if (!strcmp (yytext, "ENDCOMMENT"))
+			    comlev--;
+			}
 		    }
-		  yylineno++;
-		  if (!option_write_tokens)
-		    (void) putc (MNEWLINE, mcode);
-		  dirpos = 0;
-		  if (newlexchar == '%' && ((newlexchar == ' ' &&
-				       option_bl_in_dir_line) ? newlexchar :
-					    0, TRUE) && isalpha (lexchar))
+		}
+	      else if (!bl_in_dir_line) lerror (8);
+	      break;
+	    case 'D':
+	      if (!strcmp (yytext, "DEFINE"))
+		{
+		  while (lexchar == ' ' | lexchar == '\t')
+		    newlexchar;
+		  if (isalpha (lexchar) | lexchar == '_')
 		    {
+		      scanName ();
+		      
+		      defineName (tag (yytext), TRUE);
+		    }
+		  else if (!bl_in_dir_line) lerror (8);
+		}
+	      else if (!bl_in_dir_line) lerror (8);
+	      break;
+	    case 'E':
+	      if (!strcmp (yytext, "EOF"))
+		{
+		  fclose (includeFile ());
+		  end_of_file = 2;
+		  return;
+		}
+	      else if (!strcmp (yytext, "ELSE")) scanIfdef ();
+	      else if (!strcmp (yytext, "ELSEDEF")) scanIfdef ();
+	      else if (!strcmp (yytext, "ELSENOTDEF")) scanIfdef ();
+	      else if (!strcmp (yytext, "ENDIF")) scanIfdef ();
+	      else if (!strcmp (yytext, "ENDCOMMENT")) lerror (15);
+	      else if (!bl_in_dir_line) lerror (8);
+	      break;
+	    case 'I':
+	      if (!strcmp (yytext, "IFDEF")) scanIfdef ();
+	      else if (!strcmp (yytext, "IFNOTDEF")) scanIfdef ();
+	      else if (!strcmp (yytext, "INCLUDE"))
+		{
+		  notintext = FALSE;
+		  defineName (tag ("INCLUDED"), TRUE);
+		  while (lexchar == ' ' | lexchar == '\t')
+		    newlexchar;
+		  if (lexchar != '\n' | lexchar != EOF)
+		    {
+		      scanNows ();
+		      
+		      notintext = TRUE;
+
+		      pushfilmap (tag (yytext), ifdefp);
+		    }
+		  else if (!bl_in_dir_line) lerror (8);
+		}
+	      else if (!strcmp (yytext, "INDEXTEST"))
+		{
+		  flag = &flaggpass2;
+		  mellflag = MINDEXTEST;
+		  scanDirflags ();
+		}
+	      else if (!bl_in_dir_line) lerror (8);
+	      break;
+	    case 'L':
+	      if (!strcmp (yytext, "LIST")) ;
+	      else if (!strcmp (yytext, "LINE"))
+		{
+		  long nylinje;
+		  while (lexchar == ' ' | lexchar == '\t')
+		    newlexchar;
+		  if (isdigit (lexchar))
+		    {
+		      obstack_free (&osLex, yytext);
 		      while (isalnum (lexchar) || lexchar == '_')
 			{
-			  dirtext[dirpos++] = lexchar;
-			  if (dirpos == DIRTEXTLENGTH)
-			    goto cont;
+			  if (lexchar != '_') obstack_1grow (&osLex, lexchar);
 			  newlexchar;
 			}
-		      dirtext[dirpos] = '\0';
-		      if (!strcmp (dirtext, "COMMENT"))
-			comlev++;
-		      if (!strcmp (dirtext, "ENDCOMMENT"))
-			comlev--;
-		    }
-		cont:;
-		}
-	      goto skipline;
-	    }
-	  break;
-	case 'D':
-	  if (!strcmp (dirtext, "DEFINE"))
-	    {
-	      while (lexchar == ' ' | lexchar == '\t')
-		newlexchar;
-	      if (lexchar == '\n' | lexchar == EOF)
-		{
-		  if (!bl_in_dir_line)
-		    lerror (8);
-		  goto skipline;
-		}
-	      yyleng = 0;
-	      while (lexchar != '\n' && lexchar != EOF
-		     && lexchar != ' ' && lexchar != '\t')
-		if (yyleng > SAFEYYTEXTLENGTH)
-		  {
-		    lerror (20);
-		    yyleng = 1;
-		  }
-		else
-		  {
-		    yytext[yyleng++] = lexchar;
-		    newlexchar;
-		  }
-	      yytext[yyleng] = '\0';
-	      systag (yytext, yyleng)->definition = TRUE;
-	      goto skipline;
-	    }
-	  break;
-	case 'E':
-	  if (!strcmp (dirtext, "EOF"))
-	    {
-	      fclose (filstack[fillev]);
-	      end_of_file = 2;
-	      return;
-	    }
-	  if (!strcmp (dirtext, "ELSE"))
-	    goto pelse;
-	  if (!strcmp (dirtext, "ELSEDEF"))
-	    {
-	      elsedef = TRUE;
-	      notdef = FALSE;
-	      goto pifdef;
-	    }
-	  if (!strcmp (dirtext, "ELSENOTDEF"))
-	    {
-	      elsedef = TRUE;
-	      notdef = TRUE;
-	      goto pifdef;
-	    }
-	  if (!strcmp (dirtext, "ENDIF"))
-	    goto pendif;
-	  if (!strcmp (dirtext, "ENDCOMMENT"))
-	    {
-	      lerror (15);
-	      goto skipline;
-	    }
-	  break;
-	case 'I':
-	  if (!strcmp (dirtext, "IFDEF"))
-	    {
-	      elsedef = FALSE;
-	      notdef = FALSE;
-	      goto pifdef;
-	    }
-	  if (!strcmp (dirtext, "IFNOTDEF"))
-	    {
-	      elsedef = FALSE;
-	      notdef = TRUE;
-	      goto pifdef;
-	    }
-	  if (!strcmp (dirtext, "INCLUDE"))
-	    {
-	      notintext = FALSE;
-	      systag ("INCLUDED", 8)->definition = TRUE;
-	      while (lexchar == ' ' | lexchar == '\t')
-		newlexchar;
-	      if (lexchar == '\n' | lexchar == EOF)
-		{
-		  if (!bl_in_dir_line)
-		    lerror (8);
-		  goto skipline;
-		}
-	      yyleng = 0;
-	      while (lexchar != '\n' && lexchar != EOF
-		     && lexchar != ' ' && lexchar != '\t')
-		if (yyleng > SAFEYYTEXTLENGTH)
-		  {
-		    lerror (20);
-		    yyleng = 1;
-		  }
-		else
-		  {
-		    yytext[yyleng++] = lexchar;
-		    newlexchar;
-		  }
-	      notintext = TRUE;
-	      yytext[yyleng] = '\0';
-	      if (fillev++ == INCLUDELEV)
-		{
-		  lerror (17);
-		  fillev--;
-		}
-	      else
-		filstack[fillev] = searc_and_open_name_in_archlist (yytext, FALSE);
-	      if (filstack[fillev] == NULL)
-		{
-		  lerror (18);
-		  fillev--;
-		}
-	      else
-		{
-		  pushfilmap (tag (yytext, yyleng), 1L);
-		  includeif[fillev] = ifdefniv;
-		  if (option_verbose)
-		    fprintf (stderr, "Reading include file %s\n", yytext);
-		}
-	      /* Resten av linja er kommentar */
-	      goto skipline;
-	    }
-	  else if (!strcmp (dirtext, "INDEXTEST"))
-	    {
-	      flag = &flaggpass2;
-	      mellflag = MINDEXTEST;
-	      goto dirflags;
-	    }
-	  break;
-	case 'L':
-	  if (!strcmp (dirtext, "LIST")) goto skipline;
-	  else if (!strcmp (dirtext, "LINE"))
-	    {
-	      long nylinje;
-	      while (lexchar == ' ' | lexchar == '\t')
-		newlexchar;
-	      if (!isdigit (lexchar))
-		{
-		  if (!bl_in_dir_line)
-		    lerror (8);
-		  goto skipline;
-		}
-	      yyleng = 0;
-	      yytext[yyleng++] = lexchar;
-	      while (isdigit (newlexchar))
-		if (yyleng > SAFEYYTEXTLENGTH)
-		  {
-		    lerror (20);
-		    yyleng = 1;
-		  }
-		else
-		  yytext[yyleng++] = lexchar;
-	      yytext[yyleng++] = '\0';
-	      nylinje = radix (10, yytext);
-	      notintext = FALSE;
-	      while (lexchar == ' ' | lexchar == '\t')
-		newlexchar;
-	      if (lexchar != '\n' & lexchar != EOF)
-		{
-		  yyleng = 0;
-		  while (lexchar != '\n' && lexchar != EOF
-			 && lexchar != ' ' && lexchar != '\t')
-		    if (yyleng > SAFEYYTEXTLENGTH)
-		      {
-			lerror (20);
-			yyleng = 1;
-		      }
-		    else
-		      {
-			yytext[yyleng++] = lexchar;
+		      obstack_1grow (&osLex, 0);
+		      yytext= obstack_finish (&osLex);
+		  
+		      nylinje = radix (10, yytext);
+		      notintext = FALSE;
+		      while (lexchar == ' ' | lexchar == '\t')
 			newlexchar;
-		      }
-		  yytext[yyleng] = '\0';
-		  setfilmap (tag (yytext, yyleng), nylinje);
+		      if (lexchar != '\n' & lexchar != EOF)
+			{
+			  scanNows ();
+		      
+			  setfilmap (tag (yytext), nylinje);
+			}
+		      else
+			setfilmap ((char *) NULL, nylinje);
+		      notintext = TRUE;
+		    }
+		  else if (!bl_in_dir_line) lerror (8);
 		}
-	      else
-		setfilmap ((char *) NULL, nylinje);
-	      /* Resten av linja er kommentar */
-	      notintext = TRUE;
-	      goto skipline;
-	    }
-	  break;
-	case 'M':
-	  if (!strcmp (dirtext, "MAIN"))
-	    {
-	      while (lexchar == ' ' | lexchar == '\t')
-		newlexchar;
-	      if (!(isalnum (lexchar) || lexchar == '_'))
+	      else if (!bl_in_dir_line) lerror (8);
+	      break;
+	    case 'M':
+	      if (!strcmp (yytext, "MAIN"))
 		{
-		  if (!bl_in_dir_line)
-		    lerror (8);
-		  goto skipline;
-		}
-	      yyleng = 0;
-	      mainroutine[yyleng++] = lexchar;
-	      while ((isalnum (newlexchar) || lexchar == '_'))
-		if (yyleng == MAINROUTINELENGTH)
-		  {
-		    lerror (20);
-		    yyleng = 1;
-		  }
-		else
-		  mainroutine[yyleng++] = lexchar;
-	      mainroutine[yyleng++] = '\0';
-	      goto skipline;
-	    }
-	  break;
-	case 'N':
-	  if (!strcmp (dirtext, "NOCOMMENT"))
-	    return;
-	  if (!strcmp (dirtext, "NAMEASVAR"))
-	    {
-	      flag = &nameasvar;
-	      goto dirflags;
-	    }
-	  else if (!strcmp (dirtext, "NONETEST"))
-	    {
-	      flag = &flaggpass2;
-	      mellflag = MNONETEST;
-	      goto dirflags;
-	    }
-	  break;
-	case 'P':
-	  if (!strcmp (dirtext, "PAGE")) goto skipline;
-	  break;
-	case 'S':
-	  if (!strcmp (dirtext, "STRIPSIDEEFFECTS"))
-	    {
-	      flag = &flaggpass2;
-	      mellflag = MSTRIPSIDEEFFECTS;
-	      goto dirflags;
-	    }
-	  else if (!strcmp (dirtext, "STATICBLOCK"))
-	    {
-	      flag = &staticblock;
-	      goto dirflags;
-	    }
-	  break;
-	case 'T':
-	  if (!strcmp (dirtext, "TIMESTAMP"))
-	    {
-	      while (lexchar == ' ' | lexchar == '\t')
-		newlexchar;
-	      if (!(isalnum (lexchar) || lexchar == '_'))
-		{
-		  if (!bl_in_dir_line)
-		    lerror (8);
-		  goto skipline;
-		}
-	      yyleng = 0;
-	      directive_timestamp[yyleng++] = lexchar;
-	      while ((isalnum (newlexchar) || lexchar == '_'))
-		if (yyleng == TIMESTAMPLENGTH)
-		  {
-		    lerror (20);
-		    yyleng = 1;
-		  }
-		else
-		  directive_timestamp[yyleng++] = lexchar;
-	      directive_timestamp[yyleng++] = '\0';
-	      goto skipline;
-	    }
-	  else if (!strcmp (dirtext, "TITLE")) goto skipline;
-	  break;
-	case 'U':
-	  if (!strcmp (dirtext, "UNDEF"))
-	    {
-	      while (lexchar == ' ' | lexchar == '\t')
-		newlexchar;
-	      if (lexchar == '\n' | lexchar == EOF)
-		{
-		  if (!bl_in_dir_line)
-		    lerror (8);
-		  goto skipline;
-		}
-	      yyleng = 0;
-	      while (lexchar != '\n' && lexchar != EOF
-		     && lexchar != ' ' && lexchar != '\t')
-		if (yyleng > SAFEYYTEXTLENGTH)
-		  {
-		    lerror (20);
-		    yyleng = 1;
-		  }
-		else
-		  {
-		    yytext[yyleng++] = lexchar;
+		  while (lexchar == ' ' | lexchar == '\t')
 		    newlexchar;
-		  }
-	      yytext[yyleng] = '\0';
-	      systag (yytext, yyleng)->definition = FALSE;
-	      goto skipline;
-	    }
-	  break;
+		  if (isalpha (lexchar) | lexchar == '_')
+		    {
+		      scanName ();
 
+		      mainroutine= yytext;
+		      yytext= obstack_finish (&osLex);
+		    }
+		  else if (!bl_in_dir_line) lerror (8);
+		}
+	      else if (!bl_in_dir_line) lerror (8);
+	      break;
+	    case 'N':
+	      if (!strcmp (yytext, "NOCOMMENT"))
+		return;
+	      else if (!strcmp (yytext, "NAMEASVAR"))
+		{
+		  flag = &nameasvar;
+		  scanDirflags ();
+		}
+	      else if (!strcmp (yytext, "NONETEST"))
+		{
+		  flag = &flaggpass2;
+		  mellflag = MNONETEST;
+		  scanDirflags ();
+		}
+	      else if (!bl_in_dir_line) lerror (8);
+	      break;
+	    case 'P':
+	      if (!strcmp (yytext, "PAGE")) ;
+	      else if (!bl_in_dir_line) lerror (8);
+	      break;
+	    case 'S':
+	      if (!strcmp (yytext, "STRIPSIDEEFFECTS"))
+		{
+		  flag = &flaggpass2;
+		  mellflag = MSTRIPSIDEEFFECTS;
+		  scanDirflags ();
+		}
+	      else if (!strcmp (yytext, "STATICBLOCK"))
+		{
+		  flag = &staticblock;
+		  scanDirflags ();
+		}
+	      else if (!bl_in_dir_line) lerror (8);
+	      break;
+	    case 'T':
+	      if (!strcmp (yytext, "TIMESTAMP"))
+		{
+		  while (lexchar == ' ' | lexchar == '\t')
+		    newlexchar;
+		  if (isalpha (lexchar) | lexchar == '_')
+		    {
+		      scanName ();
+		  
+		      directive_timestamp= yytext;
+		      yytext= obstack_finish (&osLex);
+		    }
+		  else if (!bl_in_dir_line) lerror (8);
+		}
+	      else if (!strcmp (yytext, "TITLE")) ;
+	      else if (!bl_in_dir_line) lerror (8);
+	      break;
+	    case 'U':
+	      if (!strcmp (yytext, "UNDEF"))
+		{
+		  while (lexchar == ' ' | lexchar == '\t')
+		    newlexchar;
+		  if (isalpha (lexchar) | lexchar == '_')
+		    {
+		      scanName ();
+
+		      defineName (tag (yytext), FALSE);
+		    }
+		  else if (!bl_in_dir_line) lerror (8);
+		}
+	      else if (!bl_in_dir_line) lerror (8);
+	      break;
+
+	    }
 	}
-      if (!bl_in_dir_line)
-	lerror (8);
+      else if (!bl_in_dir_line) lerror (8);
     }
   else
     /* Hvis det er en blank eller tom linje er hele linja en kommentar */
-    if (lexchar == ' ' | lexchar == '\t' | lexchar == '\n'
-	| lexchar == '!' | lexchar == EOF)
-    goto skipline;
-  else
-    {
-      if (!bl_in_dir_line)
-	lerror (8);
-      goto skipline;
-    }
-  goto skipline;
-pifdef:
-  while (lexchar == ' ' | lexchar == '\t')
-    newlexchar;
-  if (lexchar == '\n' | lexchar == EOF)
-    {
-      if (!bl_in_dir_line)
-	lerror (8);
-      goto skipline;
-    }
-  yyleng = 0;
-  while (lexchar != '\n' && lexchar != EOF
-	 && lexchar != ' ' && lexchar != '\t')
-    if (yyleng > SAFEYYTEXTLENGTH)
-      {
-	lerror (20);
-	yyleng = 1;
-      }
-    else
-      {
-	yytext[yyleng++] = lexchar;
-	newlexchar;
-      }
-  yytext[yyleng] = '\0';
-  if (elsedef == TRUE)
-    {
-      if (!(ifdef[ifdefniv] & IFGREN))
-	lerror (21);
-      if (ifdef[ifdefniv] & (TRUE | SCAN))
-	scan = SCAN;
-      else
-	scan = FALSE;
-    }
-  else
-    {
-      ifdefniv++;
-      scan = FALSE;
-    }
-  ifdef[ifdefniv] = (systag (yytext, yyleng)->definition) | IFGREN | scan;
-  goto scanifdef;
-pelse:
-  if (!(ifdef[ifdefniv] & IFGREN))
-    lerror (22);
-  ifdef[ifdefniv] &= TRUE;
-  goto scanifdef;
-pendif:
-  if (ifdefniv == includeif[fillev])
-    lerror (23);
-  else
-    ifdefniv--;
-  goto scan;
-scanifdef:
-  if (notdef)
-    {
-      if ((ifdef[ifdefniv] & TRUE) == TRUE)
-	ifdef[ifdefniv]--;
-      else
-	ifdef[ifdefniv]++;
-    }
-scan:
-  if (ifdefniv > includeif[fillev] + 1)
-    {
-      if (!((ifdef[ifdefniv - 1] == (IFGREN | TRUE)) ||
-	    (ifdef[ifdefniv - 1] == (ELSEGREN | FALSE))))
-	ifdef[ifdefniv] |= SCAN;
-    }
-  if ((ifdef[ifdefniv] == (IFGREN | TRUE)) ||
-      (ifdef[ifdefniv] == (ELSEGREN | FALSE)))
-    goto skipline;
-  while (TRUE)
-    {
-      while (lexchar != '\n' && lexchar != EOF)
-	newlexchar;
-      if (lexchar == EOF)
-	goto skipline;		/* FEILMELDING VIL BLI SKREVET UT SENERE SE
-				 * lerror(24) */
-      yylineno++;
-      if (!option_write_tokens)
-	(void) putc (MNEWLINE, mcode);
-      dirpos = 0;
-      if (newlexchar == '%' && ((newlexchar == ' ' && option_bl_in_dir_line) ?
-				(newlexchar, bl_in_dir_line = TRUE) :
-		       ((bl_in_dir_line = FALSE), TRUE)) && isalpha (lexchar))
-	{
-	  while (isalnum (lexchar) || lexchar == '_')
-	    {
-	      dirtext[dirpos++] = lexchar;
-	      if (dirpos == DIRTEXTLENGTH)
-		goto pcont;
-	      newlexchar;
-	    }
-	  dirtext[dirpos] = '\0';
-	  if (!strcmp (dirtext, "ELSE"))
-	    goto pelse;
-	  if (!strcmp (dirtext, "ELSEDEF"))
-	    {
-	      elsedef = TRUE;
-	      notdef = FALSE;
-	      goto pifdef;
-	    }
-	  if (!strcmp (dirtext, "ELSENOTDEF"))
-	    {
-	      elsedef = TRUE;
-	      notdef = TRUE;
-	      goto pifdef;
-	    }
-	  if (!strcmp (dirtext, "ENDIF"))
-	    goto pendif;
-	  if (!strcmp (dirtext, "IFDEF"))
-	    {
-	      elsedef = FALSE;
-	      notdef = FALSE;
-	      goto pifdef;
-	    }
-	  if (!strcmp (dirtext, "IFNOTDEF"))
-	    {
-	      elsedef = FALSE;
-	      notdef = TRUE;
-	      goto pifdef;
-	    }
-	}
-    pcont:;
-    }
+    if (lexchar != ' ' & lexchar != '\t' & lexchar != '\n'
+	& lexchar != '!' & lexchar != EOF)
+      if (!bl_in_dir_line) lerror (8);
 
-
-dirflags:
-  while (lexchar == ' ' | lexchar == '\t')
-    newlexchar;
-  if (lexchar == '\n' | lexchar == EOF)
-    {
-      if (!bl_in_dir_line)
-	lerror (8);
-      goto skipline;
-    }
-  dirpos = 0;
-  if (isalpha (lexchar))
-    {
-      while (isalnum (lexchar) || lexchar == '_')
-	{
-	  dirtext[dirpos++] = lexchar;
-	  if (dirpos == DIRTEXTLENGTH)
-	    {
-	      if (!bl_in_dir_line)
-		lerror (8);
-	      goto skipline;
-	    }
-	  newlexchar;
-	}
-      dirtext[dirpos] = '\0';
-      if (lexchar != '\n' && lexchar != EOF
-	  && lexchar != ' ' && lexchar != '\t')
-	{
-	  if (!bl_in_dir_line)
-	    lerror (8);
-	  goto skipline;
-	}
-    }
-  else
-    {
-      if (!bl_in_dir_line)
-	lerror (8);
-      goto skipline;
-    }
-  if (!strcmp (dirtext, "ON"))
-    {
-      if (flag != &flaggpass2)
-	*flag = ON;
-      else
-	{
-	  if (!option_write_tokens)
-	    (void) putc (MFLAG, mcode);
-	  if (!option_write_tokens)
-	    (void) putc (mellflag + 1, mcode);
-	}
-    }
-  else if (!strcmp (dirtext, "OFF"))
-    {
-      if (flag != &flaggpass2)
-	*flag = OFF;
-      else
-	{
-	  if (!option_write_tokens)
-	    (void) putc (MFLAG, mcode);
-	  if (!option_write_tokens)
-	    (void) putc (mellflag, mcode);
-	}
-    }
-  else if (!bl_in_dir_line)
-    lerror (8);
-  /* Resten av linja er kommentar */
-  goto skipline;
-
-skipline:
-  while (lexchar != '\n' && lexchar != EOF)
-    newlexchar;
-  yylineno++;
+  while (lexchar != '\n' && lexchar != EOF) newlexchar;
+  lineno++;
   if (!option_write_tokens)
-    (void) putc (MNEWLINE, mcode);
+    mout (MNEWLINE);
 }
 
+
+/******************************************************************************
+                                                                   INITLEX   */
+
+int initLex (sourcename) char *sourcename;
+{
+  obstack_init (&osLex);
+  yytext= obstack_finish (&osLex);
+  obstack_init (&osIfdef);
+  ifdefp= obstack_alloc (&osIfdef, sizeof (struct ifdefstack));
+  ifdefp->prev= NULL;
+  ifdefp->ifdef= 0;
+  if (maplineInit (sourcename, ifdefp)) return (TRUE);
+  lineno = 1L;
+  while (newlexchar == '%')
+    scanDirline ();
+  unput (lexchar);
+  return FALSE;
+}
 
 /******************************************************************************
   						          PUTCHARACTER       */
 
 /* Hjelpe-prosedyre for } bygge opp et konstant-tektsobjekt. */
-
-#define LERROR(t) (leerror?leerror:(leerror=TRUE,lerror(t)))
 
 static char *
 putcharacter (character)
@@ -1133,11 +1007,11 @@ putcharacter (character)
 {
   static char s[10];
   if (external == TRUE)
-    (void) sprintf (s, "%c", character);
+    sprintf (s, "%c", character);
   else if (isgraph (character) && character != '\\' && character != '"')
-    (void) sprintf (s, "%c", character);
+    sprintf (s, "%c", character);
   else
-    (void) sprintf (s, "\\%03o", character);
+    sprintf (s, "\\%03o", character);
   return (s);
 }
 
@@ -1152,20 +1026,8 @@ static putchartext (character)
      unsigned char character;
 {
   char *s;
-  int l;
-  antsimchar++;
   s = putcharacter (character);
-  if (antchar + (l = strlen (s)) >= str_length)
-    {
-      char *s;
-      int i;
-      s = str;
-      str = (char *) xmalloc (str_length = str_length * 2 + 100);
-      for (i = 0; i < antchar; i++)
-	str[i] = s[i];
-    }
-  for (i = 0; i < l; i++)
-    str[antchar++] = s[i];
+  obstack_grow (&osLex, s, strlen (s));
 }
 
 /******************************************************************************
@@ -1185,14 +1047,12 @@ static char *
 gettext ()
 {
   char *s;
-  if (antsimchar == MAX_TEXT_CHAR)
+
+  if (obstack_object_size (&osLex) >= MAX_TEXT_CHAR)
     lerror (44);
-  if (str == NULL)
-    str = (char *) xmalloc (str_length = str_length * 2 + 100);
-  str[antchar++] = '\0';
-  s = (char *) xmalloc (antchar);
-  (void) strcpy (s, str);
-  antchar = 0;
+  obstack_1grow (&osLex, 0);
+  s= obstack_finish (&osLex);
+  yytext= obstack_finish (&osLex);
   leerror = FALSE;
   return (s);
 }
@@ -1202,614 +1062,502 @@ gettext ()
 
 /* Returnerer et token til parser. */
 
-static char forstegang = TRUE;
 int 
 yylex ()
 {
-  if (forstegang)
-    {
-      forstegang = FALSE;
-      yylineno = 1L;
-      filstack[0] = scode;
-      while (newlexchar == '%')
-	dirline ();
-      unput (lexchar);
-    }
-newtoken:
-  yylineno += antnewline;
-  for (; antnewline; antnewline--)
-    if (!option_write_tokens)
-      (void) putc (MNEWLINE, mcode);
-  if (newsymbole)
-    {
-      int symbol;
-      symbol = newsymbole;
-      newsymbole = NOSYMBOL;
-      if (symbol == HEND)
-	goto end;
-      return (symbol);
-    }
-  if (isalpha (newlexchar))
-    {
-      yyleng = 0;
-      while (isalnum (lexchar) || lexchar == '_')
-	if (yyleng > SAFEYYTEXTLENGTH)
+  char firstLexchar;
+  int reported;
+
+  while (TRUE)
+  {
+    lineno += antnewline;
+    for (; antnewline; antnewline--)
+      if (!option_write_tokens)
+	mout (MNEWLINE);
+    if (newsymbole)
+      {
+	int symbol;
+	symbol = newsymbole;
+	newsymbole = NOSYMBOL;
+	if (symbol == HEND)
+	  goto end;
+	return (symbol);
+      }
+    if (isalpha (newlexchar))
+      {
+	scanName ();
+	
+	unput (lexchar);
+	switch (yytext[0])
 	  {
-	    lerror (20);
-	    yyleng = 1;
+	  case 'A':
+	    if (!strcmp (yytext, "ACTIVATE"))
+	      return (HACTIVATE);
+	    if (!strcmp (yytext, "AFTER"))
+	      return (HAFTER);
+	    if (!strcmp (yytext, "AND"))
+	      return (HAND);
+	    if (!strcmp (yytext, "ARRAY"))
+	      return (HARRAY);
+	    if (!strcmp (yytext, "AT"))
+	      return (HAT);
+	    break;
+	  case 'B':
+	    if (!strcmp (yytext, "BEFORE"))
+	      return (HBEFORE);
+	    if (!strcmp (yytext, "BEGIN"))
+	      return (HBEGIN);
+	    if (!strcmp (yytext, "BOOLEAN"))
+	      return (HBOOLEAN);
+	    break;
+	  case 'C':
+	    if (!strcmp (yytext, "CHARACTER"))
+	      return (HCHARACTER);
+	    if (!strcmp (yytext, "CLASS"))
+	      return (HCLASS);
+	    if (!strcmp (yytext, "COMMENT"))
+	      goto comment;
+	    break;
+	  case 'D':
+	    if (!strcmp (yytext, "DELAY"))
+	      return (HDELAY);
+	    if (!strcmp (yytext, "DO"))
+	      return (HDO);
+	    break;
+	  case 'E':
+	    if (!strcmp (yytext, "ELSE"))
+	      return (HELSE);
+	    if (!strcmp (yytext, "END"))
+	      {
+	      end:
+		reported=0;
+		newlexchar;
+		while (TRUE)
+		  {
+		    while (!isalpha (lexchar))
+		      if (lexchar == '\n')
+			{
+			  antnewline++;
+			  while (newlexchar == '%')
+			    scanDirline ();
+			  notintext = TRUE;
+			}
+		      else if (lexchar == EOF)
+			{
+			  unput (lexchar);
+			  return (HEND);
+			}
+		      else if (lexchar == ';')
+			{
+			  unput (lexchar);
+			  return (HEND);
+			}
+		      else
+			newlexchar;
+		    if (lexchar == 'E')
+		      {
+			if (newlexchar == 'N')
+			  {
+			    if (newlexchar == 'D' && !isalnum (newlexchar) 
+				&& lexchar != '_')
+			      {	/* END is found and comment is terminated */
+				unput (lexchar);
+				newsymbole = HEND;
+				return (HEND);
+			      } else 
+				if (antnewline && !reported) 
+				  {lerror (32); reported = 1;}
+			  }
+			else if (lexchar == 'L' && newlexchar == 'S' 
+				 && newlexchar == 'E'
+				 && !isalnum (newlexchar) && lexchar != '_')
+			  { /* ELSE is found and comment is terminated */
+			    unput (lexchar);
+			    newsymbole = HELSE;
+			    return (HEND);
+			  } else if (antnewline && !reported) 
+			    {lerror (32); reported = 1;}
+		      }
+		    else if (lexchar == 'W')
+		      {
+			if (newlexchar == 'H' && newlexchar == 'E' 
+			    && newlexchar == 'N'
+			    && !isalnum (newlexchar) && lexchar != '_')
+			  { /* WHEN is found and comment is terminated */
+			    unput (lexchar);
+			    newsymbole = HWHEN;
+			    return (HEND);
+			  } else if (antnewline && !reported) 
+			    {lerror (32); reported = 1;}
+		      }
+		    else if (lexchar == 'O' && newlexchar == 'T' 
+			     && newlexchar == 'H' && newlexchar == 'E' 
+			     && newlexchar == 'R' && newlexchar == 'W'
+			     && newlexchar == 'I' && newlexchar == 'S' 
+			     && newlexchar == 'E'
+			     && !isalnum (newlexchar) && lexchar != '_')
+		      {	/* OTHERWISE is found and comment is terminated */
+			unput (lexchar);
+			newsymbole = HOTHERWISE;
+			return (HEND);
+		      } else if (antnewline && !reported) 
+			{lerror (32); reported = 1;}
+		    while (isalpha (lexchar) || lexchar == '_')
+		      newlexchar;
+		  }
+	      }
+	    if (!strcmp (yytext, "EQ"))
+	      {
+		yylval.token = HEQ;
+		return (HVALRELOPERATOR);
+	      }
+	    if (!strcmp (yytext, "EQV"))
+	      return (HEQV);
+	    if (!strcmp (yytext, "EXTERNAL"))
+	      return (HEXTERNAL);
+	    break;
+	  case 'F':
+	    if (!strcmp (yytext, "FALSE"))
+	      {
+		yylval.ival = FALSE;
+		return (HBOOLEANKONST);
+	      }
+	    if (!strcmp (yytext, "FOR"))
+	      return (HFOR);
+	    break;
+	  case 'G':
+	    if (!strcmp (yytext, "GE"))
+	      {
+		yylval.token = HGE;
+		return (HVALRELOPERATOR);
+	      }
+	    if (!strcmp (yytext, "GO"))
+	      return (HGO);
+	    if (!strcmp (yytext, "GOTO"))
+	      return (HGOTO);
+	    if (!strcmp (yytext, "GT"))
+	      {
+		yylval.token = HGT;
+		return (HVALRELOPERATOR);
+	      }
+	    break;
+	  case 'H':
+	    if (!strcmp (yytext, "HIDDEN"))
+	      return (HHIDDEN);
+	    break;
+	  case 'I':
+	    if (!strcmp (yytext, "IF"))
+	      return (HIF);
+	    if (!strcmp (yytext, "IMP"))
+	      return (HIMP);
+	    if (!strcmp (yytext, "IN"))
+	      {
+		yylval.token = HIN;
+		return (HOBJRELOPERATOR);
+	      }
+	    if (!strcmp (yytext, "INNER"))
+	      return (HINNER);
+	    if (!strcmp (yytext, "INSPECT"))
+	      return (HINSPECT);
+	    if (!strcmp (yytext, "INTEGER"))
+	      return (HINTEGER);
+	    if (!strcmp (yytext, "IS"))
+	      {
+		yylval.token = HIS;
+		return (HOBJRELOPERATOR);
+	      }
+	    break;
+	  case 'L':
+	    if (!strcmp (yytext, "LABEL"))
+	      return (HLABEL);
+	    if (!strcmp (yytext, "LE"))
+	      {
+		yylval.token = HLE;
+		return (HVALRELOPERATOR);
+	      }
+	    if (!strcmp (yytext, "LONG"))
+	      return (HLONG);
+	    if (!strcmp (yytext, "LT"))
+	      {
+		yylval.token = HLT;
+		return (HVALRELOPERATOR);
+	      }
+	    break;
+	  case 'N':
+	    if (!strcmp (yytext, "NAME"))
+	      return (HNAME);
+	    if (!strcmp (yytext, "NE"))
+	      {
+		yylval.token = HNE;
+		return (HVALRELOPERATOR);
+	      }
+	    if (!strcmp (yytext, "NEW"))
+	      return (HNEW);
+	    if (!strcmp (yytext, "NONE"))
+	      return (HNONE);
+	    if (!strcmp (yytext, "NOT"))
+	      return (HNOT);
+	    if (!strcmp (yytext, "NOTEXT"))
+	      {
+		yylval.tval = NOTEXT;
+		return (HTEXTKONST);
+	      }
+	    break;
+	  case 'O':
+	    if (!strcmp (yytext, "OR"))
+	      return (HOR);
+	    if (!strcmp (yytext, "OTHERWISE"))
+	      return (HOTHERWISE);
+	    break;
+	  case 'P':
+	    if (!strcmp (yytext, "PRIOR"))
+	      return (HPRIOR);
+	    if (!strcmp (yytext, "PROCEDURE"))
+	      return (HPROCEDURE);
+	    if (!strcmp (yytext, "PROTECTED"))
+	      return (HPROTECTED);
+	    break;
+	  case 'Q':
+	    if (!strcmp (yytext, "QUA"))
+	      return (HQUA);
+	    break;
+	  case 'R':
+	    if (!strcmp (yytext, "REACTIVATE"))
+	      return (HREACTIVATE);
+	    if (!strcmp (yytext, "REAL"))
+	      {
+		return (HREAL);
+	      }
+	    if (!strcmp (yytext, "REF"))
+	      return (HREF);
+	    break;
+	  case 'S':
+	    if (!strcmp (yytext, "SHORT"))
+	      return (HSHORT);
+	    if (!strcmp (yytext, "STEP"))
+	      return (HSTEP);
+	    if (!strcmp (yytext, "SWITCH"))
+	      return (HSWITCH);
+	    break;
+	  case 'T':
+	    if (!strcmp (yytext, "TEXT"))
+	      return (HTEXT);
+	    if (!strcmp (yytext, "THEN"))
+	      return (HTHEN);
+	    if (!strcmp (yytext, "THIS"))
+	      return (HTHIS);
+	    if (!strcmp (yytext, "TO"))
+	      return (HTO);
+	    if (!strcmp (yytext, "TRUE"))
+	      {
+		yylval.ival = TRUE;
+		return (HBOOLEANKONST);
+	      }
+	    break;
+	  case 'U':
+	    if (!strcmp (yytext, "UNTIL"))
+	      return (HUNTIL);
+	    break;
+	  case 'V':
+	    if (!strcmp (yytext, "VALUE"))
+	      return (HVALUE);
+	    if (!strcmp (yytext, "VAR"))
+	      return (HVAR);
+	    if (!strcmp (yytext, "VIRTUAL"))
+	      return (HVIRTUAL);
+	    break;
+	  case 'W':
+	    if (!strcmp (yytext, "WHEN"))
+	      return (HWHEN);
+	    if (!strcmp (yytext, "WHILE"))
+	      return (HWHILE);
+	    break;
 	  }
-	else
-	  {
-	    yytext[yyleng++] = lexchar;
-	    newlexchar;
-	  }
-      unput (lexchar);
-      yytext[yyleng] = '\0';
-      switch (yytext[0])
-	{
-	case 'A':
-	  if (!strcmp (yytext, "ACTIVATE"))
-	    return (HACTIVATE);
-	  if (!strcmp (yytext, "AFTER"))
-	    return (HAFTER);
-	  if (!strcmp (yytext, "AND"))
-	    return (HAND);
-	  if (!strcmp (yytext, "ARRAY"))
-	    return (HARRAY);
-	  if (!strcmp (yytext, "AT"))
-	    return (HAT);
-	  break;
-	case 'B':
-	  if (!strcmp (yytext, "BEFORE"))
-	    return (HBEFORE);
-	  if (!strcmp (yytext, "BEGIN"))
-	    return (HBEGIN);
-	  if (!strcmp (yytext, "BOOLEAN"))
-	    return (HBOOLEAN);
-	  break;
-	case 'C':
-	  if (!strcmp (yytext, "CHARACTER"))
-	    return (HCHARACTER);
-	  if (!strcmp (yytext, "CLASS"))
-	    return (HCLASS);
-	  if (!strcmp (yytext, "COMMENT"))
-	    goto comment;
-	  break;
-	case 'D':
-	  if (!strcmp (yytext, "DELAY"))
-	    return (HDELAY);
-	  if (!strcmp (yytext, "DO"))
-	    return (HDO);
-	  break;
-	case 'E':
-	  if (!strcmp (yytext, "ELSE"))
-	    return (HELSE);
-	  if (!strcmp (yytext, "END"))
-	    goto end;
-	  if (!strcmp (yytext, "EQ"))
-	    {
-	      yylval.token = HEQ;
-	      return (HVALRELOPERATOR);
-	    }
-	  if (!strcmp (yytext, "EQV"))
-	    return (HEQV);
-	  if (!strcmp (yytext, "EXTERNAL"))
-	    return (HEXTERNAL);
-	  break;
-	case 'F':
-	  if (!strcmp (yytext, "FALSE"))
-	    {
-	      yylval.ival = FALSE;
-	      return (HBOOLEANKONST);
-	    }
-	  if (!strcmp (yytext, "FOR"))
-	    return (HFOR);
-	  break;
-	case 'G':
-	  if (!strcmp (yytext, "GE"))
-	    {
-	      yylval.token = HGE;
-	      return (HVALRELOPERATOR);
-	    }
-	  if (!strcmp (yytext, "GO"))
-	    return (HGO);
-	  if (!strcmp (yytext, "GOTO"))
-	    return (HGOTO);
-	  if (!strcmp (yytext, "GT"))
-	    {
-	      yylval.token = HGT;
-	      return (HVALRELOPERATOR);
-	    }
-	  break;
-	case 'H':
-	  if (!strcmp (yytext, "HIDDEN"))
-	    return (HHIDDEN);
-	  break;
-	case 'I':
-	  if (!strcmp (yytext, "IF"))
-	    return (HIF);
-	  if (!strcmp (yytext, "IMP"))
-	    return (HIMP);
-	  if (!strcmp (yytext, "IN"))
-	    {
-	      yylval.token = HIN;
-	      return (HOBJRELOPERATOR);
-	    }
-	  if (!strcmp (yytext, "INNER"))
-	    return (HINNER);
-	  if (!strcmp (yytext, "INSPECT"))
-	    return (HINSPECT);
-	  if (!strcmp (yytext, "INTEGER"))
-	    return (HINTEGER);
-	  if (!strcmp (yytext, "IS"))
-	    {
-	      yylval.token = HIS;
-	      return (HOBJRELOPERATOR);
-	    }
-	  break;
-	case 'L':
-	  if (!strcmp (yytext, "LABEL"))
-	    return (HLABEL);
-	  if (!strcmp (yytext, "LE"))
-	    {
-	      yylval.token = HLE;
-	      return (HVALRELOPERATOR);
-	    }
-	  if (!strcmp (yytext, "LONG"))
-	    return (HLONG);
-	  if (!strcmp (yytext, "LT"))
-	    {
-	      yylval.token = HLT;
-	      return (HVALRELOPERATOR);
-	    }
-	  break;
-	case 'N':
-	  if (!strcmp (yytext, "NAME"))
-	    return (HNAME);
-	  if (!strcmp (yytext, "NE"))
-	    {
-	      yylval.token = HNE;
-	      return (HVALRELOPERATOR);
-	    }
-	  if (!strcmp (yytext, "NEW"))
-	    return (HNEW);
-	  if (!strcmp (yytext, "NONE"))
-	    return (HNONE);
-	  if (!strcmp (yytext, "NOT"))
-	    return (HNOT);
-	  if (!strcmp (yytext, "NOTEXT"))
-	    {
-	      yylval.tval = NOTEXT;
-	      return (HTEXTKONST);
-	    }
-	  break;
-	case 'O':
-	  if (!strcmp (yytext, "OR"))
-	    return (HOR);
-	  if (!strcmp (yytext, "OTHERWISE"))
-	    return (HOTHERWISE);
-	  break;
-	case 'P':
-	  if (!strcmp (yytext, "PRIOR"))
-	    return (HPRIOR);
-	  if (!strcmp (yytext, "PROCEDURE"))
-	    return (HPROCEDURE);
-	  if (!strcmp (yytext, "PROTECTED"))
-	    return (HPROTECTED);
-	  break;
-	case 'Q':
-	  if (!strcmp (yytext, "QUA"))
-	    return (HQUA);
-	  break;
-	case 'R':
-	  if (!strcmp (yytext, "REACTIVATE"))
-	    return (HREACTIVATE);
-	  if (!strcmp (yytext, "REAL"))
-	    {
-	      return (HREAL);
-	    }
-	  if (!strcmp (yytext, "REF"))
-	    return (HREF);
-	  break;
-	case 'S':
-	  if (!strcmp (yytext, "SHORT"))
-	    return (HSHORT);
-	  if (!strcmp (yytext, "STEP"))
-	    return (HSTEP);
-	  if (!strcmp (yytext, "SWITCH"))
-	    return (HSWITCH);
-	  break;
-	case 'T':
-	  if (!strcmp (yytext, "TEXT"))
-	    return (HTEXT);
-	  if (!strcmp (yytext, "THEN"))
-	    return (HTHEN);
-	  if (!strcmp (yytext, "THIS"))
-	    return (HTHIS);
-	  if (!strcmp (yytext, "TO"))
-	    return (HTO);
-	  if (!strcmp (yytext, "TRUE"))
-	    {
-	      yylval.ival = TRUE;
-	      return (HBOOLEANKONST);
-	    }
-	  break;
-	case 'U':
-	  if (!strcmp (yytext, "UNTIL"))
-	    return (HUNTIL);
-	  break;
-	case 'V':
-	  if (!strcmp (yytext, "VALUE"))
-	    return (HVALUE);
-	  if (!strcmp (yytext, "VAR"))
-	    return (HVAR);
-	  if (!strcmp (yytext, "VIRTUAL"))
-	    return (HVIRTUAL);
-	  break;
-	case 'W':
-	  if (!strcmp (yytext, "WHEN"))
-	    return (HWHEN);
-	  if (!strcmp (yytext, "WHILE"))
-	    return (HWHILE);
-	  break;
-	}
-      /* IDENTIFIKATORER    BLIR */
-      /* LAGT INN I NAVNELAGERET */
-      yylval.ident = tag (yytext, yyleng);
-      return (HIDENTIFIER);
-    }
-  switch (lexchar)
-    {
-    case '=':
-      if (newlexchar == '=')
-	{
-	  yylval.token = HEQR;
-	  return (HREFRELOPERATOR);
-	}
-      if (lexchar == '/')
+	/* IDENTIFIKATORER    BLIR */
+	/* LAGT INN I NAVNELAGERET */
+	yylval.ident = tag (yytext);
+	return (HIDENTIFIER);
+      }
+    switch (lexchar)
+      {
+      case '=':
 	if (newlexchar == '=')
 	  {
-	    yylval.token = HNER;
+	    yylval.token = HEQR;
 	    return (HREFRELOPERATOR);
 	  }
-	else
-	  lerror (7);
-      unput (lexchar);
-      yylval.token = HEQ;
-      return (HVALRELOPERATOR);
-    case '>':
-      if (newlexchar == '=')
-	{
-	  yylval.token = HGE;
-	  return (HVALRELOPERATOR);
-	}
-      unput (lexchar);
-      yylval.token = HGT;
-      return (HVALRELOPERATOR);
-    case '<':
-      if (newlexchar == '=')
-	{
-	  yylval.token = HLE;
-	  return (HVALRELOPERATOR);
-	}
-      if (lexchar == '>')
-	{
-	  yylval.token = HNE;
-	  return (HVALRELOPERATOR);
-	}
-      unput (lexchar);
-      yylval.token = HLT;
-      return (HVALRELOPERATOR);
-    case '+':
-      yylval.token = HADD;
-      return (HTERMOPERATOR);
-    case '-':
-      yylval.token = HSUB;
-      return (HTERMOPERATOR);
-    case '*':
-      if (newlexchar == '*')
-	{
-	  yylval.token = HEXP;
-	  return (HPRIMARYOPERATOR);
-	}
-      unput (lexchar);
-      yylval.token = HMUL;
-      return (HFACTOROPERATOR);
-    case '/':
-      if (newlexchar == '/')
-	{
-	  yylval.token = HINTDIV;
-	  return (HFACTOROPERATOR);
-	}
-      unput (lexchar);
-      yylval.token = HDIV;
-      return (HFACTOROPERATOR);
-    case '.':
-      if (isdigit (newlexchar))
-	goto dotdigit;
-      if (lexchar == '.')
-	if (newlexchar == '.')
-	  return (HDOTDOTDOT);
-	else
-	  lerror (7);
-      unput (lexchar);
-      return (HDOT);
-    case ',':
-      return (HPAREXPSEPARATOR);
-    case ':':
-      if (newlexchar == '=')
-	{
-	  yylval.token = HASSIGNVALUE;
-	  return (HASSIGN);
-	}
-      if (lexchar == '-' && pardeep == 0)
-	{
-	  yylval.token = HASSIGNREF;
-	  return (HASSIGN);
-	}
-      unput (lexchar);
-      return (HLABELSEPARATOR);
-    case ';':
-      pardeep = 0;
-      return (HSTATEMENTSEPARATOR);
-    case '(':
-      pardeep++;
-      return (HBEGPAR);
-    case ')':
-      pardeep--;
-      return (HENDPAR);
-    case '&':
-      if (newlexchar == '&' || lexchar == '-' || lexchar == '+'
-	  || isdigit (lexchar))
-	{
-	  yyleng = 0;
-	  lexradix = 10;
-	  yytext[yyleng++] = '1';
-	  goto digitsexp;
-	}
-      unput (lexchar);
-      return (HCONC);
-    case '!':
-      goto comment;
-    case '\'':
-      goto character;
-    case '\"':
-      goto text;
-    case '0':
-    case '1':
-    case '2':
-    case '3':
-    case '4':
-    case '5':
-    case '6':
-    case '7':
-    case '8':
-    case '9':
-      goto digit;
-    case EOF:
-      if (ifdefniv != includeif[fillev])
-	{
-	  lerror (24);
-	  ifdefniv = includeif[fillev];
-	}
-      if (fillev == 0)
-	return (NOSYMBOL);
-      systag ("INCLUDED", 8)->definition = FALSE;
-      popfilmap ();
-      (void) fclose (filstack[fillev--]);	/* Ingen break her */
-    case '\n':			/* NL (LF) */
-      yylineno++;
-      if (!option_write_tokens)
-	(void) putc (MNEWLINE, mcode);
-      while (newlexchar == '%')
-	dirline ();
-      unput (lexchar);
-      goto newtoken;
-    case ' ':
-    case '\b':			/* BS */
-    case '\t':			/* HT */
-    case '\v':			/* VT */
-    case '\f':			/* FF */
-    case '\r':			/* CR */
-      goto newtoken;
-    }
-  /* HVIS IKKE NOEN AV DE ANDRE REGLENE */
-  /* SL]R TIL S] ER DET ET ULOVLIG TEGN */
-  lerror (7);
-  goto newtoken;
-
-comment:
-  {				/* Behandling av komentarer */
-    while ((newlexchar != ';') && lexchar != EOF)
-      if (lexchar == '\n')
-	{
-	  antnewline++;
-	  while (newlexchar == '%')
-	    dirline ();
-	  unput (lexchar);
-	}
-    if (lexchar != ';')
-      {
-	lerror (1);
-	unput (lexchar);
-      }
-    goto newtoken;
-  }
-
-end:
-  {				/* Behandling av end-komentarer * Her må jeg
-				 * bruke unput */
-    int reported=0;
-    newlexchar;
-    while (TRUE)
-      {
-	while (!isalpha (lexchar))
-	  if (lexchar == '\n')
+	if (lexchar == '/')
+	  if (newlexchar == '=')
 	    {
-	      antnewline++;
-	      while (newlexchar == '%')
-		dirline ();
-	      notintext = TRUE;
-	    }
-	  else if (lexchar == EOF)
-	    {
-	      unput (lexchar);
-	      return (HEND);
-	    }
-	  else if (lexchar == ';')
-	    {
-	      unput (lexchar);
-	      return (HEND);
+	      yylval.token = HNER;
+	      return (HREFRELOPERATOR);
 	    }
 	  else
-	    newlexchar;
-	if (lexchar == 'E')
+	    lerror (7);
+	unput (lexchar);
+	yylval.token = HEQ;
+	return (HVALRELOPERATOR);
+      case '>':
+	if (newlexchar == '=')
 	  {
-	    if (newlexchar == 'N')
-	      {
-		if (newlexchar == 'D' && !isalnum (newlexchar) && lexchar != '_')
-		  {		/* END is found and comment is terminated */
-		    unput (lexchar);
-		    newsymbole = HEND;
-		    return (HEND);
-		  } else 
-		    if (antnewline && !reported) {lerror(32); reported = 1;}
-	      }
-	    else if (lexchar == 'L' && newlexchar == 'S' && newlexchar == 'E'
-		     && !isalnum (newlexchar) && lexchar != '_')
-	      {			/* ELSE is found and comment is terminated */
-		unput (lexchar);
-		newsymbole = HELSE;
-		return (HEND);
-	      } else if (antnewline && !reported) {lerror(32); reported = 1;}
+	    yylval.token = HGE;
+	    return (HVALRELOPERATOR);
 	  }
-	else if (lexchar == 'W')
+	unput (lexchar);
+	yylval.token = HGT;
+	return (HVALRELOPERATOR);
+      case '<':
+	if (newlexchar == '=')
 	  {
-	    if (newlexchar == 'H' && newlexchar == 'E' && newlexchar == 'N'
-		&& !isalnum (newlexchar) && lexchar != '_')
-	      {			/* WHEN is found and comment is terminated */
-		unput (lexchar);
-		newsymbole = HWHEN;
-		return (HEND);
-	      } else if (antnewline && !reported) {lerror(32); reported = 1;}
+	    yylval.token = HLE;
+	    return (HVALRELOPERATOR);
 	  }
-	else if (lexchar == 'O' && newlexchar == 'T' && newlexchar == 'H'
-	      && newlexchar == 'E' && newlexchar == 'R' && newlexchar == 'W'
-	      && newlexchar == 'I' && newlexchar == 'S' && newlexchar == 'E'
-		 && !isalnum (newlexchar) && lexchar != '_')
-	  {			/* OTHERWISE is found and comment is
-				 * terminated */
-	    unput (lexchar);
-	    newsymbole = HOTHERWISE;
-	    return (HEND);
-	  } else if (antnewline && !reported) {lerror(32); reported = 1;}
-	while (isalpha (lexchar) || lexchar == '_')
-	  newlexchar;
-      }
-  }
-
-character:
-  {				/* Behandling av karakter konstanter */
-    notintext = FALSE;
-    if ((isprint (newlexchar)
-#if ISO_LATIN
-	 || lexchar >= 160
-#endif
-	) && lexchar != '!')
-      {
-	yylval.ival = lexchar;
-	newlexchar;
-      }
-    else if (lexchar == '!')
-      {
+	if (lexchar == '>')
+	  {
+	    yylval.token = HNE;
+	    return (HVALRELOPERATOR);
+	  }
+	unput (lexchar);
+	yylval.token = HLT;
+	return (HVALRELOPERATOR);
+      case '+':
+	yylval.token = HADD;
+	return (HTERMOPERATOR);
+      case '-':
+	yylval.token = HSUB;
+	return (HTERMOPERATOR);
+      case '*':
+	if (newlexchar == '*')
+	  {
+	    yylval.token = HEXP;
+	    return (HPRIMARYOPERATOR);
+	  }
+	unput (lexchar);
+	yylval.token = HMUL;
+	return (HFACTOROPERATOR);
+      case '/':
+	if (newlexchar == '/')
+	  {
+	    yylval.token = HINTDIV;
+	    return (HFACTOROPERATOR);
+	  }
+	unput (lexchar);
+	yylval.token = HDIV;
+	return (HFACTOROPERATOR);
+      case '.':
 	if (isdigit (newlexchar))
 	  {
-	    firstchar = lexchar;
-	    if (isdigit (newlexchar))
+	  dotdigit:
+	    /* Behandling av tall som starter med tegnet '.' */
+	    obstack_free (&osLex, yytext);
+	    lexradix = 10;
+	  digitsdot:
+	    obstack_1grow (&osLex, '.');
+	    if (lexchar >= '0' & lexchar <= '9')
+	      obstack_1grow (&osLex, lexchar);
+	    while (newlexchar >= '0' && lexchar <= '9' || lexchar == '_')
+	      if (lexchar != '_')
+		obstack_1grow (&osLex, lexchar);
+	    if (lexchar == '&')
 	      {
-		secondchar = lexchar;
-		if (isdigit (newlexchar))
+		newlexchar;
+	      digitsexp:
+		if (lexchar == '&')
+		  newlexchar;
+		obstack_1grow (&osLex, 'e');
+		if (lexchar == '-')
 		  {
-		    thirdchar = lexchar;
-		    if (newlexchar == '!')
-		      {
-			if (firstchar < '2'
-			    || (firstchar == '2' && (secondchar < '5'
-						     || (secondchar == '5'
-						      && thirdchar < '6'))))
-			  {
-			    yylval.ival = ((firstchar - '0') * 10
-					   + secondchar - '0') * 10
-			      + thirdchar - '0';
-			    newlexchar;
-			  }
-			else
-			  {
-			    lerror (2);
-			    newlexchar;
-			  }
-		      }
-		    else
-		      {
-			lerror (2);
-		      }
-		  }
-		else if (lexchar == '!')
-		  {
-		    yylval.ival = (firstchar - '0') * 10
-		      + secondchar - '0';
+		    obstack_1grow (&osLex, '-');
 		    newlexchar;
 		  }
-		else
-		  {
-		    lerror (2);
-		  }
+		else if (lexchar == '+')
+		  newlexchar;
+		if (lexchar >= '0' & lexchar <= '9')
+		  obstack_1grow (&osLex, lexchar);
+		while (newlexchar >= '0' && lexchar <= '9' || lexchar == '_')
+		  obstack_1grow (&osLex, lexchar);
 	      }
-	    else if (lexchar == '!')
-	      {
-		yylval.ival = firstchar - '0';
-		newlexchar;
-	      }
-	    else
-	      {
-		lerror (2);
-	      }
-	  }
-	else
-	  {
-	    yylval.ival = '!';
-	  }
-      }
-    else
-      lerror (2);
-    if (lexchar != '\'')
-      {
-	unput (lexchar);
-	lerror (3);
-      }
-    notintext = TRUE;
-    return (HCHARACTERKONST);
-  }
+	    obstack_1grow (&osLex, 0);
+	    yytext= obstack_finish (&osLex);
 
-text:
-  {				/* Behandling av text-konstanter * Her må
-				 * også unput brukes */
-    notintext = FALSE;
-    newlexchar;
-    while (TRUE)
-      {
-	while ((isgraph (lexchar)
-#if ISO_LATIN
-		|| lexchar >= 160
-#endif
-	       ) && lexchar != '!' && lexchar != '"')
-	  {
-	    putchartext ((unsigned char) lexchar);
-	    newlexchar;
+	    unput (lexchar);
+
+	    yylval.rval = strtod (yytext, NULL);
+
+	    if (lexradix != 10)
+	      lerror (16);
+	    return (HREALKONST);
+
 	  }
-	if (lexchar == ' ')
+	if (lexchar == '.')
+	  if (newlexchar == '.')
+	    return (HDOTDOTDOT);
+	  else
+	    lerror (7);
+	unput (lexchar);
+	return (HDOT);
+      case ',':
+	return (HPAREXPSEPARATOR);
+      case ':':
+	if (newlexchar == '=')
 	  {
-	    putchartext ((unsigned char) lexchar);
+	    yylval.token = HASSIGNVALUE;
+	    return (HASSIGN);
+	  }
+	if (lexchar == '-' && pardeep == 0)
+	  {
+	    yylval.token = HASSIGNREF;
+	    return (HASSIGN);
+	  }
+	unput (lexchar);
+	return (HLABELSEPARATOR);
+      case ';':
+	pardeep = 0;
+	return (HSTATEMENTSEPARATOR);
+      case '(':
+	pardeep++;
+	return (HBEGPAR);
+      case ')':
+	pardeep--;
+	return (HENDPAR);
+      case '&':
+	if (newlexchar == '&' || lexchar == '-' || lexchar == '+'
+	    || isdigit (lexchar))
+	  {
+	    lexradix = 10;
+
+	    obstack_free (&osLex, yytext);
+	    obstack_1grow (&osLex, '1');
+
+	    goto digitsexp;
+	  }
+	unput (lexchar);
+	return (HCONC);
+      case '!':
+      comment:
+        while ((newlexchar != ';') && lexchar != EOF)
+	  if (lexchar == '\n')
+	  {
+	    antnewline++;
+	    while (newlexchar == '%')
+	      scanDirline ();
+	    unput (lexchar);
+	  }
+	if (lexchar != ';')
+	  {
+	    lerror (1);
+	    unput (lexchar);
+	  }
+	break;
+      case '\'':
+	notintext = FALSE;
+	if ((isprint (newlexchar)
+#if ISO_LATIN
+	     || lexchar >= 160
+#endif
+	     ) && lexchar != '!')
+	  {
+	    yylval.ival = lexchar;
 	    newlexchar;
 	  }
 	else if (lexchar == '!')
@@ -1826,15 +1574,115 @@ text:
 			if (newlexchar == '!')
 			  {
 			    if (firstchar < '2'
-				|| (firstchar == '2' && (secondchar < '5'
-						       || (secondchar == '5'
-						      && thirdchar < '6'))))
+				|| (firstchar == '2' && 
+				    (secondchar < '5'
+				     || (secondchar == '5'
+					 && thirdchar < '6'))))
 			      {
-				putchartext 
-				  ((unsigned char) (((firstchar - '0') * 10
-						     + secondchar - '0') * 10
-						    + thirdchar - '0'));
+				yylval.ival = ((firstchar - '0') * 10
+					       + secondchar - '0') * 10
+				  + thirdchar - '0';
 				newlexchar;
+			      }
+			    else
+			      {
+				lerror (2);
+				newlexchar;
+			      }
+			  }
+			else
+			  {
+			    lerror (2);
+			  }
+		      }
+		    else if (lexchar == '!')
+		      {
+			yylval.ival = (firstchar - '0') * 10
+			  + secondchar - '0';
+			newlexchar;
+		      }
+		    else
+		      {
+			lerror (2);
+		      }
+		  }
+		else if (lexchar == '!')
+		  {
+		    yylval.ival = firstchar - '0';
+		    newlexchar;
+		  }
+		else
+		  {
+		    lerror (2);
+		  }
+	      }
+	    else
+	      {
+		yylval.ival = '!';
+	      }
+	  }
+	else
+	  lerror (2);
+	if (lexchar != '\'')
+	  {
+	    unput (lexchar);
+	    lerror (3);
+	  }
+	notintext = TRUE;
+	return (HCHARACTERKONST);
+      case '\"':
+	obstack_free (&osLex, yytext);
+	notintext = FALSE;
+	newlexchar;
+	while (TRUE)
+	  {
+	    while ((isgraph (lexchar)
+#if ISO_LATIN
+		    || lexchar >= 160
+#endif
+		    ) && lexchar != '!' && lexchar != '"')
+	      {
+		putchartext ((unsigned char) lexchar);
+		newlexchar;
+	      }
+	    if (lexchar == ' ')
+	      {
+		putchartext ((unsigned char) lexchar);
+		newlexchar;
+	      }
+	    else if (lexchar == '!')
+	      {
+		if (isdigit (newlexchar))
+		  {
+		    firstchar = lexchar;
+		    if (isdigit (newlexchar))
+		      {
+			secondchar = lexchar;
+			if (isdigit (newlexchar))
+			  {
+			    thirdchar = lexchar;
+			    if (newlexchar == '!')
+			      {
+				if (firstchar < '2' 
+				    || (firstchar == '2' 
+					&& (secondchar < '5'
+					    || (secondchar == '5'
+						&& thirdchar < '6'))))
+				  {
+				    putchartext 
+				      ((unsigned char) 
+				       (((firstchar - '0') * 10
+					 + secondchar - '0') * 10
+					+ thirdchar - '0'));
+				    newlexchar;
+				  }
+				else
+				  {
+				    putchartext ('!');
+				    putchartext (firstchar);
+				    putchartext (secondchar);
+				    putchartext (thirdchar);
+				  }
 			      }
 			    else
 			      {
@@ -1844,189 +1692,171 @@ text:
 				putchartext (thirdchar);
 			      }
 			  }
+			else if (lexchar == '!')
+			  {
+			    putchartext ((unsigned char) 
+					 ((firstchar - '0') * 10
+					  + secondchar - '0'));
+			    newlexchar;
+			  }
 			else
 			  {
 			    putchartext ('!');
 			    putchartext (firstchar);
 			    putchartext (secondchar);
-			    putchartext (thirdchar);
 			  }
 		      }
 		    else if (lexchar == '!')
 		      {
-			putchartext ((unsigned char) ((firstchar - '0') * 10
-						      + secondchar - '0'));
+			putchartext (firstchar - '0');
 			newlexchar;
 		      }
 		    else
 		      {
 			putchartext ('!');
 			putchartext (firstchar);
-			putchartext (secondchar);
 		      }
-		  }
-		else if (lexchar == '!')
-		  {
-		    putchartext (firstchar - '0');
-		    newlexchar;
 		  }
 		else
 		  {
 		    putchartext ('!');
-		    putchartext (firstchar);
 		  }
 	      }
-	    else
+	    else if (lexchar == '\"')
 	      {
-		putchartext ('!');
-	      }
-	  }
-	else if (lexchar == '\"')
-	  {
-	    if (newlexchar == '\"')
-	      {
-		putchartext ((unsigned char) lexchar);
-		newlexchar;
-	      }
-	    else
-	      {
-		while (isspace (lexchar) || lexchar == '\b')
+		if (newlexchar == '\"')
 		  {
-		    if (lexchar == '\n')
-		      antnewline++;
+		    putchartext ((unsigned char) lexchar);
 		    newlexchar;
 		  }
-		if (lexchar == '\"')
-		  newlexchar;
 		else
 		  {
-		    unput (lexchar);
-		    yylval.tval = gettext ();
-		    notintext = TRUE;
-		    return (HTEXTKONST);
+		    while (isspace (lexchar) || lexchar == '\b')
+		      {
+			if (lexchar == '\n')
+			  antnewline++;
+			newlexchar;
+		      }
+		    if (lexchar == '\"')
+		      newlexchar;
+		    else
+		      {
+			unput (lexchar);
+			yylval.tval = gettext ();
+			notintext = TRUE;
+			return (HTEXTKONST);
+		      }
 		  }
 	      }
+	    else if (lexchar == '\n')
+	      {
+		antnewline++;
+		lerror (4);
+		yylval.tval = gettext ();
+		notintext = TRUE;
+		return (HTEXTKONST);
+	      }
+	    else
+	      {
+		unput (lexchar);
+		lerror (5);
+		yylval.tval = gettext ();
+		notintext = TRUE;
+		return (HTEXTKONST);
+	      }
 	  }
-	else if (lexchar == '\n')
+	break;
+      case '0':
+      case '1':
+      case '2':
+      case '3':
+      case '4':
+      case '5':
+      case '6':
+      case '7':
+      case '8':
+      case '9':
+	lexradix = 10;
+	firstLexchar= lexchar;
+
+	obstack_free (&osLex, yytext);
+	obstack_1grow (&osLex, lexchar);
+	if (newlexchar == 'R' && (firstLexchar == '2' | firstLexchar == '4' 
+				  | firstLexchar == '8'))
 	  {
-	    antnewline++;
-	    lerror (4);
-	    yylval.tval = gettext ();
-	    notintext = TRUE;
-	    return (HTEXTKONST);
+	    lexradix = firstLexchar - '0';
+	    yytext= obstack_finish (&osLex);
+	    obstack_free (&osLex, yytext);
 	  }
-	else
+	else if (firstLexchar == '1' && lexchar == '6')
 	  {
-	    unput (lexchar);
-	    lerror (5);
-	    yylval.tval = gettext ();
-	    notintext = TRUE;
-	    return (HTEXTKONST);
-	  }
-      }
-  }
-
-dotdigit:
-  /* Behandling av tall som starter med tegnet '.' */
-  yyleng = 0;
-  lexradix = 10;
-digitsdot:
-  yytext[yyleng++] = '.';
-  if (lexchar >= '0' & lexchar <= '9')
-    yytext[yyleng++] = lexchar;
-  while (newlexchar >= '0' && lexchar <= '9' || lexchar == '_')
-    if (yyleng > SAFEYYTEXTLENGTH)
-      {
-	lerror (20);
-	yyleng = 1;
-      }
-    else if (lexchar != '_')
-      yytext[yyleng++] = lexchar;
-  if (lexchar == '&')
-    {
-      newlexchar;
-    digitsexp:
-      if (lexchar == '&')
-	newlexchar;
-      yytext[yyleng++] = 'e';
-      if (lexchar == '-')
-	{
-	  yytext[yyleng++] = '-';
-	  newlexchar;
-	}
-      else if (lexchar == '+')
-	newlexchar;
-      if (lexchar >= '0' & lexchar <= '9')
-	yytext[yyleng++] = lexchar;
-      while (newlexchar >= '0' && lexchar <= '9' || lexchar == '_')
-	if (yyleng > SAFEYYTEXTLENGTH)
-	  {
-	    lerror (20);
-	    yyleng = 1;
-	  }
-	else if (lexchar != '_')
-	  yytext[yyleng++] = lexchar;
-    }
-  unput (lexchar);
-  yytext[yyleng++] = '\0';
-
-  yylval.rval = strtod (yytext, NULL);
-
-  if (lexradix != 10)
-    lerror (16);
-  return (HREALKONST);
-
-digit:
-  {				/* Behandling av tall som starter med et
-				 * siffer */
-    lexradix = 10;
-    yyleng = 0;
-    yytext[yyleng++] = lexchar;
-    if (newlexchar == 'R' && (yytext[0] == '2' | yytext[0] == '4' 
-			      | yytext[0] == '8'))
-      {
-	lexradix = yytext[0] - '0';
-	yyleng = 0;
-      }
-    else if (yytext[0] == '1' && lexchar == '6')
-      {
-	yytext[yyleng++] = lexchar;
-	if (newlexchar == 'R')
-	  {
-	    lexradix = 16;
-	    yyleng = 0;
+	    obstack_1grow (&osLex, lexchar);
+	    if (newlexchar == 'R')
+	      {
+		lexradix = 16;
+		yytext= obstack_finish (&osLex);
+		obstack_free (&osLex, yytext);
+	      }
+	    else
+	      unput (lexchar);
 	  }
 	else
 	  unput (lexchar);
+	while ((lexradix == 16 ? isxdigit (newlexchar) : isdigit (newlexchar))
+	       || lexchar == '_')
+	  if (lexchar == '_');
+	  else if (isdigit (lexchar))
+	    obstack_1grow (&osLex, lexchar);
+	  else
+	    obstack_1grow (&osLex, lexchar + ('9' + 1 - 'A'));
+	if (lexchar == '.' && lexradix == 10)
+	  {
+	    newlexchar;
+	    goto digitsdot;
+	  }
+	if (lexchar == '&' && lexradix == 10)
+	  {
+	    newlexchar;
+	    goto digitsexp;
+	  }
+	obstack_1grow (&osLex, 0);
+	yytext= obstack_finish (&osLex);
+
+	unput (lexchar);
+	yylval.ival = radix (lexradix, yytext);
+	return (HINTEGERKONST);
+
+      case EOF:
+	if (ifdefp != includeIfdefp ())
+	  {
+	    lerror (24);
+	    ifdefp = (struct ifdefstack *) includeIfdefp ();
+	  }
+	fclose (includeFile ());	
+	popfilmap ();
+	if (noFilemap ())
+	  return (NOSYMBOL);
+	defineName (tag ("INCLUDED"), FALSE);
+	/* Ingen break her */
+      case '\n':			/* NL (LF) */
+	lineno++;
+	if (!option_write_tokens)
+	  mout (MNEWLINE);
+	while (newlexchar == '%')
+	  scanDirline ();
+	unput (lexchar);
+	break;
+      case ' ':
+      case '\b':			/* BS */
+      case '\t':			/* HT */
+      case '\v':			/* VT */
+      case '\f':			/* FF */
+      case '\r':			/* CR */
+	break;
+      default:
+	lerror (7);
+	break;
       }
-    else
-      unput (lexchar);
-    while ((lexradix == 16 ? isxdigit (newlexchar) : isdigit (newlexchar))
-	   || lexchar == '_')
-      if (yyleng > SAFEYYTEXTLENGTH)
-	{
-	  lerror (20);
-	  yyleng = 1;
-	}
-      else if (lexchar == '_');
-      else if (isdigit (lexchar))
-	yytext[yyleng++] = lexchar;
-      else
-	yytext[yyleng++] = lexchar + ('9' + 1 - 'A');
-    if (lexchar == '.' && lexradix == 10)
-      {
-	newlexchar;
-	goto digitsdot;
-      }
-    if (lexchar == '&' && lexradix == 10)
-      {
-	newlexchar;
-	goto digitsexp;
-      }
-    yytext[yyleng++] = '\0';
-    unput (lexchar);
-    yylval.ival = radix (lexradix, yytext);
-    return (HINTEGERKONST);
   }
 }
 
@@ -2040,7 +1870,7 @@ scan_and_write_tokens ()
   /* printf("% Cim_pp\n%line 1 %s\n",sourcename); */
   while (token = yylex ())
     {
-      while (line < yylineno)
+      while (line < lineno)
 	{
 	  putchar ('\n');
 	  line++;

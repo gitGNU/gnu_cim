@@ -1,6 +1,6 @@
 /* $Id: cfeil.c,v 1.19 1995/03/07 10:53:16 cim Exp $ */
 
-/* Copyright (C) 1994 Sverre Hvammen Johansen,
+/* Copyright (C) 1994, 1998 Sverre Hvammen Johansen,
  * Department of Informatics, University of Oslo.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -26,12 +26,5 @@
  * Dette tabellverket brukes s} i forbindelse med utskrift              
  * av feilmeldinger. */
 
-extern pushfilmap ();
-extern popfilmap ();
-extern setfilmap ();
-extern genmap();
-
-extern long getmapline ();
-extern char * getmapfile ();
 extern int anterror;
 

@@ -44,15 +44,15 @@ __rgetcbv (p, as, ret, mret)
      int ret;
      void (*mret) ();
 {
-  switch (p->h.namekind)
+  switch (p->namekind)
     {
     case __VALUE_THUNK:
     case __ADDRESS_THUNK:
-      __goto = p->h.adr;	/* I tilfelle at kallet p} rct f|rer til
+      __goto = p->adr;	/* I tilfelle at kallet p} rct f|rer til
 				 * garbage collection, slik at p
 				 * ikke lenger peker riktig,
 				 * leses disse verdiene f|r kallet. */
-      __sl = p->h.sl;
+      __sl = p->sl;
       __rct (as);		/* Oppretter objektet og overf|rer
 				 * returadressen. */
       ((__thunkp) __pb)->h.ex.ment = mret;
@@ -60,14 +60,14 @@ __rgetcbv (p, as, ret, mret)
       __lb = __pb;		/* Gj|r thunken eksikverbar. */
       return (__TRUE);
     case __ADDRESS_NOTHUNK:
-      __ev.c = *(char *) (((char *) p->h.bp) + p->h.v.ofs);
+      __ev.c = *(char *) (((char *) p->bp) + p->v.ofs);
 #if SPLIT_MODUL
       __goto.ent = ret;
       __goto.ment = mret;
 #endif
       return (__FALSE);
     case __VALUE_NOTHUNK:
-      __ev.c = p->h.v.c;
+      __ev.c = p->v.c;
 #if SPLIT_MODUL
       __goto.ent = ret;
       __goto.ment = mret;

@@ -19,6 +19,7 @@
 
 #include "cim.h"
 #include "align.h"
+#include "simfile.h"
 
 /******************************************************************************
                                                        DO_FOR_STACK_POINTERS */

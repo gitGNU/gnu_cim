@@ -29,10 +29,30 @@ AC_DEFINE_UNQUOTED(OS_TYPE_VERSION,"`echo $target_os | tr a-z A-Z`")
 AC_DEFINE_UNQUOTED(MANUFACTURER,"`echo $target_vendor | tr a-z A-Z`")
 AC_DEFINE_UNQUOTED(OS_TYPE,"`echo $target_os_x_version | tr a-z A-Z`")
 
-AM_INIT_AUTOMAKE(cim, 2.10)
+AM_INIT_AUTOMAKE(cim, 3.20)
 AM_CONFIG_HEADER(config.h)
 AM_CYGWIN32
 AM_PROG_LIBTOOL
+
+dnl Library version
+dnl
+dnl If any routines have been removed increment CURRENT and
+dnl set REVISION and AGE to 0 (C:R:A becomes C+1:0:0).
+dnl
+dnl Else if any routines in the library have been added increment
+dnl CURRENT and AGE and set REVISION to 0 (C:R:A becomes C+1:0:A+1).
+dnl
+dnl Else if any changes in the library increment REVISION and
+dnl leave CURRENT and AGE unchanged (C:R:A becomes C:R+1:A)
+dnl
+dnl Else leave CURRENT, REVISION and AGE unchanged.
+
+LIB_CURRENT=2
+LIB_REVISION=0
+LIB_AGE=0
+AC_SUBST(LIB_CURRENT)
+AC_SUBST(LIB_REVISION)
+AC_SUBST(LIB_AGE)
 
 PACKAGE_VERSION="$PACKAGE-$VERSION"
 AC_DEFINE_UNQUOTED(PACKAGE_VERSION, "$PACKAGE_VERSION")
@@ -47,7 +67,6 @@ AC_PROG_YACC
 AC_PATH_PROG(PERL, perl)
 
 dnl Checks for libraries.
-AC_MINIX
 AC_CHECK_LIB(m,main)
 AC_CHECK_LIB(ft,main)
 AC_HEADER_STDC
@@ -74,4 +93,4 @@ CIM_WL_FLAG
 CIM_LINK_STATIC_FLAG
 CIM_PIC_FLAG
 
-AC_OUTPUT(Makefile src/Makefile lib/Makefile test/Makefile man/Makefile doc/Makefile util/Makefile util/cim2latex util/cim2ps util/cimindent, [test -z "$CONFIG_HEADERS" || echo timestamp > stamp-h])
+AC_OUTPUT(Makefile cim.spec src/Makefile lib/Makefile test/Makefile man/Makefile doc/Makefile util/Makefile util/cim2latex util/cim2ps util/cimindent, [test -z "$CONFIG_HEADERS" || echo timestamp > stamp-h])

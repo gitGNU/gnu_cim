@@ -18,6 +18,7 @@
  */
 
 #include "cim.h"
+#include "simfile.h"
 
 /******************************************************************************
                                          (SHORT) INTEGER PROCEDURE INBYTE    */

@@ -1,6 +1,6 @@
-/* $Id: csjekker.h,v 1.2 1994/07/17 10:41:06 cim Exp $ */
+/* $Id: cfeil.c,v 1.19 1995/03/07 10:53:16 cim Exp $ */
 
-/* Copyright (C) 1994 Sverre Hvammen Johansen,
+/* Copyright (C) 1998 Sverre Hvammen Johansen,
  * Department of Informatics, University of Oslo.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -16,30 +16,15 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA. */
 
-#include "dekl.h"
+#include <stdio.h>
 
-/* Objekter til aa generere uttrykk-treet */
-struct EXP
-  {
-    int token;
-    union val value;
-    char type,
-      danger,
-      konst;
-    struct EXP *left,
-     *right,
-     *up;
-    struct DECL *rd;
-    struct DECL *qual;
-    struct BLOCK *seenthrough;
-  };
-
-extern initsjekker();
-extern sjekker ();
-extern struct EXP *copytree ();
-extern int sstrlen ();
-extern char not_reached;
-extern int cexpr;
-extern int sjerror;
-extern struct EXP expbuffer[MAXEXPBUFFER];
-extern struct EXP owerflowbuffer;
+extern int maplineInit ();
+extern int pushfilmap ();
+extern void popfilmap ();
+extern void setfilmap ();
+extern long getmapline ();
+extern char *getmapfile ();
+extern void genmap ();
+extern void * includeIfdefp ();
+extern FILE *includeFile ();
+extern int noFilemap ();

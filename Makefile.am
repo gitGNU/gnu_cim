@@ -17,6 +17,10 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-SUBDIRS = src util doc man lib test
+SUBDIRS = doc man src lib util test 
+EXTRA_DIST = cim.spec
+
+
+
 
 noinst_HEADERS = limit.h

@@ -18,6 +18,7 @@
  */
 
 #include "file.h"
+#include "simfile.h"
 
 /* LASTITEM, INCHAR, INTEXT, ININT, INREAL og INFRAC er lik de i INFILE
  * OUTCHAR, OUTTEXT, OUTINT, OUTREAL, OUTFRAC og OUTFIX er lik de i OUTFILE */

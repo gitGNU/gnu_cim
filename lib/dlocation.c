@@ -18,6 +18,7 @@
  */
 
 #include "cim.h"
+#include "simfile.h"
 
 /* RUNTIME rutiner for klassen directfile  skrevet i c. */
 

@@ -18,10 +18,185 @@
 
 #include "config.h"
 #include "cim.h"
+#include "limit.h"
+#include "simfile.h"
 
 #if STDC_HEADERS
 #include <stdlib.h>
 #endif
+
+void __m_FILE();
+
+/* Ytterste blokk */
+__bs0FILE *__bp0FILE;
+short __rl0FILE[2]
+= {(char *)&((__bs0FILE *)0)->c1-(char *)0, (char *)&((__bs0FILE *)0)->c2-(char *)0};
+extern __ptyp __p0FILE;
+__pty __pl0FILE[1]
+={&__p0FILE};
+__ptyp __p0FILE =
+{'B', 0, 0, sizeof (__bs0FILE), 1, __m_FILE, 0, 2, 2, 
+  0, __rl0FILE, 0, __pl0FILE};
+
+/* class FILE */
+__bs1FILE *__bp1FILE;
+short __rl1FILE[1]
+= {(char *)&((__bs1FILE *)0)->filename-(char *)0};
+extern __ptyp __p1FILE;
+__pty __pl1FILE[1]
+= {&__p1FILE};
+__ptyp __p1FILE =
+{'C', 0, 1, sizeof (__bs1FILE), 1, __m_FILE, 0, 0, 1, 
+  0, __rl1FILE, 0, __pl1FILE};
+
+/* FILE class IMAGEFILE */
+__bs2FILE *__bp2FILE;
+short __rl2FILE[1]
+= {(char *)&((__bs2FILE *)0)->IMAGE-(char *)0};
+extern __ptyp __p2FILE;
+__pty __pl2FILE[2] =
+{&__p1FILE, &__p2FILE};
+__ptyp __p2FILE =
+{'C', 1, 1, sizeof (__bs2FILE), 4, __m_FILE, 0, 0, 1, 
+  0, __rl2FILE, 0, __pl2FILE};
+
+/* IMAGEFILE class OUTFILE */
+extern __ptyp __p3FILE;
+__pty __pl3FILE[3] =
+{&__p1FILE, &__p2FILE, &__p3FILE};
+__ptyp __p3FILE =
+{'C', 2, 1, sizeof (__bs3FILE), 7, __m_FILE, 0, 0, 0, 0, 0, 0, __pl3FILE};
+
+/* IMAGEFILE class INFILE */
+extern __ptyp __p4FILE;
+__pty __pl4FILE[3] =
+{&__p1FILE, &__p2FILE, &__p4FILE};
+__ptyp __p4FILE =
+{'C', 2, 1, sizeof (__bs4FILE), 10, __m_FILE, 0, 0, 0, 0, 0, 0, __pl4FILE};
+
+/* IMAGEFILE class DIRECTFILE */
+extern __ptyp __p5FILE;
+__pty __pl5FILE[3] =
+{&__p1FILE, &__p2FILE, &__p5FILE};
+__ptyp __p5FILE =
+{'C', 2, 1, sizeof (__bs5FILE), 13, __m_FILE, 0, 0, 0, 0, 0, 0, __pl5FILE};
+
+/* OUTFILE class PRINTFILE */
+extern __ptyp __p6FILE;
+__pty __pl6FILE[4] =
+{&__p1FILE, &__p2FILE, &__p3FILE, &__p6FILE};
+__ptyp __p6FILE =
+{'C', 3, 1, sizeof (__bs6FILE), 16, __m_FILE, 0, 0, 0, 0, 0, 0, __pl6FILE};
+
+/* FILE class BYTEFILE  */
+extern __ptyp __p7FILE;
+__pty __pl7FILE[2] =
+{&__p1FILE, &__p7FILE};
+__ptyp __p7FILE =
+{'C', 1, 1, sizeof (__bs7FILE), 19, __m_FILE, 0, 0, 0, 0, 0, 0, __pl7FILE};
+
+/* BYTEFILE class INBYTEFILE */
+extern __ptyp __p8FILE;
+__pty __pl8FILE[3] =
+{&__p1FILE, &__p7FILE, &__p8FILE};
+__ptyp __p8FILE =
+{'C', 2, 1, sizeof (__bs8FILE), 22, __m_FILE, 0, 0, 0, 0, 0, 0, __pl8FILE};
+
+/* BYTEFILE class OUTBYTEFILE */
+extern __ptyp __p9FILE;
+__pty __pl9FILE[3] =
+{&__p1FILE, &__p7FILE, &__p9FILE};
+__ptyp __p9FILE =
+{'C', 2, 1, sizeof (__bs9FILE), 25, __m_FILE, 0, 0, 0, 0, 0, 0, __pl9FILE};
+
+/* BYTEFILE class DIRECTBYTEFILE */
+extern __ptyp __p10FILE;
+__pty __pl10FILE[3] =
+{&__p1FILE, &__p7FILE, &__p10FILE};
+__ptyp __p10FILE =
+{'C', 2, 1, sizeof (__bs10FILE), 28, __m_FILE, 0, 0, 0, 0, 0, 0, __pl10FILE};
+
+/* Deklarerer tekstobjekter for filnavnene stdin og stdout */
+struct __name
+  {
+    __th h;
+    char string[9];
+  }
+__stdinname =
+{
+  (__pty) __TEXT, (__dhp) & __stdinname, __TRUE, 8, "/dev/tty"
+}
+,
+__stdoutname =
+{
+  (__pty) __TEXT, (__dhp) & __stdoutname, __TRUE, 8, "/dev/tty"
+}
+,
+__stderrname =
+{
+  (__pty) __TEXT, (__dhp) & __stderrname, __TRUE, 8, "/dev/tty"
+};
+
+/* Deklarerer tekstobjekter for stdin.IMAGE og stdout.IMAGE */
+struct __imagein
+  {
+    __th h;
+    char string[INPUT_LINE_LENGTH];
+  }
+__stdinimage =
+{
+  (__pty) __TEXT, (__dhp) & __stdinimage, __FALSE, INPUT_LINE_LENGTH, ""
+};
+
+struct __imageout
+  {
+    __th h;
+    char string[OUTPUT_LINE_LENGTH + 1];
+  }
+__stdoutimage =
+{
+  (__pty) __TEXT, (__dhp) & __stdoutimage, __FALSE, OUTPUT_LINE_LENGTH, ""
+}
+,
+__stderrimage =
+{
+  (__pty) __TEXT, (__dhp) & __stderrimage, __FALSE, OUTPUT_LINE_LENGTH, ""
+};
+
+/* Genererer og initierer ytterste blokk objekt */
+
+__bs0FILE __blokk0 =
+{(__pty) & __p0FILE, (__dhp) & __blokk0, (__dhp) & __blokk0, 
+  __FALSE, __TERMINATED, 0, 0,
+  (__dhp) & __blokk0, __NULL, __NULL};
+
+/* Genererer og initierer et infile objekt (SYSIN) */
+
+__bs4FILE __sysin =
+{(__pty) & __p4FILE, (__dhp) & __sysin, (__dhp) & __blokk0, 
+  __FALSE, __TERMINATED, 0, __NULL,
+  (__dhp) & __blokk0, (__textref) & __stdinname, 5, 1, 1, __NULL, __TRUE,
+ __NOSHARED, __NOAPPEND, __NOCREATE, __READWRITE, __NOREWIND, __NOPURGE,
+ (__textref) & __stdinimage, INPUT_LINE_LENGTH, INPUT_LINE_LENGTH + 1, 1,
+ __FALSE};
+
+/* Genererer og initierer et printfile objekt (SYSOUT) */
+
+__bs6FILE __sysout =
+{(__pty) & __p6FILE, (__dhp) & __sysout, (__dhp) & __blokk0, 
+ __FALSE, __TERMINATED, 0, __NULL,
+ (__dhp) & __blokk0, (__textref) & __stdoutname, 6, 1, 1, __NULL, __TRUE,
+ __NOSHARED, __NOAPPEND, __NOCREATE, __READWRITE, __NOREWIND, __NOPURGE,
+ (__textref) & __stdoutimage, OUTPUT_LINE_LENGTH, 1, 1,
+ 1, MAX_INT, 1, 0};
+
+__bs6FILE __syserr =
+{(__pty) & __p6FILE, (__dhp) & __syserr, (__dhp) & __blokk0, 
+ __FALSE, __TERMINATED, 0, __NULL,
+ (__dhp) & __blokk0, (__textref) & __stderrname, 6, 1, 1, __NULL, __TRUE,
+ __NOSHARED, __NOAPPEND, __NOCREATE, __READWRITE, __NOREWIND, __NOPURGE,
+ (__textref) & __stderrimage, OUTPUT_LINE_LENGTH, 1, 1,
+ 1, MAX_INT, 1, 0};
 
 void __m_FILE()
 { goto __s;
@@ -76,8 +251,7 @@ __l21: __rendclass(0);goto __sw;
                                           /* BYTEFILE class INBYTEFILE */
 
 __l22: __renddecl(2);goto __sw;
-__l23: ((__bs8 *)__lb)->endfile=__TRUE;
-       ((__bs1 *)__lb)->shared=__SHARED;
+__l23: ((__bs1 *)__lb)->shared=__SHARED;
        __rinner(2);goto __sw; 
 __l24: __rendclass(0);goto __sw;
 
@@ -119,52 +293,16 @@ case 30: goto __l30;case 31: goto __l31;
 void __init_FILE()
 {
   /*  I N I T I E R I N G   a v   B A S I C I O */
-  
-  /* Initiering av prototyper for omgivelsene (class ENVIRONMENT ) */
-  /* Ytterste blokk */
+#if 0  
   __rl0FILE[0]=(char *)&__bp0FILE->c1-(char *)__bp0FILE;
   __rl0FILE[1]=(char *)&__bp0FILE->c2-(char *)__bp0FILE;
-  __pl0FILE[0] = &__p0FILE;
-  __p0FILE.adr.ment=__m_FILE;
+
   /* class FILE */
   __rl1FILE[0]=(char *)&__bp1FILE->filename-(char *)__bp1FILE;
-  __pl1FILE[0] = &__p1FILE;
-  __p1FILE.adr.ment=__m_FILE;
+
   /* FILE class IMAGEFILE */
   
   __rl2FILE[0]=(char *)&__bp2FILE->IMAGE-(char *)__bp2FILE;
-  __pl2FILE[1] = &__p2FILE; 
-  __p2FILE.adr.ment=__m_FILE;
-  /* IMAGEFILE class OUTFILE */
-  
-  __pl3FILE[2] = &__p3FILE;
-  __p3FILE.adr.ment=__m_FILE;
-  /* IMAGEFILE class INFILE */
-  
-  __pl4FILE[2] = &__p4FILE;
-  __p4FILE.adr.ment=__m_FILE;
-  /* IMAGEFILE class DIRECTFILE */
-  
-  __pl5FILE[2] = &__p5FILE;
-  __p5FILE.adr.ment=__m_FILE;
-  /* OUTFILE class PRINTFILE */
-  
-  __pl6FILE[3] = &__p6FILE;
-  __p6FILE.adr.ment=__m_FILE;
-  /* FILE class BYTEFILE  */
-  
-  __pl7FILE[1] = &__p7FILE;
-  __p7FILE.adr.ment=__m_FILE;
-  /* BYTEFILE class INBYTEFILE */
-  
-  __pl8FILE[2] = &__p8FILE;
-  __p8FILE.adr.ment=__m_FILE;
-  /* BYTEFILE class OUTBYTEFILE */
-  
-  __pl9FILE[2] = &__p9FILE;
-  __p9FILE.adr.ment=__m_FILE;
-  /* BYTEFILE class DIRECTBYTEFILE */
-  
-  __pl10FILE[2] = &__p10FILE;
-  __p10FILE.adr.ment=__m_FILE;
+
+#endif
 }

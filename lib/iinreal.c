@@ -19,6 +19,7 @@
 
 #include "cim.h"
 #include "config.h"
+#include "simfile.h"
 
 /******************************************************************************
                                            REAL PROCEDURE INREAL             */

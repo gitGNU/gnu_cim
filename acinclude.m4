@@ -192,9 +192,15 @@ AC_MSG_RESULT($cim_cv_dynmemsizekb)
 AC_DEFINE_UNQUOTED(DYNMEMSIZEKB,$cim_cv_dynmemsizekb)
 
 AC_MSG_CHECKING(assuming that dump is implementable)
-AC_CACHE_VAL(cim_cv_dump,[cim_cv_dump=no])
-AC_MSG_RESULT($cim_cv_dump)
-if test $cim_cv_dump = yes; then
+AC_ARG_ENABLE(dump,
+[  --enable-dump           Enable implementation of (un)dump],
+[case "${enableval}" in
+  yes) cim_dump=yes ;;
+  no)  cim_dump=no ;;
+  *) AC_MSG_ERROR(bad value ${enableval} for --enable-dump) ;;
+esac],[cim_dump=no])
+AC_MSG_RESULT($cim_dump)
+if test $cim_dump = yes; then
   AC_DEFINE(DUMP)
 fi
 

@@ -19,6 +19,7 @@
 
 #include "cim.h"
 #include "config.h"
+#include "simfile.h"
 
 /******************************************************************************
                                        PROCEDURE OUTREAL(r,i,w)              */

@@ -16,16 +16,15 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA. */
 
+
+extern void initNewstr();
+extern void newstrGrown();
+extern void newstrGrow1();
+extern void newstrGrow2();
+extern char *newstrFinish();
 extern char * newstrcat1();
 extern char * newstrcat2();
 extern char * newstrcat3();
 extern char * newstrcat4();
 extern char * newstrcat5();
 extern char * newstrcat6();
-extern char * newstrcat7();
-extern char * newstrcat8();
-extern char * newstrcat9();
-extern char * newstrcat10();
-extern char * newstrcat11();
-extern char * newstrcat12();
-extern char * newstrcat13();

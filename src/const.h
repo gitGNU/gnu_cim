@@ -1,6 +1,6 @@
 /* $Id: cconst.h,v 1.6 1994/10/15 13:30:17 cim Exp $ */
 
-/* Copyright (C) 1994 Sverre Hvammen Johansen,
+/* Copyright (C) 1994, 1998 Sverre Hvammen Johansen,
  * Department of Informatics, University of Oslo.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -24,8 +24,8 @@
 #define SCAN 4
 #define DIRTEXTLENGTH 20
 
-/* extspec.c */
-#define TIMESTAMPLENGTH 12
+/* name.c */
+#define NAMEPRIMEVALUE 1951	/* 4877 */
 
 /* setenv.c */
 #define SIMENVIR "simenvir.dta"
@@ -38,7 +38,6 @@
 #define STARTLABEL 2
 
 /* The following symbols is used in other modules than dekl.c */
-#define USERGLOBALBLEV 2	/* Currently not in use */
 #define EXTERNALGLOBALBLEV 1
 #define SYSTEMGLOBALBLEV 0
 
@@ -52,6 +51,9 @@
 #define BEFORE	4
 #define AFTER	5
 
+/* gen.c */
+#define REALASDOUBLE 1
+
 /* Some boolean constants and so on */
 #define ON 	1
 #define OFF 	0
@@ -59,7 +61,6 @@
 #define NOTFREE 0
 #define TEXTATTR 1
 #define NOTTEXTATTR 0
-#define SETT 32767
 #define TRUE 1
 #define FALSE 0
 #define MAYBEE 2
@@ -67,3 +68,8 @@
 #define NOTEXT 0
 #define DANGER 1
 #define NOTDANGER 0
+
+/* gen.c */
+#define DEF_PLEV_TAB_SIZE 8	/* Default size on prefix-table. To big value
+				 * gives big prototypes. But better code for
+				 * subclasses with that plev. */

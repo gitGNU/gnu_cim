@@ -1,6 +1,6 @@
-/* $Id: cmell.h,v 1.7 1994/11/02 14:58:23 cim Exp $ */
+/* $Id: $ */
 
-/* Copyright (C) 1994 Sverre Hvammen Johansen,
+/* Copyright (C) 1998 Sverre Hvammen Johansen,
  * Department of Informatics, University of Oslo.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -15,6 +15,22 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA. */
+
+void mbuilderInit();
+void mout();
+void moutIval();
+void moutRval();
+void moutTval();
+void moutId();
+void mbuilderReinit();
+int min();
+long minIval();
+double minRval();
+char *minTval();
+char *minId();
+
+char *mpointer;
+
 
 /* De forskjellige tokens som legges ut i pass 1
  * og som skal leses inn av pass 2
@@ -100,8 +116,8 @@
 #define MIFE                    56
 #define MELSEE                  57
 
-#define MORELSE                 58
-#define MANDTHEN                59
+#define MORELSEE                 58
+#define MANDTHENE                59
 #define MEQV                    60
 #define MIMP                    61
 #define MOR                     62
@@ -199,3 +215,34 @@
 #define MNONETEST	2
 #define MINDEXTEST	4
 #define MSTRIPSIDEEFFECTS 6
+
+#define MMODULE		140
+#define MTHEN		141
+
+#define MENDDECL	142
+#define MENTRY		143
+#define MBLOCKENTRY	144
+#define MPROCEDUREENTRY	145
+
+#define MSL		146
+#define MSENTCONC	147
+#define MINSTRONGEST    148
+#define MEXITARGUMENT   149
+#define MASSIGND        150
+#define MNAMEREADTEXT   151
+#define MNAMEREADACESS  152
+#define MNAMEWRITEACESS 153
+#define MORELSE         154
+#define MANDTHEN        155
+#define MTHUNKSIMPLEADDRESS	156
+#define MTHUNKSIMPLEVALUE	157
+#define MTHUNKLABLE	158
+#define MTHUNKARRAY	159
+#define MTHUNKPROCEDURE	160
+#define MGOTOSTOP      	161
+#define MSIGNDX         162
+#define MSIGNDI         163
+#define MSIGNDR         164
+#define MASSIGNADD      165
+#define MSENDADDRESSTHUNKTOFORMALPAR	166
+#define MSENDVALUETHUNKTOFORMALPAR	167

@@ -1,12 +1,8 @@
 typedef union {
 	long token;
 	long ival;
+        long arrdim;
 	double rval;
-	struct
-	  {
-	    long i1;
-	    long i2;
-	  } rasiival;
 	char *ident;
 	char *tval;
 	char stat_decl;

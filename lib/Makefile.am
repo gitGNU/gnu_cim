@@ -20,13 +20,26 @@
 # Ranlib should not be run when creating libcim-atr.a
 RANLIB=:
 
-CIM = ../src/cim
+CIM = $(top_builddir)/src/cim
 CIMFLAGS = -H -L -L$(srcdir) -I$(srcdir) -S
 
 lib_LIBRARIES = libcim-atr.a
+
+libcim_atr_a_SOURCES = 
+
+libcim_atr_a_LIBADD = $(srcdir)/simenvir.atr $(srcdir)/simfile.atr \
+                      $(srcdir)/simset.sim $(srcdir)/simulation.sim \
+                      $(srcdir)/simset.atr $(srcdir)/simulation.atr
+
+simulation.c simulation.atr: simulation.sim simset.atr
+	$(CIM) $(CIMFLAGS) $(srcdir)/simulation.sim
+
+simset.c simset.atr: simset.sim cim.h simfile.atr simenvir.atr
+	$(CIM) $(CIMFLAGS) $(srcdir)/simset.sim
+
 lib_LTLIBRARIES = libcim.la
 
-libcim_la_LDFLAGS = -version-info 1:0:0
+libcim_la_LDFLAGS = -version-info @LIB_CURRENT@:@LIB_REVISION@:@LIB_AGE@
 
 libcim_la_SOURCES = sysin.c sysout.c syserr.c copytexttoc.c addroffirstchar.c \
               addroffirstelem.c copytextarrtoc.c copyarrtoc.c mod.c rem.c \
@@ -70,22 +83,13 @@ libcim_la_SOURCES = sysin.c sysout.c syserr.c copytexttoc.c addroffirstchar.c \
 BUILT_SOURCES = simset.c simulation.c
 
 CLEANFILES = simset.shl simulation.shl simset.mif simulation.mif
-MAINTAINER_CLEANFILES = simset.c simset.h simset.atr \
-                        simulation.c simulation.h simulation.atr
-
-maintainer-clean-libLIBRARIES:
-	test -z "$(lib_LIBRARIES)" || rm -f $(lib_LIBRARIES)
+MAINTAINER_CLEANFILES = simset.c simset.atr \
+                        simulation.c simulation.atr
 
 clean-libLIBRARIES:
 
-libcim_atr_a_SOURCES = 
-
-libcim_atr_a_LIBADD = $(srcdir)/simenvir.atr $(srcdir)/simfile.atr \
-                      $(srcdir)/simset.sim $(srcdir)/simulation.sim \
-                      $(srcdir)/simset.atr $(srcdir)/simulation.atr
-
 noinst_HEADERS = epsilon.h file.h random.h text.h trigno.h align.h \
-                 simset.h simulation.h
+                 simfile.h
 
 include_HEADERS = cim.h
 
@@ -100,10 +104,3 @@ clean-libLIBRARIES:
 
 maintainer-clean-libLIBRARIES:
 	test -z "$(lib_LIBRARIES)" || rm -f $(lib_LIBRARIES)
-
-simulation.c simulation.h simulation.atr: simulation.sim simset.atr
-	cd $(srcdir); $(CIM) $(CIMFLAGS) $(srcdir)/simulation.sim
-
-simset.c simset.h simset.atr: simset.sim cim.h simfile.atr simenvir.atr
-	cd $(srcdir); $(CIM) $(CIMFLAGS) $(srcdir)/simset.sim
-

@@ -50,7 +50,7 @@ __rgetrv (p, as, ret, mret)
   char tconv;
   __pty q;
 
-  switch (p->h.namekind)
+  switch (p->namekind)
     {
     case __VALUE_THUNK:
     case __ADDRESS_THUNK:
@@ -59,8 +59,8 @@ __rgetrv (p, as, ret, mret)
 				 * garbage collection, slik at p ikke
 				 * lengerpeker riktig,
 				 * leses disse verdiene f|r kallet. */
-      __goto = p->h.adr;
-      __sl = p->h.sl;
+      __goto = p->adr;
+      __sl = p->sl;
       __rct (as);		/* Oppretter objektet */
       ((__thunkp) __pb)->conv = tconv;
       ((__thunkp) __pb)->q = q;	/* Overf|rer strengeste kvalifikasjon p}
@@ -70,7 +70,7 @@ __rgetrv (p, as, ret, mret)
       __lb = __pb;		/* Gj|r thunken eksikverbar. */
       return (__TRUE);
     case __ADDRESS_NOTHUNK:
-      __er = *(__dhp *) (((char *) p->h.bp) + p->h.v.ofs);
+      __er = *(__dhp *) (((char *) p->bp) + p-> v.ofs);
       if ((p->conv == __READTEST || p->conv == __READWRITETEST) 
 	  && !__rin (__er, p->q))
 	__rerror ("Getrv: Wrong qualification");

@@ -1,6 +1,6 @@
-/* $Id: cnavn.h,v 1.2 1994/07/17 10:40:53 cim Exp $ */
+/* $Id: $ */
 
-/* Copyright (C) 1994 Sverre Hvammen Johansen,
+/* Copyright (C) 1998 Sverre Hvammen Johansen,
  * Department of Informatics, University of Oslo.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -16,13 +16,17 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA. */
 
-struct namebuff
-{
-  struct namebuff *next;
-  int definition;
-  char text[1];
-};
+/* In computeconst.c */
 
-extern init_define ();
-extern char *tag ();
-extern struct namebuff *systag ();
+char computeconst ();
+char setdanger_const ();
+int sstrlen ();
+
+/* In sentchecker.c */
+
+void sentCheck ();
+
+/* In expchecker.c */
+
+void expCheckerInit ();
+void mainExpcheck ();

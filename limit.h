@@ -19,37 +19,8 @@
 #include "config.h"
 
 /* lex.c */
-#define IFDEFMAXNIV 100
-#define YYTEXTLENGTH 1010
-#define SAFEYYTEXTLENGTH 1000
-#define INCLUDELEV 10
-#define MAX_TEXT_CHAR 65535
+#define MAX_TEXT_CHAR 65535  /* Max size of text-objects DO NOT EDIT */
 
-/* simula.c */
-#define MAXANTSIMLIB 100
-#define MAXANTLIBDIR 100
-
-/* navn.c */
-#define NAMEPRIMEVALUE 1951	/* 4877 */
-
-/* dekl.c */
-#define DECLTABSIZE 100
-
-/* Parser.y/c */
-#define YYMAXDEPTH 1500
-#define REMBLOCKSIZE 500
-
-/* sjekker.c */
-#define MAXEXPBUFFER 1000
-#define MAXEXPDISPLAY 1000
-
-/* gen.c */
-#define MAINROUTINELENGTH 30
-#define MAXLABELSTAKK 1000
-#define REALASDOUBLE 1
-#define DEF_PLEV_TAB_SIZE 8	/* Default size on prefix-table. To big value
-				 * gives big prototypes. But better code for
-				 * subclasses with that plev. */
 /* genexp.c */
-#define STACK_SIZE 100
-#define MAX_ARRAY_DIM 100
+#define STACK_SIZE 100       /* Size of stack used by genexp */
+#define MAX_ARRAY_DIM 100    /* The maximum number of dimensions for arrays */

@@ -18,6 +18,7 @@
  */
 
 #include "cim.h"
+#include "simfile.h"
 
 /* CHECKPOINT er lik den i DIRECTFILE */
 

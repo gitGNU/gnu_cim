@@ -1,6 +1,6 @@
 /* $Id: cextspec.c,v 1.17 1997/01/26 14:30:17 cim Exp $ */
 
-/* Copyright (C) 1994 Sverre Hvammen Johansen,
+/* Copyright (C) 1994, 1998 Sverre Hvammen Johansen,
  * Department of Informatics, University of Oslo.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -18,13 +18,15 @@
 
 /* Inn og utlesing av externe spesifikasjoner */
 
+/* TBD: Innlesing av identifikatorer mm må gjøres mer robust. */
+
 #include "const.h"
 #include "dekl.h"
 #include "filelist.h"
 #include "newstr.h"
 #include "cimcomp.h"
 #include "extspec.h"
-#include "navn.h"
+#include "name.h"
 
 #if STDC_HEADERS || HAVE_STRING_H
 #include <string.h>
@@ -48,6 +50,14 @@
 #else
 double strtod ();
 #endif
+
+#include <obstack.h>
+char *xmalloc();
+void free();
+
+#define obstack_chunk_alloc xmalloc
+#define obstack_chunk_free free
+static struct obstack osExtspec;
 
 /* HUSK AT REKKEF\LGEN SKAL V[RE categ,type,kind 
  *
@@ -90,9 +100,32 @@ double strtod ();
 #define CPROC_MARKER '^'
 #define NO_MARKER '$'
 #define inchar(f) getc(f)
-#define getval(f, i)  { int tmp;(void)fscanf(f,"%d",&tmp);i=tmp;}
-#define getconst(f, i)  { (void)fscanf(f,"%d",&i);}
-#define getname(f, x) { (void)fscanf(f,"%s",x);}
+#define getval(f, i)  { int tmp;fscanf(f,"%d",&tmp);i=tmp;}
+#define getconst(f, i)  { fscanf(f,"%d",&i);}
+
+/******************************************************************************
+                                                              INITEXTSPEC    */
+void initExtspec ()
+{
+  obstack_init (&osExtspec);
+}
+
+/******************************************************************************
+                                                                  GETNAME    */
+
+static char * getname (f) FILE *f;
+{
+  int c;
+  char *s, *sx;
+  for (c= getc (f); c !=EOF && c != '\n' && c!= ' '; c= getc (f))
+    obstack_1grow (&osExtspec, c);
+
+  obstack_1grow (&osExtspec, 0);
+  s= obstack_finish (&osExtspec);
+  sx= tag (s);
+  obstack_free (&osExtspec, s);
+  return sx;
+}
 
 /* fscanf leter frem til neste \n eller blank (eller til slutten) men lar 
  * \n eller blank bli igjen.                                              
@@ -101,11 +134,8 @@ double strtod ();
  * tegnet leses av etter at hvert navn er lest inn
  * For å overføre filnavn id til deklarasjonslageret */
 
-char timestamp[TIMESTAMPLENGTH + 1];	/* Det globale tidsmerket */
-char directive_timestamp[TIMESTAMPLENGTH + 1];
-static char hhtimestamp[TIMESTAMPLENGTH + 1];	/* Lokalt tidsmerke i denne modulen */
-static char *external_spec_id;		/* Hash verdien til konkateneringen av
-				 * tidsmerke, * en blank og filnavnet */
+char *timestamp="";	/* Det globale tidsmerket */
+char *directive_timestamp="";
 struct stamp *first_stamp;
 
 static char timestampchars[63] =
@@ -118,8 +148,7 @@ static char timestampchars[63] =
 /******************************************************************************
                                                           GETTIMESTAMP       */
 
-char *
-gettimestamp ()
+void gettimestamp ()
 {
 #if GET_TIME_OF_DAY
   static struct timeval tp;
@@ -127,13 +156,10 @@ gettimestamp ()
 #endif
 
   FILE *f;
-  int t,
-    th;
-  int tpos = 0;;
+  int t, th;
+
   if (strcmp (directive_timestamp, ""))
-    {
-      strcpy (timestamp, directive_timestamp);
-    }
+    timestamp= directive_timestamp;
   else if (option_reuse_timestamp && (f = searc_and_open_name_in_archlist 
 				      (extcodename, TRUE)) != NULL)
     {
@@ -143,18 +169,18 @@ gettimestamp ()
       {
 	char r_buff[12];
 	r_buff[0] = '\0';
-	(void) fscanf (f, "%11s\n", r_buff);
+	fscanf (f, "%11s\n", r_buff);
 	if (strcmp (r_buff, "/*Cim_atr*/"))
 	  merror (5, extcodename);
       }
 
-      getname (f, timestamp);
-      (void) fclose (f);
+      timestamp= getname (f);
+      fclose (f);
     }
   else
     {
 #if GET_TIME_OF_DAY
-      (void) gettimeofday (&tp, &tzp);
+      gettimeofday (&tp, &tzp);
       t = tp.tv_sec;
       th = tp.tv_usec;
 #else
@@ -162,45 +188,18 @@ gettimestamp ()
       th = 0;
 #endif
       th /= 252;
-      timestamp[tpos++] = timestampchars[th - th / 63 * 63];
+
+      obstack_1grow (&osExtspec, timestampchars[th - th / 63 * 63]);
       th /= 63;
-      timestamp[tpos++] = timestampchars[th - th / 63 * 63];
+      obstack_1grow (&osExtspec, timestampchars[th - th / 63 * 63]);
       while (t != 0)
 	{
-	  timestamp[tpos++] = timestampchars[t - t / 63 * 63];
+	  obstack_1grow (&osExtspec, timestampchars[t - t / 63 * 63]);
 	  t /= 63;
 	}
-      timestamp[tpos] = '\0';
+      obstack_1grow (&osExtspec, 0);
+      timestamp= obstack_finish (&osExtspec);
     }
-}
-
-/******************************************************************************
-                                                    MAKETIMESTAMPANDFILENAME */
-
-static char *
-maketimestampandfilename (timestamp, filename)
-     char *timestamp,
-      *filename;
-{
-  char s[YYTEXTLENGTH + TIMESTAMPLENGTH];
-  (void) strcpy (s, timestamp);
-  (void) strcat (s, " ");
-  (void) strcat (s, filename);
-  return (tag (s, strlen (s)));
-}
-
-/******************************************************************************
-                                                          GETIDENTID         */
-
-static char *
-getidentid (f)
-     FILE *f;
-{
-  char s[YYTEXTLENGTH];
-
-  getname (f, s);
-  (void) getc (f);		/* Leser av <LF> eller <blank> */
-  return (tag (s, strlen (s)));
 }
 
 /******************************************************************************
@@ -211,12 +210,17 @@ genatrfilenamefromid (ident)
      char *ident;
 {
   int i;
-  char s[YYTEXTLENGTH];
-  (void) sprintf (s, "%s.atr", ident);
+  char *s, *sx;
+  obstack_grow (&osExtspec, ident, strlen (ident));
+  obstack_grow0 (&osExtspec, ".atr", 4);
+  s= obstack_finish (&osExtspec);
+
   for (i = strlen (s) - 5; i >= 0; i--)
     if (s[i] >= 'A' && s[i] <= 'Z')
       s[i] += 32;		/* LOWERCASE */
-  return (tag (s, strlen (s)));
+  sx= tag (s);
+  obstack_free (&osExtspec, s);
+  return sx;
 }
 
 /******************************************************************************
@@ -224,50 +228,24 @@ genatrfilenamefromid (ident)
 
 static char *
 genatrfilenamefromfilename (filename)
-     char *filename;
+char *filename;
 {
-  char s[YYTEXTLENGTH];
-  int l = strlen (filename);
-  (void) strcpy (s, filename);
-  if (l > SAFEYYTEXTLENGTH)	/* 4 er lik lengden av ".atr" */
-    merror (1, filename);
-
-  if (l >= 4 & !strcmp (&s[l - 4], ".atr")) /* OK */ ;
-  else if (l >= 4 & !strcmp (&s[l - 4], ".sim"))
-    {
-      s[l - 3] = 'a';
-      s[l - 2] = 't';
-      s[l - 1] = 'r';
-    }
+  char *s, *sx;
+  int len = strlen (filename);
+  
+  if (len >=4 && !strcmp (&filename[len - 4], ".atr")) 
+    return (tag (filename));
+      
+  if (len >=4 && !strcmp (&filename[len - 4], ".sim"))
+    obstack_grow (&osExtspec, filename, len - 4);
   else
-    (void) strcat (s, ".atr");
-  return (tag (s, strlen (s)));
-}
+    obstack_grow (&osExtspec, filename, len);
 
-/******************************************************************************
-                                                        EXTRACT_TIMESTAMP    */
-char *
-extract_timestamp (s)
-     char *s;
-{
-  /* Ekstraherer ut tidsmerket */
-  static char htimestamp[TIMESTAMPLENGTH + 1];	/* Må ha plass til \0 til
-						 * slutt */
-
-  sscanf (s, "%s", htimestamp);
-  return (htimestamp);
-}
-
-/******************************************************************************
-                                                            EXTRACT_FILENAME */
-
-static char *
-extract_filename (s)
-     char *s;
-{
-  /* Ekstraherer ut filnavn */
-  for (; *s != ' '; s++);
-  return (++s);
+  obstack_grow0 (&osExtspec, ".atr", 4);
+  s= obstack_finish (&osExtspec);
+  sx= tag (s);
+  obstack_free (&osExtspec, s);
+  return sx;
 }
 
 /******************************************************************************
@@ -281,7 +259,7 @@ external_is_in (ident, kind)
   struct DECL *rd;
   struct BLOCK *rb;
 
-  rb = display[cblev];
+  rb = cblock;
 
   for (rd = rb->parloc; rd != NULL; rd = rd->next)
     if (rd->ident == ident && rd->kind == kind)
@@ -293,61 +271,46 @@ external_is_in (ident, kind)
 /******************************************************************************
                                                                     NEXTDECL */
 
-static lesinn ();
+static char *lesinn ();
 
-static nextdecl (f)
-     FILE *f;
+static nextdecl (f, filename, timestamp)
+     FILE *f; char *filename, *timestamp;
 {
-  char hcateg,
-    hkind;
-  char tegn,
-    filename[YYTEXTLENGTH];
+  char type, kind, categ;
+  char tegn;
   char *ident;
 
-  extern char insert_with_codeclass;
-  char with_codeclass = FALSE;
-  char codeclass;
-  char *rtname;
-  char *hexternid;
+  char codeclass=0;
+  char *rtname=NULL;
+
   categ = getc (f);
 
   if (categ == (char) EOF)
-    merror (5, extract_filename (external_spec_id));
+    merror (5, filename);
   if (categ == ENDOF_CLASS_PROC_FILE)
     return (FALSE);
   else if (categ == START_NEW_EXTERNAL_SPEC)
     {
-      char *this_external_spec_id;
-
-      /* Skal n} lese fra en annen fil. M} ta vare p} id'en til denne filen */
-      /* Etter at den nye filen er lest, skal lesingen fra denne filen      */
-      /* fortsettes. M} derfor sette tilbake fil id'en etter kallet p{      */
-      /* lesinn()                                                           */
-
-      hexternid = external_spec_id;
+      char *localTimestamp;
+      char *localFilename;
       type = getc (f);
       kind = getc (f);
 
-      ident = getidentid (f);	/* Leser navnet */
-      getname (f, hhtimestamp);
-      (void) getc (f);		/* tidsmerket   */
-      getname (f, filename);
-      (void) getc (f);		/* filnavnet    */
+      ident = getname (f);	/* Leser navnet */
+      localTimestamp= getname (f); /* tidsmerket   */
+      localFilename= getname (f);    /* filnavnet    */
 
-      external_spec_id = this_external_spec_id =
-	maketimestampandfilename (hhtimestamp, filename);
       if (!external_is_in (ident, kind))
-	lesinn (tag (filename, strlen (filename)));
-      if (external_spec_id != this_external_spec_id)
-	merror (4, extract_filename (hexternid));
-
-      external_spec_id = hexternid;
+	{
+	  if (localTimestamp != lesinn (localFilename))
+	    merror (4, filename);
+	}
       return (TRUE);
     }
 
   type = getc (f);
   kind = getc (f);
-  ident = getidentid (f);
+  ident = getname (f);
 
   switch (kind)
     {
@@ -356,16 +319,15 @@ static nextdecl (f)
       tegn = getc (f);
       if (tegn == PREFIKS_MARKER)
 	{
-	  prefquantident = getidentid (f);
+	  prefquantident = getname (f);
 	  tegn = getc (f);
 	  if (tegn == CPROC_MARKER)
 	    {
-	      rtname = getidentid (f);
+	      rtname = getname (f);
 	      if (categ != CCPROC)
-		{
-		  codeclass = getc (f) - '0';
-		  with_codeclass = TRUE;
-		}
+		codeclass = getc (f) - '0';
+	      else
+		codeclass = CCCPROC;
 	    }
 	  else
 	    ungetc (tegn, f);
@@ -375,17 +337,18 @@ static nextdecl (f)
 	  prefquantident = 0;
 	  if (tegn == CPROC_MARKER)
 	    {
-	      rtname = getidentid (f);
+	      rtname = getname (f);
 	      if (categ != CCPROC)
-		{
-		  codeclass = getc (f) - '0';
-		  with_codeclass = TRUE;
-		}
+		codeclass = getc (f) - '0';
+	      else
+		codeclass = CCCPROC;
 	    }
 	}
-      newdekl (ident);
-      newblck (kind);
-      cblock->externid = external_spec_id;
+      regDecl (ident, type, kind, categ);
+      beginBlock (kind);
+
+      cblock->timestamp= timestamp;
+      cblock->filename= filename;
 
       if (kind == KCLASS)
 	{
@@ -394,51 +357,48 @@ static nextdecl (f)
 	}
       getval (f, cblock->ptypno);
       if (getc (f) == '%')
-	cblock->blno = cblock->ptypno;
+        cblock->blno = cblock->ptypno;
       getval (f, cblock->ent);
       /* Les inn parametere, virtuelle, hidden, protected og deklarasjoner */
-      while (nextdecl (f));
-      insert_with_codeclass = with_codeclass;
-      endblock (rtname, codeclass);
-      insert_with_codeclass = FALSE;
+      while (nextdecl (f, filename, timestamp));
+      endBlock (rtname, codeclass);
       break;
     default:
       if (type == TREF)
-	prefquantident = getidentid (f);
+	{
+	  prefquantident = getname (f);
+	}
       switch (categ)
 	{
 	case CCONST:
-	  newdekl (ident);
+	  regDecl (ident, type, kind, categ);
 	  if (type == TTEXT)
 	    {
 	      int i;
 	      getval (f, i);
-	      (void) getc (f);
-	      clastdecl->value.tval.txt = (char *) xmalloc (i + 1);
-	      getname (f, clastdecl->value.tval.txt);
-	      (void) getc (f);
+	      getc (f);
+	      cblock->lastparloc->value.tval.txt= getname (f);
 	    }
 	  else if (type == TREAL)
 	    {
-	      char s[100];
-	      getname (f, s);
-	      clastdecl->value.rval= strtod (s, NULL);
-	      (void) getc (f);
+	      char *s;
+	      s= getname (f);
+	      cblock->lastparloc->value.rval= strtod (s, NULL);
 	    }
 	  else
 	    {
-	      getconst (f, clastdecl->value.ival);
-	      (void) getc (f);
+	      getconst (f, cblock->lastparloc->value.ival);
+	      getc (f);
 	    }
 	  break;
 	default:
-	  newdekl (ident);
+	  regDecl (ident, type, kind, categ);
 	  if (type == TLABEL)
-	    getconst (f, cprevdecl->idplev.plev);
+	    getconst (f, cprevdecl->plev);
 	  break;
 	}
       if (kind == KARRAY)
-	getval (f, clastdecl->dim);
+	getval (f, cblock->lastparloc->dim);
     }
   return (TRUE);
 }
@@ -446,15 +406,15 @@ static nextdecl (f)
 /******************************************************************************
                                                                       LESINN */
 
-static lesinn (filename)
+static char *lesinn (filename)
      char *filename;
 {
-  char *sp;
   struct stamp *st;
+  char *timestamp;
   FILE *f;
 
   f = searc_and_open_name_in_archlist (filename, TRUE);
-  if (f == NULL)return(TRUE);
+  if (f == NULL) return (NULL);
 
   if (option_verbose)
     fprintf (stderr, "Reading atr-file %s\n", filename);
@@ -462,23 +422,20 @@ static lesinn (filename)
   {
     char r_buff[12];
     r_buff[0] = '\0';
-    (void) fscanf (f, "%11s\n", r_buff);	
+    fscanf (f, "%11s\n", r_buff);	
     if (strcmp (r_buff, "/*Cim_atr*/"))
       merror (5, filename);
   }
 
   /* Leser tidsmerke */
 
-  getname (f, hhtimestamp);
-  (void) getc (f);
-  /* Konkatenerer tidsmerke og filnavn med en blank mellom   */
-  external_spec_id = maketimestampandfilename (hhtimestamp, filename);
-  sp = tag (hhtimestamp, strlen (hhtimestamp));
+  timestamp= getname (f); 
+
   for (st = first_stamp; st != NULL; st = st->next)
-    if (st->timestamp == sp)
+    if (st->timestamp == timestamp)
       goto found;
-  st = (struct stamp *) xmalloc (sizeof (struct stamp));
-  st->timestamp = sp;
+  st = (struct stamp *) obstack_alloc (&osExtspec, sizeof (struct stamp));
+  st->timestamp = timestamp;
   st->next = first_stamp;
   st->lest_inn = FALSE;
   st->filename = filename;
@@ -490,58 +447,51 @@ found:
   /* Leser inn liste med tidsmerker */
   while (getc (f) == ' ')
     {
-      char filename[YYTEXTLENGTH],
-       *filenamep;
-      getname (f, hhtimestamp);
-      (void) getc (f);
-      getname (f, filename);
-      (void) getc (f);
-      sp = tag (hhtimestamp, strlen (hhtimestamp));
-      filenamep = tag (filename, strlen (filename));
+      char *localTimestamp= getname (f);
+      char *localFilename= getname (f);
 
       for (st = first_stamp; st != NULL; st = st->next)
-	if (st->timestamp == sp)
+	if (st->timestamp == localTimestamp)
 	  goto find_next;
-      st = (struct stamp *) xmalloc (sizeof (struct stamp));
-      st->timestamp = sp;
+      st = (struct stamp *) obstack_alloc (&osExtspec, sizeof (struct stamp));
+      st->timestamp = localTimestamp;
       st->next = first_stamp;
       st->lest_inn = FALSE;
-      st->filename = filenamep;
+      st->filename = localFilename;
       first_stamp = st;
     find_next:;
-      if (st->filename != filenamep)
-	merror (11, filenamep);
+      if (st->filename != localFilename)
+	merror (11, localFilename);
     }
 
-  while (nextdecl (f));
+  while (nextdecl (f, filename, timestamp));
 
-  (void) fclose (f);
-  return (FALSE);
+  fclose (f);
+  return (timestamp);
 }
 
 /******************************************************************************
                                                         LESINN_EXTERNAL_SPEC */
 
-lesinn_external_spec (ident, filename)
+lesinn_external_spec (ident, filename, kind)
      char *ident;
      char *filename;
+     char kind;
 {
-  char hcateg;
   char *hprefquantident;
   struct BLOCK *hcblock;
   struct DECL *hclastdecl,
    *rd;
-  hcateg = categ;
   hprefquantident = prefquantident;
   hcblock = cblock;
-  hclastdecl = clastdecl;
+  hclastdecl = cblock->lastparloc;
   if (filename == NULL)
     filename = genatrfilenamefromid (ident);
   else
     filename = genatrfilenamefromfilename (filename);
   if (!external_is_in (ident, kind))
     {
-      if (lesinn (filename))
+      if (lesinn (filename) == NULL)
 	{
 	  merror (3, filename);
 	  return;
@@ -558,7 +508,6 @@ lesinn_external_spec (ident, filename)
   if (rd != NULL)
     rd->categ = CEXTRMAIN;
 
-  categ = hcateg;		/* M} settes tilbake. */
   prefquantident = hprefquantident;
 }
 
@@ -652,8 +601,8 @@ static write_decl_mif (f, rd, level)
       fprintf (f, "hidden proteced ");
       break;
     case CCPROC:
-      (void) fprintf (f, "external C procedure %s is "
-		      ,((exinfop) rd->descr->hiprot)->rtname);
+      fprintf (f, "external C procedure %s is "
+		      ,rd->descr->rtname);
       break;
 
     }
@@ -685,7 +634,6 @@ static write_decl_mif (f, rd, level)
     case TERROR:
       break;
     case TVARARGS:
-      fprintf (f, "... ");
       break;
     }
   switch(rd->kind)
@@ -699,16 +647,16 @@ static write_decl_mif (f, rd, level)
     case KCLASS:
       if (rd->prefqual != NULL && rd->prefqual != commonprefiks)
 	/* Prefiks klassens navn eller kvalifikasjon */
-	(void) fprintf (f, "%s ", rd->prefqual->ident);
+	fprintf (f, "%s ", rd->prefqual->ident);
       fprintf (f, "class ");
       break;
     }
 
-  (void) fprintf (f, "%s", rd->ident);
+  fprintf (f, "%s", rd->ident);
 
   if (rd->categ == CEXTR || rd->categ == CEXTRMAIN)
     {
-    (void) fprintf (f, "= \"%s\"", rd->descr->externid);
+    fprintf (f, "= \"%s %s\"", rd->descr->timestamp, rd->descr->filename);
     }
   else if (rd->kind == KPROC || rd->kind == KCLASS)
     {
@@ -743,7 +691,7 @@ static write_decl_mif (f, rd, level)
 #if 0
       /* Fornest,Connest,blno,ent */
       if (rb->quant.kind == KCLASS)
-	(void) fprintf (f, "\n%% f_c_b_e %d %d %d %d",
+	fprintf (f, "\n%% f_c_b_e %d %d %d %d",
 			rb->fornest, rb->connest, rb->blno, rb->ent);
 #endif
 
@@ -755,7 +703,7 @@ static write_decl_mif (f, rd, level)
 	  /* evt. virtuelle spesifiksajoner , men bare de som er spesifisert */
 	  /* i denne klassen. Ikke de akkumulerte. De akkumuleres opp av     */
 	  /* sjekkdekl senere                                                */
-	  i = (rb->quant.idplev.plev > 0) ? rb->quant.prefqual->descr->navirt
+	  i = (rb->quant.plev > 0) ? rb->quant.prefqual->descr->navirt
 	    + rb->quant.prefqual->descr->navirtlab : 0;
 	  for (rdv = rb->virt; i-- > 0; rdv = rdv->next);
 	  for (; rdv != NULL; rdv = rdv->next)
@@ -779,7 +727,7 @@ static write_decl_mif (f, rd, level)
     {
 #if 0
       if (rd->type == TLABEL)
-	(void) fprintf (f, "\n%% ENT %d", rd->idplev.plev);
+	fprintf (f, "\n%% ENT %d", rd->plev);
 #endif
       if (rd->categ == CCONST)
 	if (rd->type == TTEXT)
@@ -800,7 +748,7 @@ static write_decl_mif (f, rd, level)
 	else if (rd->type == TCHAR)
 	  write_char_mif (f, rd->value.ival);
 	else
-	  (void) fprintf (f, "= %d", rd->value.ival);
+	  fprintf (f, "= %d", rd->value.ival);
       if (rd->kind == KARRAY && rd->type != TLABEL)
 	{
 	  int i;
@@ -838,10 +786,8 @@ static write_decl_mif (f, rd, level)
 
 write_all_mif ()
 {
-  /* Trenger ikke skrive ut lokale deklarasjoner i procedyrer
-   * Merker i tillegg de klasser/prosedyrer som er kallbare
-   * utenifra modulen ved } sette feltet ptypno!=0 i BLOCK-
-   * objektene. */
+  /* Trenger ikke skrive ut lokale deklarasjoner i procedyrer */
+
   struct DECL *rd;
   struct stamp *st;
   FILE *f;
@@ -852,21 +798,22 @@ write_all_mif ()
     merror (9, mifcodename);
 
   /* Skriver f|rst ut identifikasjon til find */
-  (void) fprintf (f, "%% Cim_mif");
+  fprintf (f, "%% Cim_mif");
 
 #if 0
   /* Skriver ut tidsmerke */
-  (void) fprintf (f, "\n%%timestamp %s", timestamp);
+  fprintf (f, "\n%%timestamp %s", timestamp);
 
   /* Skriver ut tidsmerke til alle moduler */
   for (st = first_stamp; st != NULL; st = st->next)
-    (void) fprintf (f, "\n%% timestamp_other_module %s %s"
+    fprintf (f, "\n%% timestamp_other_module %s %s"
 		    ,st->timestamp, st->filename);
 #endif
 
-  for (rd = display[EXTERNALGLOBALBLEV]->parloc; rd != NULL; rd = rd->next)
+  for (rd = sblock->parloc; rd != NULL; rd = rd->next)
     if (rd->categ == CEXTR) /* OK */ ;
-    else if (rd->categ == CEXTRMAIN)
+    else 
+      if (rd->categ == CEXTRMAIN)
       {
 	rd->categ = CEXTR;
 	write_decl_mif (f, rd, 0);
@@ -879,8 +826,8 @@ write_all_mif ()
 	  write_decl_mif (f, rd, 0);
 	rd->categ = hcateg;
       }
-  (void) fprintf (f, "\n\n%%eof\n");
-  (void) fclose (f);
+  fprintf (f, "\n\n%%eof\n");
+  fclose (f);
 }
 
 /******************************************************************************
@@ -890,8 +837,8 @@ static write_decl_ext (f, rd)
        FILE *f; struct DECL *rd;
 {
   if (rd->categ == CEXTR || rd->categ == CEXTRMAIN)
-    (void) fprintf (f, "&%c%c%s %s\n", rd->type, rd->kind
-		    ,rd->ident, rd->descr->externid);
+    fprintf (f, "&%c%c%s %s %s\n", rd->type, rd->kind
+		    ,rd->ident, rd->descr->timestamp, rd->descr->filename);
   else if (rd->kind == KPROC || rd->kind == KCLASS)
     {
       struct DECL *rdv;
@@ -900,22 +847,22 @@ static write_decl_ext (f, rd)
       if (rd->categ == CEXTROUT)
 	rd->categ = CEXTR;
       /* Skriver ut <categ><type><kind><navn><blank> */
-      (void) fprintf (f, "%c%c%c%s ", rd->categ, rd->type, rd->kind,
+      fprintf (f, "%c%c%c%s ", rd->categ, rd->type, rd->kind,
 		      rd->ident);
 
       if (rd->prefqual != NULL && rd->prefqual != commonprefiks)
 	/* Prefiks klassens navn eller kvalifikasjon */
-	(void) fprintf (f, "%c%s ", PREFIKS_MARKER, rd->prefqual->ident);
+	fprintf (f, "%c%s ", PREFIKS_MARKER, rd->prefqual->ident);
       else if (rd->categ == CCPROC)	/* C-navnet */
-	(void) fprintf (f, "%c%s ", CPROC_MARKER
-			,((exinfop) rd->descr->hiprot)->rtname);
+	fprintf (f, "%c%s ", CPROC_MARKER
+			,rd->descr->rtname);
       else
-	(void) fprintf (f, "%c", NO_MARKER);
+	fprintf (f, "%c", NO_MARKER);
 
       /* Fornest,Connest,blno,ent */
       if (rb->quant.kind == KCLASS)
-	(void) fprintf (f, "%d %d ", rb->fornest, rb->connest);
-      (void) fprintf (f, "%d %d", rb->blno, rb->ent);
+	fprintf (f, "%d %d ", rb->fornest, rb->connest);
+      fprintf (f, "%d %d", rb->blno, rb->ent);
 
       /* evt. parametere */
       for (rd = rb->parloc; rd != NULL && (rd->categ == CDEFLT || rd->categ == CNAME ||
@@ -929,7 +876,7 @@ static write_decl_ext (f, rd)
 	  /* evt. virtuelle spesifiksajoner , men bare de som er spesifisert */
 	  /* i denne klassen. Ikke de akkumulerte. De akkumuleres opp av     */
 	  /* sjekkdekl senere                                                */
-	  i = (rb->quant.idplev.plev > 0) ? rb->quant.prefqual->descr->navirt
+	  i = (rb->quant.plev > 0) ? rb->quant.prefqual->descr->navirt
 	    + rb->quant.prefqual->descr->navirtlab : 0;
 	  for (rdv = rb->virt; i-- > 0; rdv = rdv->next);
 	  for (; rdv != NULL; rdv = rdv->next)
@@ -944,29 +891,29 @@ static write_decl_ext (f, rd)
 	  for (; rd != NULL; rd = rd->next)
 	    write_decl_ext (f, rd);
 	}
-      (void) fprintf (f, "%c", ENDOF_CLASS_PROC_FILE);
+      fprintf (f, "%c", ENDOF_CLASS_PROC_FILE);
     }
   else
     {
-      (void) fprintf (f, "%c%c%c%s ", rd->categ, rd->type,
+      fprintf (f, "%c%c%c%s ", rd->categ, rd->type,
 		      rd->kind, rd->ident);
 
       if (rd->type == TREF)
-	(void) fprintf (f, "%s ", rd->prefqual->ident);
+	fprintf (f, "%s ", rd->prefqual->ident);
       else if (rd->type == TLABEL)
-	(void) fprintf (f, "%d", rd->idplev.plev);
+	fprintf (f, "%d", rd->plev);
 
       if (rd->categ == CCONST)
 	if (rd->type == TTEXT)
-	  (void) fprintf (f, "%d %s "
+	  fprintf (f, "%d %s "
 			  ,strlen (rd->value.tval.txt)
 			  ,rd->value.tval.txt);
 	else if (rd->type == TREAL)
-	  (void) fprintf (f, "%.16e ", rd->value.rval);
+	  fprintf (f, "%.16e ", rd->value.rval);
 	else
-	  (void) fprintf (f, "%d ", rd->value.ival);
+	  fprintf (f, "%d ", rd->value.ival);
       if (rd->kind == KARRAY)
-	(void) fprintf (f, "%c", (rd->dim + ((short) '0')));
+	fprintf (f, "%c", (rd->dim + ((short) '0')));
     }
 }
 
@@ -975,10 +922,8 @@ static write_decl_ext (f, rd)
 
 write_all_ext ()
 {
-  /* Trenger ikke skrive ut lokale deklarasjoner i procedyrer
-   * Merker i tillegg de klasser/prosedyrer som er kallbare
-   * utenifra modulen ved } sette feltet ptypno!=0 i BLOCK-
-   * objektene. */
+  /* Trenger ikke skrive ut lokale deklarasjoner i procedyrer */
+
   struct DECL *rd;
   struct stamp *st;
   FILE *f;
@@ -993,18 +938,17 @@ write_all_ext ()
     merror (9, extcodename);
 
   /* Skriver f|rst ut identifikasjon til find */
-  (void) fprintf (f, "/*Cim_atr*/\n");
+  fprintf (f, "/*Cim_atr*/\n");
 
   /* Skriver ut tidsmerke */
-  (void) fprintf (f, "%s\n", timestamp);
+  fprintf (f, "%s\n", timestamp);
 
   /* Skriver ut tidsmerke til alle moduler */
   for (st = first_stamp; st != NULL; st = st->next)
-    (void) fprintf (f, " %s %s\n"
+    fprintf (f, " %s %s\n"
 		    ,st->timestamp, st->filename);
   fprintf (f, "\n");
-
-  for (rd = display[EXTERNALGLOBALBLEV]->parloc; rd != NULL; rd = rd->next)
+  for (rd = sblock->parloc; rd != NULL; rd = rd->next)
     if (rd->categ == CEXTR) /* OK */ ;
     else if (rd->categ == CEXTRMAIN)
       {
@@ -1019,10 +963,10 @@ write_all_ext ()
 	  write_decl_ext (f, rd);
 	rd->categ = hcateg;
       }
-  (void) fprintf (f, "%c", ENDOF_CLASS_PROC_FILE);
-  (void) fclose (f);
+  fprintf (f, "%c", ENDOF_CLASS_PROC_FILE);
+  fclose (f);
 
-  write_all_mif();
+  if (option_write_mif) write_all_mif();
 }
 
 /******************************************************************************
@@ -1032,6 +976,7 @@ more_modules ()
 {
   FILE *f;
   struct stamp *st;
+  char *localTimestamp;
   for (st = first_stamp; st != NULL; st = st->next)
     if (st->lest_inn == FALSE && (f = fopen (st->filename,
 #if OPEN_FILE_IN_BINARY_MODE
@@ -1046,14 +991,14 @@ more_modules ()
 	
 	/* Leser identifikasjon , som alltid ligger f|rst p} filen */
 	r_buff[0] = '\0';
-	(void) fscanf (f, "%11s\n", r_buff);
+	fscanf (f, "%11s\n", r_buff);
 	if (strcmp (r_buff, "/*Cim_atr*/"))
 	  merror (5, st->filename);
 	
 	/* Leser tidsmerke */
 
-	getname (f, hhtimestamp);
-	if (tag (hhtimestamp, strlen (hhtimestamp)) == st->timestamp)
+	localTimestamp= getname (f);
+	if (localTimestamp == st->timestamp)
 	  {
 	    if (option_verbose)
 	      fprintf (stderr, "Reading atr-file %s\n", st->filename);

@@ -1,6 +1,6 @@
 /* $Id: cextspec.c,v 1.17 1997/01/26 14:30:17 cim Exp $ */
 
-/* Copyright (C) 1994 Sverre Hvammen Johansen,
+/* Copyright (C) 1994, 1998 Sverre Hvammen Johansen,
  * Department of Informatics, University of Oslo.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -24,11 +24,11 @@ struct stamp
     char lest_inn;
   };
 
-char *gettimestamp ();
-extern char directive_timestamp[TIMESTAMPLENGTH + 1];
-extern char timestamp[TIMESTAMPLENGTH + 1];
+void gettimestamp ();
+void initExtspec ();
+extern char *directive_timestamp;
+extern char *timestamp;
 extern lesinn_external_spec ();
 extern more_modules ();
-extern char *extract_timestamp ();
 extern struct stamp *first_stamp;
 extern skrivut_external_spec ();

@@ -19,15 +19,21 @@
 
 bin_PROGRAMS = cim
 
-cim_SOURCES = feil.c genpar.c navn.c dekl.c gen.c genstr.c \
-              extspec.c genexp.c lex.c sjekker.c getopt1.c \
-              getopt.c parser.y filelist.c newstr.c cimcomp.c 
+cim_SOURCES = error.c genpar.c name.c dekl.c genline.c genstr.c \
+              extspec.c transcall.c genexp.c lex.c getopt1.c \
+              getopt.c parser.y filelist.c newstr.c cimcomp.c \
+              mellbuilder.c expbuilder.c sentbuilder.c sentchecker.c \
+              expchecker.c computeconst.c sentgen.c obstack.c \
+              mapline.c senttrans.c
 
 cim_LDADD = @ALLOCA@
 
-noinst_HEADERS = cimcomp.h const.h dekl.h gen.h mell.h navn.h feil.h \
-                 sjekker.h getopt.h parser.h filelist.h newstr.h lex.h \
-                 extspec.h
+noinst_HEADERS = cimcomp.h const.h dekl.h gen.h name.h error.h \
+                 getopt.h parser.h filelist.h newstr.h lex.h \
+                 extspec.h mellbuilder.h builder.h checker.h \
+                 obstack.h mapline.h expmacros.h trans.h
+
+YFLAGS= -d
 
 # Variables controlling compilation of the generated C-code
 SCC = $(CC)

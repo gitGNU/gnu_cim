@@ -18,6 +18,7 @@
  */
 
 #include "file.h"
+#include "simfile.h"
 
 /******************************************************************************
                                          BOOLEAN PROCEDURE INRECORD          */

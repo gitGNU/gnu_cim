@@ -68,6 +68,18 @@ GCC may run out of virtual memory, and therefore you may want to use a
 standard C-compiler instead. You can do that by typing `CC=cc
 ./configure'
 
+Static vs. shared libraries
+---------------------------
+
+Cim builds by default both static and shared libraries.  You may need
+to set some environment variables (LD_LIBRARY_PATH under Linux) or
+edit some system configuration file (/etc/ld.so.conf under Linux) to
+get access to the shared libraries at run-time. See the message that
+is produced at the end of `make install' for some details.  If you
+don't want shared libraries, then please run `./configure' with option
+--disable-shared. Static libraries can be disabled with the option
+--disable-static.
+
 Bugs
 ----
 
@@ -75,5 +87,17 @@ Please mail bug reports for Cim to cim-bug@ifi.uio.no. Please include
 the Cim version number and the system type, which you can get by
 running "cim --version", a copy of config.cache, and relevant Simula-
 and produced C-code.
+
+Version 3
+---------
+
+Cim version 3 is experimental. If you want a stable compiler, please
+use version 2 instead. Many new features will shortly be included.  We
+are planing support for some optimization and some bug-fixes that
+remained from version 2.
+
+The compiler may use a lot of virtual memory. If that is a problem for
+you, please split your program into separate compiled modules or use
+version 2 of cim instead.
 
 Sverre Hvammen Johansen
