@@ -1,0 +1,5 @@
+# CIM information
+0	string		/*Cim_atr*/	Simula atr file from cim
+0	string		/*Cim_dump*/	Simula dump file from cim
+0	string		/*Cim_ckod*/	Simula generated C file from cim
+0	string		/*Cim_hkod*/	Simula generated C header file from cim

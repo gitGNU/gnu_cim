@@ -1,0 +1,948 @@
+% $Id: cim.texi,v 1.3 1995/03/20 14:07:23 cim Exp $
+
+% Copyright (C) 1994 Sverre Hvammen Johansen, Stein Krogdahl and Terje Mjøs
+% Department of Informatics, University of Oslo. 
+%
+% This program is free software; you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation; version 2. 
+%
+% This program is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details. 
+%
+% You should have received a copy of the GNU General Public License
+% along with this program; if not, write to the Free Software
+% Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA. */
+
+\input texinfo   @c -*-texinfo-*-
+@c %**start of header
+@setfilename cim.info
+@settitle Cim
+@setchapternewpage off
+@paragraphindent 3
+@c %**end of header
+
+@set EDITION 1.52
+@set VERSION 1.52
+@set UPDATED November 1994
+
+@iftex
+@finalout
+@end iftex
+
+@ifinfo
+@format
+START-INFO-DIR-ENTRY
+* Cim: (cim).         Simula compiler based on the C programming language. 
+END-INFO-DIR-ENTRY
+@end format
+
+This file documents the Cim compiler based on the C programming language. 
+
+Copyright (C) 1994 Sverre Hvammen Johansen, Stein Krogdahl, and Terje Mjos. 
+
+Permission is granted to make and distribute verbatim copies of
+this manual provided the copyright notice and this permission notice
+are preserved on all copies. 
+
+@ignore
+Permission is granted to process this file through TeX and print the
+results, provided the printed document carries copying permission
+notice identical to this one except for the removal of this paragraph
+(this paragraph not being relevant to the printed manual). 
+
+@end ignore
+Permission is granted to copy and distribute modified versions of this
+manual under the conditions for verbatim copying, provided that the entire
+resulting derived work is distributed under the terms of a permission
+notice identical to this one. 
+
+Permission is granted to copy and distribute translations of this manual
+into another language, under the above conditions for modified versions,
+except that this permission notice may be stated in a translation approved
+by the Free Software Foundation, Inc. 
+@end ifinfo
+
+@titlepage
+@title Cim
+@subtitle Simula Compiler based on the C Programming Language
+@subtitle Edition @value{EDITION}, for Cim version @value{VERSION}
+@subtitle @value{UPDATED}
+
+@page
+@vskip 0pt plus 1filll
+Copyright (C) 1994 Sverre Hvammen Johansen, Stein Krogdahl, and Terje Mjos. 
+
+Permission is granted to make and distribute verbatim copies of
+this manual provided the copyright notice and this permission notice
+are preserved on all copies. 
+
+Permission is granted to copy and distribute modified versions of this
+manual under the conditions for verbatim copying, provided that the entire
+resulting derived work is distributed under the terms of a permission
+notice identical to this one. 
+
+Permission is granted to copy and distribute translations of this manual
+into another language, under the above conditions for modified versions,
+except that this permission notice may be stated in a translation approved
+by the Foundation. 
+@end titlepage
+
+@headings double
+
+@node Top, , , (dir)
+@comment  node-name,  next,  previous,  up
+
+@ifinfo
+This file documents the Cim compiler based on the C programming language. 
+This is edition @value{EDITION}, for Cim version @value{VERSION}. 
+
+@end ifinfo
+
+@c The master menu, created with texinfo-master-menu, goes here. 
+
+@menu
+* Introduction::                Cim's purpose strengths, and weaknesses. 
+* Installation::                How to install cim. 
+* A simple example::            A simple example on how to compile and execute. 
+* Compiling::                   The compilation command. 
+* Implementation Aspects::      Restrictions, characteristics and limitations. 
+@end menu
+
+@node Introduction, Installation, , Top
+@chapter Introduction
+
+Cim is a compiler for the programming language Simula
+(except unspecified parameters to formal or virtual procedures
+(see item %nocomment in @xref{Dependent characteristics, Implementation
+dependent characteristics,Implementation dependent characteristics},
+for how portable code for formal procedures can be written)). 
+It offers a class concept, separate compilation with 
+full type checking, interface to external C routines,
+an application package for process simulation
+and a coroutine concept.  
+
+Cim is a Simula compiler whose portability is based on
+the C programming language.  The compiler and the
+run-time system is written in C, and the compiler
+produces C code, that is passed to a C compiler for
+further processing towards machine code. 
+
+Cim is copyrighted by Sverre Hvammen Johansen, Stein Krogdahl and Terje Mjøs,
+Department of Informatics, University of Oslo. 
+
+Cim is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; version 2. 
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA. 
+
+Mail bug reports for Cim to @code{cim-bug@@ifi.uio.no}. 
+Please include the Cim version number and the system type, 
+which you can get by running @code{cim --version}. 
+
+@node Installation, A simple example, Introduction, Top
+@chapter Installation
+
+The system is distributed as a compressed tar file. 
+Take the following actions to install the software:
+
+@enumerate
+
+@item
+Uncompress the compressed tar file with the gunzip command:
+@example
+%gunzip cim-@var{version}.tar.gz
+@end example
+where @var{version} is the version number. 
+
+@item
+Extract the file with the tar command:
+@example
+%tar xf cim-@var{version}.tar
+@end example
+
+@item
+@samp{cd} to the created directory containing the source code for cim
+and execute configure with @samp{sh}:
+@example
+%cd cim-@var{version}
+%sh configure
+@end example
+
+@item
+Edit the created files @file{Makefile} and @file{config.h} if needed and
+compile the system by running make. 
+@example
+%make
+@end example
+
+@item
+Install the system by entering super user and make install:
+@example
+%su
+Password:
+%make install
+%exit
+@end example
+
+@item
+A simple check of the installation can be made by make installcheck:
+@example
+%make installcheck
+mkdir tmptest; cp ./test.sim tmptest
+cd tmptest; /usr/local/bin/cim ./test -r
+Compiling: ./test.sim
+cc -c test.c
+cc -o test test.o /usr/local/lib/libcim.a -lm
+Executing test:
+Installation: No errors found
+rm -rf tmptest
+@end example
+
+@item
+You can now remover the program binaries and object files from
+the source directory:
+@example
+%make clean
+@end example
+@end enumerate
+
+More details about installation can be found in the file INSTALL
+that comes with the distribution. 
+
+@node A simple example, Compiling, Installation, Top
+@chapter A simple example
+
+We show in this chapter a simple example of a SIMULA program 
+and how to compile and run it. 
+
+Create a SIMULA program with a text editor, and give it a name with
+extension @file{sim}.  In this example we name it @file{doesit.sim}:
+
+@example
+begin
+    Outtext("Simula does it in C");
+    Outimage;
+end
+@end example
+
+You can now compile the program with the cim command:
+
+@example
+%cim doesit
+Compiling: doesit.sim
+cc -w -c doesit.c 
+cc -o doesit doesit.o /usr/local/lib/libcim.a -lm
+%
+@end example
+
+The compiler will produce C code that is further processed towards 
+machine code with a standard C compiler.  
+All produced files have the same name as the input file,
+but with different extensions. 
+The compiled and linked program can be invoked by entering:
+
+@example
+%./doesit
+Simula does it in C
+%
+@end example
+ 
+@node Compiling, Implementation Aspects, A simple example, Top
+@chapter Compiling
+
+Cim is a Simula compiler that first compiles the source code into C. 
+The C code
+will then be compiled with cc, and linked with other modules. 
+
+The Cim command
+will accept one Simula program and other non-Simula modules. 
+The specified Simula program will be compiled and linked with the 
+modules.  If a main Simula program is compiled, it will automatic
+be linked with the necessary Simula modules.  If a separate Class or
+Procedure is compiled, then the linking will be suppressed. 
+
+The diagnostics produced by the Simula compiler are intended to
+be self-explanatory. 
+
+@menu
+* Options::                     Options that are accepted by the cim command. 
+* Arguments::                   Arguments that are accepted by cim.
+* Files::                       Files related to a compilation.
+@end menu
+
+@node Options, Arguments, , Compiling
+@section Options
+
+The following options are accepted by the cim command:
+
+@table @code
+
+@item -a
+@itemx --atr
+Try to produce an @file{atr}-file even if an error occurs. 
+Compare the produced atr-file with the atr-file produced from 
+previous compilation and if they differ return an error status code. 
+With use of this option it is possible to have external modules
+with circular dependencies.  You will then need to compile
+all the modules with this option until no error status codes are
+returned.  Then you should do a final compilation with option
+@code{-p} or option @code{-d}.  To get this to work it is important that the
+topmost external head does not contain any external declaration
+that is part of the circular dependency.  Such external declarations
+must be placed in an external head that comes after the first
+class- or procedure decraration. 
+
+@item -b@var{argument}
+@itemx --cflags=@var{argument}
+The @var{argument} will be passed to the C compiler. 
+
+@item -B@var{argument}
+@itemx --ldflags=@var{argument}
+The @var{argument} will be passed to the link-command. 
+
+@item -c
+@itemx --suppress-linking
+Suppress linking of the complete program. 
+
+@item -C@var{name}
+@itemx --c-compiler=@var{name}
+Set the @var{name} of the C compiler. 
+
+@item -d
+@itemx --compare
+Compare the produced c code with the code produced 
+from previous compilation and if they are equal 
+then touch the object-file instead 
+of compiling the c code. 
+
+@item -D@var{name}
+@itemx --define=@var{name}
+Define a symbol @var{name}. 
+
+@item -E
+@itemx --preprocess
+Run only the preprocessor and output 
+the result to standard output. 
+
+@item -g
+@itemx --debug
+Make the C compiler produce debugging information. 
+This option is useful for debugging the generated code. 
+
+@item -I@var{dir}
+@itemx --includedir=@var{dir}
+Use the Simula include file located in directory @var{dir} 
+instead of the standard directory. 
+This information may also be given by setting the 
+environment variable @code{CIMINCLUDEDIR}. 
+
+@item -h
+@itemx --no-lines
+Omit line number information in the compiled program. 
+This  will  make the program smaller and faster. 
+
+@item -l@var{library}
+@itemx --library=@var{library}
+Search for @file{.atr}-files
+and link with object library @var{library}. 
+This option is passed to the link-command. 
+
+If a @file{.atr}-file can not be found as an ordinary file,
+then the specified libraries are searched and
+if the file is still not found then the standard cim library
+is searched.
+
+This option may also be used for searching Simula include files.
+
+@item -L@var{dir}
+@itemx --library-dir=@var{dir}
+Add  directory dir to the list of directories to be searched for -l.
+This option is passed to the link-command.
+
+The standard system directory is searched first and
+then the specified directories are searched.
+The standard system directory may be given 
+by setting the environment variable @code{CIMLIBDIR}.
+
+@item -m
+@itemx --memory-pool-size
+The memory pool size may be set at runtime 
+by an option @code{-m@var{n}}. 
+
+@item -m@var{n}
+@itemx --memory-pool-size=@var{n}
+Set the initial memory pool size to @var{n} mega bytes. 
+
+@item -M@var{n}
+@itemx --max-memory-pool-size=@var{n}
+Set the maximal memory pool size to @var{n} mega bytes. 
+
+@item -N@var{file}
+@itemx --input=@var{file}
+Set the name of the Simula source file.  This option allows a Simula source
+file to have a name with an illegal extension or no extension at all.
+
+@item -o@var{file}
+@itemx --output=@var{file}
+The argument @var{file} is the name of the output 
+executable file. 
+
+@item -O
+@itemx -O@var{n}
+@itemx --optimize
+@itemx --optimize=@var{n}
+Optimize. This option is simply passed to the C compiler.
+
+@item -p
+@itemx --preserve-timestamp
+Recompile the module using the same timestamp. 
+
+@item -P
+@itemx --only-link
+Only link the specified files. 
+
+@item -q
+@itemx --quiet
+@itemx --silent
+Run the compiler in quiet mode. 
+
+@item -r
+@itemx --run
+Run the program after compilation. 
+
+@item -s
+@itemx --no-simula-compile
+Only C compile and link the specified files. 
+
+@item -S
+@itemx --only-simula-compile
+Compile into C code but do not start the C compiler.
+
+@item -t
+@itemx --dont-remove-temporaries
+Do not remove temporary files.  
+If a main program is compiled with option -r,
+then the executable file will be removed 
+unless this option or option -T is specified. 
+
+@item -T
+@itemx --dont-remove-executable
+Do not remove the executable file. 
+
+@item -U@var{name}
+@itemx --undefine=@var{name}
+Remove any initial definition of the symbol @var{name}
+(Inverse of the @code{-D} option). 
+
+@item -v
+@itemx --verbose
+Run the compiler in verbose mode.
+
+@item -V
+@item --version
+Print the version number of Cim and exit.
+
+@item -w
+@itemx --no-warn
+Do not print warnings. 
+
+@item -X
+@itemx --trace
+Trace execution for this module. 
+@end table
+
+@node Arguments, Files, Options, Compiling
+@section Arguments
+
+The following arguments are accepted by the Cim command:
+
+@table @file
+
+@item @var{file}.a
+Library of object files and attribute files.  
+Include this simula library when compiling and linking.  
+The simula library is created with ar(1V) and ranlib(1).
+
+@item @var{file}.o
+Object file of other non-Simula modules. 
+
+@item @var{file}
+@item @var{file}.sim
+Simula source file.  A file name without an extension is assumed
+to be shorthand notation for the corresponding Simula file. 
+@end table
+
+@node Files, , Arguments, Compiling
+@section Files
+
+The following files are related to a Cim compilation:
+
+@table @file
+
+@item file 
+Executable file.
+
+@item file.a
+Library of source files, attribute files and object files.  Include
+this simula library when compiling and linking.  The simula library
+is created with ar(1V) and ranlib(1).  All source and .atr files
+should be placed before .o files in the archive.
+
+@item file.o
+Object file.
+
+@item file.c
+Simula-compiler output file.
+
+@item file.h
+Output file that is included in file.c.
+
+@item file.sim
+Simula source file.
+
+@item file 
+File names without an extension are assumed to be shorthand notation 
+for the corresponding @file{.sim}-file.
+
+@item /usr/local/lib/libcim.a
+Simula library that contains the environment, Run Time System and
+class Simset and Simulation. The source code to Simset and Simulation 
+is also included, so these parts can be compiled using compiler 
+directive @code{%include}.
+
+@item /usr/local/include/cim.h
+Include file for the produced C code.
+@end table
+
+
+@node Implementation Aspects, , Compiling, Top
+@chapter Implementation Aspects
+
+@menu
+* Restrictions::                Language restrictions
+* Allowed restrictions::        Allowed implementation restrictions::
+* Dependent characteristics::   Implementation dependent characteristics
+* Defined characteristics::     Implementation defined characteristics
+* Limitations::                 Capacity Limitations
+* Extension::                   Extension to the environment::
+@end menu
+
+
+@node Restrictions, Allowed restrictions, , Implementation Aspects
+@section Language restrictions
+
+A formal or virtual procedure must be specified with respect to its type,
+and type, kind and transmission mode of its parameters
+(see item %nocomment in @xref{Dependent characteristics, Implementation
+dependent characteristics,Implementation dependent characteristics},
+for how portable code for formal procedures can be written). 
+
+@node Allowed restrictions, Dependent characteristics, Restrictions, Implementation Aspects
+@section Allowed implementation restrictions
+
+@itemize @bullet
+
+@item
+The type short integer and long real 
+is implemented as integer and real. 
+
+@item
+The standard access mode SHARED for files is not implemented. 
+
+@item
+The only and default byte size of access mode BYTESIZE is 8. 
+@end itemize
+
+@node Dependent characteristics, Defined characteristics, Allowed restrictions, Implementation Aspects
+@section Implementation dependent characteristics
+
+@itemize @bullet
+
+@item
+Trailing blanks of image are not transferred to the external file on
+@code{outfile.outimage} excepts it's a direct file. 
+
+@item
+A parameter to @code{printfile.spacing} with value zero gives the
+standard effect of overprint. 
+
+@item
+The procedures lock and unlock are not implemented. 
+
+@item
+All open external files are closed when a program is terminated. 
+
+@item
+If the first character of a line is @samp{%} (or @samp{#} as an synonym)
+the line as a whole is a directive line.
+The following directive lines are supported:
+
+@table @code
+       
+@item %@var{whitespace} ...
+A directive line with a whitespace 
+is treated as a comment line. 
+       
+@item %nocomment ...
+The rest of the line is treated as ordinary source text. 
+Some other simula implementations will ignore this line,
+and give a warning message.  But this can be useful as the 
+following example shows.  In this implementation formal
+procedures must be specified, 
+but that should not be done in standard simula 
+(@cite{Standard Simula, SS 636114.  The Simula Standards Group, August 1986}).
+This will work both on LSH 
+(@cite{Simula implementation from Lund Software House AB, Sweden})
+and Cim:
+
+@example
+PROCEDURE P(i1,P2);INTEGER i1;
+%nocomment PROCEDURE P2 IS 
+              INTEGER PROCEDURE P2
+%nocomment      (i,j);INTEGER i,j;
+           ;
+@end example
+       
+@item %comment
+Will cause the compiler to strip all lines until the
+corresponding %endcomment is reached.  This directive
+may be nested. 
+       
+@item %eof
+Will cause the compiler to react as if the end of the 
+source file was reached.  Include files that are placed in
+a archive must be preceded with this directive line. 
+       
+@item %casesensitive @var{on/off}
+The case sensitivity of identifiers and keywords is turned
+on or off.  Default value is off. 
+       
+@item %define @var{name}
+Define a name.  
+Names such as 
+acorn, aix, alpha, amiga, amigados, apollo, arm, atari, aux,
+bosx, bsd, bull,
+c1, c2, convex, cray, cray2,
+dec, dg, dgux, dynix,
+encore,
+freebsd,
+hitachi, hiuxwe, hp, hppa, hppa1.0, hppa1.1, hppa2.0, hpux, 
+i386, i486, ibm, integer_64, integer_simulation, irix,
+linux, lynx, lynxos,
+m68000, m68k, m88k, mach, minix, mips, motorola, mpw, msdos, 
+ncr, netbsd, newsosnext, next, nextstep, no_real, ns32k,
+osf,
+ptx, pyr, 
+riscix, riscos, rs6000,
+sequent, sgi, sni, solaris, sony, sparc, sunos, svr4, sysv,
+tektronix,
+ultrix, unicos, univel, unix, 
+vax, vms,
+xmp 
+and
+ymp
+are predefined dependent of the system. 
+Operating system names may also be succeeded by a
+version number. 
+       
+@item %error ...
+Will cause the compiler to believe that it has found an error
+in the source text.  The message that is preceded on the line
+is printed as an error message. 
+       
+@item %ifdef @var{name}
+If @var{name} is not defined then the compiler will strip 
+all lines until the corresponding @code{%else} or 
+@code{%endif} is reached. 
+If @var{name} is not defined then the compiler will strip
+all lines between the optional @code{%else} and @code{%endif}. 
+       
+@item %include @var{filename}
+Will cause the compiler to include the indicated file in 
+place of the include directive line.  This directive may be
+nested, but only to a level of 10. 
+       
+@item %line @var{linenumber}
+@itemx %line @var{linenumber} @var{filename}
+Will cause the compiler to believe that the line number of the next
+source line is @var{linenumber} and optionally the current input file
+name is @var{filename}.
+       
+@item %list@var{whitespace} ...
+A directive line starting with @code{list} followed by a whitespace 
+is treated as a comment line. 
+
+@item %nameasvar @var{on/off}
+If it is turned on, then transmission mode for name is 
+implemented as reference.  
+This will produce more efficient code.  Default value is off. 
+       
+@item %page@var{whitespace} ...
+A directive line starting with @code{%page} followed by a whitespace 
+is treated as a comment line. 
+
+@item %staticblock @var{on/off}
+If it is turned on, then data objects will be allocated
+static instead of dynamic,
+and the compiler may generate more efficient code. 
+This option should be used with care and
+should not be used for blocks which may have
+more than one active data object at a given time. 
+The option may not be used for classes that are given
+as prefix or virtual procedures or procedures that
+are parameter to other procedures. 
+It may not be used for external
+classes or procedures. 
+       
+@item %stripsideeffects @var{on/off}
+If it is turned on, then the compiler can generate more
+efficient code, 
+but not necessary correct code due to evaluation
+order for expressions.  Default value is off. 
+       
+@item %title@var{whitespace} ...
+A directive line starting with @code{title} followed by a whitespace 
+is treated as a comment line. 
+
+@item %undefine @var{name}
+Undefine a name.  If the name is not defined the directive line
+has no effect. 
+
+@c @item %warning} ..
+@c The message that is preceded on the line
+@c is printed as a warning message. 
+@end table
+
+@item
+C is the only language supported for non-Simula external procedures. 
+@var{Kind} is interpreted as @samp{C}, 
+and the @var{external-item} is case sensitive. 
+External C procedures must be specified in the following way:	
+	
+@code{External C procedure @var{external-item} 
+is @var{type} procedure @var{procedure-identifier} 
+@var{parameter/mode/specification-part}; ;}
+
+The rules for external C procedures are:
+	
+@itemize @minus
+       
+@item
+Avoid global symbols prefixed with @code{__}, it may lead to
+conflicts with system names in Cim. 
+       
+@item
+The procedure may have any type, except @var{ref}. 
+If the type is @var{text}, then the null terminated string
+returned from C is converted to a Simula text object. 
+       
+@item
+Parameters may not be a 
+Simula-procedure, switch or label. 
+       
+@item
+Parameters transmitted by value are always copied. 
+Texts or arrays are allocated by malloc, 
+and are not deallocated by Cim. 
+It's the C-programs responsibility to dealloc the space. 
+       
+@item
+Parameters transmitted by reference or name are transmitted
+to C as pointer to.  Texts or arrays are transmitted to C
+by the location of the first element. 
+       
+@item
+External C procedures with variable number of parameters
+can be specified by use of @code{...} 
+in the end of the parameter list.  Printf and scanf can
+be specified as follows:
+
+@example
+EXTERNAL C PROCEDURE printf IS 
+   INTEGER PROCEDURE printf(t,...);TEXT t;;
+EXTERNAL C PROCEDURE scanf IS
+   INTEGER PROCEDURE scanf(t,...);NAME ...;TEXT t;;
+@end example
+@end itemize
+@end itemize
+
+@node Defined characteristics, Limitations, Dependent characteristics, Implementation Aspects
+@section Implementation defined characteristics
+
+@itemize @bullet
+
+@item
+The internal character set is the same as the standard character set. 
+
+@item
+Inlength and outlength are equal to 80. 
+
+@item
+SYSIN, SYSOUT and SYSERR are connected to standard input, 
+standard output and standard error. 
+If they are closed and reopened they are connected to 
+@file{/dev/tty} under UNIX, AIX, LINUX and MINIX and 
+@file{sys$input} and @file{sys$output} under VMS. 
+
+@item
+The relative value ranges of real are as double in C and
+ranges of integer are as long. 
+
+@item
+Conversion from an integer type to a real type is exact except
+for implementations where integer have better precision than real
+(which are the case for the alpha and cray implementation). 
+
+@item
+The effect is not defined if the range of a numeric item in a de-editing
+procedure exceeds the value range of the procedure result. 
+
+@item
+The exponent from @code{putreal} has 5 characters except
+for the cray implementation where it may be 6 characters. 
+
+@item
+A text frame has a maximum length of about 64K characters. 
+
+@item
+The return values of @code{char} and @code{rank} are as given by the standard
+character set. 
+
+@item
+The exact definitions of the standard mathematical functions are
+system specific. 
+
+@item
+The association between a file object and an external file 
+is standard procedures based on C's FILE. 
+The object is connected to the external file when open is called. 
+
+@item
+Several file objects may represent the same external file,
+but the effect is not defined if some of them are opened for writing. 
+
+@item
+A minimum of checks are performed at @code{locate}. 
+
+@item
+The default value to @var{lines_per_page} is @var{maxint}. 
+
+@item
+The @samp{basic random drawing} procedures are implemented 
+as suggested in the standard. 
+
+@item
+Two decimals are used for the field for seconds of the function
+@code{datetime}. 
+
+@item
+Evaluation of arithmetic expressions are based on C,
+but a Simula expression is by default divided up in several 
+expressions, to guarantee correct evaluation order. 
+@end itemize
+
+@node Limitations, Extension, Defined characteristics, Implementation Aspects
+@section Capacity limitations
+
+The compiler have the following logical limitations:
+
+@itemize @bullet
+
+@item
+The maximal number of Simula-libraries that the compiler can search
+is 100 libraries. 
+
+@item
+Length of a token in the input stream is restricted to 
+about 1000 characters. 
+
+@item
+The nesting of compiler directives is limited to 100. 
+
+@item
+The level of nesting of include files must not exceed 10. 
+
+@item
+The parser is written i YACC and the parser stack have a size
+equal 1500 elements. 
+
+@item
+Block nesting level is limited to 100. 
+
+@item
+The compiler builds an expression tree for each Simula-expression,
+and one tree is limited to 1000 nodes. 
+
+@item
+The code generator have a stack of labels with 1000 elements. 
+
+@item
+Temporary expressions may not consist of more than 100 value-type,
+100 text, or 100 ref-type elements. 
+
+@item
+The nesting of temporary expressions may not be deeper than
+100 levels. 
+
+@item
+The maximum number of dimensions for arrays is 100. 
+
+@item
+Text objects may not contain more than about 64K characters. 
+
+@item
+Some other limitations that are based on the underlying hardware,
+the operating system or the C Compiler, 
+which are not checked by the compiler. 
+@end itemize
+
+@node Extension, , Limitations, Implementation Aspects
+@section Extension to the environment
+
+The following procedures are added to the Simula environment
+and may be called directly from Simula:
+
+@table @code
+
+@item PROCEDURE Gbc;...;
+The garbage collector is called when the dynamic 
+storage exceeds an implementation dependent limit.  
+The garbage collector traverse and moves all the accessible objects,
+and leaves the free space as one area initialized to zero. 
+The garbage collector may be called explicitly
+through the procedure Gbc. 
+
+@item INTEGER PROCEDURE Argc;...;
+Returns the number of command-line arguments
+that the program was invoked with. 
+
+@item INTEGER PROCEDURE Argv;...;
+Returns a pointer to an array of character strings 
+(in C fashion) that contains the arguments. 
+
+@item PROCEDURE Dump(t);TEXT t;...;
+Dump the state of the Simula-program to file. 
+Before a call on Dump all files except @var{sysin},
+@var{sysout} and @var{syserr} should be closed. 
+
+@item PROCEDURE UnDump(t);TEXT t;...;
+Read a previously stored state from file 
+and start the program in that state. 
+To get these procedures to work,
+they should be compiled into the same program. 
+The program may not be re-compiled 
+between a call on Dump and UnDump.  
+
+@item REF(PrintFile) PROCEDURE SysErr;...;
+Returns the file object associated with standard error. 
+@end table
+
+@contents
+@bye
+

@@ -1,0 +1,17 @@
+Begin3
+Title:		Cim -- Simula Compiler based on the C programming language
+Version:	cim-1.56
+Entered-date:	15.02.95
+Description:	A Compiler for the programming language SIMULA.
+Keywords:	Cim, Simula, Simulation
+Author:		Sverre Hvammen Johansen, Terje Mjoes, and Stein Krogdahl.
+		(email: cim@ifi.uio.no).
+Maintained-by:	Sverre Hvammen Johansen (email: cim@ifi.uio.no)
+Primary-site:	sunsite.unc.edu  /pub/Linux/devel/lang/simula
+		sunsite.unc.edu  /pub/languages/simula
+		300kB cim-1.71.tar.gz
+Alternate-site:	ftp.ifi.uio.no /pub/cim/
+Original-site:	ftp.ifi.uio.no /pub/cim/
+Platforms:	Linux, but should work on any Unix box with a C compiler.
+Copying-policy:	GPL
+End

@@ -1,0 +1,268 @@
+% $Id: simulation.sim,v 1.4 1997/02/14 16:33:03 cim Exp $
+
+
+% Copyright (C) 1994 Sverre Hvammen Johansen, Stein Krogdahl and Terje Mjøs
+% Department of Informatics, University of Oslo.
+%
+% This program is free software; you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation; version 2.
+%
+% This program is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details.
+%
+% You should have received a copy of the GNU General Public License
+% along with this program; if not, write to the Free Software
+% Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA. */
+
+%ifdef included
+%else
+%timestamp simulation
+%endif
+% nameasvar on
+%nonetest off
+%casesensitive on
+SIMSET CLASS SIMULATION;
+BEGIN
+  REF(PROCESS) zzsqs;
+
+  REF(zzmain_program)MAIN;
+    
+  REF(PROCESS) PROCEDURE CURRENT; CURRENT:-zzsqs.zzsqssuc;
+
+%IFDEF INTEGER_SIMULATION
+  INTEGER
+%ELSE
+  LONG REAL
+%ENDIF
+            PROCEDURE TIME; TIME:=zzsqs.zzsqssuc.zzevtime;
+
+  LINK CLASS PROCESS;
+  BEGIN
+    ! From event notice: ;
+    REF(PROCESS) zzsqssuc, zzsqspred;
+%IFDEF INTEGER_SIMULATION
+    INTEGER
+%ELSE
+    LONG REAL
+%ENDIF
+              zzevtime;
+      
+    ! From old process: ;
+    BOOLEAN zzterminated_process;
+
+    BOOLEAN PROCEDURE IDLE; IDLE:= (zzsqssuc==NONE);
+
+    BOOLEAN PROCEDURE TERMINATED; TERMINATED:=zzterminated_process;
+    
+%IFDEF INTEGER_SIMULATION
+    INTEGER
+%ELSE
+    LONG REAL
+%ENDIF
+              PROCEDURE EVTIME;
+      IF  zzsqssuc==NONE THEN ERROR("No Evtime for idle process")
+      ELSE EVTIME:= zzevtime;
+      
+    REF(PROCESS) PROCEDURE NEXTEV;
+      NEXTEV:-IF zzsqssuc==NONE OR ELSE zzsqssuc==zzsqs THEN NONE
+        ELSE zzsqssuc;
+
+    ! Not necessary: ;  zzsqssuc:- zzsqspred:- NONE;
+
+    DETACH;
+    INNER;
+    zzterminated_process:=TRUE;
+
+    ! Remove from SQS: ;
+    zzsqssuc.zzsqspred:- zzsqspred;
+    zzsqspred.zzsqssuc:- zzsqssuc;
+    zzsqspred:- zzsqssuc:- NONE;
+
+    IF zzsqs.zzsqssuc==zzsqs THEN ERROR("SQS: Empty")
+                             ELSE RESUME(zzsqs.zzsqssuc);
+
+    ERROR("SQS: Terminated process");
+  END PROCESS;
+  
+  PROCEDURE activat(REAC,X,CODE,T,Y,PRIO);
+    REF(PROCESS)X,Y;
+    BOOLEAN REAC,PRIO;
+    CHARACTER CODE;
+%IFDEF INTEGER_SIMULATION
+    INTEGER
+%ELSE
+    LONG REAL
+%ENDIF
+              T;
+  BEGIN
+    REF(PROCESS) b, cur; 
+%IFDEF INTEGER_SIMULATION
+    INTEGER
+%ELSE
+    LONG REAL
+%ENDIF
+              tm;
+
+    IF X =/= NONE AND THEN NOT X.zzterminated_process
+       AND THEN (REAC OR ELSE X.zzsqssuc == NONE) THEN
+    BEGIN
+      cur:- zzsqs.zzsqssuc; tm:=cur.zzevtime;
+
+      IF CODE = '!1!' THEN
+      BEGIN ! Direct ;
+         IF X==cur THEN GOTO exit;
+         T:=tm; b:- zzsqs;
+      END ELSE
+      IF CODE = '!2!' THEN
+      BEGIN !At;
+         IF T<=tm THEN
+         BEGIN IF PRIO AND THEN X==cur THEN GOTO exit ELSE T:=tm END;
+      END ELSE
+      IF CODE = '!3!' THEN
+      BEGIN !Delay;
+         T:= T+tm;
+         IF T<=tm THEN
+         BEGIN IF PRIO AND THEN X==cur THEN GOTO exit ELSE T:=tm END;
+      END ELSE
+      ! CODE = '!4!' OR CODE = '!5!' ;
+      BEGIN ! 4=Before, 5=After ;
+         IF Y==NONE OR ELSE Y.zzsqssuc==NONE THEN
+         BEGIN
+            IF X.zzsqssuc=/=NONE THEN
+            BEGIN
+              X.zzsqssuc.zzsqspred:- X.zzsqspred;
+              X.zzsqspred.zzsqssuc:- X.zzsqssuc;
+              X.zzsqspred:- NONE; X.zzsqssuc:- NONE;
+            END;
+
+            IF zzsqs.zzsqssuc==zzsqs THEN ERROR("SQS: Empty");
+            GOTO exit;
+         END;
+
+         IF X==Y THEN GOTO exit;
+
+         T:= Y.zzevtime; 
+         
+         IF CODE = '!4!' THEN b:- Y.zzsqspred ELSE b:- Y;
+       END;
+
+       IF X.zzsqssuc =/= NONE THEN
+       BEGIN
+           X.zzsqssuc.zzsqspred:- X.zzsqspred;
+           X.zzsqspred.zzsqssuc:- X.zzsqssuc;
+       END;
+
+       IF b==NONE THEN
+       BEGIN ! Not `direct', `after' or `before' ;
+          b:- zzsqs.zzsqspred;
+          WHILE b.zzevtime>T DO b:- b.zzsqspred;
+          IF PRIO THEN
+            WHILE b.zzevtime=T DO b:- b.zzsqspred;
+       END;
+
+       X.zzevtime:= T;
+       X.zzsqspred:- b; X.zzsqssuc:- b.zzsqssuc;
+       b.zzsqssuc:- X; X.zzsqssuc.zzsqspred:- X;
+
+       IF zzsqs.zzsqssuc=/=cur THEN RESUME(zzsqs.zzsqssuc);
+    END;
+  exit:
+  END activat;
+
+  PROCEDURE HOLD(t); 
+%IFDEF INTEGER_SIMULATION
+    INTEGER
+%ELSE
+    LONG REAL
+%ENDIF
+              t;
+  BEGIN
+    REF(PROCESS) p,q; p:- zzsqs.zzsqssuc;
+    IF t>0 THEN p.zzevtime:= p.zzevtime + t;
+    t:= p.zzevtime;  ! New evtime ;
+    IF p.zzsqssuc=/=zzsqs AND THEN p.zzsqssuc.zzevtime<=t THEN
+    BEGIN
+        p.zzsqssuc.zzsqspred:- p.zzsqspred;
+        p.zzsqspred.zzsqssuc:- p.zzsqssuc;
+
+        q:- zzsqs.zzsqspred;
+        WHILE q.zzevtime>t DO q:- q.zzsqspred;
+
+        p.zzsqspred:- q; p.zzsqssuc:- q.zzsqssuc;
+        q.zzsqssuc:- p; p.zzsqssuc.zzsqspred:- p;
+
+        RESUME(zzsqs.zzsqssuc);
+    END IF;
+  END HOLD;
+  
+  PROCEDURE PASSIVATE;
+  BEGIN
+     REF(PROCESS) p; p:- zzsqs.zzsqssuc;
+     p.zzsqssuc.zzsqspred:- p.zzsqspred;
+     p.zzsqspred.zzsqssuc:- p.zzsqssuc;
+     p.zzsqspred:- NONE; p.zzsqssuc:- NONE;
+
+     IF zzsqs.zzsqssuc==zzsqs THEN ERROR("SQS: Empty")
+                              ELSE RESUME(zzsqs.zzsqssuc);
+  END PASSIVATE;
+  
+  PROCEDURE WAIT(S);REF(HEAD)S;
+  BEGIN
+     REF(PROCESS) p; p:- zzsqs.zzsqssuc;
+     p.INTO(S); ! May also be expanded inline ;
+
+     p.zzsqssuc.zzsqspred:- p.zzsqspred;
+     p.zzsqspred.zzsqssuc:- p.zzsqssuc;
+     p.zzsqspred:- NONE; p.zzsqssuc:- NONE;
+
+     IF zzsqs.zzsqssuc==zzsqs THEN ERROR("SQS: Empty")
+                              ELSE RESUME(zzsqs.zzsqssuc);
+  END WAIT;
+  
+  PROCEDURE CANCEL(x); REF(PROCESS)x;
+  BEGIN
+     REF(PROCESS) cur;
+     IF x=/=NONE AND THEN x.zzsqssuc=/=NONE THEN
+     BEGIN
+        cur:- zzsqs.zzsqssuc;
+        x.zzsqssuc.zzsqspred:- x.zzsqspred;
+        x.zzsqspred.zzsqssuc:- x.zzsqssuc;
+        x.zzsqspred:- NONE; x.zzsqssuc:- NONE;
+
+        IF x==cur THEN
+        BEGIN
+           IF zzsqs.zzsqssuc==zzsqs THEN ERROR("SQS: Empty")
+                                    ELSE RESUME(zzsqs.zzsqssuc);
+        END;
+     END;
+  END CANCEL;
+  
+  PROCESS CLASS zzmain_program;
+  BEGIN
+    WHILE TRUE DO DETACH
+  END MAIN_PROGRAM;
+
+  PROCEDURE ACCUM(A,B,C,D);NAME A,B,C; 
+%IFDEF INTEGER_SIMULATION
+    INTEGER
+%ELSE
+    LONG REAL
+%ENDIF
+              A,B,C,D;
+  BEGIN
+    A:=A+C*(TIME-B); B:=TIME; C:=C+D;
+  END ACCUM;
+    
+  zzsqs:- NEW PROCESS; zzsqs.zzevtime:= -1;
+
+  MAIN:- NEW zzmain_program;
+  zzsqs.zzsqssuc:- MAIN; zzsqs.zzsqspred:- MAIN;
+  MAIN.zzsqssuc:- zzsqs; MAIN.zzsqspred:- zzsqs;
+
+END SIMULATION;
+
+%CASESENSITIVE OFF
+%eof

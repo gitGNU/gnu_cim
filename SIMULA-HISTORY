@@ -1,0 +1,1874 @@
+From jan@utri.no Thu Feb 23 08:00:32 1995
+Return-Path: <jan@utri.no>
+From: Jan Rune Holmevik <jan@utri.no>
+X-Mailer: SCO System V Mail (version 3.2)
+To: cim@ifi.uio.no
+Subject: SIMULA Artikkelen
+Date: Thu, 23 Feb 95 8:04:07 MET
+
+Copyright (C) 1995 Jan Rune Holmevik
+
+Permission is hereby granted to make and distribute verbatim copies
+of this work provided that the copyright notice and this permission
+are preserved on all copies.
+
+Permission is granted to copy and distribute modified versions of
+this work under the conditions for verbatim copying, provided that
+the entire resulting work is distributed under the terms of a permission
+notice identical to this one.
+
+
+COMPILING SIMULA
+
+Jan Rune Holmevik
+Institute for Studies in Research and Higher Education
+Munthes gt. 29, N-0260 OSLO, Norway
+Tel: +47 22925172 - Fax: +44 22925173
+E-mail: jan@utri.no
+
+NOTE: A printed version of the thesis in which this article
+originally appeared can be ordered from:
+
+Center for Technology and Society
+University of Trondheim
+N-7055 DRAGVOLL, Norway.
+E-mail: Knut.Sorensen@avh.unit.no
+
+
+
+
+
+The SIMULA programming language was designed and built by
+Ole-Johan Dahl and Kristen Nygaard at the Norwegian Computing
+Centre (NCC) in Oslo between 1962 and 1967.1 It was
+originally designed and implemented as a language for
+discrete event simulation, but was later expanded and
+reimplemented as a full scale general purpose programming
+language. Although SIMULA never became widely used, the
+language has been highly influential on modern programming
+methodology. Among other things SIMULA introduced important
+object-oriented programming concepts like classes and
+objects, inheritance, and dynamic binding.
+
+In broad outline, this chapter seeks to explore the wider
+history of the SIMULA project. By means of a contextual
+approach to history, it attempts to weave together the
+technical development of the language with what is normally
+seen as its social, economic, and politic context. Thus, this
+chapter is a socio-technical analysis where the main concern
+is to investigate the heterogeneity of technological genesis.
+As the historian of technology Thomas Hughes has shown in
+his remarkable studies of Edison and others, technologists in
+their work often pay little attention to commonly accepted
+knowledge categories or professional boundaries.2 He observes
+that they, in order to accomplish their aims, frequently
+transcend the limits of what is normally considered technical
+or scientific and that they habitually amalgamate matters
+commonly labeled technical, scientific, social, economical,
+or political. Thus for Hughes, technologists are
+heterogeneous professionals and their interaction with the
+wider socio-technical context to which they relate their work
+becomes the prime focus of interest. His principal argument,
+in effect, is that one cannot fully comprehend the complex
+processes of technological and scientific change unless one
+recognizes that problem-solving technologists see all the
+analytical categories above 'as going together as a thoroughly
+integrated whole, composing a seamless web, to employ Hughes'
+own terminology. In accordance with this he challenges us to
+'follow the actors' and seek explanations for technological
+and scientific change beyond the narrow internalist narrative
+of technical development.3
+
+As this chapter aims to show, the construction of SIMULA
+was indeed an effort that required a high degree of
+heterogeneous engineering on the part of the two principals,
+Dahl and Nygaard. The main portion of the chapter is devoted
+to a discussion of how the language was constructed and
+implemented. In line with what has been stated above, the
+analysis attempts to incorporate a socio-technical approach
+to history and thus several 'non-technical' aspects of the
+project are dealt with in some detail. The closing sections
+provide a brief survey of some of the most significant SIMULA
+implementations surfacing in the 1970s, as well as a
+commentary on NCC's SIMULA engagement in this period.
+
+PULLING THE THREADS TOGETHER
+
+Ever since he first started working with operations
+research back in 1952, Kristen Nygaard had been constantly
+concerned with ways to conceptualize complex real world
+systems. One of the major problems he encountered in this
+pursuit was how to describe the heterogeneity of a system and
+its operation. In the 1950s, modeling of such systems was
+usually done through means of symbol notation, i.e. flow-
+diagrams accompanied by an account of the rules governing the
+operations of the system.4 Monte Carlo simulation had proved
+to be a serviceable tool for analysis of these models and
+when the Ferranti MERCURY was eventually installed at NDRE in
+late summer of 1957, Nygaard and his team immediately started
+to write computer simulation programs.
+
+As I have pointed out in previous chapters, the late 1950s
+saw the proliferation of a new scheme for computer
+programming, known as high-level programming languages.
+Thanks to Jan Garwick, NDRE got a head start in this area and
+although Kristen Nygaard was not directly involved in this
+line of work, he was well acquainted with the principles of
+programming languages. Encouraged by the promising prospects
+of computer-aided simulation, Nygaard soon started to think
+conceptually about how he could formalize the procedures for
+systems description in a way that would allow standardized
+concepts to be easily processed by a computer. Given his
+background from NDRE, the idea of making a programming
+language does not seem too surprising, and in terms of
+technical concepts, in 1961 a fragmentary and rather vague
+set of ideas began to take shape. In January 1962 Nygaard
+wrote to his colleague, the French operations research
+specialist, Charles Salzmann:
+
+The status on the Simulation Language (Monte Carlo
+Compiler) is that I have rather clear ideas on how to
+describe queuing systems, and have developed concepts
+which I feel allow a reasonably easy description of
+large classes of situations. I believe that these
+results have some interest even isolated from the
+compiler, since the presently used ways of describing
+such systems are not very satisfactory. [...] The work
+on the compiler could not start before the language was
+fairly well developed, but this stage seems now to have
+been reached. The expert programmer who is interested in
+this part of the job will meet me tomorrow. He has been
+rather optimistic during our previous meetings.5
+As is evidenced from this letter, SIMULA was intended from
+the very outset to be simultaneously a systems description
+and a programming language, its construction would thus
+require both systems reasoning and programming skills. Even
+though Nygaard had some experience with computer programming
+at NDRE before he was assigned to operations research in
+1952, he did not have sufficient experience or knowledge to
+undertake an extensive task like this on his own. He was
+compelled to recruit programming expertise from outside and
+the best ally he could find, besides Garwick, was his old
+acquaintance from NDRE, Ole-Johan Dahl. During the spring of
+1962 Nygaard and Dahl joined in a series of discussions which
+in May, 1962 resulted in the first formal language proposal.
+
+SIMULA AT IFIP 62
+
+In order to better understand Nygaard's reasoning at this
+point, it is helpful to anticipate the course of events a
+little by examining how the language appeared when it was
+first presented publicly in the fall of 1962. The occasion
+was the second international conference on information
+processing held in Munich, Germany in late August that year.
+In the introduction to his paper entitled 'SIMULA'An
+Extension of ALGOL to the Description of Discrete-Event
+Networks,' Nygaard explained the rationale behind SIMULA as
+follows:
+
+For operational research workers and others studying
+network systems, there is a definite need for a precise
+language which allows a description of a network in
+terms of standardized and generally accepted concepts.
+Such a description should force the research worker to
+consider all relevant aspects of the network. SIMULA'
+SIMUlation LAnguage' represents an effort to meet this
+need with regard to discrete-event networks, that is,
+where the flow may be thought of as being composed of
+discrete units demanding service at discrete service
+elements, and entering and leaving the elements at
+definite moments [sic] of time. Examples of such systems
+are ticket counter systems, production lines, production
+in development programs, neuron systems, and concurrent
+processing of programs on computers.6
+
+The early approach to SIMULA was, as evidenced by the
+quotation above, based on the notion of a mathematically
+formulated network concept consisting of active stations
+serving a flow of passive customers. As illustrated in Figure
+7, these stations consisted of a queue part and a service
+part, and the actions associated with the service part were
+described by a sequence of formalized statements. The
+customers possessed no similar operating rules, but were
+instead described through a sequence of variables called
+characteristics. A customer was supposed to be generated by
+the service part of a given station, then transferred to the
+queue part of another station, and subsequently to the
+service part of that station. Here the customer was 'served',
+and then passed on to the next station in the network, and so
+on until it ultimately disappeared by not being transferred
+any further. The actions taken by the stations were regarded
+as instantaneous, occurring at discrete points in time, and
+accordingly, this class of systems was called discrete event
+networks.7
+
+The intention was to build the language around a general
+mathematical structure. Thus, a crucial question at this
+stage was whether they should construct their language
+structure from scratch, or rather adapt their concepts to an
+already existing one. Dahl and Nygaard decided early on that
+if SIMULA was to become a real programming language, and not
+just an academic 'paper language,' they would have to join
+forces with one of the dominant programming languages. In the
+early sixties ALGOL 60 8 was the leading programming language
+in Europe. The elegant and powerful concepts of this language
+appealed to Dahl and Nygaard and made it, in their opinion,
+the perfect match for SIMULA.9 The crucial decision of
+linking SIMULA to ALGOL 60 was made during the spring of
+1962, and would later prove to be both an enormous strength
+and a serious obstacle. I will return to these technical
+matters later on, but for the time being let us just
+establish that ALGOL 60 came to constitute a decisive
+technical stronghold for the SIMULA project.
+
+NEW MEN
+
+In order to understand how SIMULA grew from a set of loose
+ideas in Nygaard's head into a working programming language
+it is important to know something about the environment in
+which this development took place. As we saw in the previous
+chapter, while NDRE in the 1950s established itself as the
+leading Norwegian milieu in informatics NCC was pretty much
+on the sidelines in this area. From 1954 the computing
+center's primary task had been running NUSSE but when the far
+more powerful Ferranti MERCURY came to Norway in 1957, this
+machine soon became obsolete. In 1958 the NCC was given
+charge of running the Central Bureau of Statistic's DEUCE
+computer and, as mentioned in Chapter 3, this led to a
+reorganization of the computing center. According to NTNF's
+Annual Report for 1958/1959, NCC's new mandate was to work
+for the application of computing machinery, function as
+contract institute for computing, and do numerical and
+statistical computing for public agencies and industry.10
+Around 1960 it became apparent, however, that NCC was not
+capable of fulfilling these obligations. The amount of work
+increased rapidly, whereas the utilization of the DEUCE did
+not live up to expectations. One reason for these problems
+was a profound lack of qualified personnel.11 Another arose
+>from numerous technical problems with the machine itself, and
+yet a third from the fact that the DEUCE was an
+extraordinarily difficult machine to program. Emphasis on a
+simple machine had led to a more complicated coding than were
+used in any other computer of its day, and given the
+magnitude of the problems NCC was supposed to solve this
+posed tremendous difficulties for its staff of programmers.
+
+It soon became apparent to the parties involved that
+something had to be done and as a first step in strengthening
+NCC, its board decided, during the spring of 1960, to restate
+the Centre's objectives by imposing a more research-like
+profile. As mentioned, toward the end of the 1950s Kristen
+Nygaard had found working at NDRE increasingly difficult, and
+thus, when the NCC, in May 1960 offered him a new position he
+avidly accepted. In line with NCC's intentions, his new
+assignment was chiefly to build up a civilian operations
+research department. In order to accomplish this he brought
+along six members of his previous operations research team
+>from NDRE.
+
+To NDRE this initially came as a severe blow since a large
+number of its operations research specialists suddenly
+disappeared. However, under the leadership of Erik
+Klippenberg the remains of the group at NDRE soon re-
+organized themselves and moved into Systems Analysis. In the
+long run this event resulted in far more serious consequences
+for the institute's informatics research activities. When
+Nygaard and his group left in 1960, Ole-Johan Dahl gradually
+became associated with the SIMULA project at NCC, and Jan
+Garwick later moved to the U.S., much of the expertise that
+had been built up at NDRE disappeared. The effect of this was
+that NCC in the 1960s took over as the leading milieu in
+informatics in Norway.12
+
+The DEUCE engagement had seriously affected NCC's ability
+to execute its commissions and by 1961 it was clear that this
+had a decisive negative impact on the Centre's financial
+credibility. Notable financial deficiencies had been recorded
+both in 1959 and 1960,13 and the prospects for 1961 did not
+indicate any immediate improvement. What this above all had
+demonstrated was the necessity of a highly qualified and
+professional staff, and in this respect the introduction of
+operations research in 1960 soon proved to be a step in the
+right direction. Furthermore, it had also revealed NCC's
+profound need for a new computer which would improve the
+institute's capacity to fulfill its mandate.
+
+THE COMPUTER QUESTION
+
+The event that would eventually propel the SIMULA project
+off the paper occurred in 1962 and would eventually also
+represent the solution to NCC's computer problems.
+In April 1961 NCC received an informal proposal from the
+Danish Computing Center in Copenhagen regarding possible
+future cooperation.14 At the time, the Computing Centre's
+director Nils Ivar Beck, had ideas for a large network of
+Scandinavian computing centers called the Scandinavian
+Electronic System. According to the Danish proposition, NCC
+could, within a few years, become part of this network and
+would in the short run benefit from such cooperation in
+several ways. From the point of view of NTNF and NCC's board,
+the Danish proposition seemed to offer the ideal solution to
+NCC's most immediate problems, and after a few preliminary
+meetings during 1961, informal relations between the two
+computing centers were thus established.
+
+>From Nygaard's point of view it was tacitly understood
+that when he and NCC's director, Bjoern OErjansen were given
+the task of drawing up a report on NCC's immediate computer
+needs, they should conclude by recommending a GIER from the
+Danish Computing Center.15 GIER was a recognized medium-sized
+computer, but in Nygaard and OErjansen's opinion not the ideal
+solution for NCC's immediate needs, nor for the benefit of
+Norwegian informatics in the long run. What they wanted was a
+real mainframe like English Electric's KDF-9. However, this
+computer was, at the time, far beyond NCC's financial reach,
+and consequently they settled for GIER. Based on the
+conclusions in the Nygaard and OErjansen report, NTNF decided
+in February 1962 that NCC should order a GIER from Denmark,
+and granted 2 mill. NOK. ($280,112) for this purpose.16
+ This was roughly the situation when another important
+actor, the Univac Division of the Sperry Rand Corporation,
+entered the stage towards the end of May 1962. In connection
+with the marketing of their brand-new computers UNIVAC III
+and UNIVAC 1107, the company arranged an executive tour to
+the United States for prospective European customers. Kristen
+Nygaard was invited to participate on behalf of NCC.17
+Now, at this point let us briefly recapitulate the status
+on the SIMULA project. As mentioned earlier, the SIMULA
+concept had, by May 1962, reached a state of semi-maturity,
+and Dahl and Nygaard felt that they now had a presentable
+language concept at hand. The preliminary groundwork was
+done, and it was time to seek out financial resources. As
+reported by Dahl and Nygaard in 1981,18 there was no initial
+enthusiasm for SIMULA in NCC's environment, i.e., apart from
+the valuable moral support given by the board of NCC. The
+main objection according to them was that there would be no
+use for a programming language like SIMULA, and if by any
+chance there was, such a language certainly existed already.
+Furthermore it was asserted that their ideas were not good
+enough, and that they in general lacked the competence needed
+to embark upon such an extensive project, which for these
+reasons would never be completed. Finally it was maintained
+that this kind of work should not be performed in small
+countries like Norway. From these statements it should be
+evident that gathering financial support from the Research
+Council, would indeed be a difficult and protracted mission.
+Fortunately though, other options existed, and in an
+attempt to reverse Univac's sales mission Kristen Nygaard
+decided to introduce SIMULA to the Americans. As soon as the
+party arrived in New York, he contacted the Univac Europe
+representative James W. Nickitas and presented him with
+SIMULA and another NCC software project on linear
+programming.19 Nickitas found Nygaard's ideas interesting,
+and agreed to set up a meeting with a few influential
+representatives from Univac's software division. Present at
+this meeting was also Robert Bemer, previously a key person
+at IBM, now Univac's director of systems programming. Bemer
+recalls that:
+
+It was just after I started with UNIVAC that I met a
+Kristen Nygaard of the Norwegian Computing Center, Oslo.
+He told me about his project SIMULA. My yearly budget
+for Systems Programming was about $8 million at that
+time, for in the neighborhood of 325 people. Dr. Rader
+had advised me that 5% of that money was my discretion,
+to do what ever I thought would benefit UNIVAC most! It
+happened that I was organizing and chairing a session at
+the IFIP Conference in Munich that August, to which
+Nygaard's project was a close fit. I invited him to give
+a paper at that session. It caught my interest, and I
+wanted SIMULA for the 1107 software repertoire (ALGOL
+was also in the repertoire, which I could never have
+made happen at IBM, but at UNIVAC I was RUNNING [sic]
+the show!). 20
+
+Bemer had been a sworn ALGOL 60 fan all along and as he
+listened to Nygaard explaining his ideas for an ALGOL-based
+simulation language, he became more and more convinced that
+SIMULA's sophisticated simulation facilities would
+significantly benefit ALGOL 60 in it's struggle with
+FORTRAN.21 By the end of the meeting Bemer announced that he
+was to chair a session at the IFIP 62 World Congress in
+Munich, and that he very much wanted a presentation of SIMULA
+for this occasion. Nygaard immediately accepted this offer as
+he realized the significance of such an opportunity.22 The
+presentation of SIMULA at the IFIP conference first of all
+implied an important step toward consolidation of the
+language concepts. Furthermore, it offered a suitable setting
+for the introduction of SIMULA, and simultaneously provided
+Dahl and Nygaard with an important entry to the distinguished
+community of computer professionals.
+
+Even though Kristen Nygaard had managed to draw
+professional attention to SIMULA, the vital question of
+financial support was still unsettled. At this point,
+however, Univac started to move. In connection with the
+marketing of the UNIVAC 1107, the company needed a
+demonstration site in Europe as soon as possible. In this
+regard, Kristen Nygaard must have made quite an impression on
+the Univac people and really succeeded in convincing them of
+NCC's professional qualities, because upon his return to
+Norway, Nickitas approached him with an informal proposal for
+Univac to establish this demonstration site at NCC. The deal
+was that the demonstration site should serve promotional
+purposes for Univac, and NCC would get a 50% discount on an
+eventual purchase. In return for this generous offer however,
+Univac wanted NCC to provide them with SIMULA and an
+implementation of the linear programming system developed by
+Sverre Spurkland.23
+
+A NEW AND POWERFUL ALLY
+
+When Univac made their appearance, the conditions for the
+SIMULA project changed considerably. As previously explained,
+the prospects of attaining grants within the NTNF system were
+not at all promising. Now all of a sudden a new situation had
+arisen. Through their initiative, Univac had altered the
+terms by linking the development of SIMULA to NCC's computer
+acquisition. It is worth noticing that Univac at the time
+knew that NCC had already ordered a GIER computer from
+Denmark.24 In this regard their initiative must be understood
+as an attempt to subvert the GIER order by offering NCC a
+better contract. However their strategy was far more subtle
+than this. In addition to favorable economic conditions, it
+also implied inside collaboration. By claiming
+implementations of SIMULA and the LP Package in return for
+their computer offer, they clearly aimed at enlisting Kristen
+Nygaard as their ally and inside man in Norway.
+>From Nygaard's point of view Univac's initiative must
+really have had an appealing sound to it. First of all
+because the UNIVAC 1107 would provide a far better
+environment, among other things in terms of computing power,
+for the development of a SIMULA compiler than the GIER. Even
+today, high-precision Monte Carlo modeling and simulation are
+highly CPU intensive tasks where three-hour supercomputer
+runs are not uncommon.25  Another aspect which must also have
+attracted Nygaard was Univac's conspicuous marketing position
+and worldwide distribution network. Associated with a
+powerful computer like the 1107, SIMULA would be launched
+onto the world market as standard software in a scale that
+NCC would never have accomplished.26 However, the most
+important aspect was probably the prospect of NCC taking on
+the development costs related to the SIMULA project.
+In a broader context a number of other elements might also
+have influenced Nygaard's reasoning. Here however, we shall
+settle for perhaps the most momentous one, which also to a
+high degree was interconnected with the SIMULA effort. From
+the preceding it should be apparent that Kristen Nygaard was
+quite an ambitious man, and that his professional aspirations
+were largely linked to NCC's position as a research center in
+informatics. In this respect he must have judged the
+possibilities of attaining a computer like the 1107, in the
+early sixties among the ultimate solutions in high-tech
+computer technology, as a God-given opportunity to fortify
+Norwegian computer science, and undoubtedly his own
+professional prestige simultaneously. In any case, it was
+obvious that Univac would constitute a formidable stronghold
+for the SIMULA project, and that Kristen Nygaard and Univac
+had common interests in this case, even though they pursued
+different goals.
+
+NEGOTIATING FOR THE UNIVAC/SIMULA DEAL
+
+Back in Norway, Nygaard's mission was, accordingly, to
+canvass opinion for the Univac proposal at NCC and within
+NTNF. Since the Research Council had already ordered the GIER
+computer from Denmark, efforts had to be aimed at converting
+their interests in this case. Towards midsummer of 1962,
+Luthar Harr, director of Univac Europe, Stig Wallstam,
+director of Univac Scandinavia, and James Nickitas came to
+Norway to announce their formal proposal. In connection with
+this, members of the board of NCC together with a few
+influential people within the Research Council were summoned
+to a meeting with the Univac representatives. At this meeting
+Univac came up with an offer which meant that NCC could
+acquire an 1107 at a 50 percent discount, or approximately
+7.1 mill. NOK. ($991,400).27
+
+During the discussions however, the Univac representatives
+got the notion that the computer configuration in question
+was too large and thus too expensive. So in an attempt to
+make it more appealing to the Norwegians, they subsequently
+decided to extend their offer. In the following discussions
+they revealed that they would be willing to offer NCC a
+software contract on SIMULA and the LP Package. This
+unexpected offer, seemingly an improvised attempt to entice
+NCC and Kristen Nygaard in particular, was actually an ace
+that they had been hiding all along in an attempt to get
+SIMULA for free. It is useful to recall that, at the time,
+head of Univac Systems Programming, Robert Bemer, had a
+yearly budget of about $8 mill. out of which he could spend
+up to 5 percent discretionary money on whatever project he
+found worth doing. Since the SIMULA project, in his opinion,
+was very much worth doing, he had already authorized the
+necessary funding of the project.28 Evidence of Univac's
+sustained interest in SIMULA is found in a letter from Univac
+to Kristen Nygaard dated 23 October, 1964:
+
+'A major reason for our interest in SIMULA is that we
+wish to establish a strong systems simulation capability
+for our own use here in St. Paul. We have been
+evaluating alternative approaches and your material
+[progress reports and specifications on SIMULA] is being
+studied with considerable interest' 29
+
+This new initiative implied a closer link between SIMULA's
+destiny and the outcome of Univac's sales mission, and for
+Kristen Nygaard this must undoubtedly have been a vital spur
+for further engagement.
+
+A BIGGER FISH
+
+With his entrepreneurial maneuverings Nygaard had roused
+one of the really the big fishes in the Norwegian research
+system, namely his former boss from NDRE, Finn Lied. As
+director of NDRE, chairman of the board of IFA, member of
+NTNF's working committee, and with solid top-level contacts
+within the Ministry of Finance and the Ministry of Industry,
+Lied was a man of considerable power and influence in
+Norwegian science policy and he didn't take lightly to
+Nygaard's UNIVAC initiative at all.
+
+As early as September 1960 IFA and NDRE had first begun to
+look into the question of acquiring a new computer to
+substitute the Ferranti MERCURY. It was argued that in order
+to maintain a front-line position in high-technology R&D, it
+was imperative that the two institutes had at their disposal
+the most powerful and modern computing machinery available.
+In February 1962, the case was forwarded to the Ministry of
+Finance, but it soon turned out that things were not going as
+smoothly as one had hoped for. In May of that year, Lied
+wrote to his colleague, Karl Holberg, who at the time
+represented NDRE in the Council for Data Processing in the
+Public Administration:30
+
+The [computer] acquisition has now entered a highly
+critical phase with the greatest difficulties in the
+Ministry of Industry. Details orally. I have had to
+appeal to the two Secretaries of State both orally and
+in writing. I have yielded in every aspect except for
+the essentials. This is, in my opinion, necessary as the
+case now stands. I have put the case partly in the hands
+(yours) of the Council.31 [My translation]
+
+As these difficulties unfolded more dark clouds were
+gathering on the horizon. Kristen Nygaard was back from the
+States with an exceptionally favorable offer from Univac, and
+the Research Council was apparently swallowing the bait.
+In July NTNF's working committee decided to take the 1107
+question under deliberation, and Kristen Nygaard was
+commissioned to draw up a report on the subject. Univac's
+offer was effective until 1 October 1962, and Nygaard new
+very well what was at stake. He had to act fast. While Lied
+and others who were liable to interfere were away on summer
+holiday, he put together a report concluding that the NTNF
+should purchase the UNIVAC 1107. He argued that the needs for
+computing power in research, public agencies, private
+commerce and various industries were rapidly increasing, and
+that a computer like the 1107 would indeed serve present as
+well as future needs.32 Another asset was the fact that
+Univac's offer was approximately 2.5 mill NOK. ($350,140)
+less than the competitors' (IBM and English Electric)
+quotations.33
+
+For Lied, Nygaard's UNIVAC initiative complicated the
+plans for IFA/NDRE's computer acquisition considerably.
+Secretary of the Treasury, Petter J. Bjerve, was of the
+opinion that one mainframe computer had to be utilized to its
+full potential before the next should be acquired. This meant
+that if Nygaard and NCC's plans were put into action at this
+point, it could mean a significant delay for NDRE/IFA's own
+plans.
+
+The UNIVAC case was handled by NTNF's working committee at
+meetings held on 21 August and 12 September 1963. The
+committee members were generally in favor of the conclusions
+in Nygaard's report, that is with the exception of NDRE's
+director, Finn Lied. Lied pointed out that it would be an
+unfortunate development if NCC were to expand its staff by
+recruiting expertise from other similar institutions. He was
+also concerned that the acquisition of a large and expensive
+computer like the 1107 would jeopardize NDRE's chances of
+getting a similar computer in the near future.34 However,
+despite his concern Lied did not choose to dissent in this
+case. One reason why he refrained from interfering with NCC's
+plans was probably that the grants for IFA/NDRE's computer at
+this point seemed secure.35 Nygaard and NCC's intention was
+to finance 60 percent of the machine through private loans,
+and thus, their computer acquisition would not interfere
+directly with IFA/NDRE's negotiations with the Ministry of
+Finance and the Ministry of Industry.
+
+When the contract between NTNF and Univac was signed on 24
+October 1962, the software systems to accompany the computer
+were not yet ready. However, Univac assured NTNF through a
+penal clause in the contract that these systems would be
+available in time for delivery. The original delivery date
+was set for March 1963, but for various reasons was later
+postponed. When the computer eventually arrived, in August
+1963, it became apparent that the software systems provided
+did not meet the standards promised by Univac. This situation
+did not improve considerably, and by March 1964 NCC had
+accumulated a claim on Univac amounting to approximately 1.8
+mill. NOK ($250,000). However, progress was being made, and
+in June 1964 NCC finally considered the software situation
+satisfactory. By then NCC's standing claim on Univac had
+become substantial, and important people within the Univac
+organization found themselves in a most awkward position. So,
+in order to maintain friendly terms with Univac, and to avoid
+unnecessary 'head-rolling' within that company, NCC agreed to
+accept an upgrade of the hardware configuration instead of a
+cash payment. In short, this meant that NCC got a very
+powerful computer configuration on exceedingly favorable
+terms.36 In August 1963, the UNIVAC 1107 arrived in Oslo.
+After a few weeks of assembling and testing, the computer was
+finally operative, approximately four months after schedule.
+
+THE DEPARTMENT FOR SPECIAL PROJECTS
+
+The SIMULA project now finally seemed to be underway. The
+vital financial question was at last settled, and the
+technical premises fairly well clarified. However, despite
+these promising conditions it would still take close to a
+year before the development of SIMULA really took off. The
+reason for this seemingly unexpected delay is partly
+technical, partly political, and clearly shows how science
+and research are largely dependent upon external premises.
+Ever since Univac's offer was first known to NTNF in June
+1962, they had emphasized the fact that an engagement
+involving such a heavy investment would necessarily imply
+that the bulk of NCC's available resources had to be directed
+strictly towards the business side of the institute's
+activities.37 Since NCC operated largely on a reimbursement
+basis, this meant that activities constituting sources of
+income had to be given top priority. In this respect it can
+be asserted that the UNIVAC 1107 came to represent a double-
+edged sword, at least as far as basic research activities
+were concerned. It is somewhat difficult to establish exactly
+how this situation might have affected the development of
+SIMULA, since this project was financed by Univac. It is
+evident, however, that the 1107 engagement restricted
+research latitude in general, and gave way for a professional
+profile which, at least to a certain extent, resembled the
+situation before 1960. For Kristen Nygaard, who in December
+1962 was appointed NCC's director of research, this outlook
+must have been most disquieting, and he obviously found it
+difficult to accept that research should be pushed into 'a
+small corner.'38
+
+And so in an attempt to compromise between these diverging
+interests, and at the same time establish a more suitable,
+efficient, and dynamic organization, the board decided to
+restructure the entire institute by dividing it into a number
+of independent departments. According to the board's
+resolution of 11 December, 1962, these new departments were
+meant to engage in practical commissions as well as applied
+research on specific target areas within NCC's mandate.39 The
+SIMULA project, however, represented a slight problem with
+regard to this new organizational structure. Since software
+development had not previously been an integrated part of
+NCC's activity, and moreover required highly specific
+professional expertise, it must have been somewhat difficult
+to ascertain under which department it actually belonged. It
+was, so to speak, a disturbing element inflicted on NCC as a
+result of Kristen Nygaard's entrepreneurial activity in
+connection with the UNIVAC deal.
+
+Conflicts of interests must also have been important with
+regard to another of the board's reasons for reorganizing the
+institute. When NTNF decided to go for UNIVAC 1107 this
+implied, as we have seen, that one had to attach greater
+importance to economics. This responsibility rested first and
+foremost with NCC's director, Bjoern OErjansen, but it also
+applied to the rest of the staff. As pointed out, Kristen
+Nygaard did not quite share this opinion, and accordingly he
+did what he could to prevent basic research from being
+curtailed by scarce resources. Nygaard's activity in this
+regard created a most difficult administrative situation for
+NCC's director, and for various reasons untenable social
+conditions within NCC developed. The conflict reached a
+climax in March 1963 when three employees were fired for,
+among other things, conspiracy against OErjansen and Nygaard.
+Since the politics surrounding these events were rather
+complex, I will not engage in further discussions here. As a
+result of this crisis, however, Bjoern OErjansen decided to
+resign from his position as director of NCC and was released
+by Leif K. Olaussen in December 1963. For Kristen Nygaard the
+heavy strain caused by the working conditions in wake of the
+crisis lead to a sick leave during the autumn of 1963. This
+difficult situation must also have contributed to slow down
+in the development of SIMULA.
+
+It might therefore have been a matter of necessity that
+the board subsequently decided to establish a Department for
+Special Projects and put Nygaard in charge as director of
+research. The new department should focus on important
+problems within NCC's mandate, of such character that they
+could not be adequately treated by any of the other
+departments. As examples of this kind of activity the board
+puts forward: software development, research in new areas of
+computer application, special projects related to the
+development of NCC's professional profile, public relations
+and consulting services for important customers. As we can
+see, it can easily be asserted that this was a 'playground'
+especially designed to suit Kristen Nygaard. In this way they
+could keep him occupied, and prevent him from interfering
+with administrative matters, and simultaneously provide a
+suitable forum for software development.40 The Department for
+Special Projects became a precedent for software development
+at NCC, which undoubtedly was significant for NCC's later
+SIMULA engagements.
+
+SIMULA'A LANGUAGE FOR PROGRAMMING AND DESCRIPTION OF
+DISCRETE EVENT SYSTEMS
+
+Let us now return to the technical matters.41 When Kristen
+Nygaard and Ole-Johan Dahl started out, during the spring of
+1962, they had a rather vague set of ideas for a programming
+language which should meet a broad set of specifications. If
+we compare these initial ideas with the actual outcome of
+their scientific endeavor, the SIMULA I compiler, we find
+that there is a rather distinct difference between these two
+positions. In the following I will point out a few reasons
+for this change of goals.
+
+The early approach to SIMULA was based on an idea of a
+mathematically formulated network concept associated with
+ALGOL 60.42 In general, Dahl and Nygaard's idea was to
+implement SIMULA as a simulation procedure package along with
+a preprocessor to ALGOL 60.43 The preprocessor idea implied
+that a given SIMULA program first had to be translated to
+ALGOL and then in turn, compiled into an executable program.
+In other words, this meant that a SIMULA program had to
+operate strictly within the framework of ALGOL 60, and as we
+shall see, this proved to be a serious obstacle when
+simulation aspects were involved. However, at this early
+stage they were mainly preoccupied with the idea that
+customers in a simulation model could be depicted as ALGOL
+blocks and characterized by using local variables. At that
+time, this idea looked rather promising since ALGOL's
+recursive block mechanism did cater for multiple occurrences
+of user-defined data structures.44
+
+By the spring of 1963 however, Dahl's work on the storage
+management scheme made it quite evident that ALGOL's block
+structure and strict dynamic single stack regime were
+incompatible with an adequate implementation of SIMULA's
+sophisticated simulation facilities. In short, the problem
+facing Dahl and Nygaard at this stage was that ALGOL 60's
+procedure calls and storage allocation mechanisms operated
+strictly according to a stack principle, whereas objects
+(customers) in a simulation model rather tended to behave
+according to the queue principle. In light of this, they
+subsequently realized that they would not achieve their
+design objectives unless they found a way to get around
+ALGOL's rigorous stack regime.
+
+During the summer and autumn of 1963, while Kristen
+Nygaard was preoccupied with problems in the political arena,
+Ole-Johan Dahl commenced work on a new storage allocation
+scheme based on a two-dimensional free area list.45 With this
+new scheme at hand, they found that they were no longer tied
+by the restrictions imposed by ALGOL 60, and thus they
+eventually decided to drop the preprocessor idea completely.
+Instead they decided to implement SIMULA through a
+modification and extension of Univac's ALGOL 60 compiler.
+This change of strategy opened a whole new set of
+perspectives on SIMULA, and accordingly, they were compelled
+to start over again. This time they derived the basic
+concepts through a variety of thorough case studies, ranging
+>from job shops via airport departure systems to
+epidemiological studies.
+
+With regard to the original network concept, they
+eventually discovered that this could just as well be
+regarded the other way around, i.e. active customers making
+use of passive stations. This in turn led to the realization
+that an in-between, or dual point of view could profitably be
+adopted. From this perspective the customers were regarded as
+active in moving from station to station, but passive in
+their interaction with the service parts of the various
+stations. (See Figure 8) As a result of this vital construct,
+the joint activity within the system itself now became the
+one general principle applying to wide classes of systems. In
+light of this new understanding they found that the simple
+network concept seemed too narrow and thus inappropriate, and
+for these reasons it was subsequently abandoned. Instead Dahl
+and Nygaard introduced the far more powerful process concept
+which came to constitute the basic, unifying feature of the
+SIMULA I language. In short, a process can be understood as a
+generalized ALGOL procedure with quasi-parallel properties.46
+This decisive breakthrough, in February 1964, implied that
+the simple notion of a system being described by a general
+mathematical structure had been substituted by a much more
+powerful concept. The system was now understood as consisting
+of a series of interacting processes operating in quasi-
+parallel as ALGOL stacks within the main program execution.47
+By March 1964 the design phase had finally come to an end.
+It was now time to translate the paper version of SIMULA into
+an operating compiler. The implementation effort was solely
+conducted by Ole-Johan Dahl. On specific ALGOL related items
+he had, however, some assistance from two American software
+engineers Ken Jones and Joeseph Speroni, the latter was the
+responsible for the Case Western Reserve 1107 ALGOL.48 The
+implementation effort proceeded throughout the year, and in
+December 1964, the first prototype of the SIMULA I compiler
+was up and running on NCC's UNIVAC 1107.
+
+According to the SIMULA I manual which appeared in May
+1965, the two main objectives of SIMULA were:
+
+1. to provide a language for a precise and standardized
+description of a wide class of phenomena belonging to
+what we may call 'discrete event systems.'
+
+2. to provide a programming language for an easy
+generation of simulation programs for 'discrete event
+systems.'49
+
+Nygaard's idea of a language for system description and
+simulation programming had become a reality. During that year
+three courses were given in the language, and its use picked
+up so fast that in his report on the use of SIMULA, Nygaard
+notes that by late 1965 NCC had 'no longer complete
+information on which jobs are done by SIMULA since there are
+many users outside the institute.'50
+
+During the first year, SIMULA was applied to a wide array
+of operations research problems. In his report, Nygaard makes
+reference to production planning, administration, inventory,
+transportation, harbors, planning and scheduling, renewal,
+computer operation and design, and analyses of various social
+systems. As an illustration of the specific problems SIMULA
+was applied to that first year, Nygaard mentions, among other
+things, an analysis of the layout of the new job foundry at
+Raufoss Amunisjonsfabrikker where the object was to find the
+proper arrangement and dimensioning of cranes, storage points
+etc. The SIMULA program for this job was punched on 1130
+cards. Compiling time was 50 seconds, and a simulation of two
+and a half days of operation ran in 22 seconds. He also
+mentions that an airport departure system was being developed
+in cooperation with the Scandinavian Airlines System (SAS),
+that a large study on the transportation, pre-production, and
+storage system of a Norwegian paper mill had been conducted,
+and that two large-scale harbor simulations were made in
+SIMULA.
+
+INTERMEZZO
+
+When Dahl and Nygaard first commenced work on SIMULA
+during the spring of 1962, their idea was to develop a simple
+simulation procedure package along with a preprocessor on top
+of ALGOL 60. This seemingly straightforward approach turned
+out to be a dead end, when they ultimately ran up against the
+rigorous stack regime of ALGOL 60. As we have seen, the
+solution to this problem was found in Ole-Johan Dahl's
+storage management scheme from November 1963. From then on
+their ambitions grew and in wake of Dahl's path-breaking new
+allocation scheme a breakthrough for the entire SIMULA effort
+was made. From the end of 1963, it is evident that they now
+strove toward general, unifying concepts in order to realize
+a real high-level programming language. In this respect,
+SIMULA I should be seen as an intermediate position en route
+to what was later to become SIMULA 67.
+
+TOWARD GENERALITY
+
+During 1965 and 1966 Dahl and Nygaard spent a lot of time
+introducing and teaching SIMULA, and the use of the language
+rapidly spread to Sweden, Germany, the Soviet Union, as well
+as a number of other countries. Apart from the UNIVAC
+version, SIMULA also became available on Burroughs B5500
+computers during 1968, and later on, the Russian URAL-16
+computer. However, Dahl and Nygaard's ambitions were greater
+than this. They knew that they now had a powerful and fairly
+generalized language at hand, which would make an excellent
+platform for a general purpose programming language.
+Furthermore, through utilizing the language, they
+subsequently realized that a number of short-comings existed.
+In his report on the use of SIMULA Nygaard mentions that they
+saw a need to implement tracing and debugging facilities in
+order to make it easier for the user to detect and correct
+errors in the SIMULA source code.51 Among other things they
+had also become aware of an obvious lack of serviceable tools
+for expressing common properties between interrelated
+processes in the system. Moreover, it was obvious that the
+sophisticated simulation facilities embedded in SIMULA I were
+too heavy a burden to carry for a programming language with
+general purpose ambitions, and finally they had become aware
+of certain serious deficiencies in the UNIVAC ALGOL 60
+compiler itself.52
+
+In the autumn of 1965 the Norwegian Institute of
+Technology in Trondheim contacted NCC and expressed it's
+interest in implementing a new and improved ALGOL compiler
+for the 1107. Their idea was to design this compiler
+especially with SIMULA in mind. From Dahl and Nygaard's point
+of view this sounded like a promising suggestion, and for
+some time during 1966 relations with a computing team headed
+by Knut Skog in Trondheim were maintained.
+As mentioned, since late 1963, early 1964 Dahl and Nygaard
+had invested an increasing amount of time trying to come up
+with as general and unifying concepts as possible. As this
+pursuit proceeded throughout the summer and autumn of 1966,
+they became more and more preoccupied with the opportunities
+embedded in Tony Hoare's record class construct, first
+presented in ALGOL bulletin no. 21, 1965. After having
+carefully examined Hoare's record proposal they eventually
+came to the conclusion that, even though it obviously had a
+number of very useful properties, it failed to fully meet
+their requirements. What they were really looking for was
+some kind of generalized process concept with record class
+properties.53
+
+The answer to their problem suddenly appeared in December
+1966, when the idea of prefixing was introduced. A process,
+later called an object, could now be regarded as consisting
+of two layers: A prefix layer containing references to its
+predecessor and successor along with a number of other
+properties, and a main layer containing the attributes of the
+object in question. In addition to this important new
+feature, they also introduced the class concept, which can
+roughly be described as a highly refined version of SIMULA
+I's activity concept. This powerful new concept made it
+possible to establish class and subclass hierarchies of
+concatenated objects. As an example we can imagine the class
+Ôvehicle', which can be understood as a generalization of the
+subclasses Ôcar', Ôbus', and Ôtruck'. In other words, the
+basic concept of speaking in general and more specific terms
+had been adopted as a way of expressing reality in the
+context of a programming language. Having these general,
+unifying tools at hand, Dahl and Nygaard immediately decided
+to commence designing a new, general high-level programming
+language in terms of which an improved SIMULA I could be
+expressed.54 In the preceding I have made a rather fleeting
+reference to the fact that Dahl and Nygaard wanted to make
+the new version of SIMULA a general purpose language. In what
+follows I will try to point out some of the reasons for this.
+As heralded by Nygaard at the IFIP-62 World Congress and
+further evidenced by the SIMULA manual of May 1965, SIMULA I
+was a special-purpose language geared toward operations
+research problems. The 1960s saw an enormous proliferation of
+these so-called special-purpose languages. This can be
+understood partly as a function of the changing perceptions
+about the computer itself as I argued earlier in Chapter 2.
+Since the computer increasingly came to be seen as general-
+purpose device, special-purpose software took over the
+function of configuring it for specialized application areas
+like simulation, for example. Within the computer science
+community this proliferation was not seen as entirely
+unproblematic, something which was further emphasized by the
+sense of crisis that emerged in the late 1960s as one large
+software project after another ran behind schedule, over
+budget and below specifications. During the 1960s, the call
+for a more concerted effort in programming language design
+grew stronger, and one solution that more and more language
+developers found promising was the general-purpose language,
+the programming language that was so general in nature that
+it could be used for all conceivable purposes. At an IFIP TC
+2 55 conference at Lysebu outside Oslo in May 1967, Jan
+Garwick even went so far as to say that:
+
+The only salvation for the programming world is the
+really general purpose language. Even if it does not
+exist yet, it is clear that is the only thing we must
+strive for if we are going to give all programmers
+access to the necessary tools. We can not just produce
+new special purpose languages the whole time, because
+they will not be widely implemented. 56
+
+As I noted in Chapter 2, the very first effort to produce
+a universal, machine-independent language was ALGOL,
+developed around 1960. This project, born out of a joint
+effort between leading computer scientists 57 from both sides
+of the Atlantic, came to form the basis for most theoretical
+and practical language and compiler work during the 1960s and
+well into the Ô70s. Although ALGOL was intended to be a
+general-purpose programming language, it came to be seen
+essentially as a tool for numerical computations. To bring
+the language more in line with the original intentions, in
+1964 a new committee (Working Group 2.1) set out to 'Clean up
+ALGOL 60'58 and in programming language circles a new name,
+ALGOL X, started to appear.59
+
+While this was happening, another major general-purpose
+language project was being conducted at IBM. In Chapter 2 I
+made reference to this language in connection with the
+discussion of IBM's new product line, the System/360. As
+opposed to ALGOL X (today known as ALGOL 68), which was a
+multinational venture coordinated by IFIP, PL/1 was an
+industry effort pushed forth by IBM. In the 1960s these two
+large and prestigious projects spurred a considerable
+interest in the idea of general-purpose languages, and this
+is background, I think, against which we must view Dahl and
+Nygaard's SIMULA 67 effort. To use Nygaard's own words:
+Dahl and I started out to make a simulation language,
+but of course we have spent so much time with all these
+people working on general purpose languages, that I must
+admit we have to some extent fallen in love with the
+concept of general purpose languages.60
+
+As a result of a proposal made by Ole-Johan Dahl, at the
+time the Norwegian representative to IFIP Technical Committee
+2 (on programming languages), in the autumn of 1965, it was
+decided that an IFIP Working Conference on simulation
+languages should be held in Oslo in May 1967. There is little
+doubt that acknowledgment from a professional forum like IFIP
+TC-2 would constitute a professional stronghold of major
+importance for their efforts, and when the conceptual
+breakthrough finally came at the turn of the year, they were
+determined to present a new and revised version of SIMULA at
+this IFIP Working Conference.61
+
+SIMULA 67 COMMON BASE
+
+Prior to the Lysebu conference Dahl and Nygaard had been
+working desperately to finish their Class and Subclass
+Declarations paper. Despite the short time available to them
+they managed to incorporate all the important new aspects,
+and thus this paper became in a sense the first formal
+definition of the new language. The conference's response to
+SIMULA 67 was positive, and the project now finally seemed to
+be on the right track.
+
+Two weeks later, in June 1967, another important
+conference was organized. The purpose of this conference was
+mainly twofold, first to define a standard for the exchange
+of SIMULA programs between various implementations, called
+the Common Base Standard, and secondly to initiate
+implementation projects for the Control Data 3000 (upper and
+lower) series and the UNIVAC 1100 series. Once again Dahl and
+Nygaard came up with a number of new proposals. One of the
+things that they wanted to incorporate was a unification of
+the related notions of Type and Class. The new proposal
+underwent serious discussions, but after having considered
+the implications and difficulties involved, the pragmatic
+approach prevailed and the implementers subsequently rejected
+it. This, however, did not signify that the idea as such was
+dead, and like Sleeping Beauty it would eventually come to
+life again.62
+
+Items related to string handling and I/O had not been
+discussed in any of Dahl and Nygaard's many proposals to the
+conference. However, the implementers unanimously stressed
+the need to have these things incorporated and defined as
+part of the Common Base Definition. In order to secure high
+standardization and portability, it was therefore decided to
+furnish SIMULA with these facilities. The responsibility for
+design and development was given to Bjoern Myhrhaug, a close
+colleague of Dahl and Nygaard. The results of his work were
+accepted at the first meeting of the SIMULA Standards Group
+(SSG) in February 1968, after which SIMULA was formally
+frozen.63
+
+INTO THE WORLD: THE SIMULA 67 COMPILERS
+
+As has been stressed, Dahl and Nygaard had great ambitions
+for SIMULA 67. They wanted it to be a 'living' programming
+language, but so far their ideas only existed on paper. They
+envisioned at the time that only a few of the many
+programming languages developed in the 1960s would still be
+in use by 1980 and if SIMULA was to become one of these, it
+was essential that implementations of the language were
+available on the important mainframes. Around 1970 this
+basically meant the UNIVAC 1100 series, and the IBM 360/370
+series of computers.64
+
+THE UNIVAC 1100 SIMULA
+
+>From 1966/67 research scientists from NCC had been working
+with Knut Skog's team in Trondheim to develop a new ALGOL
+compiler (NUALGOL) for the UNIVAC. Whereas the intention had
+been that this should be both an ALGOL and a SIMULA compiler,
+it soon became apparent that the differences between these
+languages and their respective implementation techniques made
+such a unification impractical.65
+
+Partly due to these technical problems and partly because
+NCC felt a certain obligation toward SIMULA I and its user
+community, during 1968 it was decided that NCC should
+withdraw from the NUALGOL project and that a SIMULA 67
+implementation for the 1107 be developed instead.66
+The UNIVAC SIMULA team, consisting of Ron Kerr and Sigurd
+Kubosch with some assistance from Bjoern Myhrhaug, did not
+start from scratch. The code of the ALGOL implementation
+served as a guide throughout the entire effort and wherever
+they could this code was cannibalized and reused. This way
+the only areas that needed fresh design and implementation
+were related to SIMULA-specific items. Working so close to
+the ALGOL code, Kerr and Kubosch took great pains to ensure
+that wherever possible SIMULA's code generation and runtime
+performance was competitive with that of ALGOL. This
+painstaking work contributed largely to the fact that the
+UNIVAC SIMULA compiler became one of the fastest SIMULA
+systems ever made. A competitive element introduced by the
+IBM compiler development proceeding alongside also had
+positive effects on the performance.
+
+For various reasons the Research Council decided in
+September 1969 to sell the 1107, and hand over the profitable
+computing commissions, which that year alone amounted to
+approximately 1.2 mill. NOK ($167,832), 67 to Computas, a
+company owned by the large and influential ship
+classification society Det Norske Veritas. 68 In spite of the
+abandonment of the old 1107 the UNIVAC SIMULA project,
+however, continued and the new target machine became the
+UNIVAC 1108.
+
+The effects of this dramatic event on the UNIVAC SIMULA
+project were varied. In terms of progress, it represented an
+immediate and significant setback because of all the recoding
+it necessitated. However, the UNIVAC 1108 and its new
+operating system (EXEC 8), in many ways state-of-the-art
+around 1970, provided a much more powerful and efficient
+environment that in the long run actually had quite a
+positive effect on the compiler performance. Another problem
+was that the new 1108 host was not located in-house as had
+been the case with the 1107. At a time when batch processing
+was the order of the day this undoubtedly contributed to a
+slowing of the project. In any event, progress was being made
+and in March 1971 the first commercial version of UNIVAC 1100
+Series SIMULA was released.69
+
+Univac was not unanimous in its reactions to the new
+SIMULA compiler. First of all, SIMULA I had been a useful but
+not very important part of their software repertoire, and
+they felt no market demand for a new and improved version.
+Secondly, they had spent a substantial amount of money on the
+SIMULA I project, and saw no reason why they should share
+SIMULA with other manufacturers. Nevertheless, in 1968 a long
+series of discussions between NCC and Univac concerning a
+possible transfer of rights to the compiler took place, but
+no contracts were ever signed. 70
+
+THE IBM 360/370 SIMULA
+
+In the case of the IBM 360/370 compilers, the situation
+was somewhat different. When Nygaard and his team in 1967/68
+expressed their interest in developing SIMULA 67 compilers
+for IBM and UNIVAC the conditions for doing this were stated
+very clearly. Firstly, such projects could only be undertaken
+if sufficient external financing was at hand, and secondly,
+that one, in the course of 5 years, would be able to cover
+the total expenses by selling the compilers on a strictly
+commercial basis. 71 According to these pre-conditions Kristen
+Nygaard and the private consultant Harald Omdahl started the
+tedious and difficult task of putting together a consortium
+of firms which would be interested in investing money in the
+compiler development projects. The hunt for investors went on
+with little or no success until Nygaard eventually meet with
+representatives from the Swedish Research Institute for
+National Defence (Swedish abbreviation: FOA) in the summer of
+1969. FOA had, for many years, been wanting to make use of
+SIMULA in connection with their research activities, and as
+they had recently purchased an IBM/360 computer they were
+naturally very interested in Nygaard's proposals regarding
+the development of a SIMULA 67 compiler for this particular
+system.72 On the basis of this FOA subsequently agreed to
+support the IBM 360/370 project by funding the participation
+of two Swedish software engineers, Lars Enderin and Stefan
+Arnborg. Apart from this, IBM also made an important
+contribution by giving NCC a total of 240 hours of computing
+time to be used in connection with the development and
+testing of the compiler.73 After nearly three years of
+extensive work the IBM compilers was released to the public
+in May 1972. Bjoern Myhrhaug had been in charge of the project
+and, in addition to Enderin and Arnborg, the team also
+consisted of Graham Birtwistle who was responsible for the
+syntax analysis, Francis Stevenson who took care of the code
+generation part, Paul Wynn on the CMS modification, and last
+but not least Karel Babcicky, who was responsible for
+semantics processing, and who, during the second part of the
+1970s, was responsible for the entire SIMULA activity at the
+Norwegian Computing Centre. 74
+
+Even though the costs related to the two implementation
+projects had been estimated at approximately 15 person-years
+each 75, and both were conducted at NCC under the auspices of
+Bjoern Myhrhaug, they were very much different. The IBM team
+worked within a well-supported and carefully planned project,
+whereas the UNIVAC team was much more loosely organized,
+worked with less external support, and over a longer period
+of time. However, both projects produced high quality
+compilers which have been used in excess worldwide for more
+than 20 years.76
+
+THE CONTROL DATA SIMULA
+
+In the previous sections I have tried to give a general
+outline of NCC's own compiler development projects. These two
+compilers, however, were not the first SIMULA compilers
+available. Prior to the Common Base Conference, Kristen
+Nygaard had managed to get Control Data Corporation (CDC),
+through important Norwegian customers, interested in SIMULA
+implementations for their 3000 (upper and lower) and 6000
+series of computers.77 In May 1967 contracts were signed, and
+in Paris a team directed by Jacques Newey commenced work on a
+SIMULA 67 implementation for the CDC 6000. This compiler was
+later refined by SHAPE 78 Technical Center in the
+Netherlands, and a new version for the CDC Cyber 70 series
+was developed in 1973/74 by NDRE. In Norway, a team from the
+University of Oslo, headed by Per Ofstad, carried out the CDC
+3300 (lower series) implementation, while another Norwegian
+team from NDRE and the University of Oslo's Joint Computer
+Installation at Kjeller (KCIN), headed by Svein A. OEvergaard,
+handled the CDC 3600 (upper series) implementation. The two
+projects were organized as a joint enterprise under the
+auspices of Per Martin Kjeldsaas from KCIN, and both were
+completed during the spring of 1969. Some financial support
+was provided by Control Data Europe, which in turn obtained
+marketing and distribution rights, whereas the maintenance
+responsibility for the respective compilers remained with the
+University and KCIN.79
+
+In addition to these projects, compilers for CII 10070 and
+IRIS 80 were implemented by the French company Compagnie
+Internationale pour l'Informatique (CII). The two identical
+systems were released in 1972, and were provided free of
+charge to CII's customers.80
+
+THE DEC SYSTEM-10 SIMULA
+
+Another important SIMULA development took place in Sweden
+in the first half of the 1970s, this time the target machine
+was Digital Equipment's PDP-10.81 Around 1970 the Swedish
+Research Institute of National Defense (FOA) in Stockholm had
+decided to establish a laboratory for advanced military
+studies in operations research. In connection with this they
+intended to purchase a new computer, and Jacob Palme, the
+most prominent SIMULA actor in Sweden at the time, was
+appointed chairman of a committee whose purpose was to draw
+up an evaluation report on the subject. After having
+carefully examined four different computers, they eventually
+decided on the PDP-10. Since this computer at the time had no
+SIMULA compiler in its software library, such an
+implementation was immediately ordered from the Swedish
+software house ENEA Data. The first test version of the
+compiler was available to programmers at the QZ data center
+in Stockholm, and via communication networks from September
+1974. The first public release took place in January 1975.
+
+The DEC System-10 SIMULA was in many ways more
+comprehensive then it's predecessors. It contained, among
+other things, online debugging facilities which allowed
+setting and re-setting of break points during program
+execution.82 Besides, the compiler was especially designed
+for interactive use, and would soon set a new standard for
+the development of SIMULA compilers.
+
+Apart from FOA, Digital Equipment Corp. also contributed
+to the project under the condition that the compiler should
+be distributed free of charge. This condition was accepted,
+with the result that the DEC System-10 compiler came to have
+a major impact on the dissemination of SIMULA, especially in
+the United States. In August 1975, eight months after it was
+released, the compiler had been distributed to 28
+installations, 22 of which were located in the United States
+and Canada.83
+
+A NOTE ON NCC'S SIMULA ENGAGEMENT IN THE 1970S
+
+In the early days of the 1960s promotion and marketing of
+SIMULA was mainly done by the developers themselves whenever
+they attended a conference, or gave introductory courses to
+other research scientists, either at NCC or abroad. However,
+as the language rapidly spread to larger groups of users, and
+the amounts of money invested in the project steadily grew,
+this situation had to be done in a more professional manner.
+As mentioned in connection with the two NCC compiler
+development projects, UNIVAC and IBM, the computing center
+felt no immediate responsibility for funding the
+accomplishment of these. As reported by Kristen Nygaard, this
+reluctance was especially articulated in the case of the IBM
+project.84 The general opinion was that the lifetime for a
+programming language like SIMULA would not exceed five years.
+Furthermore, if one took into consideration the costs of
+developing a compiler, not to mention the great commercial
+risks involved, NCC was naturally very reserved.
+Nevertheless, when NCC eventually agreed to take
+responsibility for the two compiler development projects,
+their conditions for doing this were that sufficient external
+financing was at bay, and that the Centre as such would not
+incur expenses. Based on this mutual understanding the two
+projects were started (UNIVAC in 1967/68 and IBM in 1969),
+and Nygaard began his hunt for investors. As we know,
+however, his efforts proved unsuccessful, and when this
+eventually became clear to the parties involved both projects
+had developed to a point beyond no return, and NCC had to
+carry the financial burden alone.
+
+Due to these circumstances, NCC found itself in the early
+70s in a very difficult economic situation. The Centre
+operated largely on a reimbursement basis, and could not rely
+on government funding in this case. From the management's
+point of view it was therefore necessary for the SIMULA
+activity to be self-supporting, and for the compiler
+investments to show profits.85
+
+NCC has often been criticized for its pricing policy
+regarding its two SIMULA compilers. This critique has in some
+cases been justifiable, e.g. when Donald Knuth in 1973 was
+prevented from introducing SIMULA at Stanford University,
+partly because of NCC's unwillingness to reduce prices, and
+give it away free of charge to universities.86 When
+discussing these matters, however, one should bear in mind
+the fact that NCC was neither a conventional software house,
+nor a fully financed governmental institution. In addition to
+the SIMULA operations, NCC was also committed to a number of
+other research activities which deserved equal attention and
+financial support. Nevertheless, by 1973 the use of SIMULA
+had spread to such an extent that NCC had lost track of it,
+and despite the fact that this dissemination could have
+gained even more momentum if NCC had lowered its prices, the
+language was estimated to be in regular use at more than 250
+sites that year.87
+
+THE ASSOCIATION OF SIMULA USERS
+
+When talking about NCC's SIMULA commitment in the 1970s,
+one must also mention the Centre's instrumental role in the
+establishment of an Association of SIMULA Users (ASU). The
+construction of an organizational framework which could
+facilitate the exchange of ideas among SIMULA users was
+actually an old idea first proposed by Dahl and Nygaard back
+in 1967. However, at that time other and more pressing needs
+were given priority, but in 1972/73 the idea surfaced again
+and in September 1973 the Association of SIMULA Users was
+formally founded.
+
+Through annual conferences, workshops and newsletters the
+ASU came to constitute an international forum for discussion
+and exchange of ideas within the SIMULA community. In this
+capacity the organization also represented an important
+channel for exchange of information and ideas between the
+SIMULA Standards Group88 consisting of members from the
+various SIMULA implementation teams, and the wider user
+community.89
+
+At the first ASU conference in Oslo the number of founding
+members were 43, one year later, in August 1974, this number
+had increased to a total of 172, and the SIMULA community now
+extended to more than 23 different countries around the
+world.90
+
+EPILOGUE: POWER TO THE PEOPLE
+
+Before concluding this chapter I want to dwell a bit on
+one interesting aspect of the SIMULA project that clearly
+shows how scientific and technological activity is just as
+loaded with political interests as any other human
+enterprise.91 During his work with operations research in the
+1950s, Kristen Nygaard had become increasingly aware of what
+he saw as the dangers of technocracy.92 He was concerned that
+modern technology would become the means by which a small,
+technically-informed elite could extend its power over the
+large masses which did not have access to the same knowledge
+base. To illustrate how Nygaard's views on technocracy
+influenced the development of SIMULA, I want to reproduce a
+portion of a speech he made at the Lysebu Conference on
+Simulation Programming Languages in May of 1967. His concern
+surfaced in a dispute with Jan Garwick, the author of the
+general-purpose language GPL, over the implications of
+technocracy in the programming community.
+
+It is a common belief here that this Conference consists
+of people belonging to the 1% group'this is not true,
+since I am a representative of the 99% group and I think
+since we are so many and we are going to use these
+tools, we should have the right to say something here.
+We are simple-minded men but we have complex problems
+and we are forced to face these complex problems. [...]
+When Garwick talked about his language, he said this was
+a super language which solved all problems. Of course,
+even if it looked a little frightening still I was
+relieved. But then'what happened? He said that this is
+just for the 1% group'but for the 99% we are going to
+provide a number of different languages which are
+defined in the general language so, therefore, we are
+forced to learn all these languages instead. This is not
+what we want. What we want is to be given concepts so
+that we can handle complex problems in a manner which we
+are able to grasp. 93
+
+Nygaard's noble defense for the layman is charming
+perhaps, but it reveals a deep concern about the
+power/knowledge relationship between the suppliers and the
+users of technology. He strongly opposed Garwick's idea about
+1 percent high priests as suppliers of technology and called
+for a universal language that was simple and easy enough for
+ordinary programmers to learn and use efficiently.94 There is
+little doubt that he wanted SIMULA 67 to be precisely that
+language. To use a well-known slogan, we may say that
+Nygaard's techno-political program was 'power to the people.'
+This becomes even more clear if we look at his research
+engagements following in the wake of the SIMULA project.
+As the use of SIMULA I picked up during 1966 and 1967,
+Nygaard observed that the language'his language'was gradually
+becoming a tool in the hands of what he saw as the society's
+ruling elite. He says:
+
+I could see that SIMULA was being used to organize work
+for people and I could see that it would contribute to
+major changes in this area: More routine work, less
+demand for knowledge and a skilled labor force, less
+flexibility at the work place, more pressure. I could
+see this because I was involved in many of the projects
+where SIMULA was being used. Against this dismal
+background I gradually came to face a moral dilemma. I
+won't say that it was as dramatic and heroic as the one
+the nuclear physicists experienced over the atomic bomb,
+but it was analogous. I realized that the technology I
+had helped to develop had serious consequences for other
+people, especially the people that I had come to
+identify with politically. The question was what to do
+about it? I had no desire to un-invent SIMULA [...]
+because I was convinced that in the society I wanted to
+help build, computers would come to play an immensely
+important role.95 [My translation]
+
+Kristen Nygaard took his experiences, his knowledge and
+technical expertise to the labor movement. He wanted to warn
+them about 'what was coming their way,'96 so to speak, and he
+wanted to educate them and help them build up a knowledge
+base about the new computer technology. His contacts and
+cooperation with the Norwegian labor movement in the late
+1960s lead to a big research project97 where Nygaard and his
+researchers at NCC collaborated with members of the labor
+movement to build up this knowledge base. This project was a
+pioneer effort on a worldwide scale and, as the first
+individual outside North-America, Kristen Nygaard was
+distinguished for his efforts by the American organization,
+Computer Professionals for Social Responsibility.98 This,
+however, is a different story that will have to remain beyond
+the scope of this study.
+
+SUMMARY
+
+This chapter has been an attempt to display and discuss
+how the SIMULA programming language came into existence.
+Employing a contextual or socio-technical perspective on
+history, the basic aim has been to explore the heterogeneity
+of technological genesis and change as demonstrated in the
+case of the development of a programming language.
+When reading traditional internalist accounts in the
+history of technology, one often gets the mistaken impression
+that technologies, as it were, evolve in a technical or
+scientific vacuum. This flawed notion of the nature of
+technological change stems, as many writers have repeatedly
+criticized,99 to a large extent from the absence of a wider
+context to which one can relate the technical narrative.
+As this chapter has aimed to show, the construction of
+SIMULA was by no means a self-contained technical and
+scientific enterprise, and the outcome of Dahl and Nygaard's
+efforts was largely dependent on what is usually considered
+external or contextual premises. As examples one can but
+mention the UNIVAC 1107 which significantly improved the
+environment for the development of SIMULA, and the Department
+for Special Projects which in many ways came to constitute an
+ambiance of major importance for software engineering at NCC.
+Another, but nonetheless significant aspect of the problem
+addressed above is the parthenogenic myth that technologies,
+like Athena from Zeus' head, spring to life fully-grown in a
+sudden flash of insight by genius minds like Charles Babbage,
+Alan Turing or John von Neumann. However, as should be fairly
+evident from the preceding, such was not the case with
+SIMULA.
+
+>From a simple simulation procedure package associated with
+ALGOL 60, the language was painstakingly constructed, shaped,
+and transformed, via SIMULA I, into the SIMULA 67 high level
+programming language we know today. This genesis involved, as
+has been stressed, a high degree of heterogeneous engineering
+on the part of Dahl and Nygaard. Apart from their constant
+strive toward ultimate technical solutions, their activities
+also had ramifications into areas not normally deemed
+technical or scientific. Kristen Nygaard's entrepreneurial
+role in connection with the Univac/SIMULA deal, and Ole-Johan
+Dahl's persistent work on language design and implementation
+as well as his instrumental role within IFIP TC-2 are
+representative examples of the kind of heterogeneous
+engineering I have been trying to illuminate in this chapter.
+
+NOTES
+
+1 This chapter is revised from an article published in the Annals
+of the History of Computing. Vol. 16(4), 1994; pp. 25-37. I gratefully
+acknowledge the many helpful comments and suggestions on earlier
+drafts
+offered by among others William Aspray, Martin Campbell-Kelly, Paul
+Ceruzzi, Michael S. Mahoney, Arthur L. Norberg, Nils Roll-Hansen,
+Knut
+H. Soerensen, and the referees of the Annals of the History of
+Computing.
+2 See for instance: Hughes (1983) and Hughes (1989).
+3 See Hughes (1986) and Latour (1987).
+4 'A Status Report on SIMULA - A Language for the Description of
+Discrete Event Networks'. 13 July, 1963. NCC
+5 Nygaard K. and Dahl O.J: 'The Development of the SIMULA
+Languages', Wexelblatt (ed.), Op.cit., p. 441.
+6 Nygaard (1963, p. 520).
+7 Nygaard K. and Dahl O.J: 'The Development of the SIMULA
+Languages', Wexelblatt (ed.), Op.cit.
+8 ALGOL 60 represents a milestone in the history of programming
+languages, and during the 60s and 70s this language was the prime
+source of most theoretical work related to compiler design and
+development.
+9 Interview with Ole Johan Dahl, 7 November, 1991.
+10 NTNF's Annual Report 1958/59, p.82.
+11 'Den fremtidige virksomhet ved Norsk Regnesentral', 3 May 1961.
+NCC.
+12 The preceding account is primarily based on interviews with
+Kristen Nygaard 28 November, 1992, Karl Holberg 5 March, 1992, and
+Finn
+Lied 6 March, 1992.
+13 NCC's Financial Accounts 1959, 1960.
+14 'Den fremtidige virksomhet ved Norsk Regnesentral', 3 May, 1961.
+NCC.
+15 Interview with Kristen Nygaard, 28 November, 1991.
+16 'Forslag om anskaffelse av en elektronisk regnemaskin type
+UNIVAC-1107 til Norsk Regnesentral', innstilling fra raadets
+arbeidsutvalg. Fall 1962. NTNF. Please note that all US $figures in
+this chapter are based on US-Norwegian exchange rates listed in
+Historical Statistics 1978, p. 513.
+17 Note from NTNF's director Robert Major. 19 July, 1962. NTNF.
+18 Nygaard K. and Dahl O.J: 'The Development of the SIMULA
+Languages', Wexelblatt (ed.), Op.cit., p. 442.
+19 This project was based on a new and promising algorithm for
+linear programming, denoted parametric decent, developed by Sverre
+Spurkland at NCC. Even though the project was based on a very
+powerful
+concept, and later on was to receive substantial financial support
+from
+Univac, it was never completed.
+20 Letter from Robert W. Bemer to the author. 15 July, 1994.
+21 Telephone interview with Robert W. Bemer, 14 April, 1992.
+22 Nygaard (1963).
+23 Nygaard K. and Dahl O.J: 'The Development of the SIMULA
+Languages', Wexelblatt (ed.), Op.cit., p. 455.
+24 Ibid., p. 454.
+25 Donald MacKenzie: 'The Influence of the Los Alamos and Livermore
+National Laboratories on the Development of Supercomputing' Annals
+of
+the History of Computing, Vol.13(2), 1991.
+26 Interview with Kristen Nygaard, 28 November, 1991
+27 Sperry Rand Univac's offer to NCC regarding UNIVAC 1107, 26
+June,
+1962, and 'Agreement made 1st. day of June by and between Sperry
+Rand
+Corporation (Univac) and the Royal Norwegian Council for scientific
+and
+industrial research'. 1 June, 1963. NTNF.
+28 Telephone interview with Robert Bemer, 14 April, 1992, and
+letter
+>from Robert Bemer to the author, 29 July, 1992.
+29 Letter from A. A. Cohen, Staff Scientist of the Data Processing
+Division to Kristen Nygaard. 23 October, 1964. NCC.
+30 Raadet for elektronisk databehanding i staten. My translation.
+31 Memo from Finn Lied to Karl Holberg. 11 May 1962. NDRE
+32 His conclusion was largely drawn from a survey of computing
+needs
+in the Oslo area. In this survey Nygaard contacted a number of
+institutions that had previously benefited from his OR services and
+asked how they would make use of an eventual mainframe computer in
+the
+Oslo area. These were Aftenposten, Det Norske Veritas, Direktoratet
+for
+Statens Skoger, H. EEG Henriksen A/S, Kontroautomasjon A/S, Norsk
+Produktivitetsinstitutt, Oslo Kommune/ kommunikasjons-raadmannen,
+Oslo
+Kommune/ Likningskontoret, M. Petterson & Soenn A/S,
+Sentralinstituttet
+for Industriell Forskning, and Vegdirektoraet. Source: 'Forslag om
+anskaffelse av en stor elektronisk regnemaskin til Norsk
+Regnesentral'.
+September 1962. NTNF.
+33 'Forslag om anskaffelse av en elektronisk regnemaskin type
+UNIVAC-1107 til Norsk Regnesentral', innstilling fra raadets
+arbeidsutvalg. Fall 1962. NTNF.
+34 Lied referred to a meeting with Secretary of State Gudmumd
+Harlem
+where Harlem had expressed that if the acquisition of two computers
+was
+proposed at this stage this could lead to significant delays for
+both.
+Source: Minutes from the working committee's meeting 21 August
+1962.
+NTNF
+35 Minutes from the working committee's meeting 21 August 1962.
+NTNF
+36 Note from NCC's director Leif K. Olaussen: 'Oversikt over
+forholdet mellom Norsk Regnesentral og Univac angaaende levering av
+den
+elektroniske regnemaskinen UNIVAC 1107 og tilhoerende
+programmeringssystemer', 15 January, 1965, and interview with
+Robert
+Major, 29 November, 1991.
+37 Letter from NTNF's director Robert Major to NCC's director
+Bjoern
+OErjansen, 21 July, 1962. NTNF.
+38 Note from Kristen Nygaard to the board of NCC, 22 January, 1964.
+NTNF.
+39 Resolution from the board of NCC: 'Organisasjonsplan for Norsk
+Regnesentral', 11 December, 1962, and interview with Karl Holberg,
+5
+March, 1992. NTNF.
+40 Resolution from the board of NCC: 'Organisasjonsplan for Norsk
+Regnesentral', 11 December, 1962, and interviews with: Bjoern
+OErjansen
+25 November, Sverre Spurkland 27 November, Robert Major 29
+November,
+1991, and Karl Holberg 5 March, 1992. NTNF.
+41 The title for this subsection is taken from Dahl, Ole-Johan and
+Nygaard, Kristen. 'SIMULA: A Language for Programming and
+Description
+of Discrete Event Systems. Introduction and User's Manual'. May
+1965.
+NCC.
+42 It should be added, that even though Dahl and Nygaard at this
+stage asserted that SIMULA should be ALGOL-based, they did not rule
+out
+a later version based on FORTRAN, using the same basic concepts.
+43 Dahl O.-J. and Nygaard K: 'Preliminary presentation of the
+SIMULA
+Language (as of May 18th, 1963) and some examples of network
+descriptions'. NCC: May 1963.
+44 Nygaard K. and Dahl O.-J: 'The Development of the SIMULA
+Languages', Wexelblatt (ed.), Op.cit., pp. 447-448, and interview
+with
+Ole-Johan Dahl 7 November, 1991.
+45 Dahl O.-J: 'The SIMULA Storage Allocation Scheme'. NCC Document
+no. 162, November 1963, and an interview with Ole-Johan Dahl, 7
+November, 1991.
+46 Interviews with Ole-Johan Dahl, 7 November, 1991 and 4 March,
+1992, and Kristen Nygaard, 28 November, 1991
+47 Quasi-parallel process execution implied that a main program
+could switch control from one process to another during a program
+run
+according to special sequencing statements. In SIMULA this
+sequencing
+was determined by the Hold statement, in addition to local
+reference
+variables in each inactive process, identifying where the control
+should resume operation the next time the process was activated.
+(Source: Dahl O.-J: 'The SIMULA Data Structures', NCC Document,
+February/ March 1964).
+48 Letter from Ole-Johan Dahl to the author, 10 April, 1992.
+49 Dahl and Nygaard (1965, p. 2).
+50 Nygaard, Kristen. 'Report on the Use of SIMULA up to December
+1965.' December 1965. NCC.
+51 Ibid.
+52 Nygaard K. and Dahl O.J: 'The Development of the SIMULA
+Languages', Wexelblatt (ed.), Op.cit., pp. 459-461.
+53 Interview with Ole-Johan Dahl, 4 March, 1992.
+54 Nygaard K. and Dahl O.J: 'The Development of the SIMULA
+Languages', Wexelblatt (ed.), Op.cit., p 459-461.
+55 International Federation for Information Processing's Technical
+Committee 2 was a committee especially dedicated to programming
+languages.
+56 Buxton (1968, pp.337-338)
+57 I use that term even if didn't exist in the 1950s and early
+Ô60s.
+Back then these people were mathematicians and the field they were
+working in was commonly referred to as applied mathematics.
+58 F. G. Duncan and A. van Wijngaarden. 'Cleaning up ALGOL 60'.
+ALGOL Bulletin, AB16.3.3, May 1964.
+59 For further reference, see: C. H. Lindsey. 'A History of Algol
+68.' ACM/SIGPLAN Notices, Vol. 28(3), March 1993; pp. 97-132.
+60 Buxton (1968, p. 345).
+61 Dahl O.-J., and Nygaard K: 'Class and subclass declarations'.
+NCC
+Document, March 1967.
+62 After having designed the systems descriptions language DELTA
+(1973-1975), in the second half of the 1970s, Kristen Nygaard
+together
+with research scientists from the University of AArhus and the
+University of AAlborg Denmark, embarked upon yet another language
+development project called BETA. The basic idea behind this project
+was
+the very same that was turned down by the Common Base Conference
+ten
+years earlier. Very roughly, one can say that the BETA project was
+an
+attempt to generalize and refine the related notion of classes,
+records, types and procedures into one basic construct upon which a
+new
+programming language could eventually be designed and implemented.
+The
+effort proved successful, and the BETA team came up with a new
+construct called Super Pattern. Based on this highly general
+concept, a
+DELTA compiler was later developed at the University of AArhus.
+Source:
+Birger Moeller-Pedersen: 'How did SIMULA make us Think of BETA'.
+Talk
+presented at: 'SIMULA 1967Ð1992', Special Workshop at TOOLS'92,
+Dortmund Germany, 31 March, 1992, and interview with Kristen
+Nygaard:
+November 28, 1991.
+63 Myhrhaug Bjoern: 'Proposal for string handling and input/output
+definition in SIMULA 67 Common Base. Preliminary presentation'
+January
+1968. NCC publication No. 212.
+64 Nygaard K. and Dahl O.J: 'The Development of the SIMULA
+Languages', Wexelblatt (ed.), Op.cit., p. 471
+65 Letter from Ron Kerr to the author, 17 March 1993.
+66 Interview Drude Berntsen, 6 November, 1991.
+67 NTNF's annual review 1969, p. 69
+68 The running of the UNIVAC 1107 was, in the second half of the
+1960s, one of NCC's most important sources of income, and a
+cornerstone
+in the Centre's research activities. When the Research Council's
+decision was known this naturally gave rise to speculations
+concerning
+NCC's future, and rightfully so since there were strong reasons to
+believe that central forces within the Research Council wanted to
+shut
+down the entire Centre, and transfer it's operations to other NTNF
+institutes. In a reaction to this, NCC employees organized
+themselves
+and launched a counterattack on NTNF. The conflict reached its
+climax
+in January/ February 1970, after which NCC was reorganized and the
+situation returned to normal. Source: Interview with Sverre
+Spurkland,
+27 November, 1991.
+69 The account of the development of UNIVAC SIMULA is based on an
+interview with Sigurd Kubosch, 5 March, 1992, correspondence with
+Ron
+Kerr 1993 and SIMULA Newsletter: Vol. 1, No. 1, May 1973
+70 Interview with Drude Berntsen, 6 November 1991, and 'Draft
+outline for a SIMULA 67 agreement between UNIVAC and the Norwegian
+Computing Centre', September 1969.
+71 Nygaard K. and Dahl O.J: 'The Development of the SIMULA
+Languages', Wexelblatt (ed.), Op.cit., p. 470.
+72 Interview with Jacob Palme, 19 August, 1992, and Jacob Palme:
+'Are Simulation Languages Convenient for Military Simulations?'.
+Research Institute for National Defence, Operations Research Centre
+Sweden, April 1968.
+73 Nygaard K. and Dahl O.J: 'The Development of the SIMULA
+Languages', Wexelblatt (ed.), Op.cit., p. 475.
+74 Karel Babcicky: 'The Stone Age SIMULA'. Talk presented at:
+'SIMULA 1967Ð1992', Special Workshop at TOOLS'92, Dortmund Germany,
+31
+March, 1992
+75 Nygaard K. and Dahl O.J: 'The Development of the SIMULA
+Languages', Wexelblatt (ed.), Op.cit., p. 475.
+76 Karel Babcicky: 'The Stone Age SIMULA'. Talk presented at;
+'SIMULA 1967Ð1992', Special Workshop at TOOLS'92, Dortmund Germany,
+31
+March. 1992.
+77 'Agreement on implementation of the SIMULA 67 language between
+Control Data A/S Norway and the Norwegian Computing Centre'. Oslo
+23
+May, 1967. NCC
+78 SHAPE is an abbreviation for: Supreme Headquarters Allied Powers
+Europe.
+79 Nygaard K. and Dahl O.J: 'The Development of the SIMULA
+Languages', Wexelblatt (ed.), Op.cit., pp. 473 - 474.
+80 Drude Berntsen: 'Welcoming Speech', in Proceedings of the I.
+SIMULA Users' Conference. Oslo, September 24 - 25, 1973.
+81 The following account, describing the development of the Swedish
+DEC-10 SIMULA compiler, is based upon an interview with Jacob
+Palme, 19
+August 1992.
+82 SIMULA Newsletter, Vol. 2, No. 3, August 1974.
+83 DEC System-10 SIMULA Gazette, Vol. 1, No. 2, August 1975.
+84 Kristen Nygaard: 'Constructing SIMULA Ð Cooperation and War'.
+Talk presented at: 'SIMULA 1967Ð1992', Special Workshop at
+TOOLS'92,
+Dortmund Germany, March 31, 1992, and interview with Kristen
+Nygaard:
+28 November, 1991.
+85 Interview with Drude Berntsen: 6 November, 1991.
+86 Kristen Nygaard: 'Constructing SIMULA Ð Cooperation and War'.
+Talk presented at: 'SIMULA 1967Ð1992', Special Workshop at
+TOOLS'92,
+Dortmund Germany, March 31, 1992, and interview with Kristen
+Nygaard:
+28 November, 1991.
+87 Drude Berntsen: 'Welcoming Speech', in Proceedings of the I.
+SIMULA Users' Conference. Oslo, 24-25 September  1973. Among the
+largest users known in 1973 we find: The Norwegian Defense Research
+Establishment, the Swedish Research Institute of National Defence,
+the
+Finnish State Computing Center and Broken Hill Proprietary Co.,
+Ltd. in
+Australia. In addition to these major institutions, a number of
+European universities were also known to use the language for
+educational purposes.
+88 The SIMULA Standards Group was formed after the Common Base
+Conference in 1967. It consisted of one representative from each of
+the
+SIMULA implementation teams, plus two representatives from the
+Norwegian Computing Centre. An important part of their task was to
+guard the SIMULA 67 standard against the undesirable flourishing of
+dialects experienced in so many other languages. In this respect
+their
+efforts must be regarded as quite successful since the SIMULA 67
+standard remained very much on track throughout the period and
+indeed
+up to the very present.
+89 When talking about the ASU it would be wrong not to mention the
+'Simulady' herself, Mrs. Eileen Schreiner. As secretary of the ASU
+from
+1973 to 1989, and treasurer and Newsletter editor to the present
+(1993), Mrs. Schreiner has been a thread of continuity in the
+SIMULA
+community and in many respects SIMULA's staunchest champion.
+90 SIMULA Newsletter: Vol. 2, No. 3, August 1974, p. 3. As of
+August
+1974 the following countries were represented in ASU; Australia,
+Austria, Belgium, Britain, Czechoslovakia, Denmark, Finland,
+France,
+Germany, Hong Kong, Hungary, Israel, Italy, New Zealand, the
+Netherlands, Norway, Poland, South Africa, Spain, Switzerland, and
+the
+United States. In addition to this one must also take into account
+the
+SIMULA activity in the then Soviet Union, which in many ways
+constituted an ambiance of its own, isolated from the
+organizational
+framework of the ASU.
+91 For interested readers I refer to Langdon Winner. 'Do artifacts
+have politics' in Donald MacKenzie and Judy Wajcman (eds.) The
+Social
+Shaping of Technology. Milton Keynes: Open University Press, 1985.
+92 The following draws on an interview with Kristen Nygaard 28
+November 1991.
+93 Buxton (1968, pp. 210-211).
+94 In spite of these good intentions, however, it is interesting to
+note that SIMULA never became an easy language to learn and use.
+Most
+people found it extremely difficult to adapt to the SIMULA way of
+thinking and Bjarne Stroustrup, author of C++ by far the most
+popular
+SIMULA-like language in the 1990s, claims that for people who were
+not
+familiar with the key concepts, SIMULA was incomprehensible. In his
+opinion, this also, to a large extent, explains why the language
+never
+became wide-spread in use. Source: Interview with Bjarne
+Stroustrup, 22
+April 1993.
+95 Interview with Kristen Nygaard, 28 November 1991.
+96 Ibid.
+97 In Norwegian: Jern- og metallprosjektet.
+98 The Computer Professionals for Social Responsibility is an
+organization of computer professionals concentrating on certain
+areas
+of the impact of computer technology on society. The alliance dates
+back to the fall of 1981 when several researchers in Palo Alto,
+California decided to do something about their concern regarding
+the
+close connection between computing and the nuclear arms race.
+99 John M. Staudenmaier, S. J.: Technology's Storytellers -
+Reweaving the Human Fabric. Cambridge, Ma: The Society for the
+History
+of Technology and MIT Press, 1985. See also Wiebe E. Bijker, Thomas
+Hughes and Trevor Pinch (eds.): The Social Construction of
+Technological Systems - New Directions in the Sociology and History
+of
+Technology. Cambridge, Ma: MIT Press, 1987.
+
+
+

@@ -1,0 +1,65 @@
+Installation on MSDOS
+=====================
+
+To install on MSDOS, you need to have the GNU C compiler for MSDOS
+(also known as djgpp), GNU Make, rm, mv, and sed.  See the remarks in
+config.bat for more information about locations and versions. The 
+configuration step (see below) will test for these utilities and will 
+refuse to continue if any of them isn't found.
+
+If you are building the MSDOS version of Cim on an MSDOS-like system
+which supports long file names (e.g. Windows 95), you need to make
+sure that long file names are handled consistently both when you
+unpack the distribution and compile it.  If you intend to compile with
+DJGPP v2.0 or later, and long file names support is enabled (LFN=y in
+the environment), you need to unpack Cim distribution in a way that
+doesn't truncate the original long filenames to the DOS 8.3 namespace;
+the easiest way to do this is to use djtar program which comes with
+DJGPP, since it will note the LFN setting and behave accordingly.
+DJGPP v1 doesn't support long filenames, so you must unpack Emacs with
+a program that truncates the filenames to 8.3 naming as it extracts
+files; again, using djtar after setting LFN=n is the recommended way.
+You can build Cim with LFN=n even if you use DJGPP v2, if some of
+your tools don't support long file names: just ensure that LFN is set
+to `n' during both unpacking and compiling.
+
+(By the time you read this, you have already unpacked the Cim
+distribution, but if the explanations above imply that you should have
+done it differently, it's safer to delete the directory tree created
+by the unpacking program and unpack Cim again, than to risk running
+into problems during the build process.)
+
+It is important to understand that the runtime support of long file
+names by the Cim binary is NOT affected by the LFN setting during
+compilation; Cim compiled with DJGPP v2.0 or later will always
+support long file names on Windows 95 no matter what was the setting
+of LFN at compile time.
+
+To unpack Emacs with djtar, type this command:
+
+    djtar -x cim.tgz
+
+(This assumes that the Emacs distribution is called `cim.tgz' on
+your system.)  There are a few files in the archive whose names
+collide with other files under the 8.3 DOS naming.  On native MSDOS,
+or if you have set LFN=n on Windows 95, djtar will ask you to supply
+alternate names for these files; you can just press `Enter' when this
+happens (which makes djtar skip these files) because they aren't
+required for MS-DOS.
+
+When unpacking is done, a directory called `cim-1.XX' will be
+created, where 1.XX is the Cim version.  To build and install
+Cim, chdir to that directory and type these commands:
+
+    config
+    make
+    make install
+
+Building Cim creates an executable file plus some more in the current 
+directories.  Installing Cim on MSDOS moves this executable to the
+directory "c:\djgpp\bin". 
+
+You will probably run into trouble with gcc unless you enlarge its
+maximum stack size. Run `stubedit' on `c:\djgpp\bin\cc1.exe'
+and enlarge its maximum stack size to e.g. 2M bytes.
+
