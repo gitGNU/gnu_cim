@@ -28,7 +28,7 @@ typedef struct
       c2;
   }
 __bs0FILE, __bs0;
-extern __bs0FILE __blokk0;
+extern __bs0FILE __blokk0FILE;
 extern __bs0FILE *__bp0FILE;
 extern short __rl0FILE[];
 extern __pty __pl0FILE[];

@@ -35,7 +35,7 @@ __rgoto (ob)
       /* Hvis ikke __lb ligger p} operasjonskjeden s} skal goto 
        * resultere i en feil. Det må sjekkes her. */
 
-      if (__pb == (__dhp) & __blokk0)
+      if (__pb == (__dhp) & __blokk0FILE)
 	__rerror ("Goto: Label not on operating chain");
 
       if (__pb->pp == (__pty) __ACTS || __pb->pp->kind != __KCLASS)

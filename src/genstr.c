@@ -378,8 +378,10 @@ static blockstructure (rb)
 
       if (rb->stat)
 	{
+	  if (rb->timestamp) fprintf (ccode, "extern ");
 	  fprintf 
-	    (ccode, "__bs%d __blokk%d%s;\n", rb->blno, rb->blno, timestamp);
+	    (ccode, "__bs%d __blokk%d%s;\n", rb->blno, rb->blno, 
+	     rb->timestamp?rb->timestamp:timestamp);
 	}
 
       if (rb->timestamp != 0)
@@ -639,7 +641,8 @@ static void doForEachStatPointer (block) struct BLOCK *block;
       if (block->stat)
 	fprintf (ccode, "if(((__dhp)&__blokk%d%s)->gl!=__NULL|force)"
 		 "__do_for_each_pointer(&__blokk%d%s,doit,doit_notest);\n"
-		 ,block->blno, timestamp, block->blno, timestamp);
+		 ,block->blno, timestamp, block->blno, 
+		 block->timestamp?block->timestamp:timestamp);
     }
   for (rd= block->parloc; rd!= NULL; rd= rd->next)
     {
@@ -671,8 +674,8 @@ static void updateGlNull (block) struct BLOCK *block;
     case KBLOKK:
     case KPRBLK:
       if (block->stat)
-	fprintf (ccode, "((__dhp)&__blokk%d%s)->gl=(__dhp)0;\n"
-		 ,block->blno, timestamp);
+	fprintf (ccode, "((__dhp)&__blokk%d%s)->gl=(__dhp)0;\n",block->blno, 
+		 block->timestamp?block->timestamp:timestamp);
     }
   for (rd= block->parloc; rd!= NULL; rd= rd->next)
     {
@@ -707,8 +710,9 @@ static void updateGlObj (block) struct BLOCK *block;
 	fprintf 
 	  (ccode, 
 	   "if(((__dhp)&__blokk%d%s)->gl)((__dhp)&__blokk%d%s)->gl=(__dhp)&__blokk%d%s;\n"
-	   ,block->blno, timestamp
-	   ,block->blno, timestamp, block->blno, timestamp);
+	   ,block->blno, block->timestamp?block->timestamp:timestamp
+	   ,block->blno, block->timestamp?block->timestamp:timestamp, 
+	   block->blno, block->timestamp?block->timestamp:timestamp);
     }
 
   for (rd= block->parloc; rd!= NULL; rd= rd->next)

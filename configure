@@ -885,7 +885,7 @@ fi
 
 PACKAGE=cim
 
-VERSION=3.20
+VERSION=3.21
 
 if test "`cd $srcdir && pwd`" != "`pwd`" && test -f $srcdir/config.status; then
   { echo "configure: error: source directory already configured; run "make distclean" there first" 1>&2; exit 1; }
@@ -1435,7 +1435,7 @@ $libtool_flags --no-verify $ac_aux_dir/ltmain.sh $host \
 
 
 
-LIB_CURRENT=2
+LIB_CURRENT=3
 LIB_REVISION=0
 LIB_AGE=0
 

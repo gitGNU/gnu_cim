@@ -90,7 +90,7 @@ genchain (rb, atr)
   if (rb->stat)
     if (atr)
       fprintf (ccode, "(__blokk%d%s).", rb->blno, 
-	       timestamp);
+	       rb->timestamp?rb->timestamp:timestamp);
 #if 0
     else if (rb == sblock && separat_comp)
 #else
@@ -99,7 +99,7 @@ genchain (rb, atr)
       fprintf (ccode, "__NULL");
     else
       fprintf (ccode, "((__dhp)&__blokk%d%s)", rb->blno, 
-	       timestamp);
+	       rb->timestamp?rb->timestamp:timestamp);
   else
     {
       struct BLOCK *rbx;
@@ -113,12 +113,14 @@ genchain (rb, atr)
 	{
 	  if (atr)
 	    {
-	      fprintf (ccode, "((__bs%d *)&__blokk%d%s)->"
-			      ,rb->blno, rbx->blno, timestamp);
+	      fprintf (ccode, "((__bs%d *)&__blokk%d%s)->",
+		       rb->blno, rbx->blno, 
+		       rbx->timestamp?rbx->timestamp:timestamp);
 	    }
 	  else
 	    fprintf (ccode, "((__dhp)&__blokk%d%s)", 
-			    rbx->blno, timestamp);
+		     rbx->blno, 
+		     rbx->timestamp?rbx->timestamp:timestamp);
 	}
       else
 	{

@@ -165,17 +165,17 @@ __stderrimage =
 
 /* Genererer og initierer ytterste blokk objekt */
 
-__bs0FILE __blokk0 =
-{(__pty) & __p0FILE, (__dhp) & __blokk0, (__dhp) & __blokk0, 
+__bs0FILE __blokk0FILE =
+{(__pty) & __p0FILE, (__dhp) & __blokk0FILE, (__dhp) & __blokk0FILE, 
   __FALSE, __TERMINATED, 0, 0,
-  (__dhp) & __blokk0, __NULL, __NULL};
+  (__dhp) & __blokk0FILE, __NULL, __NULL};
 
 /* Genererer og initierer et infile objekt (SYSIN) */
 
 __bs4FILE __sysin =
-{(__pty) & __p4FILE, (__dhp) & __sysin, (__dhp) & __blokk0, 
+{(__pty) & __p4FILE, (__dhp) & __sysin, (__dhp) & __blokk0FILE, 
   __FALSE, __TERMINATED, 0, __NULL,
-  (__dhp) & __blokk0, (__textref) & __stdinname, 5, 1, 1, __NULL, __TRUE,
+  (__dhp) & __blokk0FILE, (__textref) & __stdinname, 5, 1, 1, __NULL, __TRUE,
  __NOSHARED, __NOAPPEND, __NOCREATE, __READWRITE, __NOREWIND, __NOPURGE,
  (__textref) & __stdinimage, INPUT_LINE_LENGTH, INPUT_LINE_LENGTH + 1, 1,
  __FALSE};
@@ -183,17 +183,17 @@ __bs4FILE __sysin =
 /* Genererer og initierer et printfile objekt (SYSOUT) */
 
 __bs6FILE __sysout =
-{(__pty) & __p6FILE, (__dhp) & __sysout, (__dhp) & __blokk0, 
+{(__pty) & __p6FILE, (__dhp) & __sysout, (__dhp) & __blokk0FILE, 
  __FALSE, __TERMINATED, 0, __NULL,
- (__dhp) & __blokk0, (__textref) & __stdoutname, 6, 1, 1, __NULL, __TRUE,
+ (__dhp) & __blokk0FILE, (__textref) & __stdoutname, 6, 1, 1, __NULL, __TRUE,
  __NOSHARED, __NOAPPEND, __NOCREATE, __READWRITE, __NOREWIND, __NOPURGE,
  (__textref) & __stdoutimage, OUTPUT_LINE_LENGTH, 1, 1,
  1, MAX_INT, 1, 0};
 
 __bs6FILE __syserr =
-{(__pty) & __p6FILE, (__dhp) & __syserr, (__dhp) & __blokk0, 
+{(__pty) & __p6FILE, (__dhp) & __syserr, (__dhp) & __blokk0FILE, 
  __FALSE, __TERMINATED, 0, __NULL,
- (__dhp) & __blokk0, (__textref) & __stderrname, 6, 1, 1, __NULL, __TRUE,
+ (__dhp) & __blokk0FILE, (__textref) & __stderrname, 6, 1, 1, __NULL, __TRUE,
  __NOSHARED, __NOAPPEND, __NOCREATE, __READWRITE, __NOREWIND, __NOPURGE,
  (__textref) & __stderrimage, OUTPUT_LINE_LENGTH, 1, 1,
  1, MAX_INT, 1, 0};

@@ -49,7 +49,7 @@ __rresume (ob, ret, mret)
   sh = __NULL;
   while (__lb != ob->sl)
     {
-      if (__lb == (__dhp) & __blokk0)
+      if (__lb == (__dhp) & __blokk0FILE)
 	__rerror ("Resume: Illegal object");
       sh = __lb;
       if (__lb->dt == __EXECUTING || __lb->pp == (__pty) __ACTS)

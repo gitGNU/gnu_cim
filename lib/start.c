@@ -155,7 +155,7 @@ __rstart (argc, argv)
   else
     __rallocdynmem (DYNMEMSIZEKB * (long) 1024);
 
-  __lb = __pb = (__dhp) & __blokk0;
+  __lb = __pb = (__dhp) & __blokk0FILE;
   /* Fyller IMAGE til stdin og stdout med blanke */
   __rtextvalassign (&((__bs2FILE *) __rsysin ())->IMAGE, (__txtvp) & __tk0);
   __rtextvalassign (&((__bs2FILE *) __rsysout ())->IMAGE, (__txtvp) & __tk0);
@@ -164,8 +164,8 @@ __rstart (argc, argv)
   /* Kobler c1,c2 i blokk0 til objektene av infile og printfile * henholdsvis 
    * 
    * *  * *  * *  * *  * * sysin og sysout. */
-  __blokk0.c1 = __rsysin ();
-  __blokk0.c2 = __rsysout ();
+  __blokk0FILE.c1 = __rsysin ();
+  __blokk0FILE.c2 = __rsysout ();
 
 #if HAVE_SIGFPE
   signal (SIGFPE, __rfloat_trap);
@@ -191,9 +191,9 @@ __rstart (argc, argv)
                                                                RUTINESLUTT   */
 __rslutt ()
 {
-  if (__gc && ((__bs1FILE *) __blokk0.c2)->open)
+  if (__gc && ((__bs1FILE *) __blokk0FILE.c2)->open)
     {
-      __rpoutimage (__blokk0.c2);
+      __rpoutimage (__blokk0FILE.c2);
 
       printf ("%d garbage collection(s) in %.1f seconds.", __gc, __gbctime);
       if (__chpoolsize)

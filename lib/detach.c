@@ -45,7 +45,7 @@ __rdetach (ob, ret, mret)
   p = __lb;
   while (p != ob)
     {
-      if (p == (__dhp) & __blokk0)
+      if (p == (__dhp) & __blokk0FILE)
 	__rerror ("Detach: The object is not on the operating chain");
       if (p->dt == __RESUMED)
 	p = p->sl;

@@ -23,7 +23,13 @@ Version 2:
   details.
 
 
+Version 3.21
 
+* Corrected an error which caused execution external modeles which
+  contained references to sysout or sysin (either directly or 
+  indirectly) to fail.
+
+
 Version 3.20
 
 * Version 3.19 solved the problem with real numbers on big-endian 

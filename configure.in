@@ -29,7 +29,7 @@ AC_DEFINE_UNQUOTED(OS_TYPE_VERSION,"`echo $target_os | tr a-z A-Z`")
 AC_DEFINE_UNQUOTED(MANUFACTURER,"`echo $target_vendor | tr a-z A-Z`")
 AC_DEFINE_UNQUOTED(OS_TYPE,"`echo $target_os_x_version | tr a-z A-Z`")
 
-AM_INIT_AUTOMAKE(cim, 3.20)
+AM_INIT_AUTOMAKE(cim, 3.21)
 AM_CONFIG_HEADER(config.h)
 AM_CYGWIN32
 AM_PROG_LIBTOOL
@@ -47,7 +47,7 @@ dnl leave CURRENT and AGE unchanged (C:R:A becomes C:R+1:A)
 dnl
 dnl Else leave CURRENT, REVISION and AGE unchanged.
 
-LIB_CURRENT=2
+LIB_CURRENT=3
 LIB_REVISION=0
 LIB_AGE=0
 AC_SUBST(LIB_CURRENT)
