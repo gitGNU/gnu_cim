@@ -296,7 +296,7 @@ d1error (errcode, name)
 /*VARARGS1 */
 d2error (errcode, rd1, rd2)
      int errcode;
-     struct DECL *rd1,
+     decl_t *rd1,
       *rd2;
 {
   char *name1 = rd1->ident;

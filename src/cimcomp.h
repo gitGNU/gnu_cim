@@ -48,6 +48,3 @@ extern int option_input;
 extern int option_dump_build;
 extern int option_dump_check;
 extern int option_dump_trans;
-
-extern struct SENT *main_sent;
-

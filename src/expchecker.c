@@ -23,33 +23,33 @@
 #include "checker.h"
 #include "expmacros.h"
 
-static struct DECL *absfunction;
-static struct DECL *absfunctionr;
-static struct DECL *absfunctioni;
-static struct DECL *minfunction;
-static struct DECL *minfunctiont;
-static struct DECL *minfunctionc;
-static struct DECL *minfunctionr;
-static struct DECL *minfunctioni;
-static struct DECL *maxfunction;
-static struct DECL *maxfunctiont;
-static struct DECL *maxfunctionc;
-static struct DECL *maxfunctionr;
-static struct DECL *maxfunctioni;
-static struct DECL *signfunction;
-static struct DECL *signfunctionr;
-static struct DECL *signfunctioni;
-static struct DECL *sourcelinefunction;
+static decl_t *absfunction;
+static decl_t *absfunctionr;
+static decl_t *absfunctioni;
+static decl_t *minfunction;
+static decl_t *minfunctiont;
+static decl_t *minfunctionc;
+static decl_t *minfunctionr;
+static decl_t *minfunctioni;
+static decl_t *maxfunction;
+static decl_t *maxfunctiont;
+static decl_t *maxfunctionc;
+static decl_t *maxfunctionr;
+static decl_t *maxfunctioni;
+static decl_t *signfunction;
+static decl_t *signfunctionr;
+static decl_t *signfunctioni;
+static decl_t *sourcelinefunction;
 
-static struct DECL *varargsint;
-static struct DECL *varargsreal;
-static struct DECL *varargschar;
-static struct DECL *varargstext;
-static struct DECL *varargsintvar;
-static struct DECL *varargsrealvar;
-static struct DECL *varargscharvar;
-static struct DECL *varargstextvalue;
-static struct DECL *varargs;
+static decl_t *varargsint;
+static decl_t *varargsreal;
+static decl_t *varargschar;
+static decl_t *varargstext;
+static decl_t *varargsintvar;
+static decl_t *varargsrealvar;
+static decl_t *varargscharvar;
+static decl_t *varargstextvalue;
+static decl_t *varargs;
 
 void 
 exp_checker_init_pass2 ()
@@ -127,7 +127,7 @@ exp_checker_init_pass2 ()
 static 
 sserror (melding, re)
      int melding;
-     struct EXP *re;
+     exp_t *re;
 {
   if (RD && RD->categ == CNEW)
     {
@@ -166,12 +166,12 @@ sserror (melding, re)
 /*VARARGS2 */
 static 
 konvtype (re, type, qual)
-     struct EXP **re;
+     exp_t **re;
      char type;
-     struct DECL *qual;
+     decl_t *qual;
 {
-  struct EXP *rex;
-  struct DECL *rd;
+  exp_t *rex;
+  decl_t *rd;
   if (((*re)->type == TINTG && type == TREAL)
       || ((*re)->type == TREAL && type == TINTG))
     {
@@ -229,7 +229,7 @@ konvtype (re, type, qual)
 
 static 
 sametype (rel, rer)
-     struct EXP **rel,
+     exp_t **rel,
      **rer;
 {
   if ((*rel)->type == TINTG && (*rer)->type == TREAL)
@@ -244,7 +244,7 @@ sametype (rel, rer)
 static 
 argumenterror (melding, re)
      int melding;
-     struct EXP *re;
+     exp_t *re;
 {
   int i = 1;
   if (TYPE == TERROR)
@@ -265,11 +265,11 @@ argumenterror (melding, re)
 
 static 
 set_param (re)
-     struct EXP *re;
+     exp_t *re;
 {
   re->right->rd = first_param (re->rd);
   {
-    struct EXP *rex;
+    exp_t *rex;
     for (rex = re->right; rex->token != MENDSEP; rex = rex->right)
       {
 	if (more_param (rex->rd) == FALSE)
@@ -286,7 +286,7 @@ set_param (re)
 
 static 
 exp_check (re)
-     struct EXP *re;
+     exp_t *re;
 {
 
   /* Sjekker først at nodene har riktige typer */
@@ -836,7 +836,7 @@ exp_check (re)
       QUAL = RD->prefqual;
       if (RD->type == TVARARGS)
 	{
-	  struct DECL *rdx;
+	  decl_t *rdx;
 	  exp_check (LEFT);
 	  rdx = RD;
 	  if (RD->categ == CNAME || RD->categ == CVAR)
@@ -1010,7 +1010,7 @@ exp_check (re)
                                                            MAIN_EXP_CHECK      */
 
 void 
-main_exp_check (re) struct EXP *re;
+main_exp_check (re) exp_t *re;
 {
   exp_check (re);
   computeconst (re);

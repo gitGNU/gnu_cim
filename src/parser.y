@@ -70,15 +70,16 @@ char ysensitive;
 /* Kontakt med lex */
 
 /* Makroer for registrering av blokker */
-struct blockstack
+typedef struct _blockstack blockstack_t;
+struct _blockstack
 {
   char rem;
-  struct blockstack *prev;
+  blockstack_t *prev;
 }  *blockp;
 
-#define OBSBLOCK() { struct blockstack *prev= blockp;\
-     blockp= (struct blockstack *) \
-       obstack_alloc (&os_block,sizeof (struct blockstack));\
+#define OBSBLOCK() { blockstack_t *prev= blockp;\
+     blockp= (blockstack_t *) \
+       obstack_alloc (&os_block,sizeof (blockstack_t));\
      blockp->prev= prev;\
      blockp->rem=TRUE;}
 
@@ -86,7 +87,7 @@ struct blockstack
        mout(MBLOCK);\
        blockp->rem= FALSE;begin_block(KBLOKK);}
 
-#define MBEEENDBLOCK() { struct blockstack *prev= blockp->prev;\
+#define MBEEENDBLOCK() { blockstack_t *prev= blockp->prev;\
      if(blockp->rem==FALSE)\
        {mout(MENDBLOCK);end_block(NULL,CCNO);}\
      obstack_free (&os_block, blockp);\
@@ -982,8 +983,8 @@ parser_init_pass1 ()
   inbytefileident=tag("INBYTEFILE");
   outbytefileident=tag("OUTBYTEFILE");
   directbytefileident=tag("DIRECTBYTEFILE");
-  blockp= (struct blockstack *)
-    obstack_alloc (&os_block,sizeof (struct blockstack));
+  blockp= (blockstack_t *)
+    obstack_alloc (&os_block,sizeof (blockstack_t));
   blockp->prev= NULL;
   blockp->rem=FALSE;
 }

@@ -303,7 +303,7 @@ __rgbc ()
 	  qh = (__dhp *) q;
 	  q = (__dhp) ((char *) q + size);
 
-	  bcopy ((char *) ph, (char *) qh, size);
+	  memmove ( (char *) qh,(char *) ph, size);
 	}
 
       p = (__dhp) ((char *) p + size);
@@ -315,7 +315,7 @@ __rgbc ()
 
 
   /* Nuller resten av omr}det */
-  bzero ((char *) __fri, (char *) p - (char *) __fri);
+  memset ((char *) __fri, 0, (char *) p - (char *) __fri);
   __gbctime += __rcputime ();
 }
 
@@ -390,7 +390,7 @@ __ralloc (size)
       __sto = __NULL;
       if (dp->pp != __NULL)
 	{
-	  bzero ((char *) dp, size);
+	  memset ((char *) dp, 0, size);
 	}
       return (dp);
     }
@@ -433,7 +433,7 @@ __ralloc (size)
 	      /* Nuller resten av omr}det */
 	      ph = (long *) ((char *) __max + disp);
 	      __max = (__dhp) (new_min + new_size);
-	      bzero ((char *) ph, (char *) __max - (char *) ph);
+	      memset ((char *) ph, 0, (char *) __max - (char *) ph);
 	      __chpoolsize = __TRUE;
 	      __poolsize = new_size / 1024;
 	    }

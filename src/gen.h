@@ -56,10 +56,14 @@ extern genline();
 
 /* transcall.c */
 extern int findallentry();
-extern struct EXP *transcall();
+extern exp_t *transcall();
 extern long ant_stack();
 
 /* genexp.c */
+
+extern void gen_for_val();
+extern void gen_con_val();
+
 extern gen();
 extern gensl();
 extern genchain();

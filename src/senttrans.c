@@ -24,10 +24,10 @@
                                                                  SORTPROCARR */
 
 static void 
-sort_proc_arr (parent_sent) struct SENT *parent_sent;
+sort_proc_arr (parent_sent) sent_t *parent_sent;
 {
   int line= parent_sent->line;
-  struct SENT *proc=NULL, *sent, *nextsent, *new;
+  sent_t *proc=NULL, *sent, *nextsent, *new;
   for (sent= parent_sent->first; sent!=NULL ;sent= nextsent)
     {
       nextsent= sent->next;
@@ -85,9 +85,9 @@ sort_proc_arr (parent_sent) struct SENT *parent_sent;
                                                                SENTLISTTRANS */
 
 static void 
-sent_list_trans (parent_sent) struct SENT *parent_sent;
+sent_list_trans (parent_sent) sent_t *parent_sent;
 {
-  struct SENT *sent;
+  sent_t *sent;
 
   for (sent= parent_sent->first; sent!=NULL; sent= sent->next)
     {
@@ -106,7 +106,7 @@ sent_list_trans (parent_sent) struct SENT *parent_sent;
                                                                  MODULETRANS */
 
 static void 
-module_trans (sent) struct SENT *sent;
+module_trans (sent) sent_t *sent;
 {     
   if (! separat_comp)
     insert_before_sent (sent, NULL, new_sent (MGOTOSTOP));
@@ -117,7 +117,7 @@ module_trans (sent) struct SENT *sent;
                                                                   BLOCKTRANS */
 
 static void 
-block_trans (sent) struct SENT *sent;
+block_trans (sent) sent_t *sent;
 {
   cblock= sent->cblock;
   sort_proc_arr (sent);
@@ -128,7 +128,7 @@ block_trans (sent) struct SENT *sent;
                                                                 PRBLOCKTRANS */
 
 static void 
-prblock_trans (sent) struct SENT *sent;
+prblock_trans (sent) sent_t *sent;
 {
   cblock= sent->cblock;
   sort_proc_arr (sent);
@@ -140,7 +140,7 @@ prblock_trans (sent) struct SENT *sent;
                                                               PROCEDURETRANS */
 
 static void 
-procedure_trans (sent) struct SENT *sent;
+procedure_trans (sent) sent_t *sent;
 {
   cblock= sent->cblock;
   sort_proc_arr (sent);
@@ -151,7 +151,7 @@ procedure_trans (sent) struct SENT *sent;
                                                                   CLASSTRANS */
 
 static void 
-class_trans (sent) struct SENT *sent;
+class_trans (sent) sent_t *sent;
 {
   cblock= sent->cblock;
   sort_proc_arr (sent);
@@ -162,7 +162,7 @@ class_trans (sent) struct SENT *sent;
                                                                 INSPECTTRANS */
 
 static void 
-inspect_trans (sent) struct SENT *sent;
+inspect_trans (sent) sent_t *sent;
 {
   cblock= sent->cblock;
   sent->iexp= transcall (sent->exp->up, sent->exp, 1, 1, 1); 
@@ -173,7 +173,7 @@ inspect_trans (sent) struct SENT *sent;
                                                                      DOTRANS */
 
 static void 
-do_trans (sent) struct SENT *sent;
+do_trans (sent) sent_t *sent;
 {
   cblock= sent->cblock;
   sent_list_trans (sent);
@@ -183,7 +183,7 @@ do_trans (sent) struct SENT *sent;
                                                                    WHENTRANS */
 
 static void 
-when_trans (sent) struct SENT *sent;
+when_trans (sent) sent_t *sent;
 {
   cblock= sent->cblock;
   sent_list_trans (sent);
@@ -193,7 +193,7 @@ when_trans (sent) struct SENT *sent;
                                                               OTHERWISETRANS */
 
 static void 
-otherwise_trans (sent) struct SENT *sent;
+otherwise_trans (sent) sent_t *sent;
 {
   cblock= sent->cblock;
   sent_list_trans (sent);
@@ -203,10 +203,10 @@ otherwise_trans (sent) struct SENT *sent;
                                                                 FORELEMTRANS */
 
 static void 
-forelem_trans (re, rex) struct EXP *re, *rex;
+forelem_trans (re, rex) exp_t *re, *rex;
 {
-  struct EXP *rey, *red;
-  struct EXP *reinit, *retest, *restep;
+  exp_t *rey, *red;
+  exp_t *reinit, *retest, *restep;
 
   int konst_step, notnegativ;
 
@@ -271,9 +271,9 @@ forelem_trans (re, rex) struct EXP *re, *rex;
                                                                   FORDOTRANS */
 
 static void 
-fordo_trans (sent) struct SENT *sent;
+fordo_trans (sent) sent_t *sent;
 {
-  struct EXP *re, *rex;
+  exp_t *re, *rex;
   cblock= sent->cblock;
   re= sent->exp;
   for (rex = re->right; rex->token != MENDSEP; rex = rex->right)
@@ -286,7 +286,7 @@ fordo_trans (sent) struct SENT *sent;
                                                                   WHILETRANS */
 
 static void 
-while_trans (sent) struct SENT *sent;
+while_trans (sent) sent_t *sent;
 {
   sent->iexp= transcall (sent->exp->up, sent->exp, 1, 1, 1); 
   sent_list_trans (sent);
@@ -296,7 +296,7 @@ while_trans (sent) struct SENT *sent;
                                                                      IFTRANS */
 
 static void 
-if_trans (sent) struct SENT *sent;
+if_trans (sent) sent_t *sent;
 {
   sent->iexp= transcall (sent->exp->up, sent->exp, 1, 1, 1);
   sent_list_trans (sent);
@@ -306,7 +306,7 @@ if_trans (sent) struct SENT *sent;
                                                                    ELSETRANS */
 
 static void 
-else_trans (sent) struct SENT *sent;
+else_trans (sent) sent_t *sent;
 {
   sent_list_trans (sent);
 }
@@ -315,7 +315,7 @@ else_trans (sent) struct SENT *sent;
                                                                    THENTRANS */
 
 static void 
-then_trans (sent) struct SENT *sent;
+then_trans (sent) sent_t *sent;
 {
   sent_list_trans (sent);
 }
@@ -324,7 +324,7 @@ then_trans (sent) struct SENT *sent;
                                                                    GOTOTRANS */
 
 static void 
-goto_trans (sent) struct SENT *sent;
+goto_trans (sent) sent_t *sent;
 {
   sent->iexp= transcall (sent->exp->up, sent->exp, 1, 1, 1);
 }
@@ -333,7 +333,7 @@ goto_trans (sent) struct SENT *sent;
                                                                   INNERTRANS */
 
 static void 
-inner_trans (sent) struct SENT *sent;
+inner_trans (sent) sent_t *sent;
 {
 }
 
@@ -341,9 +341,9 @@ inner_trans (sent) struct SENT *sent;
                                                               ENDSWITCHTRANS */
 
 static void 
-endswitch_trans (sent) struct SENT *sent;
+endswitch_trans (sent) sent_t *sent;
 {
-  struct EXP *rex, *rey;
+  exp_t *rex, *rey;
   for (rex = sent->exp->right; rex->token != MENDSEP; rex = rex->right)
     {
       rey= transcall (rex, rex->left, 1, 1, 1); fprintf (ccode, ";");
@@ -359,7 +359,7 @@ endswitch_trans (sent) struct SENT *sent;
                                                               ENDASSIGNTRANS */
 
 static void 
-endassign_trans (sent) struct SENT *sent;
+endassign_trans (sent) sent_t *sent;
 {
   sent->iexp= transcall (sent->exp->up, sent->exp, 1, 1, 1);
 }
@@ -368,7 +368,7 @@ endassign_trans (sent) struct SENT *sent;
                                                                ENDARRAYTRANS */
 
 static void 
-endarray_trans (sent) struct SENT *sent;
+endarray_trans (sent) sent_t *sent;
 {
   sent->iexp= transcall (sent->exp, sent->exp->right, 1, 1, 1);
 }
@@ -377,21 +377,21 @@ endarray_trans (sent) struct SENT *sent;
                                                                ENDLABELTRANS */
 
 static void 
-endlabel_trans (sent) struct SENT *sent;
+endlabel_trans (sent) sent_t *sent;
 {
 }
 
 /******************************************************************************
                                                                GOTOSTOPTRANS */
 
-goto_stop_trans (sent) struct SENT *sent;
+goto_stop_trans (sent) sent_t *sent;
 {
 }
 
 /******************************************************************************
                                                                   THUNKTRANS */
 
-thunk_trans (sent) struct SENT *sent;
+thunk_trans (sent) sent_t *sent;
 {
   cblock= sent->cblock;
   inthunk= sent->exp->value.thunk.inthunk;
@@ -403,7 +403,7 @@ thunk_trans (sent) struct SENT *sent;
                                                                    SENTTRANS */
 
 void 
-sent_trans (sent) struct SENT *sent;
+sent_trans (sent) sent_t *sent;
 {
   switch (sent->token)
     {

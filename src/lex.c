@@ -59,7 +59,7 @@ static int lexchar;
 static unsigned char firstchar;
 static unsigned char secondchar;
 static unsigned char thirdchar;
-static unsigned char *yytext;
+static char *yytext;
 
 static int pardeep = 0;
 static int antsimchar = 0;
@@ -73,10 +73,11 @@ char external = FALSE;	/* Har man sett "EXTERNAL PROC/CLASS =" angir
 				 * som ikke skal behandles som
 				 * en text-konstant. */
 
-struct ifdefstack
+typedef struct _ifdefstack ifdefstack_t;
+struct _ifdefstack
 {
   char ifdef;
-  struct ifdefstack *prev;
+  ifdefstack_t *prev;
 }  *ifdefp;
 
 char *flag, mellflag, bl_in_dir_line;
@@ -578,7 +579,7 @@ scan_ifdef ()
 	  if (ifdefp == include_ifdefp ()) lerror (23);
 	  else 
 	    {
-	      struct ifdefstack *prev= ifdefp->prev;
+	      ifdefstack_t *prev= ifdefp->prev;
 	      obstack_free (&os_ifdef, ifdefp);
 	      ifdefp= prev;
 	    }
@@ -633,9 +634,9 @@ scan_ifdef ()
 		    }
 		  else
 		    {
-		      struct ifdefstack *prev= ifdefp;
-		      ifdefp= (struct ifdefstack *)
-			obstack_alloc (&os_ifdef, sizeof (struct ifdefstack));
+		      ifdefstack_t *prev= ifdefp;
+		      ifdefp= (ifdefstack_t *)
+			obstack_alloc (&os_ifdef, sizeof (ifdefstack_t));
 		      ifdefp->prev= prev;
 		      ifdefp->ifdef= 0;
 		      scan = FALSE;
@@ -824,7 +825,8 @@ scan_dirline ()
 	    case 'I':
 	      if (!strcmp (yytext, "IFDEF")) scan_ifdef ();
 	      else if (!strcmp (yytext, "IFNOTDEF")) scan_ifdef ();
-	      else if (!strcmp (yytext, "INCLUDE"))
+	      else if (!strcmp (yytext, "INCLUDE") ||
+		       !strcmp (yytext, "INSERT"))
 		{
 		  notintext = FALSE;
 		  define_name (tag ("INCLUDED"), TRUE);
@@ -974,7 +976,7 @@ scan_dirline ()
   else
     /* Hvis det er en blank eller tom linje er hele linja en kommentar */
     if (lexchar != ' ' & lexchar != '\t' & lexchar != '\n'
-	& lexchar != '!' & lexchar != EOF)
+	& lexchar != '\r' & lexchar != '!' & lexchar != EOF)
       if (!bl_in_dir_line) lerror (8);
 
   while (lexchar != '\n' && lexchar != EOF) newlexchar;
@@ -1000,7 +1002,7 @@ int
 lex_init_pass1 (sourcename) char *sourcename;
 {
   yytext= obstack_finish (&os_lex);
-  ifdefp= obstack_alloc (&os_ifdef, sizeof (struct ifdefstack));
+  ifdefp= obstack_alloc (&os_ifdef, sizeof (ifdefstack_t));
   ifdefp->prev= NULL;
   ifdefp->ifdef= 0;
   if (mapline_init (sourcename, ifdefp)) return (TRUE);
@@ -1851,7 +1853,7 @@ yylex ()
 	if (ifdefp != include_ifdefp ())
 	  {
 	    lerror (24);
-	    ifdefp = (struct ifdefstack *) include_ifdefp ();
+	    ifdefp = (ifdefstack_t *) include_ifdefp ();
 	  }
 	fclose (include_file ());	
 	popfilmap ();

@@ -39,9 +39,9 @@ START-INFO-DIR-ENTRY
 END-INFO-DIR-ENTRY
 @end format
 
-This file documents the Cim compiler based on the C programming language. 
+This file documents the GNU Cim compiler based on the C programming language. 
 
-Copyright (C) 1994 Sverre Hvammen Johansen
+Copyright (C) 1994-1999 Sverre Hvammen Johansen
 
 Permission is granted to make and distribute verbatim copies of
 this manual provided the copyright notice and this permission notice
@@ -66,9 +66,9 @@ by the Free Software Foundation, Inc.
 @end ifinfo
 
 @titlepage
-@title Cim
+@title GNU Cim
 @subtitle Simula Compiler based on the C Programming Language
-@subtitle Edition @value{EDITION}, for Cim version @value{VERSION}
+@subtitle Edition @value{EDITION}, for GNU Cim version @value{VERSION}
 @subtitle @value{UPDATED}
 
 @page
@@ -96,8 +96,8 @@ by the Foundation.
 @comment  node-name,  next,  previous,  up
 
 @ifinfo
-This file documents the Cim compiler based on the C programming language. 
-This is edition @value{EDITION}, for Cim version @value{VERSION}. 
+This file documents the GNU Cim compiler based on the C programming language. 
+This is edition @value{EDITION}, for GNU Cim version @value{VERSION}. 
 
 @end ifinfo
 
@@ -113,7 +113,7 @@ This is edition @value{EDITION}, for Cim version @value{VERSION}.
 @node Introduction, A simple example, , Top
 @chapter Introduction
 
-Cim is a compiler for the programming language Simula
+GNU Cim is a compiler for the programming language Simula
 (except unspecified parameters to formal or virtual procedures
 (see item %nocomment in @xref{Dependent characteristics, Implementation
 dependent characteristics,Implementation dependent characteristics},
@@ -123,17 +123,17 @@ full type checking, interface to external C routines,
 an application package for process simulation
 and a coroutine concept.  
 
-Cim is a Simula compiler whose portability is based on
+GNU Cim is a Simula compiler whose portability is based on
 the C programming language.  The compiler and the
 run-time system is written in C, and the compiler
 produces C code, that is passed to a C compiler for
 further processing towards machine code. 
 
-Cim is copyrighted by Sverre Hvammen Johansen, Stein Krogdahl, and Terje Mjøs,
+GNU Cim is copyrighted by Sverre Hvammen Johansen, Stein Krogdahl, and Terje Mjøs,
 Department of Informatics, University of Oslo (plus some parts from
 Free Software Fundation).
 
-Cim is free software; you can redistribute it and/or modify
+GNU Cim is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; version 2. 
 
@@ -141,12 +141,12 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA. 
 
-Mail bug reports for Cim to @code{cim-bug@@ifi.uio.no}. 
-Please include the Cim version number and the system type, 
+Mail bug reports for Cim to @code{bug-cim@@gnu.org}. 
+Please include the GNU Cim version number and the system type, 
 which you can get by running @code{cim --version}. 
 
-Cim uses, GNU Autoconf, GNU Automake, and GNU Libtool,
-so that cim can be installed by following the generic
+GNU Cim uses, GNU Autoconf, GNU Automake, and GNU Libtool,
+so that GNU Cim can be installed by following the generic
 installation instructions found in the file INSTALL.
 You also may want to read the instructions in the file README.
 
@@ -191,11 +191,11 @@ Simula does it in C
 @node Compiling, Implementation Aspects, A simple example, Top
 @chapter Compiling
 
-Cim is a Simula compiler that first compiles the source code into C. 
+GNU Cim is a Simula compiler that first compiles the source code into C. 
 The C code
 will then be compiled with cc, and linked with other modules. 
 
-The Cim command
+The cim command
 will accept one Simula program and other non-Simula modules. 
 The specified Simula program will be compiled and linked with the 
 modules.  If a main Simula program is compiled, it will automatic
@@ -207,7 +207,7 @@ be self-explanatory.
 
 @menu
 * Options::                     Options that are accepted by the cim command. 
-* Arguments::                   Arguments that are accepted by cim.
+* Arguments::                   Arguments that are accepted by Cim.
 * Files::                       Files related to a compilation.
 @end menu
 
@@ -403,7 +403,7 @@ Do not print warnings.
 @node Arguments, Files, Options, Compiling
 @section Arguments
 
-The following arguments are accepted by the Cim command:
+The following arguments are accepted by the cim command:
 
 @table @file
 
@@ -424,7 +424,7 @@ to be shorthand notation for the corresponding Simula file.
 @node Files, , Arguments, Compiling
 @section Files
 
-The following files are related to a Cim compilation:
+The following files are related to a compilation:
 
 @table @file
 
@@ -540,9 +540,7 @@ following example shows.  In this implementation formal
 procedures must be specified, 
 but that should not be done in Standard Simula 
 (@cite{Standard Simula, SS 636114.  The Simula Standards Group, August 1986}).
-This will work both on LSH 
-(@cite{Simula implementation from Lund Software House AB, Sweden})
-and Cim:
+This will work both on a standard Simula Compiler and Cim:
 
 @example
 PROCEDURE P(i1,P2);INTEGER i1;

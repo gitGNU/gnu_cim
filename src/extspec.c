@@ -246,7 +246,10 @@ char *filename;
   if (len >=4 && !strcmp (&filename[len - 4], ".atr")) 
     return (tag (filename));
       
-  if (len >=4 && !strcmp (&filename[len - 4], ".sim"))
+  if (len >=4 && !(strcmp (&filename[len - 4], ".sim")
+                  && strcmp (&filename[len - 4], ".SIM")
+                  && strcmp (&filename[len - 4], ".cim")
+		   && strcmp (&filename[len - 4], ".CIM")))
     obstack_grow (&os_extspec, filename, len - 4);
   else
     obstack_grow (&os_extspec, filename, len);
@@ -266,8 +269,8 @@ external_is_in (ident, kind)
      char *ident;
      char kind;
 {
-  struct DECL *rd;
-  struct BLOCK *rb;
+  decl_t *rd;
+  block_t *rb;
 
   rb = cblock;
 
@@ -496,8 +499,8 @@ lesinn_external_spec (ident, filename, kind)
      char kind;
 {
   char *hprefquantident;
-  struct BLOCK *hcblock;
-  struct DECL *hclastdecl,
+  block_t *hcblock;
+  decl_t *hclastdecl,
    *rd;
   hprefquantident = prefquantident;
   hcblock = cblock;
@@ -583,7 +586,7 @@ write_text_mif (f, s) FILE *f; unsigned char *s;
 
 static 
 write_decl_mif (f, rd, level)
-       FILE *f; struct DECL *rd; int level;
+       FILE *f; decl_t *rd; int level;
 {
   if (rd->kind == KBLOKK || rd->kind == KPRBLK || rd->kind == KFOR || 
       rd->kind == KINSP) return;
@@ -682,9 +685,9 @@ write_decl_mif (f, rd, level)
     }
   else if (rd->kind == KPROC || rd->kind == KCLASS)
     {
-      struct DECL *rdv;
-      struct BLOCK *rb;
-      struct DECL *rdx;
+      decl_t *rdv;
+      block_t *rb;
+      decl_t *rdx;
       rb = rd->descr;
       if (rd->categ == CEXTROUT)
 	rd->categ = CEXTR;
@@ -815,7 +818,7 @@ write_all_mif ()
 {
   /* Trenger ikke skrive ut lokale deklarasjoner i procedyrer */
 
-  struct DECL *rd;
+  decl_t *rd;
   struct stamp *st;
   FILE *f;
 
@@ -862,7 +865,7 @@ write_all_mif ()
 
 static 
 write_decl_ext (f, rd)
-       FILE *f; struct DECL *rd;
+       FILE *f; decl_t *rd;
 {
   if (rd->kind == KBLOKK || rd->kind == KPRBLK || rd->kind == KFOR || 
       rd->kind == KINSP) ;
@@ -871,8 +874,8 @@ write_decl_ext (f, rd)
 		    ,rd->ident, rd->descr->timestamp, rd->descr->filename);
   else if (rd->kind == KPROC || rd->kind == KCLASS)
     {
-      struct DECL *rdv;
-      struct BLOCK *rb;
+      decl_t *rdv;
+      block_t *rb;
       rb = rd->descr;
       if (rd->categ == CEXTROUT)
 	rd->categ = CEXTR;
@@ -959,7 +962,7 @@ write_all_ext ()
 {
   /* Trenger ikke skrive ut lokale deklarasjoner i procedyrer */
 
-  struct DECL *rd;
+  decl_t *rd;
   struct stamp *st;
   FILE *f;
 

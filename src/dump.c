@@ -334,7 +334,7 @@ token_print (token) int token;
 /******************************************************************************
                                                                 VALUE_PRINT  */
 static
-value_print (value, token) union val value; int token;
+value_print (value, token) val_t value; int token;
 {
   switch (token)
     {
@@ -523,7 +523,7 @@ print_indent (level, marker) int level; char marker;
 /******************************************************************************
                                                                    EXP_DUMP  */
 void
-exp_dump (exp, level) struct EXP *exp; int level;
+exp_dump (exp, level) exp_t *exp; int level;
 {
   print_indent (level, '.');
   token_print (exp->token);
@@ -541,9 +541,9 @@ exp_dump (exp, level) struct EXP *exp; int level;
 /******************************************************************************
                                                                   SENT_DUMP  */
 void
-sent_dump (parent_sent, level) struct SENT *parent_sent; int level;
+sent_dump (parent_sent, level) sent_t *parent_sent; int level;
 {
-  struct SENT *sent;
+  sent_t *sent;
   print_indent (level, '_');
   token_print (parent_sent->token);
   printf (" line: %d cblock: %d ", parent_sent->line , (int) parent_sent->cblock);

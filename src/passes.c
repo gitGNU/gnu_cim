@@ -16,8 +16,6 @@
 
 /* Initialization */
 
-#include "passes.h"
-
 #include <stdio.h>
 #include "const.h"
 #include "name.h"
@@ -26,10 +24,12 @@
 #include "cimcomp.h"
 #include "error.h"
 #include "lex.h"
-#include "mellbuilder.h"
 #include "checker.h"
 #include "gen.h"
 #include "trans.h"
+#include "passes.h"
+
+sent_t *main_sent;
 
 passes_init ()
 {

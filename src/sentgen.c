@@ -20,6 +20,7 @@
 #include "gen.h"
 #include "extspec.h"
 #include "error.h"
+#include "passes.h"
 
 char not_reached;
 
@@ -29,9 +30,9 @@ char *mainroutine = "main";
                                                                  SENTLISTGEN */
 
 void 
-sent_list_gen (parent_sent, lab) struct SENT *parent_sent; int lab;
+sent_list_gen (parent_sent, lab) sent_t *parent_sent; int lab;
 {
-  struct SENT *sent;
+  sent_t *sent;
 
   for (sent= parent_sent->first; sent!=NULL; sent= sent->next)
     {
@@ -68,7 +69,7 @@ gen_init ()
 /******************************************************************************
                                                                    MODULEGEN */
 
-module_gen (sent) struct SENT *sent;
+module_gen (sent) sent_t *sent;
 {
   int i;
 
@@ -173,33 +174,30 @@ module_gen (sent) struct SENT *sent;
 /******************************************************************************
                                                                     BLOCKGEN */
 
-block_gen (sent) struct SENT *sent;
+block_gen (sent) sent_t *sent;
 {
   cblock= sent->cblock;
   cblev= cblock->blev;
-  if (sent->cblock->blev != EXTERNALGLOBALBLEV)
-    {
-      genline ();
-      if (sent->cblock->stat)
-	fprintf (ccode, "__sto= (__dhp)&__blokk%d%s;", sent->cblock->blno
-		 ,timestamp);
-      fprintf (ccode, "__rb(");
-      gen_adr_prot (ccode, &sent->cblock->quant);
-      fprintf (ccode, ");");
-    }
+
+  genline ();
+  if (sent->cblock->stat)
+    fprintf (ccode, "__sto= (__dhp)&__blokk%d%s;", sent->cblock->blno
+	     ,timestamp);
+  fprintf (ccode, "__rb(");
+  gen_adr_prot (ccode, &sent->cblock->quant);
+  fprintf (ccode, ");");
+
   gotollabel (sent->cblock->ent = newllabel ());
   sent_list_gen (sent);
-  if (sent->cblock->blev != EXTERNALGLOBALBLEV)
-    {
-      if (not_reached == FALSE)
-	fprintf (ccode, "__rbe();");
-    }
+  
+  if (not_reached == FALSE)
+    fprintf (ccode, "__rbe();");
 }
 
 /******************************************************************************
                                                                   PRBLOCKGEN */
 
-prblock_gen (sent) struct SENT *sent;
+prblock_gen (sent) sent_t *sent;
 {
   int labexit;
   if (not_reached == FALSE)
@@ -233,7 +231,7 @@ prblock_gen (sent) struct SENT *sent;
 /******************************************************************************
                                                                 PROCEDUREGEN */
 
-procedure_gen (sent) struct SENT *sent;
+procedure_gen (sent) sent_t *sent;
 {
   cblock= sent->cblock;
   cblev= cblock->blev;
@@ -269,7 +267,7 @@ procedure_gen (sent) struct SENT *sent;
 /******************************************************************************
                                                                     CLASSGEN */
 
-class_gen (sent) struct SENT *sent;
+class_gen (sent) sent_t *sent;
 {
   cblock= sent->cblock;
   cblev= cblock->blev;
@@ -284,7 +282,7 @@ class_gen (sent) struct SENT *sent;
 /******************************************************************************
                                                                   INSPECTGEN */
 
-inspect_gen (sent) struct SENT *sent;
+inspect_gen (sent) sent_t *sent;
 {
   int labnull, labexit;
   if (not_reached == FALSE)
@@ -296,15 +294,14 @@ inspect_gen (sent) struct SENT *sent;
   cblev= cblock->blev;
   genvalue (sent->iexp); fprintf (ccode, ";");
 
-  fprintf (ccode, "((__bs%d *)__lb)->c%d=", 
-	   sent->cblock->quant.match->descr->blno,
-	   sent->cblock->connest);
+  gen_con_ref (sent->cblock->connest);
+  fprintf (ccode, "=");
   genvalue (sent->exp);
   fprintf (ccode, ";");
 
-  fprintf (ccode, "if(((__bs%d *)__lb)->c%d==__NULL)", 
-	   sent->cblock->quant.match->descr->blno, 
-	   sent->cblock->connest);
+  fprintf (ccode, "if(");
+  gen_con_ref (sent->cblock->connest);
+  fprintf (ccode, "==__NULL)");
 
   labexit = newllabel ();
 
@@ -317,10 +314,11 @@ inspect_gen (sent) struct SENT *sent;
 
 
   if (sent->first!=NULL && sent->first->token == MWHEN)
-    fprintf (ccode, "__pp=((__bs%d *)__lb)->c%d->pp; ",
-	     sent->cblock->quant.match->descr->blno, 
-	     sent->cblock->connest);
-
+    {
+      fprintf (ccode, "__pp=");
+      gen_con_ref (sent->cblock->connest);
+      fprintf (ccode, "->pp; ");
+    }
   sent_list_gen (sent, labexit);
 
   if (sent->last!=NULL && sent->last->token == MOTHERWISE)
@@ -340,7 +338,7 @@ inspect_gen (sent) struct SENT *sent;
 /******************************************************************************
                                                                        DOGEN */
 
-do_gen (sent, labexit) struct SENT *sent; int labexit;
+do_gen (sent, labexit) sent_t *sent; int labexit;
 {
   cblock= sent->cblock;
   cblev= cblock->blev;
@@ -357,7 +355,7 @@ do_gen (sent, labexit) struct SENT *sent; int labexit;
 /******************************************************************************
                                                                      WHENGEN */
 
-when_gen (sent, labexit) struct SENT *sent; int labexit;
+when_gen (sent, labexit) sent_t *sent; int labexit;
 {
   int labnextcase;
   cblock= sent->cblock;
@@ -384,7 +382,7 @@ when_gen (sent, labexit) struct SENT *sent; int labexit;
 /******************************************************************************
                                                                 OTHERWISEGEN */
 
-otherwise_gen (sent) struct SENT *sent;
+otherwise_gen (sent) sent_t *sent;
 {
 }
 
@@ -394,14 +392,14 @@ otherwise_gen (sent) struct SENT *sent;
 static 
 forelemgen (re, rex, labcontinue, labdo, labexit, single, 
 		   notlastdefault, listnrp)
-     struct EXP *re, *rex;
+     exp_t *re, *rex;
      int labcontinue, labdo, labexit, single, notlastdefault;
      int *listnrp;
 {
-  struct EXP *rey;
+  exp_t *rey;
   int labnext;
 
-  struct EXP *reconc, *red;
+  exp_t *reconc, *red;
 
   rey= rex->left;
   switch (rey->token)
@@ -421,9 +419,9 @@ forelemgen (re, rex, labcontinue, labdo, labexit, single,
 	}
       else
 	{
-	  fprintf (ccode, "{((__bs%d *)__lb)->f%d= %d;", 
-		   cblock->quant.match->descr->blno, 
-		   cblock->fornest, ++*listnrp);
+	  fprintf (ccode, "{");
+	  gen_for_val(cblock->fornest);
+	  fprintf (ccode, "= %d;", ++*listnrp);
 	  gotollabel (labdo);
 	  fprintf (ccode, "}");
 	  
@@ -450,10 +448,8 @@ forelemgen (re, rex, labcontinue, labdo, labexit, single,
 	typellabel (labcontinue);
       else if (notlastdefault)
 	{
-	  fprintf (ccode, "((__bs%d *)__lb)->f%d= %d;", 
-		   cblock->quant.match->descr->blno, 
-		   cblock->fornest, ++*listnrp);
-	  fprintf (ccode, "   case %d:", *listnrp);
+	  gen_for_val(cblock->fornest);
+	  fprintf (ccode, "= %d;", ++*listnrp);
 	}
       genvalue (rey->left); fprintf (ccode, ";");
       fprintf (ccode, "if(");
@@ -469,9 +465,8 @@ forelemgen (re, rex, labcontinue, labdo, labexit, single,
       genvalue (rey); fprintf (ccode, ";");
       if (!single)
 	{
-	  fprintf (ccode, "((__bs%d *)__lb)->f%d= %d;", 
-		   cblock->quant.match->descr->blno,
-		   cblock->fornest, ++*listnrp);
+	  gen_for_val(cblock->fornest);
+	  fprintf (ccode, "= %d;", ++*listnrp);
 	  gotollabel (labdo);
 	  fprintf (ccode, "   case %d:", *listnrp);
 	}
@@ -485,11 +480,11 @@ forelemgen (re, rex, labcontinue, labdo, labexit, single,
                                                       FORGEN                 */
 /* Genererer kode for en for l|kke med et antall liste elementer             */
 forgen (re, labcontinue, labdo, labexit)
-     struct EXP *re;
+     exp_t *re;
      int labcontinue, labdo, labexit;
 {
   int notlastdefault=FALSE;
-  struct EXP *rex;
+  exp_t *rex;
   int labnext;
 
   int listnr=0;
@@ -497,16 +492,16 @@ forgen (re, labcontinue, labdo, labexit)
   if (re->right->right->token == MENDSEP)
     return forelemgen (re, re->right, labcontinue, labdo, labexit, TRUE);
 
-  fprintf (ccode, "((__bs%d *)__lb)->f%d=1;", 
-		  cblock->quant.match->descr->blno,
-		  cblock->fornest);
+  gen_for_val(cblock->fornest);
+  fprintf (ccode, "=1;");
 
   gotollabel (labnext= newllabel ());
   typellabel (labcontinue);
 				
-  fprintf (ccode, "switch (((__bs%d *)__lb)->f%d ){", 
-	   cblock->quant.match->descr->blno,
-	   cblock->fornest);
+  fprintf (ccode, "switch (");
+  gen_for_val(cblock->fornest);
+  fprintf (ccode, " ){"); 
+
   typellabel (labnext);
 
   for (rex = re->right; rex->token != MENDSEP; rex = rex->right)
@@ -523,7 +518,7 @@ forgen (re, labcontinue, labdo, labexit)
 /******************************************************************************
                                                                     FORDOGEN */
 
-fordo_gen (sent) struct SENT *sent;
+fordo_gen (sent) sent_t *sent;
 {
   int labcontinue, labdo, labexit, iterate;
   if (not_reached == FALSE)
@@ -558,7 +553,7 @@ fordo_gen (sent) struct SENT *sent;
 /******************************************************************************
                                                                     WHILEGEN */
 
-while_gen (sent) struct SENT *sent;
+while_gen (sent) sent_t *sent;
 {
   int labstart, labexit;
   if (not_reached == FALSE)
@@ -586,7 +581,7 @@ while_gen (sent) struct SENT *sent;
 /******************************************************************************
                                                                        IFGEN */
 
-if_gen (sent) struct SENT *sent;
+if_gen (sent) sent_t *sent;
 {
   int labelse, labexit;
   if (not_reached == FALSE)
@@ -628,7 +623,7 @@ if_gen (sent) struct SENT *sent;
 /******************************************************************************
                                                                      GOTOGEN */
 
-goto_gen (sent) struct SENT *sent;
+goto_gen (sent) sent_t *sent;
 {
   if (not_reached == FALSE)
     genline ();
@@ -642,7 +637,7 @@ goto_gen (sent) struct SENT *sent;
 /******************************************************************************
                                                                     INNERGEN */
 
-inner_gen (sent, lab) struct SENT *sent; int lab;
+inner_gen (sent, lab) sent_t *sent; int lab;
 {
   genline ();
   fprintf (ccode, "__rinner(%d);", sent->cblock->quant.plev);
@@ -652,7 +647,7 @@ inner_gen (sent, lab) struct SENT *sent; int lab;
 /******************************************************************************
                                                                     ENTRYGEN */
 
-entry_gen (sent) struct SENT *sent;
+entry_gen (sent) sent_t *sent;
 {
   typelabel (sent->cblock->ent);
 }
@@ -660,7 +655,7 @@ entry_gen (sent) struct SENT *sent;
 /******************************************************************************
                                                                BLOCKENTRYGEN */
 
-block_entry_gen (sent) struct SENT *sent;
+block_entry_gen (sent) sent_t *sent;
 {
   typellabel (sent->cblock->ent);
 }
@@ -668,9 +663,9 @@ block_entry_gen (sent) struct SENT *sent;
 /******************************************************************************
                                                            PROCEDUREENTRYGEN */
 
-procedure_entry_gen (sent) struct SENT *sent;
+procedure_entry_gen (sent) sent_t *sent;
 {
-  struct DECL *rd= sent->cblock->parloc;
+  decl_t *rd= sent->cblock->parloc;
   int i;
 
   typelabel (sent->cblock->ent);
@@ -698,9 +693,9 @@ procedure_entry_gen (sent) struct SENT *sent;
 /******************************************************************************
                                                                 ENDSWITCHGEN */
 
-endswitch_gen (sent) struct SENT *sent;
+endswitch_gen (sent) sent_t *sent;
 {
-  struct EXP *re= sent->exp, *rex;
+  exp_t *re= sent->exp, *rex;
   int i = 1;
   if (not_reached == FALSE)
     genline ();
@@ -734,7 +729,7 @@ endswitch_gen (sent) struct SENT *sent;
 /******************************************************************************
                                                                 ENDASSIGNGEN */
 
-endassign_gen (sent) struct SENT *sent;
+endassign_gen (sent) sent_t *sent;
 {
   if (not_reached == FALSE)
     genline ();
@@ -748,9 +743,9 @@ endassign_gen (sent) struct SENT *sent;
 /******************************************************************************
                                                                  ENDARRAYGEN */
 
-endarray_gen (sent) struct SENT *sent;
+endarray_gen (sent) sent_t *sent;
 {
-  struct EXP *re= sent->exp, *re1, *re2;
+  exp_t *re= sent->exp, *re1, *re2;
   int i;
   char ifskrevet = FALSE;
 
@@ -872,7 +867,7 @@ endarray_gen (sent) struct SENT *sent;
 /******************************************************************************
                                                                   ENDDECLGEN */
 
-enddecl_gen (sent, lab) struct SENT *sent;
+enddecl_gen (sent, lab) sent_t *sent;
 {
   if (not_reached == FALSE)
     genline ();
@@ -886,9 +881,9 @@ enddecl_gen (sent, lab) struct SENT *sent;
 /******************************************************************************
                                                                  ENDLABELGEN */
 
-endlabel_gen (sent) struct SENT *sent;
+endlabel_gen (sent) sent_t *sent;
 {
-  struct EXP *re= sent->exp;
+  exp_t *re= sent->exp;
   if (not_reached == FALSE)
     genline ();
   else
@@ -910,7 +905,7 @@ endlabel_gen (sent) struct SENT *sent;
 
 /******************************************************************************
                                                                  GOTOSTOPGEN */
-goto_stop_gen (sent) struct SENT *sent;
+goto_stop_gen (sent) sent_t *sent;
 {
   fprintf (ccode, "goto __slutt;");
 }
@@ -919,7 +914,7 @@ goto_stop_gen (sent) struct SENT *sent;
 /******************************************************************************
                                                                     THUNKGEN */
 
-thunk_gen (sent) struct SENT *sent;
+thunk_gen (sent) sent_t *sent;
 {
   int labbypass;
   cblock= sent->cblock;
@@ -953,7 +948,7 @@ thunk_gen (sent) struct SENT *sent;
                                                                      SENTGEN */
 
 void 
-sent_gen (sent, lab) struct SENT *sent;
+sent_gen (sent, lab) sent_t *sent;
 {
   switch (sent->token)
     {

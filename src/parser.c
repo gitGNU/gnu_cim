@@ -175,15 +175,16 @@ char ysensitive;
 /* Kontakt med lex */
 
 /* Makroer for registrering av blokker */
-struct blockstack
+typedef struct _blockstack blockstack_t;
+struct _blockstack
 {
   char rem;
-  struct blockstack *prev;
+  blockstack_t *prev;
 }  *blockp;
 
-#define OBSBLOCK() { struct blockstack *prev= blockp;\
-     blockp= (struct blockstack *) \
-       obstack_alloc (&os_block,sizeof (struct blockstack));\
+#define OBSBLOCK() { blockstack_t *prev= blockp;\
+     blockp= (blockstack_t *) \
+       obstack_alloc (&os_block,sizeof (blockstack_t));\
      blockp->prev= prev;\
      blockp->rem=TRUE;}
 
@@ -191,7 +192,7 @@ struct blockstack
        mout(MBLOCK);\
        blockp->rem= FALSE;begin_block(KBLOKK);}
 
-#define MBEEENDBLOCK() { struct blockstack *prev= blockp->prev;\
+#define MBEEENDBLOCK() { blockstack_t *prev= blockp->prev;\
      if(blockp->rem==FALSE)\
        {mout(MENDBLOCK);end_block(NULL,CCNO);}\
      obstack_free (&os_block, blockp);\
@@ -201,7 +202,7 @@ struct blockstack
 
 /* Spesifikasjonene til YACC */
 
-#line 99 "parser.y"
+#line 100 "parser.y"
 typedef union {
 	long token;
 	long ival;
@@ -383,33 +384,33 @@ static const short yyrhs[] = {    -1,
 
 #if YYDEBUG != 0
 static const short yyrline[] = { 0,
-   177,   179,   180,   182,   188,   188,   199,   202,   203,   209,
-   210,   213,   217,   238,   239,   241,   242,   244,   248,   249,
-   251,   254,   256,   257,   259,   264,   264,   265,   266,   267,
-   268,   269,   270,   274,   283,   284,   286,   289,   294,   297,
-   298,   300,   306,   308,   310,   311,   313,   316,   321,   323,
-   329,   332,   333,   335,   337,   339,   342,   349,   351,   351,
-   353,   356,   358,   361,   363,   366,   368,   372,   376,   378,
-   382,   383,   385,   390,   394,   397,   400,   405,   406,   408,
-   410,   416,   420,   424,   428,   430,   433,   437,   440,   452,
-   456,   457,   462,   464,   469,   475,   477,   485,   487,   488,
-   490,   521,   522,   530,   531,   537,   540,   541,   546,   550,
-   551,   552,   553,   555,   558,   559,   565,   568,   580,   581,
-   585,   591,   594,   598,   604,   607,   612,   616,   618,   622,
-   623,   624,   625,   627,   629,   630,   632,   635,   636,   638,
-   639,   640,   641,   642,   643,   646,   649,   650,   652,   653,
-   654,   657,   659,   661,   663,   665,   667,   669,   675,   676,
-   678,   679,   680,   681,   683,   684,   686,   687,   688,   689,
-   690,   691,   692,   693,   694,   695,   696,   697,   698,   699,
-   700,   702,   704,   706,   708,   710,   711,   713,   714,   716,
-   717,   719,   720,   722,   723,   724,   726,   730,   731,   733,
-   735,   738,   744,   746,   748,   749,   751,   752,   754,   756,
-   759,   760,   761,   763,   766,   767,   769,   773,   774,   777,
-   780,   785,   786,   793,   798,   799,   807,   811,   816,   820,
-   824,   826,   828,   830,   832,   833,   844,   849,   854,   858,
-   863,   869,   872,   874,   876,   878,   880,   882,   884,   885,
-   888,   888,   890,   894,   897,   901,   902,   905,   908,   912,
-   914
+   178,   180,   181,   183,   189,   189,   200,   203,   204,   210,
+   211,   214,   218,   239,   240,   242,   243,   245,   249,   250,
+   252,   255,   257,   258,   260,   265,   265,   266,   267,   268,
+   269,   270,   271,   275,   284,   285,   287,   290,   295,   298,
+   299,   301,   307,   309,   311,   312,   314,   317,   322,   324,
+   330,   333,   334,   336,   338,   340,   343,   350,   352,   352,
+   354,   357,   359,   362,   364,   367,   369,   373,   377,   379,
+   383,   384,   386,   391,   395,   398,   401,   406,   407,   409,
+   411,   417,   421,   425,   429,   431,   434,   438,   441,   453,
+   457,   458,   463,   465,   470,   476,   478,   486,   488,   489,
+   491,   522,   523,   531,   532,   538,   541,   542,   547,   551,
+   552,   553,   554,   556,   559,   560,   566,   569,   581,   582,
+   586,   592,   595,   599,   605,   608,   613,   617,   619,   623,
+   624,   625,   626,   628,   630,   631,   633,   636,   637,   639,
+   640,   641,   642,   643,   644,   647,   650,   651,   653,   654,
+   655,   658,   660,   662,   664,   666,   668,   670,   676,   677,
+   679,   680,   681,   682,   684,   685,   687,   688,   689,   690,
+   691,   692,   693,   694,   695,   696,   697,   698,   699,   700,
+   701,   703,   705,   707,   709,   711,   712,   714,   715,   717,
+   718,   720,   721,   723,   724,   725,   727,   731,   732,   734,
+   736,   739,   745,   747,   749,   750,   752,   753,   755,   757,
+   760,   761,   762,   764,   767,   768,   770,   774,   775,   778,
+   781,   786,   787,   794,   799,   800,   808,   812,   817,   821,
+   825,   827,   829,   831,   833,   834,   845,   850,   855,   859,
+   864,   870,   873,   875,   877,   879,   881,   883,   885,   886,
+   889,   889,   891,   895,   898,   902,   903,   906,   909,   913,
+   915
 };
 #endif
 
@@ -1378,21 +1379,21 @@ yyreduce:
   switch (yyn) {
 
 case 1:
-#line 177 "parser.y"
+#line 178 "parser.y"
 {	  categ=CLOCAL; mout(MBLOCK);
                                   begin_block(KBLOKK);separat_comp=FALSE;;
     break;}
 case 2:
-#line 179 "parser.y"
+#line 180 "parser.y"
 { end_block(NULL,CCNO);   mout(MENDBLOCK);;
     break;}
 case 4:
-#line 185 "parser.y"
+#line 186 "parser.y"
 { MBEENEWBLOCK();        
 				  kind=KPROC;;
     break;}
 case 6:
-#line 192 "parser.y"
+#line 193 "parser.y"
 { MBEENEWBLOCK();
 				  type=TNOTY;
 				  kind=KPROC;
@@ -1402,167 +1403,167 @@ case 6:
                                   sensitive=ON;;
     break;}
 case 7:
-#line 199 "parser.y"
+#line 200 "parser.y"
 { yyval.ident=yyvsp[0].ident;
                                   sensitive=ysensitive;;
     break;}
 case 8:
-#line 202 "parser.y"
+#line 203 "parser.y"
 { categ=CLOCAL;;
     break;}
 case 9:
-#line 205 "parser.y"
+#line 206 "parser.y"
 { MBEENEWBLOCK();        
 				  kind=KCLASS;;
     break;}
 case 11:
-#line 212 "parser.y"
+#line 213 "parser.y"
 { if(yyvsp[0].token!=HIS)yerror (2);;
     break;}
 case 12:
-#line 215 "parser.y"
+#line 216 "parser.y"
 {         reg_decl(yyvsp[0].ident, type, KPROC, CCPROC);
                                           begin_block(kind);;
     break;}
 case 13:
-#line 218 "parser.y"
+#line 219 "parser.y"
 { categ=CLOCAL;
 				  end_block(yyvsp[-8].tval==NULL?yyvsp[-9].ident:tag(yyvsp[-8].tval),CCCPROC);;
     break;}
 case 18:
-#line 246 "parser.y"
+#line 247 "parser.y"
 { lesinn_external_spec(yyvsp[-1].ident,yyvsp[0].tval, kind);;
     break;}
 case 19:
-#line 248 "parser.y"
+#line 249 "parser.y"
 { yyval.tval=NULL;;
     break;}
 case 20:
-#line 249 "parser.y"
+#line 250 "parser.y"
 { if(yyvsp[0].token!=HEQ)yerror (9);
                                           external=TRUE;;
     break;}
 case 21:
-#line 251 "parser.y"
+#line 252 "parser.y"
 { yyval.tval=yyvsp[0].tval;external=FALSE;;
     break;}
 case 22:
-#line 254 "parser.y"
+#line 255 "parser.y"
 { type=TNOTY;;
     break;}
 case 25:
-#line 261 "parser.y"
+#line 262 "parser.y"
 { prefquantident=yyvsp[0].ident; 
                                           type=TREF;;
     break;}
 case 27:
-#line 264 "parser.y"
+#line 265 "parser.y"
 { type=TTEXT;;
     break;}
 case 28:
-#line 265 "parser.y"
+#line 266 "parser.y"
 { type=TBOOL;;
     break;}
 case 29:
-#line 266 "parser.y"
+#line 267 "parser.y"
 { type=TCHAR;;
     break;}
 case 30:
-#line 267 "parser.y"
+#line 268 "parser.y"
 { type=TSHORT;;
     break;}
 case 31:
-#line 268 "parser.y"
+#line 269 "parser.y"
 { type=TINTG;;
     break;}
 case 32:
-#line 269 "parser.y"
+#line 270 "parser.y"
 { type=TREAL;;
     break;}
 case 33:
-#line 270 "parser.y"
+#line 271 "parser.y"
 { type=TLONG;;
     break;}
 case 35:
-#line 283 "parser.y"
+#line 284 "parser.y"
 { OBSBLOCK();     mout(MELSE);;
     break;}
 case 36:
-#line 284 "parser.y"
+#line 285 "parser.y"
 { MBEEENDBLOCK();;
     break;}
 case 37:
-#line 286 "parser.y"
+#line 287 "parser.y"
 { mout(MENDSEP);
                                                   mout(MLISTSEP);
 						  yyval.kind=KFOR;;
     break;}
 case 38:
-#line 291 "parser.y"
+#line 292 "parser.y"
 { mout(MLISTSEP);
 						  yyval.kind=KFORLIST;
     break;}
 case 41:
-#line 299 "parser.y"
+#line 300 "parser.y"
 { mout(MFORWHILE);;
     break;}
 case 42:
-#line 303 "parser.y"
+#line 304 "parser.y"
 { mout(MUNTIL);
                                                   mout(MSTEP);;
     break;}
 case 46:
-#line 311 "parser.y"
+#line 312 "parser.y"
 {   begin_block(KCON);   mout(MDO);
                               OBSBLOCK(); ;
     break;}
 case 47:
-#line 313 "parser.y"
+#line 314 "parser.y"
 {   end_block(NULL,CCNO);  
                                   MBEEENDBLOCK();  mout(MENDDO);;
     break;}
 case 48:
-#line 318 "parser.y"
+#line 319 "parser.y"
 {   begin_block(KCON);  mout(MIDENTIFIER);
                                    OBSBLOCK();     mout_id(yyvsp[-1].ident);
 				   		   mout(MWHEN);;
     break;}
 case 49:
-#line 321 "parser.y"
+#line 322 "parser.y"
 {   end_block(NULL,CCNO);   
                               MBEEENDBLOCK(); mout(MENDWHEN);;
     break;}
 case 50:
-#line 326 "parser.y"
+#line 327 "parser.y"
 { begin_block(KCON);	   mout(MIDENTIFIER);
                                  OBSBLOCK();       mout_id(yyvsp[-1].ident);
 				 		   mout(MWHEN);;
     break;}
 case 51:
-#line 329 "parser.y"
+#line 330 "parser.y"
 { end_block(NULL,CCNO); 
                               MBEEENDBLOCK();    mout(MENDWHEN);;
     break;}
 case 53:
-#line 333 "parser.y"
+#line 334 "parser.y"
 {OBSBLOCK();    mout(MOTHERWISE);;
     break;}
 case 54:
-#line 335 "parser.y"
+#line 336 "parser.y"
 {MBEEENDBLOCK();mout(MENDOTHERWISE);;
     break;}
 case 55:
-#line 337 "parser.y"
+#line 338 "parser.y"
 { mout(MBOOLEANKONST);
 						  mout_ival(FALSE);;
     break;}
 case 56:
-#line 339 "parser.y"
+#line 340 "parser.y"
 { mout(MBOOLEANKONST);
 						  mout_ival(TRUE);;
     break;}
 case 57:
-#line 342 "parser.y"
+#line 343 "parser.y"
 { mout(MCHARACTERKONST);
 						  mout_ival(DIRECT);
 						  mout(MINTEGERKONST);
@@ -1572,162 +1573,162 @@ case 57:
 						  mout_ival(FALSE);;
     break;}
 case 58:
-#line 349 "parser.y"
+#line 350 "parser.y"
 { mout(MNONE);;
     break;}
 case 60:
-#line 351 "parser.y"
+#line 352 "parser.y"
 { mout(MINTEGERKONST);
 						  mout_ival(0);;
     break;}
 case 61:
-#line 353 "parser.y"
+#line 354 "parser.y"
 { mout(MBOOLEANKONST);
 						  mout_ival(FALSE);;
     break;}
 case 62:
-#line 356 "parser.y"
+#line 357 "parser.y"
 { mout(MCHARACTERKONST);
 						  mout_ival(AT);;
     break;}
 case 63:
-#line 358 "parser.y"
+#line 359 "parser.y"
 { mout(MCHARACTERKONST);
 						  mout_ival(DELAYS);;
     break;}
 case 64:
-#line 361 "parser.y"
+#line 362 "parser.y"
 { mout(MCHARACTERKONST);
 						  mout_ival(BEFORE);;
     break;}
 case 65:
-#line 363 "parser.y"
+#line 364 "parser.y"
 { mout(MCHARACTERKONST);
 						  mout_ival(AFTER);;
     break;}
 case 66:
-#line 366 "parser.y"
+#line 367 "parser.y"
 { mout(MBOOLEANKONST);
 						  mout_ival(FALSE);;
     break;}
 case 67:
-#line 368 "parser.y"
+#line 369 "parser.y"
 { mout(MBOOLEANKONST);
 						  mout_ival(TRUE);;
     break;}
 case 68:
-#line 374 "parser.y"
+#line 375 "parser.y"
 { STOPOBSBLOCK(); mout(MWHILE);
                                   OBSBLOCK();;
     break;}
 case 69:
-#line 376 "parser.y"
+#line 377 "parser.y"
 { MBEEENDBLOCK(); mout(MENDWHILE);
 					  	          yyval.stat_decl=STATEMENT;;
     break;}
 case 70:
-#line 380 "parser.y"
+#line 381 "parser.y"
 { STOPOBSBLOCK(); mout(MIF);
                                   OBSBLOCK();;
     break;}
 case 71:
-#line 382 "parser.y"
+#line 383 "parser.y"
 { MBEEENDBLOCK();;
     break;}
 case 72:
-#line 383 "parser.y"
+#line 384 "parser.y"
 { mout(MENDIF);
 							  yyval.stat_decl=STATEMENT;;
     break;}
 case 73:
-#line 387 "parser.y"
+#line 388 "parser.y"
 { STOPOBSBLOCK(); mout(MIDENTIFIER);
                                                   mout_id(yyvsp[-1].ident);;
     break;}
 case 74:
-#line 390 "parser.y"
+#line 391 "parser.y"
 { begin_block(yyvsp[-1].kind);
                         if(yyvsp[-3].token==HASSIGNVALUE)      mout(MFOR);
                                         else      mout(MFORR);
                                   OBSBLOCK();     mout(MFORDO);;
     break;}
 case 75:
-#line 394 "parser.y"
+#line 395 "parser.y"
 { MBEEENDBLOCK();
                                   end_block(NULL,CCNO); mout(MENDFOR);
 							  yyval.stat_decl=STATEMENT;;
     break;}
 case 76:
-#line 398 "parser.y"
+#line 399 "parser.y"
 { mout(MGOTO);
                                   STOPOBSBLOCK();	  yyval.stat_decl=STATEMENT;;
     break;}
 case 77:
-#line 401 "parser.y"
+#line 402 "parser.y"
 { mout(MINSPECT);
                                   STOPOBSBLOCK();
                                   begin_block(KINSP);;
     break;}
 case 78:
-#line 405 "parser.y"
+#line 406 "parser.y"
 { end_block(NULL,CCNO);;
     break;}
 case 79:
-#line 406 "parser.y"
+#line 407 "parser.y"
 { mout(MENDINSPECT);
 							  yyval.stat_decl=STATEMENT;;
     break;}
 case 80:
-#line 408 "parser.y"
+#line 409 "parser.y"
 { STOPOBSBLOCK(); mout(MINNER);
                                   reg_inner();		  yyval.stat_decl=STATEMENT;;
     break;}
 case 81:
-#line 412 "parser.y"
+#line 413 "parser.y"
 { STOPOBSBLOCK();
                                   reg_decl(yyvsp[-1].ident, TLABEL, KSIMPLE, categ);    mout(MLABEL);
                                                   mout_id(yyvsp[-1].ident);
                                                   mout(MENDLABEL);;
     break;}
 case 82:
-#line 416 "parser.y"
+#line 417 "parser.y"
 { if(yyvsp[0].stat_decl<=DECLARATION)
                                             { yerror (27);
                                               yyval.stat_decl=DECLARATION;}
                                           else yyval.stat_decl=yyvsp[0].stat_decl;;
     break;}
 case 83:
-#line 422 "parser.y"
+#line 423 "parser.y"
 { yyval.ident=yyvsp[-1].ident; ;
     break;}
 case 84:
-#line 424 "parser.y"
+#line 425 "parser.y"
 { mout(MPRBLOCK);
 				  prefquantident=yyvsp[-3].ident;
                                   begin_block(KPRBLK);;
     break;}
 case 85:
-#line 428 "parser.y"
+#line 429 "parser.y"
 { end_block(NULL,CCNO); mout(MENDPRBLOCK);
                                                           yyval.stat_decl=STATEMENT;;
     break;}
 case 86:
-#line 431 "parser.y"
+#line 432 "parser.y"
 { yyval.stat_decl=STATEMENT;
 			         end_block(NULL,CCNO); mout(MENDPRBLOCK);;
     break;}
 case 87:
-#line 434 "parser.y"
+#line 435 "parser.y"
 { yyval.stat_decl=STATEMENT;
 			         end_block(NULL,CCNO); mout(MENDPRBLOCK);;
     break;}
 case 88:
-#line 438 "parser.y"
+#line 439 "parser.y"
 { STOPOBSBLOCK();         yyval.stat_decl=STATEMENT;
                                                   mout(MENDASSIGN);;
     break;}
 case 89:
-#line 441 "parser.y"
+#line 442 "parser.y"
 {      	  yyval.stat_decl=STATEMENT;
 						  mout(MENDSEP);
 						  mout(MARGUMENTSEP);
@@ -1741,63 +1742,63 @@ case 89:
 						  mout(MENDASSIGN);;
     break;}
 case 90:
-#line 453 "parser.y"
+#line 454 "parser.y"
 { STOPOBSBLOCK();
                                   OBSBLOCK();;
     break;}
 case 91:
-#line 456 "parser.y"
+#line 457 "parser.y"
 { MBEEENDBLOCK();         yyval.stat_decl=STATEMENT;;
     break;}
 case 92:
-#line 459 "parser.y"
+#line 460 "parser.y"
 { MBEENEWBLOCK(); mout(MPROCEDURE);
                                           reg_decl(yyvsp[0].ident, type, KPROC, categ);
                                           begin_block(KPROC);;
     break;}
 case 93:
-#line 462 "parser.y"
+#line 463 "parser.y"
 { end_block(NULL,CCNO); yyval.stat_decl=DECLARATION;
                                                   mout(MENDPROCEDURE);;
     break;}
 case 94:
-#line 467 "parser.y"
+#line 468 "parser.y"
 { yyval.ident=yyvsp[-2].ident; ;
     break;}
 case 95:
-#line 470 "parser.y"
+#line 471 "parser.y"
 { prefquantident=yyvsp[-5].ident;
 				  mout(MCLASS);
                                           reg_decl(yyvsp[0].ident, TNOTY, KCLASS, categ);
                                           begin_block(KCLASS);;
     break;}
 case 96:
-#line 475 "parser.y"
+#line 476 "parser.y"
 { end_block(NULL,CCNO); yyval.stat_decl=DECLARATION;
                                                   mout(MENDCLASS);;
     break;}
 case 97:
-#line 480 "parser.y"
+#line 481 "parser.y"
 { prefquantident=0;
                                   MBEENEWBLOCK(); mout(MCLASS);
                                           reg_decl(yyvsp[0].ident, TNOTY, KCLASS, categ);
                                           begin_block(KCLASS);;
     break;}
 case 98:
-#line 485 "parser.y"
+#line 486 "parser.y"
 { end_block(NULL,CCNO); yyval.stat_decl=DECLARATION;
                                                   mout(MENDCLASS);;
     break;}
 case 99:
-#line 487 "parser.y"
+#line 488 "parser.y"
 { yyval.stat_decl=EXTDECLARATION;;
     break;}
 case 100:
-#line 488 "parser.y"
+#line 489 "parser.y"
 { STOPOBSBLOCK();	  yyval.stat_decl=EMPTYSTATEMENT;;
     break;}
 case 101:
-#line 490 "parser.y"
+#line 491 "parser.y"
 { MBEENEWBLOCK(); 
                                   kind=KCLASS;
 				  if(yyvsp[0].ident==simsetident && 
@@ -1830,70 +1831,70 @@ case 101:
 					FILEATRFILE, kind);;
     break;}
 case 103:
-#line 526 "parser.y"
+#line 527 "parser.y"
 { MBEENEWBLOCK();
                                           kind=KSIMPLE;
                                           reg_decl(yyvsp[-2].ident, type, KSIMPLE, categ);
 					  categ=CLOCAL;;
     break;}
 case 104:
-#line 530 "parser.y"
+#line 531 "parser.y"
 { yyval.stat_decl=DECLARATION;;
     break;}
 case 105:
-#line 534 "parser.y"
+#line 535 "parser.y"
 { MBEENEWBLOCK();
                                           reg_decl(yyvsp[-1].ident, type, KSIMPLE, categ);
 					  categ=CLOCAL;	  yyval.stat_decl=DECLARATION;;
     break;}
 case 106:
-#line 538 "parser.y"
+#line 539 "parser.y"
 { MBEENEWBLOCK();
                                           kind=KARRAY;;
     break;}
 case 107:
-#line 540 "parser.y"
+#line 541 "parser.y"
 { yyval.stat_decl=DECLARATION;;
     break;}
 case 108:
-#line 543 "parser.y"
+#line 544 "parser.y"
 { MBEENEWBLOCK(); mout(MIDENTIFIER);
                                                   mout_id(yyvsp[-1].ident);
                                           reg_decl(yyvsp[-1].ident, TLABEL, KARRAY, categ);;
     break;}
 case 109:
-#line 546 "parser.y"
+#line 547 "parser.y"
 { yyval.stat_decl=DECLARATION;
                                                    mout(MSWITCH);
                                                    mout(MENDSWITCH);;
     break;}
 case 110:
-#line 550 "parser.y"
+#line 551 "parser.y"
 { if(yyvsp[0].stat_decl<=DECLARATION)yerror (29);;
     break;}
 case 114:
-#line 555 "parser.y"
+#line 556 "parser.y"
 { if(yyvsp[0].stat_decl<=DECLARATION)yerror (28);
 					  yyval.stat_decl=yyvsp[0].stat_decl;;
     break;}
 case 115:
-#line 558 "parser.y"
+#line 559 "parser.y"
 { yyval.stat_decl=yyvsp[0].stat_decl;;
     break;}
 case 116:
-#line 561 "parser.y"
+#line 562 "parser.y"
 { if(yyvsp[-2].stat_decl>=STATEMENT && yyvsp[0].stat_decl<=DECLARATION)
                                             yerror (26);
                                           yyval.stat_decl=yyvsp[0].stat_decl;;
     break;}
 case 117:
-#line 565 "parser.y"
+#line 566 "parser.y"
 { if(yyvsp[0].stat_decl==DECLARATION)
 					  {separat_comp=TRUE;gettimestamp();}
                                           yyval.stat_decl=yyvsp[0].stat_decl;;
     break;}
 case 118:
-#line 569 "parser.y"
+#line 570 "parser.y"
 { if(yyvsp[-2].stat_decl>=STATEMENT && yyvsp[0].stat_decl<=DECLARATION)
                                             yerror (26);else
        					  if(yyvsp[-2].stat_decl>=STATEMENT 
@@ -1905,22 +1906,22 @@ case 118:
 					  yyval.stat_decl=yyvsp[0].stat_decl;;
     break;}
 case 121:
-#line 587 "parser.y"
+#line 588 "parser.y"
 { mout(MARRAY);
                                                   mout(MENDARRAY);
                                                   set_array_dim(yyvsp[-1].arrdim);;
     break;}
 case 122:
-#line 591 "parser.y"
+#line 592 "parser.y"
 { mout(MENDSEP);
                                                   mout(MARRAYSEP);;
     break;}
 case 123:
-#line 596 "parser.y"
+#line 597 "parser.y"
 { mout(MARRAYSEP);;
     break;}
 case 124:
-#line 598 "parser.y"
+#line 599 "parser.y"
 { mout(MIDENTIFIER);
                                                   mout_id(yyvsp[0].ident);
                                                   reg_decl(yyvsp[0].ident, type, kind, categ);
@@ -1928,203 +1929,203 @@ case 124:
                                      last_array=cblock->lastparloc;;
     break;}
 case 125:
-#line 604 "parser.y"
+#line 605 "parser.y"
 { mout(MENDSEP);
                                                   mout(MBOUNDSEP);
                                                   yyval.arrdim=1;;
     break;}
 case 126:
-#line 609 "parser.y"
+#line 610 "parser.y"
 { mout(MBOUNDSEP);
                                                   yyval.arrdim=yyvsp[0].arrdim+1;;
     break;}
 case 127:
-#line 614 "parser.y"
+#line 615 "parser.y"
 { mout(MBOUNDPARSEP);;
     break;}
 case 128:
-#line 616 "parser.y"
+#line 617 "parser.y"
 { mout(MENDSEP);
                                                   mout(MSWITCHSEP);;
     break;}
 case 129:
-#line 620 "parser.y"
+#line 621 "parser.y"
 { mout(MSWITCHSEP);;
     break;}
 case 130:
-#line 622 "parser.y"
+#line 623 "parser.y"
 { kind=KNOKD;;
     break;}
 case 131:
-#line 623 "parser.y"
+#line 624 "parser.y"
 { categ=CSPEC;;
     break;}
 case 132:
-#line 624 "parser.y"
+#line 625 "parser.y"
 { kind=KNOKD;;
     break;}
 case 133:
-#line 625 "parser.y"
+#line 626 "parser.y"
 { categ=CVIRT;;
     break;}
 case 134:
-#line 627 "parser.y"
+#line 628 "parser.y"
 { categ=CLOCAL;;
     break;}
 case 140:
-#line 638 "parser.y"
+#line 639 "parser.y"
 { reg_decl(yyvsp[0].ident, type, KNOKD, CDEFLT);;
     break;}
 case 141:
-#line 639 "parser.y"
+#line 640 "parser.y"
 { reg_decl(varargsid, TVARARGS, KNOKD, categ);;
     break;}
 case 142:
-#line 640 "parser.y"
+#line 641 "parser.y"
 { reg_decl(yyvsp[0].ident, type, KNOKD, CDEFLT);;
     break;}
 case 149:
-#line 652 "parser.y"
+#line 653 "parser.y"
 { reg_decl(varargsid, TVARARGS, KNOKD, categ);;
     break;}
 case 152:
-#line 658 "parser.y"
+#line 659 "parser.y"
 { reg_decl(yyvsp[0].ident, type, kind, categ);;
     break;}
 case 154:
-#line 662 "parser.y"
+#line 663 "parser.y"
 { categ=CNAME;;
     break;}
 case 155:
-#line 664 "parser.y"
+#line 665 "parser.y"
 { categ=CVALUE;;
     break;}
 case 156:
-#line 666 "parser.y"
+#line 667 "parser.y"
 { categ=CVAR;;
     break;}
 case 157:
-#line 667 "parser.y"
+#line 668 "parser.y"
 { categ=CDEFLT;;
     break;}
 case 158:
-#line 671 "parser.y"
+#line 672 "parser.y"
 { yyval.ival=categ;
                                           reg_decl(yyvsp[0].ident, type, KPROC, categ);
                                           begin_block(KPROC);;
     break;}
 case 159:
-#line 675 "parser.y"
+#line 676 "parser.y"
 { categ=yyvsp[-1].ival; /* M} settes tilbake*/;
     break;}
 case 160:
-#line 676 "parser.y"
+#line 677 "parser.y"
 { end_block(NULL,CCNO);;
     break;}
 case 161:
-#line 678 "parser.y"
+#line 679 "parser.y"
 { reg_decl(yyvsp[0].ident, type, kind, categ);;
     break;}
 case 162:
-#line 679 "parser.y"
+#line 680 "parser.y"
 {	  reg_decl(varargsid, TVARARGS, kind, categ);;
     break;}
 case 163:
-#line 680 "parser.y"
+#line 681 "parser.y"
 { reg_decl(yyvsp[0].ident, type, kind, categ);;
     break;}
 case 182:
-#line 702 "parser.y"
+#line 703 "parser.y"
 { categ=CNAME;;
     break;}
 case 184:
-#line 706 "parser.y"
+#line 707 "parser.y"
 { categ=CVAR;;
     break;}
 case 186:
-#line 710 "parser.y"
+#line 711 "parser.y"
 { categ=CVALUE;;
     break;}
 case 193:
-#line 721 "parser.y"
+#line 722 "parser.y"
 { if(yyvsp[0].token!=HIS) yerror (8);;
     break;}
 case 196:
-#line 725 "parser.y"
+#line 726 "parser.y"
 { yerror (45);;
     break;}
 case 197:
-#line 728 "parser.y"
+#line 729 "parser.y"
 { yerror (45);;
     break;}
 case 198:
-#line 730 "parser.y"
+#line 731 "parser.y"
 { kind=KSIMPLE;;
     break;}
 case 199:
-#line 732 "parser.y"
+#line 733 "parser.y"
 { kind=KARRAY;;
     break;}
 case 200:
-#line 733 "parser.y"
+#line 734 "parser.y"
 { type=TLABEL;
                                           kind=KSIMPLE;;
     break;}
 case 201:
-#line 735 "parser.y"
+#line 736 "parser.y"
 { type=TLABEL;
                                           kind=KARRAY;;
     break;}
 case 202:
-#line 740 "parser.y"
+#line 741 "parser.y"
 { yyval.ival=categ;
                                           reg_decl(yyvsp[0].ident, type, KPROC, categ);
                                           begin_block(KPROC);;
     break;}
 case 203:
-#line 744 "parser.y"
+#line 745 "parser.y"
 { categ=yyvsp[-1].ival; /* M} settes tilbake*/;
     break;}
 case 204:
-#line 746 "parser.y"
+#line 747 "parser.y"
 { end_block(NULL,CCNO);;
     break;}
 case 211:
-#line 759 "parser.y"
+#line 760 "parser.y"
 { categ=CHIDEN;;
     break;}
 case 212:
-#line 760 "parser.y"
+#line 761 "parser.y"
 { categ=CPROT;;
     break;}
 case 213:
-#line 762 "parser.y"
+#line 763 "parser.y"
 { categ=CHIPRO;;
     break;}
 case 214:
-#line 764 "parser.y"
+#line 765 "parser.y"
 { categ=CHIPRO;;
     break;}
 case 218:
-#line 773 "parser.y"
+#line 774 "parser.y"
 { reg_decl(yyvsp[0].ident, type, kind, categ);;
     break;}
 case 219:
-#line 775 "parser.y"
+#line 776 "parser.y"
 { reg_decl(yyvsp[0].ident, type, kind, categ);;
     break;}
 case 220:
-#line 778 "parser.y"
+#line 779 "parser.y"
 { reg_decl(yyvsp[-1].ident, type, kind, categ);
 					  categ=CLOCAL;;
     break;}
 case 221:
-#line 782 "parser.y"
+#line 783 "parser.y"
 { reg_decl(yyvsp[-1].ident, type, kind, categ);
 					  categ=CLOCAL;;
     break;}
 case 223:
-#line 787 "parser.y"
+#line 788 "parser.y"
 { MBEENEWBLOCK();
 			    if(yyvsp[0].token!=HEQ) yerror (8);
 					  if(type==TREF)yerror (7);
@@ -2133,58 +2134,58 @@ case 223:
 						  mout_id(yyvsp[-1].token);;
     break;}
 case 224:
-#line 793 "parser.y"
+#line 794 "parser.y"
 { mout(MASSIGN);
 						  mout(MCONST);;
     break;}
 case 225:
-#line 798 "parser.y"
+#line 799 "parser.y"
 {;
     break;}
 case 226:
-#line 804 "parser.y"
+#line 805 "parser.y"
 { mout(MELSEE);
                                                   mout(MIFE);;
     break;}
 case 227:
-#line 809 "parser.y"
+#line 810 "parser.y"
 { if(yyvsp[-1].token==HASSIGNREF)mout(MASSIGNR);
                                           else    mout(MASSIGN);yyval.ident=NULL;;
     break;}
 case 228:
-#line 815 "parser.y"
+#line 816 "parser.y"
 { mout(MCONC);yyval.ident=NULL;;
     break;}
 case 229:
-#line 819 "parser.y"
+#line 820 "parser.y"
 { mout(MORELSEE);yyval.ident=NULL;;
     break;}
 case 230:
-#line 823 "parser.y"
+#line 824 "parser.y"
 { mout(MANDTHENE);yyval.ident=NULL;;
     break;}
 case 231:
-#line 825 "parser.y"
+#line 826 "parser.y"
 { mout(MEQV);yyval.ident=NULL;;
     break;}
 case 232:
-#line 827 "parser.y"
+#line 828 "parser.y"
 { mout(MIMP);yyval.ident=NULL;;
     break;}
 case 233:
-#line 829 "parser.y"
+#line 830 "parser.y"
 { mout(MOR);yyval.ident=NULL;;
     break;}
 case 234:
-#line 831 "parser.y"
+#line 832 "parser.y"
 { mout(MAND);yyval.ident=NULL;;
     break;}
 case 235:
-#line 832 "parser.y"
+#line 833 "parser.y"
 { mout(MNOT);yyval.ident=NULL;;
     break;}
 case 236:
-#line 836 "parser.y"
+#line 837 "parser.y"
 { switch(yyvsp[-1].token)
                                     {   case HEQ: mout(MEQ);break;
                                         case HNE: mout(MNE);break;
@@ -2195,113 +2196,113 @@ case 236:
                                     }yyval.ident=NULL;;
     break;}
 case 237:
-#line 847 "parser.y"
+#line 848 "parser.y"
 { if(yyvsp[-1].token==HNER)    mout(MNER);
                                         else      mout(MEQR);yyval.ident=NULL;;
     break;}
 case 238:
-#line 852 "parser.y"
+#line 853 "parser.y"
 { if(yyvsp[-1].token==HIS)     mout(MIS);
                                         else      mout(MINS);yyval.ident=NULL;;
     break;}
 case 239:
-#line 856 "parser.y"
+#line 857 "parser.y"
 { if(yyvsp[-1].token==HADD)    mout(MUADD);
                                         else      mout(MUSUB);yyval.ident=NULL;;
     break;}
 case 240:
-#line 861 "parser.y"
+#line 862 "parser.y"
 { if(yyvsp[-1].token==HADD)    mout(MADD);
                                         else      mout(MSUB);yyval.ident=NULL;;
     break;}
 case 241:
-#line 866 "parser.y"
+#line 867 "parser.y"
 { if(yyvsp[-1].token==HMUL)    mout(MMUL); else
                                   if(yyvsp[-1].token==HDIV)    mout(MDIV);
                                         else      mout(MINTDIV);yyval.ident=NULL;;
     break;}
 case 242:
-#line 871 "parser.y"
+#line 872 "parser.y"
 { mout(MPRIMARY);yyval.ident=NULL;;
     break;}
 case 243:
-#line 873 "parser.y"
+#line 874 "parser.y"
 { mout(MNOOP);yyval.ident=NULL;;
     break;}
 case 244:
-#line 874 "parser.y"
+#line 875 "parser.y"
 { mout(MTEXTKONST);
                                                   mout_tval(yyvsp[0].tval);yyval.ident=NULL;;
     break;}
 case 245:
-#line 876 "parser.y"
+#line 877 "parser.y"
 { mout(MCHARACTERKONST);
                                                   mout_ival(yyvsp[0].ival);yyval.ident=NULL;;
     break;}
 case 246:
-#line 878 "parser.y"
+#line 879 "parser.y"
 { mout(MREALKONST);
                                                   mout_rval(yyvsp[0].rval);yyval.ident=NULL;;
     break;}
 case 247:
-#line 880 "parser.y"
+#line 881 "parser.y"
 { mout(MINTEGERKONST);
                                                   mout_ival(yyvsp[0].ival);yyval.ident=NULL;;
     break;}
 case 248:
-#line 882 "parser.y"
+#line 883 "parser.y"
 { mout(MBOOLEANKONST);
                                                   mout_ival(yyvsp[0].ival);yyval.ident=NULL;;
     break;}
 case 249:
-#line 884 "parser.y"
+#line 885 "parser.y"
 { mout(MNONE);yyval.ident=NULL;;
     break;}
 case 250:
-#line 886 "parser.y"
+#line 887 "parser.y"
 { yyval.ident=yyvsp[0].ident;;
     break;}
 case 252:
-#line 888 "parser.y"
+#line 889 "parser.y"
 { mout(MTHIS);
                                                   mout_id(yyvsp[0].ident);yyval.ident=NULL;;
     break;}
 case 253:
-#line 892 "parser.y"
+#line 893 "parser.y"
 { mout(MNEWARG);
                                                   mout_id(yyvsp[-1].ident);yyval.ident=NULL;;
     break;}
 case 254:
-#line 896 "parser.y"
+#line 897 "parser.y"
 { mout(MDOT);yyval.ident=NULL;;
     break;}
 case 255:
-#line 898 "parser.y"
+#line 899 "parser.y"
 { mout(MQUA);
                                                   mout_id(yyvsp[0].ident);yyval.ident=NULL;;
     break;}
 case 256:
-#line 901 "parser.y"
+#line 902 "parser.y"
 { mout(MENDSEP);;
     break;}
 case 258:
-#line 905 "parser.y"
+#line 906 "parser.y"
 { mout(MIDENTIFIER);
                                                   mout_id(yyvsp[0].ident);
 						  yyval.ident=yyvsp[0].ident;;
     break;}
 case 259:
-#line 909 "parser.y"
+#line 910 "parser.y"
 { mout(MARGUMENT);
                                                   mout_id(yyvsp[-3].ident);;
     break;}
 case 260:
-#line 912 "parser.y"
+#line 913 "parser.y"
 { mout(MENDSEP);
                                                   mout(MARGUMENTSEP);;
     break;}
 case 261:
-#line 916 "parser.y"
+#line 917 "parser.y"
 { mout(MARGUMENTSEP);;
     break;}
 }
@@ -2502,7 +2503,7 @@ yyerrhandle:
   yystate = yyn;
   goto yynewstate;
 }
-#line 918 "parser.y"
+#line 919 "parser.y"
 
 /******************************************************************************
                                                                 YYERROR      */
@@ -2570,8 +2571,8 @@ parser_init_pass1 ()
   inbytefileident=tag("INBYTEFILE");
   outbytefileident=tag("OUTBYTEFILE");
   directbytefileident=tag("DIRECTBYTEFILE");
-  blockp= (struct blockstack *)
-    obstack_alloc (&os_block,sizeof (struct blockstack));
+  blockp= (blockstack_t *)
+    obstack_alloc (&os_block,sizeof (blockstack_t));
   blockp->prev= NULL;
   blockp->rem=FALSE;
 }

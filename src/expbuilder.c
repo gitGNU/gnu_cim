@@ -52,11 +52,11 @@ ebuilder_init_pass2 ()
 /******************************************************************************
  								      NEWEXP */
 
-struct EXP *
+exp_t *
 newexp()
 {
-  struct EXP *re;
-  re= (struct EXP *) salloc (sizeof (struct EXP));
+  exp_t *re;
+  re= (exp_t *) salloc (sizeof (exp_t));
   re->line= lineno;
   return re;
 }
@@ -64,10 +64,10 @@ newexp()
 /******************************************************************************
 								     MAKEEXP */
 
-struct EXP *
-makeexp (token, left, right) int token; struct EXP *left, *right;
+exp_t *
+makeexp (token, left, right) int token; exp_t *left, *right;
 {
-  struct EXP *re;
+  exp_t *re;
   re= newexp();
 
   re->token= token;
@@ -83,8 +83,8 @@ makeexp (token, left, right) int token; struct EXP *left, *right;
 /******************************************************************************
 								     CONCEXP */
 
-struct EXP *
-concexp (left, right) struct EXP *left, *right;
+exp_t *
+concexp (left, right) exp_t *left, *right;
 {
   if (left==NULL) return right;
   if (right==NULL) return left;
@@ -94,10 +94,10 @@ concexp (left, right) struct EXP *left, *right;
 /******************************************************************************
 								 REPLACENODE */
 
-struct EXP *
-replacenode (rep, token) struct EXP **rep; int token;
+exp_t *
+replacenode (rep, token) exp_t **rep; int token;
 {
-  struct EXP *rex;
+  exp_t *rex;
   rex= newexp ();
   if (is_after_dot ((*rep))) *rex= *(*rep)->up;
   else
@@ -113,11 +113,11 @@ replacenode (rep, token) struct EXP **rep; int token;
 /******************************************************************************
                                                                 COPYTREE     */
 
-struct EXP *
+exp_t *
 copytree (re)
-     struct EXP *re;
+     exp_t *re;
 {
-  struct EXP *rex;
+  exp_t *rex;
   if (re == NULL) return NULL;
   rex = newexp();
   if (re->left != NULL)
@@ -150,7 +150,7 @@ copytree (re)
 								  REMOVE_DOT */
 
 remove_dot (rep)
-     struct EXP **rep;
+     exp_t **rep;
 {
   if (is_after_dot ((*rep)))
     {
@@ -176,7 +176,7 @@ eclean()
 								       EPUSH */
 
 static 
-epush(re)struct EXP *re;
+epush(re)exp_t *re;
 {
   obstack_ptr_grow (&os_stack, re);
 }
@@ -185,10 +185,10 @@ epush(re)struct EXP *re;
 								        EPOP */
 
 static 
-struct EXP *epop()
+exp_t *epop()
 {
-  struct EXP *re;
-  re= * ((struct EXP * *)obstack_next_free (&os_stack) - 1);
+  exp_t *re;
+  re= * ((exp_t * *)obstack_next_free (&os_stack) - 1);
   obstack_blank (&os_stack, - sizeof (void *));
   return (re);
 }
@@ -196,10 +196,10 @@ struct EXP *epop()
 /******************************************************************************
 								       ELOOK */
 
-struct EXP *
+exp_t *
 elook()
 {
-  return *((struct EXP * *)obstack_next_free (&os_stack) - 1);
+  return *((exp_t * *)obstack_next_free (&os_stack) - 1);
 }
 
 
@@ -210,7 +210,7 @@ elook()
 
 ebuild ()
 {
-  struct EXP *re;
+  exp_t *re;
 
   eclean();
   while (TRUE)
@@ -221,64 +221,92 @@ ebuild ()
 	case MUADD:
 	case MUSUB:
 	case MNOOP:
+	  epush(re= makeexp(token, epop(), NULL));
+	  break;
 	case MQUA:
 	  epush(re= makeexp(token, epop(), NULL));
-	  /* Sjekke dobbel unær
-	   * Eventuelt optimalisere bort noen noop */
+	  re->value.ival= (long) min_id();
 	  break;
-	case MTEXTKONST:
-	case MCHARACTERKONST:
-	case MREALKONST:
-	case MINTEGERKONST:
-	case MBOOLEANKONST:
-	case MENDSEP:
-	case MNONE:
 	case MIDENTIFIER:
 	case MTHIS:
 	case MLABEL:
+	  epush(re= makeexp(token, NULL, NULL));
+	  re->value.ival= (long) min_id();
+	  break;
+	case MTEXTKONST:
+	  epush(re= makeexp(token, NULL, NULL));
+	  re->value.tval.txt= min_tval();
+	  re->value.tval.id= NOTEXT;
+	  break;
+	case MREALKONST:
+	  epush(re= makeexp(token, NULL, NULL));
+	  re->value.rval= min_rval();
+	  break;
+	case MCHARACTERKONST:
+	case MINTEGERKONST:
+	case MBOOLEANKONST:
+	  epush(re= makeexp(token, NULL, NULL));
+	  re->value.ival= min_ival();
+	  break;
+	case MENDSEP:
+	case MNONE:
 	  epush(re= makeexp(token, NULL, NULL));
 	  break;
 	case MNEWARG:
 	case MARGUMENT:
 	  epush(re= makeexp(token, NULL, epop()));
+	  re->value.ival= (long) min_id();
 	  break;
 	case MNEWLINE:
 	  lineno++;
-	  goto newtoken;
 	  break;
 	case MFLAG:
 	  set_flag ();
 	  break;
+	case MERROR:
+	case MSTOP:
+	case MBLOCK:
+	case MENDBLOCK:
+	case MPRBLOCK:
+	case MENDPRBLOCK:
+	case MPROCEDURE:
+	case MENDPROCEDURE:
+	case MCLASS:
+	case MENDCLASS:
+	case MINSPECT:
+	case MENDINSPECT:
+	case MDO:
+	case MENDDO:
+	case MWHEN:
+	case MENDWHEN:
+	case MOTHERWISE:
+	case MENDOTHERWISE:
+	case MFORDO:
+	case MENDFOR:
+	case MWHILE:
+	case MENDWHILE:
+	case MIF:
+	case MELSE:
+	case MENDIF:
+	case MGOTO:
+	case MINNER:
+	case MENDSWITCH:
+	case MENDASSIGN:
+	case MENDARRAY:
+	case MENDLABEL:
+	case MCONST:
+	  re= elook()->up= makeexp(token, NULL, NULL);
+	  re->up= re;
+	  return;
 	default:
-	  if (setntokens (token) || token == MERROR || token == MSTOP)
-	    {
-	      re= elook()->up= makeexp(token, NULL, NULL);
-	      re->up= re;
-	      return;
-	    }
-	  /* VANELIG BEHANDLING */
 	  {
-	    struct EXP *right= epop();
+	    exp_t *right= epop();
 	    epush (re= makeexp (token, epop(), right));
 	  }
 	}
-      if (expridtokens (token))
-	re->value.ival= (long) min_id();
-	  else
-	if (token == MTEXTKONST)
-	  {
-	    re->value.tval.txt= min_tval();
-	    re->value.tval.id= NOTEXT;
-	  }
-	    else
-	  if (token == MREALKONST)
-	    re->value.rval= min_rval();
-	      else
-	    if (exprvaltokens (token))
-	      re->value.ival= min_ival();
-    newtoken:
       token= min();
     }
 }
+
 
 

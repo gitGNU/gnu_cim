@@ -21,6 +21,7 @@
 
 #include "gen.h"
 #include "salloc.h"
+#include "passes.h"
 
 char *xmalloc();
 void free();
@@ -30,13 +31,13 @@ void free();
 
 static struct obstack os_stack;
 
-struct SENT module;
+sent_t module;
 
 /******************************************************************************
                                                                        SPUSH */
 
 static 
-spush(re)struct EXP *re;
+spush(re)exp_t *re;
 {
   obstack_ptr_grow (&os_stack, re);
 }
@@ -44,11 +45,11 @@ spush(re)struct EXP *re;
 /******************************************************************************
                                                                         SPOP */
 
-static struct SENT *
+static sent_t *
 spop()
 {
-  struct SENT *rs;
-  rs= * ((struct SENT * *)obstack_next_free (&os_stack) - 1);
+  sent_t *rs;
+  rs= * ((sent_t * *)obstack_next_free (&os_stack) - 1);
   obstack_blank (&os_stack, - sizeof (void *));
   rs->last_line= lineno;
   return (rs);
@@ -57,10 +58,10 @@ spop()
 /******************************************************************************
                                                                        SLOOK */
 
-struct SENT *
+sent_t *
 slook()
 {
-  return *((struct SENT * *)obstack_next_free (&os_stack) - 1);
+  return *((sent_t * *)obstack_next_free (&os_stack) - 1);
 }
 
 /******************************************************************************
@@ -80,11 +81,11 @@ char stripsideeffects = OFF;
 /******************************************************************************
                                                                      NEWSENT */
 
-struct SENT *
+sent_t *
 new_sent(token) int token;
 {
-  struct SENT *new;
-  new= (struct SENT *) salloc (sizeof (struct SENT));
+  sent_t *new;
+  new= (sent_t *) salloc (sizeof (sent_t));
 
   new->token= token;
   new->line= lineno;
@@ -95,10 +96,10 @@ new_sent(token) int token;
 /******************************************************************************
                                                                   CREATESENT */
 
-static struct SENT *
-create_sent(token, exp) int token; struct EXP *exp;
+static sent_t *
+create_sent(token, exp) int token; exp_t *exp;
 {
-  struct SENT *new= new_sent (token), *parent;
+  sent_t *new= new_sent (token), *parent;
 
   new->exp= exp;
   new->nonetest= nonetest;
@@ -123,7 +124,7 @@ create_sent(token, exp) int token; struct EXP *exp;
                                                                   INSERTSENT */
 
 void 
-insert_after_sent (parent, after, new) struct SENT *parent, *after, *new;
+insert_after_sent (parent, after, new) sent_t *parent, *after, *new;
 {
   if (after == NULL)
     {
@@ -156,7 +157,7 @@ insert_after_sent (parent, after, new) struct SENT *parent, *after, *new;
 }
 
 void 
-insert_before_sent (parent, before, new) struct SENT *parent, *before, *new;
+insert_before_sent (parent, before, new) sent_t *parent, *before, *new;
 {
   if (before == NULL)
     insert_after_sent (parent, parent->last, new);
@@ -168,7 +169,7 @@ insert_before_sent (parent, before, new) struct SENT *parent, *before, *new;
                                                                   REMOVESENT */
 
 void 
-remove_sent(parent, rem) struct SENT *parent, *rem;
+remove_sent(parent, rem) sent_t *parent, *rem;
 {
   if (rem->next == NULL)
     {
@@ -227,7 +228,7 @@ set_flag ()
 /******************************************************************************
                                                                       SBUILD */
 
-struct SENT *
+sent_t *
 sbuild()
 {
   token= min();
@@ -314,9 +315,9 @@ sbuild()
 								INSERT_THUNK */
 
 void 
-insert_thunk (rex, token) struct EXP *rex; int token;
+insert_thunk (rex, token) exp_t *rex; int token;
 {
-  struct SENT *new= new_sent (token);
+  sent_t *new= new_sent (token);
   if (token == MTHUNKSIMPLEVALUE)
     rex->token= MSENDVALUETHUNKTOFORMALPAR;
   else

@@ -33,7 +33,7 @@ int inthunk;			/* Brukes i forbindelse med uttrykk i
                                                                          GEN */
 
 gen (re)
-     struct EXP *re;
+     exp_t *re;
 {
   genvalue (transcall (re->up, re, 1, 1, 1));
   gen_sent_marker();
@@ -45,7 +45,7 @@ gen (re)
                                                                 GENSL        */
 
 gensl (re, atr, nonetest)
-     struct EXP *re;
+     exp_t *re;
      char atr,
        nonetest;
 {
@@ -83,7 +83,7 @@ gensl (re, atr, nonetest)
                                                                GENCHAIN     */
 
 genchain (rb, atr)
-     struct BLOCK *rb;
+     block_t *rb;
      char atr;
 {
   int i;
@@ -102,7 +102,7 @@ genchain (rb, atr)
 	       rb->timestamp?rb->timestamp:timestamp);
   else
     {
-      struct BLOCK *rbx;
+      block_t *rbx;
       /*      rbx = display[rb->blev];*/
       for (rbx= cblock; rbx->blev != rb->blev; rbx= rbx->quant.encl);
       
@@ -140,7 +140,7 @@ genchain (rb, atr)
                                                                 GENTYPE      */
 
 gentype (re)
-     struct EXP *re;
+     exp_t *re;
 {
   switch (re->type)
     {
@@ -171,7 +171,7 @@ gentype (re)
                                                             GEN_ADR_PROT     */
 
 gen_adr_prot (code, rd) FILE *code;
-     struct DECL *rd;
+     decl_t *rd;
 {
   fprintf (code, "&__p%d%s"
 	   ,rd->descr->timestamp == 0 ? rd->descr->blno : rd->descr->ptypno
@@ -194,63 +194,67 @@ genmodulemark(maintimestamp) char *maintimestamp;
 }
 
 /******************************************************************************
-                                                           GEN_STACK_OBJECT  */
+                                                           GEN_ATTR_OBJECT  */
+#define FOR_VAL 1
+#define CON_REF 2
+#define STACK_VAL 3
+#define STACK_REF 4
+#define STACK_TXT 5
 
-#if ACSTACK_IN_OBJ
-static struct BLOCK *
-find_stack_object ()
+static void
+gen_attr_object (i, type) int i; int type;
 {
+  block_t *rb;
+  int j;
+
   switch (cblock->quant.kind)
     {
     case KFOR:
     case KINSP:
     case KCON:
-      return cblock->quant.match->descr;
+      rb= cblock->quant.match->descr;
       break;
     default:
-      return cblock;
+      rb= cblock;
     }
-}
-
-gen_stack_object_val (i) int i;
-{
-  struct BLOCK *rb= find_stack_object ();
 
   if ((rb->quant.kind == KCLASS || rb->quant.kind == KPRBLK) && 
       rb->quant.plev > 0)
     {
-      while (rb->quant.plev >0 && rb->quant.prefqual->descr->maxusedval >= i)
-	rb= rb->quant.prefqual->descr;
+      while (rb->quant.plev >0)
+	{
+	  switch (type)
+	    {
+	    case FOR_VAL: j=rb->quant.prefqual->descr->fornest; break;
+	    case CON_REF: j=rb->quant.prefqual->descr->connest; break;
+	    case STACK_VAL: j=rb->quant.prefqual->descr->maxusedval; break;
+	    case STACK_REF: j=rb->quant.prefqual->descr->maxusedref; break;
+	    case STACK_TXT: j=rb->quant.prefqual->descr->maxusedtxt; break;
+	    }
+	  if (j < i) break;
+	  rb= rb->quant.prefqual->descr;
+	}
     }
   genchain (rb, TRUE);
 }
 
-gen_stack_object_ref (i) int i;
+/******************************************************************************
+                                                                GEN_FOR_VAL  */
+void
+gen_for_val (i) int i;
 {
-  struct BLOCK *rb= find_stack_object ();
-
-  if ((rb->quant.kind == KCLASS || rb->quant.kind == KPRBLK) && 
-      rb->quant.plev > 0)
-    {
-      while (rb->quant.plev >0 && rb->quant.prefqual->descr->maxusedref >= i)
-	rb= rb->quant.prefqual->descr;
-    }
-  genchain (rb, TRUE);
+  gen_attr_object (i, FOR_VAL);
+  fprintf (ccode, "f%d", i);
 }
 
-gen_stack_object_txt (i) int i;
+/******************************************************************************
+                                                                GEN_CON_VAL  */
+void
+gen_con_ref (i) int i;
 {
-  struct BLOCK *rb= find_stack_object ();
-
-  if ((rb->quant.kind == KCLASS || rb->quant.kind == KPRBLK) && 
-      rb->quant.plev > 0)
-    {
-      while (rb->quant.plev >0 && rb->quant.prefqual->descr->maxusedtxt >= i)
-	rb= rb->quant.prefqual->descr;
-    }
-  genchain (rb, TRUE);
+  gen_attr_object (i, CON_REF);
+  fprintf (ccode, "c%d", i);
 }
-#endif
 
 /******************************************************************************
                                                               GEN_INT_STACK  */
@@ -258,7 +262,7 @@ gen_stack_object_txt (i) int i;
 gen_int_stack (i) int i;
 {
 #if ACSTACK_IN_OBJ
-  gen_stack_object_val (i);
+  gen_attr_object (i, STACK_VAL);
   fprintf (ccode, "__v%d.i", i);
 #else
   fprintf (ccode, "__v[%d].i", i);
@@ -272,7 +276,7 @@ gen_int_stack (i) int i;
 gen_rea_stack (i) int i;
 {
 #if ACSTACK_IN_OBJ
-  gen_stack_object_val (i);
+  gen_attr_object (i, STACK_VAL);
   fprintf (ccode, "__v%d.f", i);
 #else
   fprintf (ccode, "__v[%d].f", i);
@@ -286,7 +290,7 @@ gen_rea_stack (i) int i;
 gen_cha_stack (i) int i;
 {
 #if ACSTACK_IN_OBJ
-  gen_stack_object_val (i);
+  gen_attr_object (i, STACK_VAL);
   fprintf (ccode, "__v%d.c", i);
 #else
   fprintf (ccode, "__v[%d].c", i);
@@ -300,7 +304,7 @@ gen_cha_stack (i) int i;
 gen_txt_stack (i) int i;
 {
 #if ACSTACK_IN_OBJ
-  gen_stack_object_txt (i);
+  gen_attr_object (i, STACK_TXT);
   fprintf (ccode, "__t%d", i);
 #else
   fprintf (ccode, "__t[%d]", i);
@@ -313,7 +317,7 @@ gen_txt_stack (i) int i;
 gen_ref_stack (i) int i;
 {
 #if ACSTACK_IN_OBJ
-  gen_stack_object_ref (i);
+  gen_attr_object (i, STACK_REF);
   fprintf (ccode, "__r%d", i);
 #else
   fprintf (ccode, "__r[%d]", i);
@@ -324,10 +328,10 @@ gen_ref_stack (i) int i;
                                                                 GENVALUE     */
 
 genvalue (re)
-     struct EXP *re;
+     exp_t *re;
 {
-  struct EXP *rex;
-  static struct EXP *ree;
+  exp_t *rex;
+  static exp_t *ree;
 
   if (re == NULL)
     return;
@@ -523,8 +527,8 @@ genvalue (re)
 	    fprintf (ccode, "__ctext= ");
 	    gencproccall (re);
 	    fprintf (ccode, ";");
-	    fprintf (ccode, "__rblanks(%ldL,strlen(__ctext));"
-		     "(void)strcpy(", 
+	    fprintf (ccode, "__rblanks(%ldL,__ctext==__NULL?0:"
+		     "strlen(__ctext));(void)strcpy(", 
 		     re->value.n_of_stack_elements);
 	    fprintf (ccode, "__et.obj->string,__ctext);");
 
@@ -1510,7 +1514,26 @@ genvalue (re)
       fprintf (ccode, ";");
       genvalue (re->right);
       break;
-    default:
+    case MDIV:
+    case MINTDIV:
+      putc ('(', ccode);
+      genvalue (re->left);
+      fprintf (ccode, "/");
+
+#ifdef DIV0
+      if (re->token == MINTDIV)
+      fprintf (ccode, "__ridiv0 (");
+      else
+      fprintf (ccode, "__rrdiv0 (");
+#endif /* DIV0 */
+
+      genvalue (re->right);
+      putc (')', ccode);
+
+#ifdef DIV0
+      putc (')', ccode);
+#endif /* DIV0 */
+      break;                                                                      default:
       putc ('(', ccode);
       if (re->left->type == TCHAR)
 	fprintf (ccode, "(unsigned char)");
@@ -1562,10 +1585,6 @@ genvalue (re)
 	case MMULI:
 	  fprintf (ccode, "*");
 	  break;
-	case MDIV:
-	case MINTDIV:
-	  fprintf (ccode, "/");
-	  break;
 	default:
 	  fprintf (stderr, "Illegal token:%d\n"
 			  ,re->token);
@@ -1581,7 +1600,7 @@ genvalue (re)
 /*****************************************************************************
 						              GEN_TEXTCONST */
 
-gen_textconst (re) struct EXP *re;
+gen_textconst (re) exp_t *re;
 {
   if (re->value.tval.id == NOTEXT)
     {

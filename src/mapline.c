@@ -34,28 +34,30 @@ void free();
 static struct obstack os_map, os_mapstack;
 
 
-struct map
+typedef struct _map map_t;
+struct _map
 {
   char *filename;
   long line,
     fromline;
-  struct map *neste;
+  map_t *neste;
 }
 mapinit;
 
-struct mapstack
+typedef struct _mapstack mapstack_t;
+struct _mapstack
 {
   long line;
   char *filename;
   void *ifdefp;
   FILE *file;
-  struct mapstack *prev;
+  mapstack_t *prev;
 } *mapstackp;
 
-static struct map *mappos = &mapinit;
-static struct map *firstmappos = &mapinit;
-static struct map *lastmappos = &mapinit;
-static struct map *mapindeks = &mapinit;
+static map_t *mappos = &mapinit;
+static map_t *firstmappos = &mapinit;
+static map_t *lastmappos = &mapinit;
+static map_t *mapindeks = &mapinit;
 static int antmap = 1;
 
 /******************************************************************************
@@ -87,7 +89,7 @@ pushfilmap (filename, ifdefp)
      void *ifdefp;
 {
   FILE *file;
-  struct mapstack *prev= mapstackp;
+  mapstack_t *prev= mapstackp;
   if (mapstackp == NULL)
     {
       file= fopen (filename, "r");
@@ -99,7 +101,7 @@ pushfilmap (filename, ifdefp)
     } 
   else
     {
-      struct mapstack *ms;
+      mapstack_t *ms;
       
       for (ms= mapstackp; ms != NULL; ms= ms->prev)
 	{
@@ -119,8 +121,8 @@ pushfilmap (filename, ifdefp)
 	fprintf (stderr, "Reading include file %s\n", filename);
 
     }
-  mapstackp= (struct mapstack *) 
-    obstack_alloc (&os_mapstack, sizeof (struct mapstack));
+  mapstackp= (mapstack_t *) 
+    obstack_alloc (&os_mapstack, sizeof (mapstack_t));
   mapstackp->line= lineno + 1 + lastmappos->line;
   mapstackp->filename= lastmappos->filename;
   mapstackp->ifdefp= ifdefp;
@@ -152,7 +154,7 @@ include_ifdefp ()
 void
 popfilmap ()
 {
-  struct mapstack *prev= mapstackp->prev;
+  mapstack_t *prev= mapstackp->prev;
   setfilmap (mapstackp->filename, mapstackp->line);
   obstack_free (&os_mapstack, mapstackp);
   mapstackp= prev;
@@ -170,7 +172,7 @@ setfilmap (filename, line)
   mappos->line = line - lineno - 1;
   mappos->fromline = lineno + 1;
   mappos = (lastmappos = mappos)->neste 
-    = (struct map *) obstack_alloc (&os_map, sizeof (struct map));
+    = (map_t *) obstack_alloc (&os_map, sizeof (map_t));
   mappos->fromline = MAX_INT;
 }
 
@@ -209,7 +211,7 @@ void
 genmap ()
 {
   int i;
-  struct map *m = firstmappos;
+  map_t *m = firstmappos;
   fprintf (ccode, "__map __map%s[%d]={"
 	   ,separat_comp ? timestamp : "main", antmap);
   for (i = 1; i < antmap; i++)

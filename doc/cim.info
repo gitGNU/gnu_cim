@@ -5,10 +5,10 @@ START-INFO-DIR-ENTRY
 * Cim: (cim).         Simula compiler based on the C programming language.
 END-INFO-DIR-ENTRY
 
-   This file documents the Cim compiler based on the C programming
+   This file documents the GNU Cim compiler based on the C programming
 language.
 
-   Copyright (C) 1994 Sverre Hvammen Johansen
+   Copyright (C) 1994-1999 Sverre Hvammen Johansen
 
    Permission is granted to make and distribute verbatim copies of this
 manual provided the copyright notice and this permission notice are
@@ -27,8 +27,8 @@ translation approved by the Free Software Foundation, Inc.
 
 File: cim.info,  Node: Top,  Up: (dir)
 
-   This file documents the Cim compiler based on the C programming
-language.  This is edition 1.52, for Cim version 1.52.
+   This file documents the GNU Cim compiler based on the C programming
+language.  This is edition 1.52, for GNU Cim version 1.52.
 
 * Menu:
 
@@ -43,7 +43,7 @@ File: cim.info,  Node: Introduction,  Next: A simple example,  Up: Top
 Introduction
 ************
 
-   Cim is a compiler for the programming language Simula (except
+   GNU Cim is a compiler for the programming language Simula (except
 unspecified parameters to formal or virtual procedures (see item
 %nocomment in *Note Implementation dependent characteristics: Dependent
 characteristics, for how portable code for formal procedures can be
@@ -51,31 +51,31 @@ written)).  It offers a class concept, separate compilation with full
 type checking, interface to external C routines, an application package
 for process simulation and a coroutine concept.
 
-   Cim is a Simula compiler whose portability is based on the C
+   GNU Cim is a Simula compiler whose portability is based on the C
 programming language.  The compiler and the run-time system is written
 in C, and the compiler produces C code, that is passed to a C compiler
 for further processing towards machine code.
 
-   Cim is copyrighted by Sverre Hvammen Johansen, Stein Krogdahl, and
-Terje Mjøs, Department of Informatics, University of Oslo (plus some
-parts from Free Software Fundation).
+   GNU Cim is copyrighted by Sverre Hvammen Johansen, Stein Krogdahl,
+and Terje Mjøs, Department of Informatics, University of Oslo (plus
+some parts from Free Software Fundation).
 
-   Cim is free software; you can redistribute it and/or modify it under
-the terms of the GNU General Public License as published by the Free
-Software Foundation; version 2.
+   GNU Cim is free software; you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by the
+Free Software Foundation; version 2.
 
    You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software Foundation,
 Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-   Mail bug reports for Cim to `cim-bug@ifi.uio.no'.  Please include
-the Cim version number and the system type, which you can get by
+   Mail bug reports for Cim to `bug-cim@gnu.org'.  Please include the
+GNU Cim version number and the system type, which you can get by
 running `cim --version'.
 
-   Cim uses, GNU Autoconf, GNU Automake, and GNU Libtool, so that cim
-can be installed by following the generic installation instructions
-found in the file INSTALL.  You also may want to read the instructions
-in the file README.
+   GNU Cim uses, GNU Autoconf, GNU Automake, and GNU Libtool, so that
+GNU Cim can be installed by following the generic installation
+instructions found in the file INSTALL.  You also may want to read the
+instructions in the file README.
 
 
 File: cim.info,  Node: A simple example,  Next: Compiling,  Prev: Introduction,  Up: Top
@@ -117,10 +117,11 @@ File: cim.info,  Node: Compiling,  Next: Implementation Aspects,  Prev: A simple
 Compiling
 *********
 
-   Cim is a Simula compiler that first compiles the source code into C.
-The C code will then be compiled with cc, and linked with other modules.
+   GNU Cim is a Simula compiler that first compiles the source code
+into C.  The C code will then be compiled with cc, and linked with
+other modules.
 
-   The Cim command will accept one Simula program and other non-Simula
+   The cim command will accept one Simula program and other non-Simula
 modules.  The specified Simula program will be compiled and linked with
 the modules.  If a main Simula program is compiled, it will automatic
 be linked with the necessary Simula modules.  If a separate Class or
@@ -132,7 +133,7 @@ self-explanatory.
 * Menu:
 
 * Options::                     Options that are accepted by the cim command.
-* Arguments::                   Arguments that are accepted by cim.
+* Arguments::                   Arguments that are accepted by Cim.
 * Files::                       Files related to a compilation.
 
 
@@ -324,7 +325,7 @@ File: cim.info,  Node: Arguments,  Next: Files,  Prev: Options,  Up: Compiling
 Arguments
 =========
 
-   The following arguments are accepted by the Cim command:
+   The following arguments are accepted by the cim command:
 
 `FILE.a'
      Library of object files and attribute files.  Include this simula
@@ -346,7 +347,7 @@ File: cim.info,  Node: Files,  Prev: Arguments,  Up: Compiling
 Files
 =====
 
-   The following files are related to a Cim compilation:
+   The following files are related to a compilation:
 
 `file'
      Executable file.
@@ -453,9 +454,8 @@ Implementation dependent characteristics
           following example shows.  In this implementation formal
           procedures must be specified, but that should not be done in
           Standard Simula (`Standard Simula, SS 636114.  The Simula
-          Standards Group, August 1986').  This will work both on LSH
-          (`Simula implementation from Lund Software House AB, Sweden')
-          and Cim:
+          Standards Group, August 1986').  This will work both on a
+          standard Simula Compiler and Cim:
 
                PROCEDURE P(i1,P2);INTEGER i1;
                %nocomment PROCEDURE P2 IS
@@ -697,19 +697,19 @@ be called directly from Simula:
 
 
 Tag Table:
-Node: Top1013
-Node: Introduction1477
-Node: A simple example3220
-Node: Compiling4153
-Node: Options5074
-Node: Arguments9992
-Node: Files10552
-Node: Implementation Aspects11625
-Node: Restrictions12143
-Node: Allowed restrictions12578
-Node: Dependent characteristics13001
-Node: Defined characteristics20093
-Node: Limitations22260
-Node: Extension22674
+Node: Top1022
+Node: Introduction1494
+Node: A simple example3262
+Node: Compiling4195
+Node: Options5121
+Node: Arguments10039
+Node: Files10599
+Node: Implementation Aspects11668
+Node: Restrictions12186
+Node: Allowed restrictions12621
+Node: Dependent characteristics13044
+Node: Defined characteristics20087
+Node: Limitations22254
+Node: Extension22668
 
 End Tag Table

@@ -30,7 +30,7 @@
 #include <limits.h>
 #endif
 
-union val
+typedef union val
   {
     long ival;
     double rval;
@@ -52,7 +52,7 @@ union val
     {
       short label, inthunk;
     } thunk;
-  };
+  } val_t;
 
 /* Definition of type */
 
@@ -107,17 +107,20 @@ union val
 #define CCPROC	  'R'
 #define CEXTROUT  'F'
 
-struct DECL
+typedef struct _block block_t;
+
+typedef struct _decl decl_t;
+struct _decl
   {
     char *ident;		/* Navnet til deklarasjonen */
     long plev;			/* Prefix nivå, kan fjernes */
     char *identqual;		/* Navnet til kvalifikasjonen */
-    struct BLOCK *encl;		/* Omslutningen til deklarasjonen */
-    struct BLOCK *descr;	/* Representasjonen av deklarasjonen */
-    struct DECL *match;		/* Matsjende deklarasjoner (virtual) */
-    struct DECL *next;		/* Neste deklarasjon i lista */
-    struct DECL *prefqual;	/* Prefiks-kjede eller kval. til peker */
-    union val value;		/* Verdi for konstantdeklarasjon */
+    block_t *encl;		/* Omslutningen til deklarasjonen */
+    block_t *descr;	/* Representasjonen av deklarasjonen */
+    decl_t *match;		/* Matsjende deklarasjoner (virtual) */
+    decl_t *next;		/* Neste deklarasjon i lista */
+    decl_t *prefqual;	/* Prefiks-kjede eller kval. til peker */
+    val_t value;		/* Verdi for konstantdeklarasjon */
     long line;			/* Linjenommer */
     short dim;			/* Dimensjonen */
     short virtno;		/* Virtuelt nommer */
@@ -127,9 +130,9 @@ struct DECL
     char protected;		/* Angir om attributtet er protected */
   };
 
-struct BLOCK
+struct _block
   {
-    struct DECL quant;		/* Deklarasjonen til denne blokken */
+    decl_t quant;		/* Deklarasjonen til denne blokken */
     char inner;
     char localclasses,
       thisused;
@@ -155,13 +158,13 @@ struct BLOCK
 
     char *timestamp;
     char *filename;
-    struct DECL *when;
-    struct DECL *parloc;	/* Parametere og lokale deklarasjoner */
-    struct DECL *lastparloc;
-    struct DECL *virt;		/* Blokkens virtuelle bindinger */
-    struct DECL *lastvirt;
-    struct DECL *hiprot;	/* Blokkens protections */
-    struct BLOCK *next_block;	/* Neste blokk i sekvensen */
+    decl_t *when;
+    decl_t *parloc;	/* Parametere og lokale deklarasjoner */
+    decl_t *lastparloc;
+    decl_t *virt;		/* Blokkens virtuelle bindinger */
+    decl_t *lastvirt;
+    decl_t *hiprot;	/* Blokkens protections */
+    block_t *next_block;	/* Neste blokk i sekvensen */
   };
 
 /* Kodeklasser */
@@ -192,44 +195,44 @@ extern begin_block ();
 extern end_block ();
 extern reg_decl ();
 extern reg_inner ();
-extern struct DECL *new_decl ();
-extern struct BLOCK *firstclass ();
+extern decl_t *new_decl ();
+extern block_t *firstclass ();
 extern in_block ();
 extern out_block ();
-extern struct DECL *reg_this ();
+extern decl_t *reg_this ();
 
 extern remove_block ();
 
 extern char *prefquantident;
-int localused;
+extern int localused;
 
-extern struct BLOCK *cblock;
-extern struct BLOCK *ssblock;
-extern struct BLOCK *sblock;
-extern struct BLOCK *eblock;
+extern block_t *cblock;
+extern block_t *ssblock;
+extern block_t *sblock;
+extern block_t *eblock;
 extern int cblev;
 extern char subclass ();
 extern char insert_with_codeclass;
-extern struct DECL *cprevdecl;
+extern decl_t *cprevdecl;
 
-extern struct DECL *commonprefiks;
-extern struct DECL *commonqual ();
-extern struct DECL *find_global ();
-extern struct DECL *find_local ();
-extern struct DECL *find_decl ();
+extern decl_t *commonprefiks;
+extern decl_t *commonqual ();
+extern decl_t *find_global ();
+extern decl_t *find_local ();
+extern decl_t *find_decl ();
 
-extern struct DECL *first_param ();
-extern struct DECL *next_param ();
+extern decl_t *first_param ();
+extern decl_t *next_param ();
 extern more_param ();
 
 extern int arrdim;
-extern struct DECL *last_array;
+extern decl_t *last_array;
 extern set_array_dim ();
 extern char danger_proc ();
 
-extern struct BLOCK *seenthrough;
+extern block_t *seenthrough;
 extern body ();
-extern struct DECL *classtext;
+extern decl_t *classtext;
 extern char subordinate ();
 extern same_param ();
 extern decl_init ();

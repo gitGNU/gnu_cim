@@ -56,7 +56,7 @@ __rrs ()
 
   if ((char *) __fri == ((char *) x) + align (size))
     {
-      bzero ((char *) x, (char *) __fri - (char *) x);
+      memset ((char *) x, 0, (char *) __fri - (char *) x);
       __fri = (__dhp) x;
     }
 

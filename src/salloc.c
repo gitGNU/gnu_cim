@@ -57,7 +57,7 @@ salloc (size) int size;
 {
   char *p;
   p= obstack_alloc (&os_salloc, size);
-  bzero (p, size);
+  memset (p, 0, size);
   return p;
 }
 

@@ -26,7 +26,7 @@
 
 static 
 gen_conv_and_q (rex, procedure, transported, copied_all)
-     struct EXP *rex;
+     exp_t *rex;
      char procedure,
        transported,
        copied_all;
@@ -153,7 +153,7 @@ gen_conv_and_q (rex, procedure, transported, copied_all)
 
 static 
 gen_arit_conv (rex, transported, copied_all)
-     struct EXP *rex;
+     exp_t *rex;
      char transported,
        copied_all;
 {
@@ -187,7 +187,7 @@ gen_arit_conv (rex, transported, copied_all)
 
 static 
 gen_conv (rex, procedure, copied_all)
-     struct EXP *rex;
+     exp_t *rex;
      char procedure,
        copied_all;
 {
@@ -220,7 +220,7 @@ gen_conv (rex, procedure, copied_all)
 
 static 
 send_to_formal_par (rex, addressthunk)
-     struct EXP *rex;
+     exp_t *rex;
      char addressthunk;
 {
   /* Hvis hdot = FALSE er denne rutinen kalt for en label     eller array
@@ -259,7 +259,7 @@ send_to_formal_par (rex, addressthunk)
  * kvalifikasjonstester */
 
 gen_thunk_simple_address (rex)
-     struct EXP *rex;
+     exp_t *rex;
 {
   switch (rex->left->token)
     {
@@ -324,7 +324,7 @@ gen_thunk_simple_address (rex)
                                                     GEN_THUNK_SIMPLE_VALUE   */
 
 gen_thunk_simple_value (rex)
-     struct EXP *rex;
+     exp_t *rex;
 {
   switch (rex->left->type)
     {
@@ -379,11 +379,11 @@ gen_thunk_simple_value (rex)
 
 static 
 gensimplepar (rex)
-     struct EXP *rex;
+     exp_t *rex;
 {
   int i;
 /***** ENKEL INTEGER, REAL, CHAR, REF,TEXT ELLER BOOL  PARAMETER     ****/
-  struct EXP *re;
+  exp_t *re;
   char index_is_const = TRUE;
 
   if (rex->rd->categ == CVALUE && rex->rd->type == TTEXT)
@@ -607,7 +607,7 @@ gensimplepar (rex)
 	      gen_conv (rex, FALSE, FALSE);
 	    }
 	  break;
-	case MARRAYARG:
+	case MARRAYADR:
 	  /* ARRAY HVOR ALLE INDEKSENE BEST]R AV KONSTANTER  ADDRESS
 	   * NOTHUNK  Tilordner den formelle name-parameterens bp og ofs */
 
@@ -636,7 +636,7 @@ gensimplepar (rex)
 
 static 
 genlabelparexp (rex, formellpar, thunk)
-     struct EXP *rex,
+     exp_t *rex,
       *formellpar;
      char thunk;
 {
@@ -708,7 +708,7 @@ genlabelparexp (rex, formellpar, thunk)
                                                              GEN_THUNK_LABLE */
 
 gen_thunk_lable (rex)
-     struct EXP *rex;
+     exp_t *rex;
 {
   /* genlabelparexp skriver ut uttrykket, og tilordner ment, ent og ob for
    * hver gren i uttrykket. (if-i-uttrykk) Den skriver ogs} ut kallet for
@@ -722,7 +722,7 @@ gen_thunk_lable (rex)
 
 static 
 genlabelswitchpar (rex)
-     struct EXP *rex;
+     exp_t *rex;
 {
   int i;
 
@@ -842,7 +842,7 @@ genlabelswitchpar (rex)
                                                              GEN_THUNK_ARRAY */
 
 gen_thunk_array (rex)
-     struct EXP *rex;
+     exp_t *rex;
 {
   fprintf (ccode, "__er=(__dhp)");
   genvalue (rex->left);
@@ -854,7 +854,7 @@ gen_thunk_array (rex)
 
 static 
 genarraypar (rex)
-     struct EXP *rex;
+     exp_t *rex;
 {
   int i;
   switch (rex->rd->categ)
@@ -863,15 +863,21 @@ genarraypar (rex)
       /* V A L U E   P A R A M E T E R */
 
       fprintf (ccode, "__ap=(__arrp)__rca(");
-      if (rex->left->rd->categ == CNAME)
-	fprintf (ccode, "__er);");
+      if (rex->left->token == MIDENTIFIER)
+      {
+        if (rex->left->rd->categ == CNAME)
+          fprintf (ccode, "__er");
+        else
+          {
+            gensl (rex->left, TRUE, OFF);
+            fprintf (ccode, "%s", rex->left->rd->ident);
+          }
+      }
       else
-	{
-	  gensl (rex->left, TRUE, OFF);
-	  fprintf (ccode, "%s);", rex->left->rd->ident);
-	}
+	genvalue (rex->left);
+      fprintf (ccode, ");");
       fprintf (ccode, "((__bs%d *)__pb)->%s=__ap;"
-		      ,rex->rd->encl->blno, rex->rd->ident);
+	            ,rex->rd->encl->blno, rex->rd->ident);
       break;
     case CDEFLT:
     case CVAR:
@@ -933,7 +939,7 @@ genarraypar (rex)
                                                          GEN_THUNK_PROCEDURE */
 
 gen_thunk_procedure (rex)
-     struct EXP *rex;
+     exp_t *rex;
 {
   fprintf (ccode, "__sl=");
   if (nonetest == ON)
@@ -956,7 +962,7 @@ gen_thunk_procedure (rex)
 
 static 
 genprocedurepar (rex)
-     struct EXP *rex;
+     exp_t *rex;
 {
   int i;
   /* OVERF\RING AV PROSEDYRER SOM PARAMETERE */
@@ -1075,9 +1081,9 @@ genprocedurepar (rex)
                                                                 GENPROCPARAM */
 
 genprocparam (re)
-     struct EXP *re;
+     exp_t *re;
 {
-  struct EXP *rex;
+  exp_t *rex;
 
   for (rex = re->right; rex->token != MENDSEP; rex = rex->right)
     {
@@ -1122,12 +1128,12 @@ genprocparam (re)
                                                       GENPREDEFPROCCALL      */
 
 genpredefproccall (re)
-     struct EXP *re;
+     exp_t *re;
 {
   int i;
   /* Hvis danger = TRUE s} skal returverdien legges p} stakken */
   
-  struct EXP *rex;
+  exp_t *rex;
 
   if (re->rd->descr->codeclass != CCEXIT)
     fprintf (ccode, "%s(", re->rd->descr->rtname);
@@ -1226,10 +1232,10 @@ genpredefproccall (re)
  * parametere til eksterne C-prosedyrer. */
 
 
-static struct DECL *
-getfirstclassattribut (rd) struct DECL *rd;
+static decl_t *
+getfirstclassattribut (rd) decl_t *rd;
 {
-  struct DECL *rdd;
+  decl_t *rdd;
   
   if (rd->plev != 0 
       && (rdd = getfirstclassattribut (rd->prefqual)) != NULL)
@@ -1250,9 +1256,9 @@ getfirstclassattribut (rd) struct DECL *rd;
  * formelle. */
 
 static 
-par_to_cproc (rex) struct EXP *rex;
+par_to_cproc (rex) exp_t *rex;
 {
-  struct DECL *rd;
+  decl_t *rd;
   switch (rex->rd->kind)
     {
     case KSIMPLE:
@@ -1357,9 +1363,9 @@ par_to_cproc (rex) struct EXP *rex;
 
 /******************************************************************************
   GENCPROCCALL      */
-gencproccall (re) struct EXP *re;
+gencproccall (re) exp_t *re;
 {
-  struct EXP *rex;
+  exp_t *rex;
   
   fprintf (ccode, "%s(", re->rd->descr->rtname);
   

@@ -1,6 +1,6 @@
-Cim NEWS
+GNU Cim NEWS
 
-Copyright (C) 1997-98 Sverre Hvammen Johansen
+Copyright (C) 1997-99 Sverre Hvammen Johansen
 See the end for copying conditions.
 
 Version 4:
@@ -23,6 +23,27 @@ Version 2:
   details.
 
 
+Version: 4.2
+
+* Integrated the changes in cim-3.28 - cim-3.35
+
+* Note: There are a lot of changes in the src directory. 
+  All files under lib are identical, except simenvir.atr and
+  simfile.atr.
+
+
+Version: 4.1
+
+* Used enum instead of #define for tokens in mellbuilder.h
+
+* Used typedef: 
+    sent_t replaces struct SENT
+    exp_t replaces struct EXP
+    decl_t replaces struct DECL
+    block_t replaces struct BLOCK
+    and so on
+
+
 Version: 4.0
 
 * Rearranged some of the code in the compiler program
@@ -39,6 +60,56 @@ Version: 4.0
   some new debug options.
 
 * Only reserve a for-list-element index variable when necessary.
+
+
+Version 3.35
+
+* Minor changes. Corrected a bug that remained from version 3.34.
+
+
+Version 3.34
+
+* Fixed a bug which caused option -a to not work correctly. NULL from
+  externernal C text procedures are now acepted. Replaced bzery by memset
+  and bcopy by memmove. directive %INSERT is now accepted as a synonym
+  for %INCLUDE. '%\r' is now accepted as a directive line comment.
+  Doing some preparation for Mingw32. Please not upgrade now. More bugs
+  will be corrected later.
+
+
+Version 3.33
+
+* Minor changes so that the C-compiler will compile with TenDRA C.
+  The RTS and generated C-code will not compile with TenDRA C, without
+  major changes. I belive that the TenDRA C compiler is broken.
+
+
+Version 3.32
+
+* Broken configure script: Because of libtool upgrade some configure tests
+  needed corrections.
+
+
+Version 3.31
+
+* Fixed a bug which produced incorrect code for some actual
+  parameters to simple parameters transmitted by name.
+
+* Upgraded to libtool-1.3.3.
+
+
+Version: 3.30
+
+* Released as a GNU program
+
+* Fixed a bug which produced incorrect code for dotted actual
+  parameters to arrays transmitted by value.
+  
+
+Version: 3.29
+
+* Fixed a bug which caused segmentation fault when running programs
+  containing gotos to non-local virtual labels.
 
 
 Version: 3.28

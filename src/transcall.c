@@ -29,10 +29,10 @@ static int dim;
 
 static int stackno;
 
-static struct EXP *
+static exp_t *
 savepar (ret, re, up, ident, type, first, 
 			    minval, minref, mintxt)
-     struct EXP *ret,
+     exp_t *ret,
        *re;
      char up;
      char *ident;
@@ -40,7 +40,7 @@ savepar (ret, re, up, ident, type, first,
      char first;
      int minval, minref, mintxt;
 {
-  struct EXP *rex;
+  exp_t *rex;
 
   if (first) stackno=0;
   
@@ -81,7 +81,7 @@ savepar (ret, re, up, ident, type, first,
 	    ;
 	  else
 	    {
-	      struct EXP *restack1, *restack2, *reconc;
+	      exp_t *restack1, *restack2, *reconc;
 	      
 	      if (stackno == 0)
 		{
@@ -140,7 +140,7 @@ char usedentry[STACK_SIZE + 1];
 
 static 
 findsubentry (re)
-     struct EXP *re;
+     exp_t *re;
 {
   switch (re->token)
     {
@@ -178,13 +178,13 @@ findsubentry (re)
 
 int 
 findallentry (ret, re, type, min)
-     struct EXP *ret,
+     exp_t *ret,
       *re;
      int type, min;
 {
   int i,
     max = 0;
-  struct EXP *rex;
+  exp_t *rex;
 
   if (is_after_dot(re))
     re = re->up;
@@ -218,7 +218,7 @@ findallentry (ret, re, type, min)
       if ((usedentry[i] & type) == 0)
 	{
 #if ACSTACK_IN_OBJ
-	  struct BLOCK *rb;
+	  block_t *rb;
 	  switch (cblock->quant.kind)
 	    {
 	    case KFOR:
@@ -252,7 +252,7 @@ findallentry (ret, re, type, min)
 
 long 
 ant_stack (ret, re, minval, minref, mintxt)
-     struct EXP *ret,
+     exp_t *ret,
        *re;
      int minval, minref, mintxt;
 {
@@ -272,15 +272,15 @@ ant_stack (ret, re, minval, minref, mintxt)
 /* This routine traverse a expression tree upwards.
  * For every leftside */
 
-static struct EXP * 
+static exp_t * 
 genstack (ret, re, only_pointers, minval, minref, mintxt)
-     struct EXP *ret,
+     exp_t *ret,
       *re;
      char only_pointers;
      int minval, minref, mintxt;
 {
   int i;
-  struct EXP *rex, *reconc=NULL;
+  exp_t *rex, *reconc=NULL;
   rex = re->up;
   while (rex != ret & rex->left == re)
     {
@@ -343,7 +343,7 @@ genstack (ret, re, only_pointers, minval, minref, mintxt)
       { 
 	int entry;
 	int type= rex->left->type;
-	struct EXP *restack;
+	exp_t *restack;
 	switch (rex->left->type)
 	  {
 	  case TREF:
@@ -401,7 +401,7 @@ genstack (ret, re, only_pointers, minval, minref, mintxt)
 
 static char 
 workbeforetest (re)
-     struct EXP *re;
+     exp_t *re;
 {
   int token;			/* token er deklarert som int fordi
 				 * kompilatoren ga warning om at constant 136 
@@ -427,10 +427,10 @@ workbeforetest (re)
 
 static
 transparam (ret, re, minval, minref, mintxt) 
-     struct EXP *ret, *re;
+     exp_t *ret, *re;
      int minval, minref, mintxt;
 {
-  struct EXP *rex, *rexp, *rey;
+  exp_t *rex, *rexp, *rey;
   char index_is_const = TRUE;
   rexp=re;
   for (rex = re->right; rex->token != MENDSEP; rex = rex->right)
@@ -465,6 +465,7 @@ transparam (ret, re, minval, minref, mintxt)
 		    
 		    if (!index_is_const)
 		      insert_thunk (rex,  MTHUNKSIMPLEADDRESS);
+		    else goto trcall;
 		    break;
 		  case MDOT:
 		    /* Dersom det er et dot'et prosedyre-kall, 
@@ -496,6 +497,7 @@ transparam (ret, re, minval, minref, mintxt)
 	}
       else
 	{
+	trcall:
 #if ACSTACK_IN_OBJ
 	  rey= transcall (rex, rex->left,
 			  findallentry (ret, re, USEDVAL | MAXUSED, minval)+1,
@@ -518,13 +520,13 @@ transparam (ret, re, minval, minref, mintxt)
 /******************************************************************************
                                                               TRANSCALL      */
 
-struct EXP *
+exp_t *
 transcall (ret, re, minval, minref, mintxt)
-     struct EXP *ret,
+     exp_t *ret,
       *re;
      int minval, minref, mintxt;
 {
-  struct EXP *rex, *reconc=NULL;
+  exp_t *rex, *reconc=NULL;
   short entry;
 
   switch (re->token)

@@ -152,6 +152,7 @@ newstrcat6(s1, s2, s3, s4, s5, s6)
   obstack_grow (&os_newstr, s2, strlen(s2));
   obstack_grow (&os_newstr, s3, strlen(s3));
   obstack_grow (&os_newstr, s4, strlen(s4));
+  obstack_grow (&os_newstr, s5, strlen(s5));
   obstack_grow0 (&os_newstr, s6, strlen(s6));
   return obstack_finish (&os_newstr);;
 }

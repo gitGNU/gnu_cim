@@ -52,7 +52,7 @@
 
 char 
 setdanger_const (re)
-     struct EXP *re;
+     exp_t *re;
 {
   char sub_danger;
   if (LEFT != NULL)
@@ -71,7 +71,7 @@ setdanger_const (re)
       DANGER = danger_proc (RD);
       if (DANGER == FALSE)
 	{
-	  struct EXP *rex;
+	  exp_t *rex;
 	  KONST = TRUE;
 	  for (rex = RIGHT; rex->token != MENDSEP; rex = rex->right)
 	    {
@@ -195,7 +195,7 @@ sstrlen (s)
 
 char 
 computeconst (re)
-     struct EXP *re;
+     exp_t *re;
 {
   char lconst,
     rconst;
@@ -205,7 +205,7 @@ computeconst (re)
       lconst = computeconst (LEFT);
       if (lconst == TRUE)
 	{
-	  struct EXP *rex;
+	  exp_t *rex;
 	  if (LEFTVALUE.ival == TRUE)
 	    rex = RIGHTLEFT;
 	  else

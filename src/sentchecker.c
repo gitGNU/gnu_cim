@@ -27,9 +27,9 @@
                                                                    SENTCHECK */
 
 void 
-sent_check (parent_sent, res_labels) struct SENT *parent_sent; char res_labels;
+sent_check (parent_sent, res_labels) sent_t *parent_sent; char res_labels;
 {
-  struct SENT *sent, *next_sent, *when_sent;
+  sent_t *sent, *next_sent, *when_sent;
   char remove_when_clauses=FALSE;
 
   for (sent= parent_sent->first; sent!=NULL; sent= next_sent)

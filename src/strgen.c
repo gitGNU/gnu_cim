@@ -42,7 +42,7 @@ static int naref;
 
 static 
 write_decl (rd, type, output_refs)
-     struct DECL *rd; char *type, output_refs; 
+     decl_t *rd; char *type, output_refs; 
 {
   if (!output_refs)
     {
@@ -56,7 +56,7 @@ write_decl (rd, type, output_refs)
 
 static 
 write_refs (rb, rd, atrib, output_refs) 
-     struct BLOCK *rb; struct DECL *rd; char *atrib, output_refs;
+     block_t *rb; decl_t *rd; char *atrib, output_refs;
 {
 
   /* TBD Hvis rd alltil hadde vært forskjellig fra NULL kunne rb sløyfes
@@ -78,7 +78,7 @@ write_refs (rb, rd, atrib, output_refs)
 
 static 
 declstructure (rd, output_refs)
-     struct DECL *rd;
+     decl_t *rd;
      char output_refs;
 {
   char write = 0;
@@ -223,7 +223,7 @@ declstructure (rd, output_refs)
 
 static 
 skrivprefikspp (rd)
-     struct DECL *rd;
+     decl_t *rd;
 {
   if (rd != NULL)
     {
@@ -243,10 +243,10 @@ skrivprefikspp (rd)
 
 static 
 blockmainstructure (rb, output_refs)
-     struct BLOCK *rb; char output_refs;
+     block_t *rb; char output_refs;
 {
   int i;
-  struct DECL *rd;
+  decl_t *rd;
   if (rb->quant.kind == KPROC && rb->quant.type != TNOTY)
     {
       if (rb->quant.type == TTEXT)
@@ -255,12 +255,22 @@ blockmainstructure (rb, output_refs)
 	write_refs (rb, NULL, "er", output_refs); 
     }
   
-  for (i = 1; i <= rb->connest; i++)
-    {
-      char s[10];
-      sprintf (s, "c%d", i);
-      write_refs (rb, NULL, s, output_refs);
-    };
+  {
+    int mincon= 1;
+    if ((rb->quant.kind == KCLASS || rb->quant.kind == KPRBLK) && 
+	rb->quant.plev > 0)
+      {
+	if (rb->connest < rb->quant.prefqual->descr->connest)
+	  rb->connest= rb->quant.prefqual->descr->connest;
+	mincon= rb->quant.prefqual->descr->connest+1;
+      } 
+    for (i = mincon; i <= rb->connest; i++)
+      {
+	char s[10];
+	sprintf (s, "c%d", i);
+	write_refs (rb, NULL, s, output_refs);
+      };
+  }
 
 #if ACSTACK_IN_OBJ
   {
@@ -297,10 +307,10 @@ blockmainstructure (rb, output_refs)
 
 static 
 blockstructure (rb)
-     struct BLOCK *rb;
+     block_t *rb;
 {
   int i;
-  struct DECL *rd;
+  decl_t *rd;
 
 #if 0
   if (rb->blno < 11)
@@ -407,10 +417,23 @@ blockstructure (rb)
 	    fprintf (ccode, "        char ec;\n");
 	}
 
-      for (i = 1; i <= rb->fornest; i++)
-	fprintf (ccode, "        short f%d;\n", i);
-      for (i = 1; i <= rb->connest; i++)
-	fprintf (ccode, "        __dhp c%d;\n", i);
+      {
+	int minfor= 1, mincon=1;
+	if ((rb->quant.kind == KCLASS || rb->quant.kind == KPRBLK) && 
+	    rb->quant.plev > 0)
+	  {
+	    if (rb->fornest < rb->quant.prefqual->descr->fornest)
+	      rb->fornest= rb->quant.prefqual->descr->fornest;
+	    if (rb->connest < rb->quant.prefqual->descr->connest)
+	      rb->connest= rb->quant.prefqual->descr->connest;
+	    minfor= rb->quant.prefqual->descr->fornest+1;
+	    mincon= rb->quant.prefqual->descr->connest+1;
+	  } 
+	for (i = minfor; i <= rb->fornest; i++)
+	  fprintf (ccode, "        short f%d;\n", i);
+	for (i = mincon; i <= rb->connest; i++)
+	  fprintf (ccode, "        __dhp c%d;\n", i);
+      }
 
 #if ACSTACK_IN_OBJ
       {
@@ -595,9 +618,9 @@ blockstructure (rb)
 }
 
 specifier_proc_structure (rd)
-     struct DECL *rd;
+     decl_t *rd;
 {
-  struct DECL *rdi;
+  decl_t *rdi;
   if (rd->kind == KPROC)
     {
       if (rd->descr->parloc != NULL)
@@ -620,14 +643,14 @@ specifier_proc_structure (rd)
 }
 
 specifier_structure (rb)
-     struct BLOCK *rb;
+     block_t *rb;
 {				/* Kaller på param_structure som skriver ut
 				 * structer for evt. parameterspesifikasjoner 
 				 * til virtuelle  og formelle prosedyre-
 				 * spesifikasjoner. Altså kun for de som
 				 * inneholder parametere. */
 
-  struct DECL *rd,
+  decl_t *rd,
    *rdi;
 
   /* Ser forst etter formell prosedyre spesifikasjoner */
@@ -663,7 +686,7 @@ specifier_structure (rb)
 
 structure ()
 {
-  struct BLOCK *block;
+  block_t *block;
   if (separat_comp)
     {
       fprintf (ccode, "void __m_%s();\n", timestamp);
@@ -694,9 +717,9 @@ structure ()
 								UPDATEGLNULL */
 
 static void 
-do_for_each_stat_pointer (block) struct BLOCK *block;
+do_for_each_stat_pointer (block) block_t *block;
 {
-  struct DECL *rd;
+  decl_t *rd;
   switch (block->quant.kind)
     {
     case KPROC:
@@ -730,9 +753,9 @@ do_for_each_stat_pointer (block) struct BLOCK *block;
 								UPDATEGLNULL */
 
 static void 
-update_gl_null (block) struct BLOCK *block;
+update_gl_null (block) block_t *block;
 {
-  struct DECL *rd;
+  decl_t *rd;
   switch (block->quant.kind)
     {
     case KPROC:
@@ -764,9 +787,9 @@ update_gl_null (block) struct BLOCK *block;
 								UPDATEGLOBJ */
 
 static void 
-update_gl_obj (block) struct BLOCK *block;
+update_gl_obj (block) block_t *block;
 {
-  struct DECL *rd;
+  decl_t *rd;
   switch (block->quant.kind)
     {
     case KPROC:
@@ -804,7 +827,7 @@ update_gl_obj (block) struct BLOCK *block;
 
 stat_pointers ()
 {
-  struct BLOCK *block;
+  block_t *block;
   struct stamp *st;
 
   if (!separat_comp)

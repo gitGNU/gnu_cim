@@ -230,7 +230,9 @@ typedef struct /* CLEAR */
 short __rl221SIMSET[3]={(short)((char *)&((__bs221 *)0)->__r1-(char *)0),(short)((char *)&((__bs221 *)0)->PTR-(char *)0),(short)((char *)&((__bs221 *)0)->PTRSUC-(char *)0),};
 extern __ptyp __p221SIMSET;__pty   __pl221SIMSET[1]={&__p221SIMSET};
 __ptyp __p221SIMSET={'P',0,4,sizeof(__bs221),25,__m_SIMSET,0,0,3,0,__rl221SIMSET,0,__pl221SIMSET,__NULL};
-void __m_SIMSET(){goto __s;goto __ll0;/* START CLASS SIMSET *//* START CLASS LINKAGE *//* START PROCEDURE SUC */__l8:
+void __m_SIMSET(){goto __s;
+# 25 "./simset.sim"
+__sto= (__dhp)&__blokk205SIMSET;__rb(&__p205SIMSET);goto __ll0;/* START CLASS SIMSET *//* START CLASS LINKAGE *//* START PROCEDURE SUC */__l8:
 # 31 "./simset.sim"
 
 # 32 "./simset.sim"
@@ -342,7 +344,7 @@ __rendclass(1);goto __sw;/* SLUTT CLASS HEAD */__l2:
 # 25 "./simset.sim"
 __renddecl(0);goto __sw;__l3:__rinner(0);goto __sw;__l4:
 # 120 "./simset.sim"
-__rendclass(0);goto __sw;/* SLUTT CLASS SIMSET */__ll0:__sw:if(__goto.ment!=(void (*)())__m_SIMSET)return;__s:switch(__goto.ent){case 2: goto __l2;
+__rendclass(0);goto __sw;/* SLUTT CLASS SIMSET */__ll0:__rbe();__sw:if(__goto.ment!=(void (*)())__m_SIMSET)return;__s:switch(__goto.ent){case 2: goto __l2;
 case 3: goto __l3;
 case 4: goto __l4;
 case 5: goto __l5;

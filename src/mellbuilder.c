@@ -108,7 +108,7 @@ long
 min_ival()
 {
   long x;
-  bcopy (mpointer,&x,sizeof(long));
+  memmove (&x,mpointer,sizeof(long));
   mpointer += sizeof(long);
   return (x);
 }
@@ -120,7 +120,7 @@ double
 min_rval()
 {
   double x;
-  bcopy (mpointer,&x,sizeof (double));
+  memmove (&x,mpointer,sizeof (double));
   mpointer += sizeof (double);
   return (x);
 }
@@ -132,7 +132,7 @@ char *
 min_tval()
 {
   char *x;
-  bcopy(mpointer,&x,sizeof(char *));
+  memmove(&x,mpointer,sizeof(char *));
   mpointer += sizeof(char *);
   return(x);
 }
@@ -144,7 +144,7 @@ char *
 min_id()
 {
   char *x;
-  bcopy (mpointer,&x,sizeof(char *));
+  memmove (&x,mpointer,sizeof(char *));
   mpointer += sizeof(char *);
   return(x);
 }

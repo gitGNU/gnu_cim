@@ -79,15 +79,16 @@ host_alias = @host_alias@
 host_triplet = @host@
 target_alias = @target_alias@
 target_triplet = @target@
+AS = @AS@
 CC = @CC@
-LD = @LD@
+DLLTOOL = @DLLTOOL@
 LIBTOOL = @LIBTOOL@
 LIB_AGE = @LIB_AGE@
 LIB_CURRENT = @LIB_CURRENT@
 LIB_REVISION = @LIB_REVISION@
 LN_S = @LN_S@
 MAKEINFO = @MAKEINFO@
-NM = @NM@
+OBJDUMP = @OBJDUMP@
 PACKAGE = @PACKAGE@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PERL = @PERL@
@@ -111,7 +112,7 @@ cimindent.in
 
 DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
-TAR = gtar
+TAR = tar
 GZIP_ENV = --best
 all: all-redirect
 .SUFFIXES:

@@ -1,14 +1,14 @@
 Introduction
 ------------
 
-Cim is a compiler for the programming language Simula (except
+GNU Cim is a compiler for the programming language Simula (except
 unspecified parameters to formal or virtual procedures (see the
 documentation for how portable code for formal procedures can be
 written)).  It offers a class concept, separate compilation with full
 type checking, interface to external C routines, an application
 package for process simulation and a coroutine concept.
 
-Cim is a Simula compiler whose portability is based on the C
+The portability of the GNU Simula Compiler is based on the C
 programming language.  The compiler and the run-time system is written
 in C, and the compiler produces C code, that is passed to a C compiler
 for further processing towards machine code.
@@ -16,11 +16,11 @@ for further processing towards machine code.
 Copyright
 ---------
 
-Cim is copyrighted by Sverre Hvammen Johansen, Stein Krogdahl, and
+GNU Cim is copyrighted by Sverre Hvammen Johansen, Stein Krogdahl, and
 Terje Mjøs, Department of Informatics, University of Oslo (plus some
 minor parts from Free Software Fundation).
 
-Cim is free software; you can redistribute it and/or modify it under
+GNU Cim is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free
 Software Foundation; version 2.
 
@@ -83,7 +83,7 @@ don't want shared libraries, then please run `./configure' with option
 Bugs
 ----
 
-Please mail bug reports for Cim to cim-bug@ifi.uio.no. Please include
+Please mail bug reports for Cim to bug-cim@gnu.org. Please include
 the Cim version number and the system type, which you can get by
 running "cim --version", a copy of config.cache, and relevant Simula-
 and produced C-code.
@@ -91,13 +91,13 @@ and produced C-code.
 Version 4
 ---------
 
-Cim version 4 is experimental.  If you want a stable compiler, please
+GNU Cim version 4 is experimental.  If you want a stable compiler, please
 use version 3 instead.  We are planing support for more optimizations.
 
 Version 3
 ---------
 
-Cim version 3 is no longer experimental.  The compiler may use a lot
+GNU Cim version 3 is no longer experimental.  The compiler may use a lot
 of virtual memory. If that is a problem for you, please split your
 program into separate compiled modules or use version 2 of cim
 instead.

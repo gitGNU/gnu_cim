@@ -17,3 +17,5 @@
 extern passes_init ();
 extern passes_do ();
 extern passes_reinit ();
+
+extern sent_t *main_sent;

@@ -58,21 +58,21 @@ int localused;
 int arrdim;
 
 
-struct BLOCK *ssblock; /* First system block 
+block_t *ssblock; /* First system block 
                           (The outermost system block with blev=0) 
                           the system environment is conected to this block */
 
-struct BLOCK *cblock; /* Current block */
-struct BLOCK *sblock; /* First non system block 
+block_t *cblock; /* Current block */
+block_t *sblock; /* First non system block 
                          (The outermost block with blev=1)
                          sblock is connected with ssblock through
                          two INSP blocks (sysin and sysout) */
-static struct BLOCK *lblock;
+static block_t *lblock;
 
 static int cblno;
 
 
-struct BLOCK *seenthrough;	/* Settes av find_global og find_local og peker 
+block_t *seenthrough;	/* Settes av find_global og find_local og peker 
 				 * p}  en utenforliggende inspect blokk(hvis
 				 * den      finnes). Det er fordi jeg onsker
 				 * } vite n}r en variable er sett gjennom
@@ -80,34 +80,34 @@ struct BLOCK *seenthrough;	/* Settes av find_global og find_local og peker
 				 * kode genereringen for }    aksessere
 				 * variable fra den inspiserte klassen 
 				 * gjennom inspect variabelen */
-struct DECL *classtext;
+decl_t *classtext;
 
 
 int cblev;
 
-struct DECL *cprevdecl;
+decl_t *cprevdecl;
  
 /* Har en peker som peker p} en array deklarasjon som ikke har f}tt
  * satt sin dim verdi. */
-struct DECL *last_array;
+decl_t *last_array;
 
 /* Under sjekkingen og innlesingen av deklarasjonene
  * trenger jeg å merke de ulike objektene
  * Lar atributter peke paa ulike objekter for merkeingen */
-static struct DECL *sjekkdeklcalled;
-static struct DECL *lastunknowns;
-static struct BLOCK *unknowns;
-struct DECL *commonprefiks;	/* Felles prefiks til alle ikke prefiksede
+static decl_t *sjekkdeklcalled;
+static decl_t *lastunknowns;
+static block_t *unknowns;
+decl_t *commonprefiks;	/* Felles prefiks til alle ikke prefiksede
 				 * klasser Inneholder prosedyren DETACH */
-static struct DECL *switchparam;
-static struct DECL *procparam;
-static struct DECL *sluttparam;
-static struct DECL *arrayparam;
+static decl_t *switchparam;
+static decl_t *procparam;
+static decl_t *sluttparam;
+static decl_t *arrayparam;
 
 /******************************************************************************
 						      PCLEAN, PPUSH and PPOP */
 static 
-ppush(rd)struct DECL *rd;
+ppush(rd)decl_t *rd;
 {
   obstack_ptr_grow (&os_pref, rd);
 }
@@ -121,13 +121,13 @@ pclean()
 }
 
 static 
-struct DECL *ppop()
+decl_t *ppop()
 {
-  struct DECL *rd;
+  decl_t *rd;
   if (obstack_next_free (&os_pref) == obstack_base (&os_pref))
     return (NULL);
 
-  rd= * ((struct DECL * *) obstack_next_free (&os_pref) - 1);
+  rd= * ((decl_t * *) obstack_next_free (&os_pref) - 1);
   obstack_blank (&os_pref, - sizeof (void *));
   return (rd);
 }
@@ -136,17 +136,17 @@ struct DECL *ppop()
 						        NEW-DECL/BLOCK       */
 
 
-struct DECL *
+decl_t *
 new_decl()
 {
-  return (struct DECL *) salloc (sizeof (struct DECL));
+  return (decl_t *) salloc (sizeof (decl_t));
 }
 
-static struct BLOCK *
+static block_t *
 new_block()
 {
-  struct BLOCK *rb;
-  rb= (struct BLOCK *) salloc (sizeof (struct BLOCK));
+  block_t *rb;
+  rb= (block_t *) salloc (sizeof (block_t));
   rb->quant.descr = rb;
   return rb;
 }
@@ -170,8 +170,8 @@ decl_init ()
 
 decl_init_pass1 ()
 {
-  struct BLOCK *rb;
-  struct DECL *rd;
+  block_t *rb;
+  decl_t *rd;
   
   cblev= -1;
   unknowns = new_block ();
@@ -218,7 +218,7 @@ decl_init_pass1 ()
 
 decl_init_pass2 ()
 {
-  struct DECL *rd;
+  decl_t *rd;
   end_block (NULL,CCNO);
   end_block (NULL,CCNO);
   end_block (NULL,CCNO);
@@ -302,7 +302,7 @@ set_array_dim (arrdim) int arrdim;
 /* Newnotseen kalles hver gang det er noe udeklarert
  * Den legger alle disse inn i en liste med de ukjente */
 
-static struct DECL *
+static decl_t *
 newnotseen (ident)
      char *ident;
 {
@@ -330,13 +330,13 @@ newnotseen (ident)
  *  deklarasjonspakka, hvis ikke returneres NULL                         
  *  HVIS virt==TRUE skal det først letes i evt. virtuell liste */
 
-struct DECL *
+decl_t *
 find_decl (ident, rb, virt)
      char *ident;
-     struct BLOCK *rb;
+     block_t *rb;
      char virt;
 {
-  struct DECL *rd;
+  decl_t *rd;
   if ((rb->quant.kind == KINSP) && (rb->when != NULL))
     {
       seenthrough = rb;
@@ -375,13 +375,13 @@ find_decl (ident, rb, virt)
  * Stopper ved f\rste forekomst, fins den ikke kalles newnotseen 
  * Hvis virt==true skal det først letes i evt. virtuell liste */
 
-struct DECL *
+decl_t *
 find_global (ident, virt)
      char *ident;
      char virt;
 {
-  struct DECL *rd;
-  struct BLOCK *rb;
+  decl_t *rd;
+  block_t *rb;
 
   seenthrough = NULL;
   for (rb= cblock; rb; rb= rb->quant.encl)
@@ -405,10 +405,10 @@ find_global (ident, virt)
 /* Sjekker om parameterene er de samme */
 
 same_param (rb1, rb2)
-     struct BLOCK *rb1,
+     block_t *rb1,
       *rb2;
 {
-  struct DECL *rd1,
+  decl_t *rd1,
    *rd2;
   int i;
   if (rb1 == NULL || rb2 == NULL)
@@ -453,7 +453,7 @@ same_param (rb1, rb2)
 /* Gjør rd1 lik rd2 ved å kopiere atributter */
 
 static makeequal (rd1, rd2)
-     struct DECL *rd1,
+     decl_t *rd1,
       *rd2;
 {
   rd1->ident = rd2->ident;
@@ -478,9 +478,9 @@ static makeequal (rd1, rd2)
 /* Finner felles kvalifikasjon for to klasser
  * NULL hviss ingen slik finnes */
 
-struct DECL *
+decl_t *
 commonqual (rdx, rdy)
-     struct DECL *rdx,
+     decl_t *rdx,
       *rdy;
 {				/* Hvis rdx eller rdy peker på
 				 * commonprefiks (som har plev=-1) s} vil 
@@ -515,12 +515,12 @@ commonqual (rdx, rdy)
 
 char 
 subclass (rdx, rdy)
-     struct DECL *rdx,
+     decl_t *rdx,
       *rdy;
 {
   if (rdx == rdy)
     return (TRUE);
-  if (rdx == NULL || rdx == NULL) return(FALSE);
+  if (rdx == NULL || rdy == NULL) return(FALSE);
   if (rdx->plev < rdy->plev)
     return (0);
   while (rdx != NULL && rdx->plev > rdy->plev)
@@ -533,7 +533,7 @@ subclass (rdx, rdy)
 
 char 
 subordinate (rda, rdb)
-     struct DECL *rda,
+     decl_t *rda,
       *rdb;
 {
   return ((rda->type != TREF && rda->type == rdb->type)
@@ -555,7 +555,7 @@ subordinate (rda, rdb)
 begin_block (kind)
      char kind;
 {
-  struct DECL *rd2;
+  decl_t *rd2;
   if (yaccerror)
     return;
 #ifdef DEBUG
@@ -564,11 +564,11 @@ begin_block (kind)
 #endif
 
   {
-    struct BLOCK *lastcblock= cblock;
+    block_t *lastcblock= cblock;
 
     if (kind == KPROC || kind == KCLASS)
       {
-	cblock = (struct BLOCK *) cprevdecl;
+	cblock = (block_t *) cprevdecl;
 	cprevdecl->match = cprevdecl;
       }
     else
@@ -718,7 +718,7 @@ end_block (rtname, codeclass)
 reg_decl (ident, type, kind, categ)
      char *ident, type, kind, categ;
 {
-  struct DECL *pd,
+  decl_t *pd,
    *pdx = NULL;
 #ifdef DEBUG
   if (option_input)
@@ -763,7 +763,7 @@ reg_decl (ident, type, kind, categ)
     proceed:
       if (kind == KCLASS || kind == KPROC)
 	{
-	  pd = (struct DECL *) new_block ();
+	  pd = (decl_t *) new_block ();
 	}
       else
 	{
@@ -816,7 +816,7 @@ reg_decl (ident, type, kind, categ)
 	      if (cblock->lastparloc == pd)
 		cblock->lastparloc = cprevdecl;
 	      makeequal (cprevdecl, pd);
-	      cprevdecl->descr = (struct BLOCK *) cprevdecl;
+	      cprevdecl->descr = (block_t *) cprevdecl;
 	      cprevdecl->next = pd->next;
 	      if (pdx == NULL)
 		cblock->parloc = cprevdecl;
@@ -862,7 +862,7 @@ reg_decl (ident, type, kind, categ)
     case CVIRT:
       if (kind == KCLASS || kind == KPROC)
 	{
-	  pd = (struct DECL *) new_block ();
+	  pd = (decl_t *) new_block ();
 	}
       else
 	{
@@ -936,7 +936,7 @@ reg_inner ()
 
 static 
 dumpdekl (rd)
-     struct DECL *rd;
+     decl_t *rd;
 {
   printf ("        --DECL:%s=%d, k:%c,t:%c,c:%c, plev:%d, dim:%d, virtno:%d, line:%ld", rd->ident, rd->ident, rd->kind, rd->type, rd->categ, rd->plev, rd->dim, rd->virtno, rd->line);
   if (rd->protected == TRUE)
@@ -991,9 +991,9 @@ dumpdekl (rd)
  * Den gjør i sin tur en rekke kall paa dumpdekl */
 
 dumpblock (rb)
-     struct BLOCK *rb;
+     block_t *rb;
 {
-  struct DECL *rd;
+  decl_t *rd;
   printf 
     ("->BLOCK:(%d,%d)  k:%c, np:%d, nv:%d, nvl:%d, f:%d, c:%d, l:%ld, ",
      rb->blno, rb->blev, rb->quant.kind,
@@ -1090,7 +1090,7 @@ dumpblock (rb)
 
 dump ()
 {
-  struct BLOCK *rb;
+  block_t *rb;
   printf ("BLOKK:Blno,Blev,kind,napar,navirt,navirtlab,");
   printf ("fornest,connest,line1,line2,localclasses,thisused\n\n");
   printf ("DECL:navn,kind,type,categ,plev,dim,virtno,line\n\n");
@@ -1112,12 +1112,12 @@ dump ()
 
 static 
 setprotectedvirt (rb, rd, protected)
-     struct BLOCK *rb;
-     struct DECL *rd;
+     block_t *rb;
+     decl_t *rd;
      char protected;
 {
-  struct BLOCK *rbx;
-  struct DECL *rdx;
+  block_t *rbx;
+  decl_t *rdx;
   rbx = rb;
   /* Den virtuelle listen for innerste prefiksniv} er ikke akkumulert opp */
   if (rb->navirt == 0 & rb->navirtlab == 0)
@@ -1142,11 +1142,11 @@ setprotectedvirt (rb, rd, protected)
 
 static 
 setprotected (rb, protected)
-     struct BLOCK *rb;
+     block_t *rb;
      char protected;
 {
-  struct BLOCK *rbx;
-  struct DECL *rd;
+  block_t *rbx;
+  decl_t *rd;
   for (rd = rb->hiprot; rd != NULL; rd = rd->next)
     if (rd->match != NULL && rd->match->encl == rb)
       {
@@ -1179,9 +1179,9 @@ setprotected (rb, protected)
 
 static 
 setprefchain (rd)
-     struct DECL *rd;
+     decl_t *rd;
 {
-  struct DECL *rdx;
+  decl_t *rdx;
   if (rd->plev <= 0 && rd->identqual==NULL)
     {
       if (rd->plev == 0)
@@ -1246,12 +1246,12 @@ setprefchain (rd)
 /* Setter opp prefikskjeden og kvalifikasjonen til pekere        
  * gjør kall på setprefchain og sjekker  kvalifikasjonen */
 
-static struct DECL *
+static decl_t *
 setqualprefchain (rd, param)
-     struct DECL *rd;
+     decl_t *rd;
      int param;
 {
-  struct DECL *rdx;
+  decl_t *rdx;
   for (; rd != NULL; rd = rd->next)
     {
       if (param && (rd->categ == CLOCAL || rd->categ == CCONSTU
@@ -1292,15 +1292,15 @@ setqualprefchain (rd, param)
 
 static 
 sjekkdekl (rb)
-     struct BLOCK *rb;
+     block_t *rb;
 {
-  struct DECL *rd = NULL,
+  decl_t *rd = NULL,
    *rdx = NULL,
    *rdy,
    *va = NULL,
    *vb = NULL,
    *vc = NULL;
-  struct BLOCK *rbx = NULL;
+  block_t *rbx = NULL;
   int vno,
     vnolab,
     kind;
@@ -1651,14 +1651,14 @@ sjekkdekl (rb)
 /******************************************************************************
   							      FIRSTCLASS     */
 
-struct BLOCK *
+block_t *
 firstclass ()
 {				/* Retunerer med blev for den n{rmeste
 				 * klassen eller prefiksblokk sett
 				 * fra cblock */
 
   int i;
-  struct BLOCK *rb;
+  block_t *rb;
   i = cblev;
   for (rb = cblock; rb->quant.kind != KCLASS && rb->quant.kind != KPRBLK; rb = rb->quant.encl)
     if ((rb->quant.kind == KFOR || rb->quant.kind == KINSP
@@ -1727,7 +1727,7 @@ out_block ()
                                                                 REGWHEN      */
 
 
-regwhen (rb, rd) struct BLOCK *rb; struct DECL *rd;
+regwhen (rb, rd) block_t *rb; decl_t *rd;
 {
   rb->quant.prefqual->descr->when= rd;
 }
@@ -1736,7 +1736,7 @@ regwhen (rb, rd) struct BLOCK *rb; struct DECL *rd;
                                                                 REGINSP      */
 
 
-reginsp (rb, rd) struct BLOCK *rb; struct DECL *rd;
+reginsp (rb, rd) block_t *rb; decl_t *rd;
 {
   if (rd == NULL)
     {
@@ -1753,14 +1753,14 @@ reginsp (rb, rd) struct BLOCK *rb; struct DECL *rd;
 /* Kalles fra sjekkeren hver gang this oppdages,
  * sjekker da lovligheten */
 
-struct DECL *
+decl_t *
 reg_this (ident)
      char *ident;
 {
-  struct DECL *rd,
+  decl_t *rd,
    *rdt,
    *rdx;
-  struct BLOCK *rb;
+  block_t *rb;
 #ifdef DEBUG
   if (option_input)
     printf ("reg_this---line:%ld cblev:%d\t"
@@ -1819,10 +1819,10 @@ reg_this (ident)
  * Den registrerer også localused 
  * Hvis virt==TRUE skal det først letes i evt. virtuell liste */
 
-struct DECL *
+decl_t *
 find_local (ident, rd, virt)
      char *ident;
-     struct DECL *rd;
+     decl_t *rd;
      char virt;
 {
   seenthrough = NULL;
@@ -1845,11 +1845,11 @@ find_local (ident, rd, virt)
  * til en prosedyre eller klasse 
  * Får som input forrige parameter */
 
-struct DECL *
+decl_t *
 next_param (rd)
-     struct DECL *rd;
+     decl_t *rd;
 {
-  struct DECL *rdx;
+  decl_t *rdx;
   int plev;
   if (rd == NULL)
     return (NULL);
@@ -1875,11 +1875,11 @@ next_param (rd)
   return (sluttparam);
 }
 
-static struct DECL *
+static decl_t *
 firstclassparam (rd)
-     struct DECL *rd;
+     decl_t *rd;
 {
-  struct DECL *rdx,
+  decl_t *rdx,
    *rdy;
   if (rd->plev > 0)
     {
@@ -1901,11 +1901,11 @@ firstclassparam (rd)
 
 
 
-struct DECL *
+decl_t *
 first_param (rd)
-     struct DECL *rd;
+     decl_t *rd;
 {
-  struct DECL *rdx;
+  decl_t *rdx;
   if (rd->kind == KCLASS)
     {
       pclean ();
@@ -1942,7 +1942,7 @@ first_param (rd)
 /* Forlanges det flere parametere */
 
 more_param (rd)
-     struct DECL *rd;
+     decl_t *rd;
 {
   if (rd == sluttparam)
     return (FALSE);
@@ -1972,9 +1972,9 @@ more_param (rd)
 /* Er vi inne i en prosedyre kropp */
 
 body (rd)
-     struct DECL *rd;
+     decl_t *rd;
 {
-  struct BLOCK *rb, *rbx;
+  block_t *rb, *rbx;
   rbx = cblock;
   rb = rd->descr;
   for (rbx= cblock; rbx->blev > 0; rbx= rbx->quant.encl)
@@ -1997,7 +1997,7 @@ body (rd)
 
 char 
 danger_proc (rd)
-     struct DECL *rd;
+     decl_t *rd;
 {
   switch (rd->descr->codeclass)
     {
@@ -2018,9 +2018,9 @@ danger_proc (rd)
 /*****************************************************************************
                                                                 REMOVEBLOCK */
 
-remove_block (rb) struct BLOCK *rb;
+remove_block (rb) block_t *rb;
 {
-  struct DECL *rd;
+  decl_t *rd;
   if (rb->quant.encl->parloc->descr == rb) 
     rb->quant.encl->parloc= rb->quant.encl->parloc->next;
   else
