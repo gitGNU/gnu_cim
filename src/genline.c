@@ -106,7 +106,7 @@ genline ()
 {
   if (true_last_line != lineno)
     {
-      fprintf (ccode, "\n# %d \"\%s\"\n",getmapline(lineno), getmapfile(lineno));
+      fprintf (ccode, "\n# %d \"%s\"\n",getmapline(lineno), getmapfile(lineno));
     }
   if (!option_line && last_line != lineno)
     fprintf (ccode, "__cline=%ld;", lineno);

@@ -50,7 +50,7 @@ ebuilderInit()
 struct EXP *newexp()
 {
   struct EXP *re;
-  re= obstack_alloc (&osExpr, sizeof (struct EXP));
+  re= (struct EXP *)obstack_alloc (&osExpr, sizeof (struct EXP));
   bzero (re, sizeof (struct EXP));
   re->line= lineno;
   return re;

@@ -130,7 +130,7 @@ static struct DECL *ppop()
 struct DECL *newDecl()
 {
   struct DECL *rd;
-  rd= obstack_alloc (&osDecl, sizeof (struct DECL));
+  rd= (struct DECL *) obstack_alloc (&osDecl, sizeof (struct DECL));
   bzero (rd, sizeof (struct DECL));
   return rd;
 }
@@ -138,7 +138,7 @@ struct DECL *newDecl()
 static struct BLOCK *newBlock()
 {
   struct BLOCK *rb;
-  rb= obstack_alloc (&osDecl, sizeof (struct BLOCK));
+  rb= (struct BLOCK *)obstack_alloc (&osDecl, sizeof (struct BLOCK));
   bzero (rb, sizeof (struct BLOCK));
   rb->quant.descr = rb;
   return rb;

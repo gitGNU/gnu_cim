@@ -23,6 +23,13 @@ Version 2:
   details.
 
 
+Version 3.33
+
+* Minor changes so that the C-compiler will compile with TenDRA C.
+  The RTS and generated C-code will not compile with TenDRA C, without
+  major changes. I belive that the TenDRA C compiler is broken.
+
+
 Version 3.32
 
 * Broken configure script: Because of libtool upgrade some configure tests

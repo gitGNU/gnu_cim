@@ -57,7 +57,7 @@ static int lexchar;
 static unsigned char firstchar;
 static unsigned char secondchar;
 static unsigned char thirdchar;
-static unsigned char *yytext;
+static char *yytext;
 
 static int pardeep = 0;
 static int antsimchar = 0;

@@ -81,7 +81,7 @@ char stripsideeffects = OFF;
 struct SENT *newSent(token) int token;
 {
   struct SENT *new;
-  new= obstack_alloc (&osSent, sizeof (struct SENT));
+  new= (struct SENT *)obstack_alloc (&osSent, sizeof (struct SENT));
   bzero (new, sizeof (struct SENT));
 
   new->token= token;
