@@ -28,8 +28,10 @@
 double __rrdiv0(double i)
 {
   if (i != 0) return i;
-  __rerror ("division by zero.");
-  return 1;
+  __rerror ("Div0: Division by zero");
+  return 1.0;
 }
 
 #endif
+
+

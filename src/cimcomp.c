@@ -336,7 +336,9 @@ basename (str) char *str;
   str= newstrcat1 (str);
   i= strlen (str);
   if (i > 4 && !(strcmp (&str[i - 4], ".sim")
-		 && strcmp (&str[i - 4], ".cim")))
+		 && strcmp (&str[i - 4], ".SIM")
+		 && strcmp (&str[i - 4], ".cim")
+		 && strcmp (&str[i - 4], ".CIM")))
     str[i - 4] = '\0';
   
   return str;
@@ -651,7 +653,9 @@ static parseoptions (argc, argv)
 	      print_help (1);
 	    };
 	  if (l > 4 && !(strcmp (&argv[index][l - 4], ".sim")
-			 && strcmp (&argv[index][l - 4], ".cim")))
+			 && strcmp (&argv[index][l - 4], ".SIM")
+			 && strcmp (&argv[index][l - 4], ".cim")
+			 && strcmp (&argv[index][l - 4], ".CIM")))
 	    sourcename = newstrcat1 (argv[index]);
 	  else
 	    sourcename = newstrcat2 (argv[index], ".sim");

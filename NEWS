@@ -23,6 +23,11 @@ Version 2:
   details.
 
 
+Version 3.35
+
+* Minor changes. Corrected a bug that remained from version 3.34.
+
+
 Version 3.34
 
 * Fixed a bug which caused option -a to not work correctly. NULL from
@@ -32,6 +37,7 @@ Version 3.34
   Doing some preparation for Mingw32. Please not upgrade now. More bugs
   will be corrected later.
 
+
 Version 3.33
 
 * Minor changes so that the C-compiler will compile with TenDRA C.

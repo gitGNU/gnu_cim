@@ -28,7 +28,7 @@
 long __ridiv0(long i)
 {
   if (i != 0) return i;
-  __rerror ("division by zero.");
+  __rerror ("Div0: Division by zero");
   return 1;
 }
 #endif

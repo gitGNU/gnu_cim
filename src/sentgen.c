@@ -143,23 +143,20 @@ blockGen (sent) struct SENT *sent;
 {
   cblock= sent->cblock;
   cblev= cblock->blev;
-  if (sent->cblock->blev != EXTERNALGLOBALBLEV)
-    {
-      genline ();
-      if (sent->cblock->stat)
-	fprintf (ccode, "__sto= (__dhp)&__blokk%d%s;", sent->cblock->blno
-		 ,timestamp);
-      fprintf (ccode, "__rb(");
-      gen_adr_prot (ccode, &sent->cblock->quant);
-      fprintf (ccode, ");");
-    }
+
+  genline ();
+  if (sent->cblock->stat)
+    fprintf (ccode, "__sto= (__dhp)&__blokk%d%s;", sent->cblock->blno
+	     ,timestamp);
+  fprintf (ccode, "__rb(");
+  gen_adr_prot (ccode, &sent->cblock->quant);
+  fprintf (ccode, ");");
+
   gotollabel (sent->cblock->ent = newllabel ());
   sentListGen (sent);
-  if (sent->cblock->blev != EXTERNALGLOBALBLEV)
-    {
-      if (not_reached == FALSE)
-	fprintf (ccode, "__rbe();");
-    }
+
+  if (not_reached == FALSE)
+    fprintf (ccode, "__rbe();");
 }
 
 /******************************************************************************

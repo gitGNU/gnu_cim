@@ -236,8 +236,10 @@ char *filename;
   if (len >=4 && !strcmp (&filename[len - 4], ".atr")) 
     return (tag (filename));
       
-  if (len >=4 && (!strcmp (&filename[len - 4], ".sim")
-                  || !strcmp (&filename[len - 4], ".SIM")))
+  if (len >=4 && !(strcmp (&filename[len - 4], ".sim")
+                  && strcmp (&filename[len - 4], ".SIM")
+                  && strcmp (&filename[len - 4], ".cim")
+                  && strcmp (&filename[len - 4], ".CIM")))
     obstack_grow (&osExtspec, filename, len - 4);
   else
     obstack_grow (&osExtspec, filename, len);

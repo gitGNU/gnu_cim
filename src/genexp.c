@@ -1363,6 +1363,26 @@ genvalue (re)
       fprintf (ccode, ";");
       genvalue (re->right);
       break;
+    case MDIV:
+    case MINTDIV:
+      putc ('(', ccode);
+      genvalue (re->left);
+      fprintf (ccode, "/");
+
+#ifdef DIV0
+      if (re->token == MINTDIV) 
+	fprintf (ccode, "__ridiv0 (");
+      else
+	fprintf (ccode, "__rrdiv0 (");
+#endif /* DIV0 */
+
+      genvalue (re->right);
+      putc (')', ccode);
+
+#ifdef DIV0
+      putc (')', ccode); 
+#endif /* DIV0 */
+      break;
     default:
       putc ('(', ccode);
       if (re->left->type == TCHAR)
@@ -1415,22 +1435,6 @@ genvalue (re)
 	case MMULI:
 	  fprintf (ccode, "*");
 	  break;
-	case MDIV:
-	case MINTDIV:
-#ifdef DIV0
-          if (re->right->type == TINTG) {
-            fprintf (ccode, "/ __ridiv0 (");
-          }
-          else if (re->right->type == TREAL) {
-            fprintf (ccode, "/ __rrdiv0 (");
-          }
-          else {
-            fprintf (stderr, "Invalid operand type...\n");
-          }
-#else
-	  fprintf (ccode, "/");
-#endif /* DIV0 */
-	  break;
 	default:
 #ifdef DEBUG
 	  fprintf (stderr, "Illegal token:%s\n"
@@ -1444,9 +1448,6 @@ genvalue (re)
       if (re->left->type == TCHAR)
 	fprintf (ccode, "(unsigned char)");
       genvalue (re->right);
-#ifdef DIV0
-      if (re->token == MDIV || re->token == MINTDIV) putc (')', ccode); 
-#endif /* DIV0 */
       putc (')', ccode);
     }
 }
