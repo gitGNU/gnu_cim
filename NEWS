@@ -23,6 +23,11 @@ Version 2:
   details.
 
 
+Version: 3.26
+
+* Corrected a tiny bug in the code-generator.
+
+
 Version: 3.25
 
 * Corrected a bug which may report "(null) is declared twice" for

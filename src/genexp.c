@@ -826,8 +826,8 @@ genvalue (re)
 			fprintf (ccode, "bp)+",
 				 re->rd->ident);
 			      
-		      fprintf (ccode, "%s.", re->rd->ident);
 		      gensl (re, TRUE, ON);
+		      fprintf (ccode, "%s.", re->rd->ident);
 			      
 		      if (re->rd->categ == CVAR)
 			fprintf (ccode, "ofs)", re->rd->ident);
