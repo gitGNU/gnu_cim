@@ -23,6 +23,11 @@ Version 2:
   details.
 
 
+Version: 4.3
+
+* Bugfix: New in combination with inspect did not work correctly.
+
+
 Version: 4.2
 
 * Integrated the changes in cim-3.28 - cim-3.35
