@@ -23,6 +23,14 @@ Version 2:
   details.
 
 
+Version 3.24
+
+* Corrected a bug concerning programs that contained an inner
+  inside a while- or if-statement.
+
+* Updated cim.spec.in so that cim is buildroot-capable.
+
+
 Version 3.23
 
 * Version 3 is not experimental anymore. Please use version 3 instead of 

@@ -88,16 +88,23 @@ the Cim version number and the system type, which you can get by
 running "cim --version", a copy of config.cache, and relevant Simula-
 and produced C-code.
 
+Version 4
+---------
+
+Cim version 4 is experimental.  If you want a stable compiler, please
+use version 3 instead.  We are planing support for more optimizations.
+
 Version 3
 ---------
 
-Cim version 3 is experimental. If you want a stable compiler, please
-use version 2 instead. Many new features will shortly be included.  We
-are planing support for some optimization and some bug-fixes that
-remained from version 2.
-
-The compiler may use a lot of virtual memory. If that is a problem for
-you, please split your program into separate compiled modules or use
-version 2 of cim instead.
+Cim version 3 is no longer experimental.  The compiler may use a lot
+of virtual memory. If that is a problem for you, please split your
+program into separate compiled modules or use version 2 of cim
+instead.
 
 Sverre Hvammen Johansen
+
+
+
+
+

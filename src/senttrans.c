@@ -71,17 +71,8 @@ static void sortProcArr (parentSent) struct SENT *parentSent;
       new->cblock= parentSent->cblock;
       insertBeforeSent (parentSent, sent, new);
 
-      if (parentSent->token==MCLASS)
+      if (parentSent->token==MCLASS && !cblock->inner)
 	{
-	  for (; sent!=NULL ;sent=sent->next)
-	    {
-	      line= sent->line;
-	      switch (sent->token)
-		{
-		case MINNER:
-		  return;
-		}
-	    }
 	  new= newSent (MINNER);
 	  new->cblock= parentSent->cblock;
 	  insertBeforeSent (parentSent, NULL, new);

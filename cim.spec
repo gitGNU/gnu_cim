@@ -1,14 +1,14 @@
 Summary: Simula to C translator. Mother of all OO-languages.
 Name: cim
-Version: 3.23
+Version: 3.24
 Release: 1
-Source: ftp.ifi.uio.no:/pub/cim/cim-3.23.tar.gz
+Source: ftp.ifi.uio.no:/pub/cim/cim-3.24.tar.gz
 Copyright: GPL
 Group: Development/Languages
 Provides: cim
 Requires: gcc
 Packager: Sverre Hvammen Johansen <cim@ifi.uio.no>
-# BuildRoot: /tmp/cim-root
+BuildRoot: /tmp/cim-root
 
 %description
 Cim compiles Simula code to C and uses a C compiler like gcc to
@@ -17,11 +17,12 @@ with object-oriented features. The Simula language has features for
 quasi-paralell execution and a framework for doing simulations.
 
 %prep
-%setup -n cim-3.23
+%setup -n cim-3.24
 
 %build
-# CFLAGS=-O2 LDFLAGS=-s ./configure --prefix=$RPM_BUILD_ROOT/usr --enable-dump=yes
-CFLAGS=-O2 LDFLAGS=-s ./configure --prefix=/usr --enable-dump=yes
+CFLAGS=-O2 LDFLAGS=-s ./configure --prefix=$RPM_BUILD_ROOT/usr --enable-dump=yes
+#CFLAGS=-O2 LDFLAGS=-s ./configure --prefix=/usr --enable-dump=yes
+(cd src; make libdir=/usr/lib includedir=/usr/include)
 make all
 
 %install
