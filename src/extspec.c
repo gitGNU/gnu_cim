@@ -565,6 +565,8 @@ static write_text_mif (f, s) FILE *f; unsigned char *s;
 static write_decl_mif (f, rd, level)
        FILE *f; struct DECL *rd; int level;
 {
+  if (rd->kind == KBLOKK || rd->kind == KPRBLK || rd->kind == KFOR || 
+      rd->kind == KINSP) return;
   if (level == 0)
     {
       int i;
@@ -836,7 +838,9 @@ write_all_mif ()
 static write_decl_ext (f, rd)
        FILE *f; struct DECL *rd;
 {
-  if (rd->categ == CEXTR || rd->categ == CEXTRMAIN)
+  if (rd->kind == KBLOKK || rd->kind == KPRBLK || rd->kind == KFOR || 
+      rd->kind == KINSP) ;
+  else if (rd->categ == CEXTR || rd->categ == CEXTRMAIN)
     fprintf (f, "&%c%c%s %s %s\n", rd->type, rd->kind
 		    ,rd->ident, rd->descr->timestamp, rd->descr->filename);
   else if (rd->kind == KPROC || rd->kind == KCLASS)

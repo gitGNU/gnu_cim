@@ -410,12 +410,18 @@ computeconst (re)
       break;
     case MPRIMARYRI:
       {
-	long i;
+	long i, s;
 	VALUE.rval = 1.0;
-	if (RIGHTVALUE.ival < 0)
+	if (LEFTVALUE.rval == 0 && RIGHTVALUE.ival == 0)
 	  serror (4);
+	if (RIGHTVALUE.ival < 0) 
+	  {
+	    RIGHTVALUE.ival= -RIGHTVALUE.ival;
+	    s= 1;
+	  } else s= 0;
 	for (i = 1; i <= RIGHTVALUE.ival; i++)
 	  VALUE.rval *= LEFTVALUE.rval;
+	if (s) VALUE.rval= 1.0 / VALUE.rval;
 	TOKEN = MREALKONST;
       }
       break;

@@ -124,7 +124,7 @@ static gen_conv_and_q (rex, procedure, transported, copied_all)
 
       if (transported)
 	{
-	  fprintf (ccode, "}elseif(__rrin(");
+	  fprintf (ccode, "}else if(__rrin(");
 	  gensl (rex->left, TRUE, ON);
 	  fprintf (ccode, "%s.q,",
 			  rex->left->value.ident);

@@ -23,6 +23,18 @@ Version 2:
   details.
 
 
+Version: 3.25
+
+* Corrected a bug which may report "(null) is declared twice" for
+  external compiled modules.
+
+* Corrected a bug in genpar.c, a missing blank which caused C-compilation
+  of generated code to fail. Same bug corrected in version 2.11.
+
+* Corrected a bug which reported real-constant ** negative-integer-constant 
+  as an error.
+
+
 Version 3.24
 
 * Corrected a bug concerning programs that contained an inner

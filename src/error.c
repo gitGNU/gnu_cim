@@ -319,10 +319,10 @@ d2error (errcode, rd1, rd2)
 		      ,rd2->ident, name1);
       break;
     case 53:
-      fprintf (stderr, "%s have unknown qualification.\n", name1);
+      fprintf (stderr, "%s has unknown qualification.\n", name1);
       break;
     case 54:
-      fprintf (stderr, "%s have illegal qualification.\n"
+      fprintf (stderr, "%s has illegal qualification.\n"
 		      , name1);
       break;
     case 55:
@@ -466,7 +466,7 @@ serror (errcode, name, ant)
      char *name;
 {
   char *antt;
-  if (option_nowarning && errcode == 83)
+  if (option_nowarning && errcode >= 81 && errcode <= 83 )
     return;
   starterror (lineno);
   antt = textnumber (ant);
@@ -512,7 +512,7 @@ serror (errcode, name, ant)
       fprintf (stderr, "Expression after IF/WHILE is not of type boolean.\n");
       break;
     case 81:
-      fprintf (stderr, "Warning: FOR/WHILE-statement have empty body.\n");
+      fprintf (stderr, "Warning: FOR/WHILE-statement has empty body.\n");
       anterror--;
       break;
     case 82:
@@ -710,7 +710,7 @@ merror (errcode, name)
 		      ,name);
       break;
     case 5:
-      fprintf (stderr, "File %s have illegal format.\n"
+      fprintf (stderr, "File %s has illegal format.\n"
 		      ,name);
       break;
     case 6:
