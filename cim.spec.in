@@ -3,11 +3,12 @@ Name: cim
 Version: @VERSION@
 Release: 1
 Source: ftp.ifi.uio.no:/pub/cim/cim-@VERSION@.tar.gz
-Copyright: distributable
+Copyright: GPL
 Group: Development/Languages
 Provides: cim
 Requires: gcc
 Packager: Sverre Hvammen Johansen <cim@ifi.uio.no>
+# BuildRoot: /tmp/cim-root
 
 %description
 Cim compiles Simula code to C and uses a C compiler like gcc to
@@ -19,6 +20,7 @@ quasi-paralell execution and a framework for doing simulations.
 %setup -n cim-@VERSION@
 
 %build
+# CFLAGS=-O2 LDFLAGS=-s ./configure --prefix=$RPM_BUILD_ROOT/usr --enable-dump=yes
 CFLAGS=-O2 LDFLAGS=-s ./configure --prefix=/usr --enable-dump=yes
 make all
 
@@ -27,6 +29,7 @@ make install
 /sbin/ldconfig
 
 %files
+# %defattr(-, root, root)
 /usr/bin/cim
 /usr/bin/cim2latex
 /usr/bin/cim2ps
@@ -41,11 +44,7 @@ make install
 /usr/man/man1/cim.1
 /usr/info/cim.info
 
-%doc README
-# %doc IAFA-PACKAGE
-%doc doc/SIMULA-HISTORY
-%doc doc/cim.texi
-%doc doc/cim.info
+%doc README doc/SIMULA-HISTORY AUTHORS COPYING ChangeLog NEWS TODO
 
 %post
 /sbin/ldconfig
