@@ -30,6 +30,8 @@
 
 #include <obstack.h>
 
+#include <string.h>
+
 char *xmalloc();
 void free();
 
@@ -49,6 +51,7 @@ tag (t)
 {
   int leng;
   long hash;
+  void *ptr= NULL;
   void * * list, * *prevlist = NULL;
 
   leng= strlen (t);
@@ -64,7 +67,11 @@ tag (t)
       prevlist = list;
     }
 
+#if 0
   obstack_ptr_grow(&osName, NULL);
+#else
+  obstack_grow(&osName, &ptr, sizeof (void *));
+#endif
   obstack_grow0 (&osName, t, leng);
   obstack_1grow (&osName, FALSE);
   list= (void * *)obstack_finish (&osName);

@@ -803,7 +803,7 @@ static scanDirline ()
 	    case 'E':
 	      if (!strcmp (yytext, "EOF"))
 		{
-		  fclose (includeFile ());
+		  //fclose (includeFile ());
 		  end_of_file = 2;
 		  return;
 		}
@@ -1145,7 +1145,7 @@ yylex ()
 			}
 		      else if (lexchar == EOF)
 			{
-			  unput (lexchar);
+			  //unput (lexchar);
 			  return (HEND);
 			}
 		      else if (lexchar == ';')

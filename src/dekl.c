@@ -102,7 +102,11 @@ static struct DECL *arrayparam;
 						      PCLEAN, PPUSH and PPOP */
 static ppush(rd)struct DECL *rd;
 {
+#if 0
   obstack_ptr_grow (&osPref, rd);
+#else
+  obstack_grow(&osPref, &rd, sizeof (void *));
+#endif
 }
 
 static pclean()

@@ -37,7 +37,11 @@ struct SENT module;
 
 static spush(re)struct EXP *re;
 {
+#if 0
   obstack_ptr_grow (&osStack, re);
+#else
+  obstack_grow(&osStack, &re, sizeof (void *));
+#endif
 }
 
 /******************************************************************************

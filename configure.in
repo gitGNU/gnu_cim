@@ -29,7 +29,7 @@ AC_DEFINE_UNQUOTED(OS_TYPE_VERSION,"`echo $target_os | tr a-z A-Z`")
 AC_DEFINE_UNQUOTED(MANUFACTURER,"`echo $target_vendor | tr a-z A-Z`")
 AC_DEFINE_UNQUOTED(OS_TYPE,"`echo $target_os_x_version | tr a-z A-Z`")
 
-AM_INIT_AUTOMAKE(cim, 3.36)
+AM_INIT_AUTOMAKE(cim, 3.37)
 AM_CONFIG_HEADER(config.h)
 AC_CYGWIN
 AM_PROG_LIBTOOL
