@@ -811,7 +811,6 @@ scan_dirline ()
 	    case 'E':
 	      if (!strcmp (yytext, "EOF"))
 		{
-		  fclose (include_file ());
 		  end_of_file = 2;
 		  return;
 		}
