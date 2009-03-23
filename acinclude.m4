@@ -14,7 +14,7 @@ dnl You should have received a copy of the GNU General Public License
 dnl along with this program; if not, write to the Free Software
 dnl Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA. */
 
-AC_DEFUN(CIM_LINK_STATIC_FLAG,
+AC_DEFUN([CIM_LINK_STATIC_FLAG],
 [
 AC_MSG_CHECKING(grepping libtool to find link_static_flag)
 AC_CACHE_VAL(cim_cv_link_static_flag,[
@@ -22,10 +22,10 @@ eval `grep link_static_flag libtool|head -1`
 cim_cv_link_static_flag=$link_static_flag
 ])
 AC_MSG_RESULT($cim_cv_link_static_flag)
-AC_DEFINE_UNQUOTED(LINK_STATIC_FLAG,"$cim_cv_link_static_flag")
+AC_DEFINE_UNQUOTED(LINK_STATIC_FLAG,"$cim_cv_link_static_flag", "Compiler flag to prevent dynamic linking")
 ])dnl
 
-AC_DEFUN(CIM_PIC_FLAG,
+AC_DEFUN([CIM_PIC_FLAG],
 [
 AC_MSG_CHECKING(grepping libtool to find pic_flag)
 AC_CACHE_VAL(cim_cv_pic_flag,[
@@ -33,10 +33,10 @@ eval `grep pic_flag libtool|head -1`
 cim_cv_pic_flag=$pic_flag
 ])
 AC_MSG_RESULT($cim_cv_pic_flag)
-AC_DEFINE_UNQUOTED(PIC_FLAG,"$cim_cv_pic_flag")
+AC_DEFINE_UNQUOTED(PIC_FLAG,"$cim_cv_pic_flag", "Additional compiler flags for building shared library objects")
 ])dnl
 
-AC_DEFUN(CIM_WL_FLAG,
+AC_DEFUN([CIM_WL_FLAG],
 [
 AC_MSG_CHECKING(grepping libtool to find wl_flag)
 AC_CACHE_VAL(cim_cv_wl_flag,[
@@ -44,10 +44,10 @@ eval `grep wl= libtool|head -1`
 cim_cv_wl_flag=$wl
 ])
 AC_MSG_RESULT($cim_cv_wl_flag)
-AC_DEFINE_UNQUOTED(WL_FLAG,"$cim_cv_wl_flag")
+AC_DEFINE_UNQUOTED(WL_FLAG,"$cim_cv_wl_flag", "How to pass a linker flag through the compiler")
 ])dnl
 
-AC_DEFUN(CIM_TRAP,
+AC_DEFUN([CIM_TRAP],
 [
 
 AC_MSG_CHECKING(signal SIGFPE)
@@ -62,7 +62,7 @@ exit(0);
 }],cim_cv_sigfpe=yes,cim_cv_sigfpe=no,cim_cv_sigfpe=yes)])
 AC_MSG_RESULT($cim_cv_sigfpe)
 if test $cim_cv_sigfpe = yes; then
-  AC_DEFINE(HAVE_SIGFPE)
+  AC_DEFINE_UNQUOTED(HAVE_SIGFPE, 1, "Define if we have signal sigfpe")
 fi
 
 AC_MSG_CHECKING(signal SIGSEGV)
@@ -77,7 +77,7 @@ exit(0);
 }],cim_cv_sigsegv=yes,cim_cv_sigsegv=no,cim_cv_sigsegv=yes)])
 AC_MSG_RESULT($cim_cv_sigsegv)
 if test $cim_cv_sigsegv = yes; then
-  AC_DEFINE(HAVE_SIGSEGV)
+  AC_DEFINE_UNQUOTED(HAVE_SIGSEGV, 1, "Define if we have signal sigsegv")
 fi
 
 AC_MSG_CHECKING(signal SIGILL)
@@ -92,7 +92,7 @@ exit(0);
 }],cim_cv_sigill=yes,cim_cv_sigill=no,cim_cv_sigill=yes)])
 AC_MSG_RESULT($cim_cv_sigill)
 if test $cim_cv_sigill = yes; then
-  AC_DEFINE(HAVE_SIGILL)
+  AC_DEFINE_UNQUOTED(HAVE_SIGILL, 1, "Define if we have signal sigill")
 fi
 
 AC_MSG_CHECKING(signal SIGTRAP)
@@ -107,7 +107,7 @@ exit(0);
 }],cim_cv_sigtrap=yes,cim_cv_sigtrap=no,cim_cv_sigtrap=yes)])
 AC_MSG_RESULT($cim_cv_sigtrap)
 if test $cim_cv_sigtrap = yes; then
-  AC_DEFINE(HAVE_SIGTRAP)
+  AC_DEFINE_UNQUOTED(HAVE_SIGTRAP, 1, "Define if we have signal sigtrap")
 fi
 
 AC_MSG_CHECKING(signal SIGSYS)
@@ -122,7 +122,7 @@ exit(0);
 }],cim_cv_sigsys=yes,cim_cv_sigsys=no,cim_cv_sigsys=yes)])
 AC_MSG_RESULT($cim_cv_sigsys)
 if test $cim_cv_sigsys = yes; then
-  AC_DEFINE(HAVE_SIGSYS)
+  AC_DEFINE_UNQUOTED(HAVE_SIGSYS, 1, "Define if we have signal sigsys")
 fi
 
 AC_MSG_CHECKING(signal SIGBUS)
@@ -137,12 +137,12 @@ exit(0);
 }],cim_cv_sigbus=yes,cim_cv_sigbus=no,cim_cv_sigbus=yes)])
 AC_MSG_RESULT($cim_cv_sigbus)
 if test $cim_cv_sigbus = yes; then
-  AC_DEFINE(HAVE_SIGBUS)
+  AC_DEFINE_UNQUOTED(HAVE_SIGBUS, 1, "Define if we have signal sigbus")
 fi
 
 ])dnl
 
-AC_DEFUN(CIM_BINARY_FILE,
+AC_DEFUN([CIM_BINARY_FILE],
 [
 AC_MSG_CHECKING(whether files must be opened in binary mode)
 AC_CACHE_VAL(cim_cv_binary_file,
@@ -158,38 +158,38 @@ if (getc(f)=='\032') return (0); else return(1);
 rm -f conffile
 AC_MSG_RESULT($cim_cv_binary_file)
 if test $cim_cv_binary_file = yes; then
-  AC_DEFINE(OPEN_FILE_IN_BINARY_MODE)
+  AC_DEFINE_UNQUOTED(OPEN_FILE_IN_BINARY_MODE, 1, "Define if temporary file have to be opened in binary mode")
 fi
 ])dnl
 
-AC_DEFUN(CIM_DEFAULTS,
+AC_DEFUN([CIM_DEFAULTS],
 [
 AC_MSG_CHECKING(assuming iso latin)
 AC_CACHE_VAL(cim_cv_ISO_latin,[cim_cv_iso_latin=yes])
 AC_MSG_RESULT($cim_cv_iso_latin)
 if test $cim_cv_iso_latin = yes; then
-  AC_DEFINE(ISO_LATIN)
+  AC_DEFINE_UNQUOTED(ISO_LATIN, 1, "Define if ISO_LATIN is implemented")
 fi
 
 AC_MSG_CHECKING(assuming input line length)
 AC_CACHE_VAL(cim_cv_input_line_length,[cim_cv_input_line_length=80])
 AC_MSG_RESULT($cim_cv_input_line_length)
-AC_DEFINE_UNQUOTED(INPUT_LINE_LENGTH,$cim_cv_input_line_length)
+AC_DEFINE_UNQUOTED(INPUT_LINE_LENGTH,$cim_cv_input_line_length, "Define input_line_length")
 
 AC_MSG_CHECKING(assuming output line length)
 AC_CACHE_VAL(cim_cv_output_line_length,[cim_cv_output_line_length=80])
 AC_MSG_RESULT($cim_cv_output_line_length)
-AC_DEFINE_UNQUOTED(OUTPUT_LINE_LENGTH,$cim_cv_output_line_length)
+AC_DEFINE_UNQUOTED(OUTPUT_LINE_LENGTH,$cim_cv_output_line_length, "Define output line length")
 
 AC_MSG_CHECKING(assuming lines per page)
 AC_CACHE_VAL(cim_cv_lines_per_page,[cim_cv_lines_per_page=60])
 AC_MSG_RESULT($cim_cv_lines_per_page)
-AC_DEFINE_UNQUOTED(LINES_PER_PAGE,$cim_cv_lines_per_page)
+AC_DEFINE_UNQUOTED(LINES_PER_PAGE,$cim_cv_lines_per_page, "Define lines per page")
 
 AC_MSG_CHECKING(assuming the size of the heap in kB)
 AC_CACHE_VAL(cim_cv_dynmemsizekb,[cim_cv_dynmemsizekb=512])
 AC_MSG_RESULT($cim_cv_dynmemsizekb)
-AC_DEFINE_UNQUOTED(DYNMEMSIZEKB,$cim_cv_dynmemsizekb)
+AC_DEFINE_UNQUOTED(DYNMEMSIZEKB,$cim_cv_dynmemsizekb, "Define the size of the heap")
 
 AC_MSG_CHECKING(assuming that dump is implementable)
 AC_ARG_ENABLE(dump,
@@ -201,7 +201,7 @@ AC_ARG_ENABLE(dump,
 esac],[cim_dump=no])
 AC_MSG_RESULT($cim_dump)
 if test $cim_dump = yes; then
-  AC_DEFINE(DUMP)
+  AC_DEFINE_UNQUOTED(DUMP, 1, "Define if dump is implemented")
 fi
 
 AC_MSG_CHECKING(assuming that floatingpoint conform to IEEE-754)
@@ -218,7 +218,7 @@ case "$target" in
 esac
 AC_MSG_RESULT($cim_cv_float_ieee)
 if test $cim_cv_float_ieee = yes; then
-  AC_DEFINE(FLOAT_IEEE)
+  AC_DEFINE_UNQUOTED(FLOAT_IEEE, 1, "Define if the implementation conforms to IEEE-754")
 fi
 
 AC_MSG_CHECKING(assuming that floatingpoint conform to VAX-format)
@@ -232,7 +232,7 @@ case "$target" in
 esac
 AC_MSG_RESULT($cim_cv_float_vax)
 if test $cim_cv_float_vax = yes; then
-  AC_DEFINE(FLOAT_VAX)
+  AC_DEFINE_UNQUOTED(FLOAT_VAX, 1, "Define if the implementation conforms to the vax architecture")
 fi
 
 AC_MSG_CHECKING(assuming value of max double)
@@ -242,7 +242,7 @@ else
   AC_CACHE_VAL(cim_cv_max_double,[cim_cv_max_double=MAXDOUBLE])
 fi
 AC_MSG_RESULT($cim_cv_max_double)
-AC_DEFINE_UNQUOTED(MAX_DOUBLE,$cim_cv_max_double)
+AC_DEFINE_UNQUOTED(MAX_DOUBLE,$cim_cv_max_double, "Define MAX_DOUBLE")
 
 AC_MSG_CHECKING(assuming value of min double)
 if test $ac_cv_header_stdc = yes; then
@@ -251,12 +251,12 @@ else
   AC_CACHE_VAL(cim_cv_min_double,[cim_cv_min_double=MINDOUBLE])
 fi
 AC_MSG_RESULT($cim_cv_min_double)
-AC_DEFINE_UNQUOTED(MIN_DOUBLE,$cim_cv_min_double)
+AC_DEFINE_UNQUOTED(MIN_DOUBLE,$cim_cv_min_double, "Define MIN_DOUBLE")
 
 AC_MSG_CHECKING(assuming alignment)
 AC_CACHE_VAL(cim_cv_alignment,[cim_cv_alignment=8])
 AC_MSG_RESULT($cim_cv_alignment)
-AC_DEFINE_UNQUOTED(ALIGNMENT,$cim_cv_alignment)
+AC_DEFINE_UNQUOTED(ALIGNMENT,$cim_cv_alignment, "Define alignment")
 
 ])dnl
 

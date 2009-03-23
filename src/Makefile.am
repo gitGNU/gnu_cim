@@ -34,7 +34,7 @@ noinst_HEADERS = cimcomp.h const.h dekl.h gen.h name.h error.h \
                  obstack.h mapline.h expmacros.h trans.h salloc.h \
                  passes.h dump.h
 
-YFLAGS= -d
+AM_YFLAGS= -d
 
 # Variables controlling compilation of the generated C-code
 SCC = $(CC)

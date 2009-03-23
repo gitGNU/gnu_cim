@@ -23,11 +23,11 @@ AC_CANONICAL_SYSTEM
 changequote(,)dnl
 target_os_x_version=`echo $target_os|sed -e 's/\([^0-9.]*\)[0-9.]*/\1/'`
 changequote([,])dnl
-AC_DEFINE_UNQUOTED(SYSTEM_TYPE,"$target")
-AC_DEFINE_UNQUOTED(CPU_TYPE,"`echo $target_cpu | tr a-z A-Z`")
-AC_DEFINE_UNQUOTED(OS_TYPE_VERSION,"`echo $target_os | tr a-z A-Z`")
-AC_DEFINE_UNQUOTED(MANUFACTURER,"`echo $target_vendor | tr a-z A-Z`")
-AC_DEFINE_UNQUOTED(OS_TYPE,"`echo $target_os_x_version | tr a-z A-Z`")
+AC_DEFINE_UNQUOTED(SYSTEM_TYPE,"$target", "Define the system type we are running")
+AC_DEFINE_UNQUOTED(CPU_TYPE,"`echo $target_cpu | tr a-z A-Z`", "Define cpu type derived from system type")
+AC_DEFINE_UNQUOTED(OS_TYPE_VERSION,"`echo $target_os | tr a-z A-Z`", "Define os type including version derived from system type")
+AC_DEFINE_UNQUOTED(MANUFACTURER,"`echo $target_vendor | tr a-z A-Z`", "Define manufacturer derived from system type")
+AC_DEFINE_UNQUOTED(OS_TYPE,"`echo $target_os_x_version | tr a-z A-Z`", "Define os type derived from system type")
 
 AM_INIT_AUTOMAKE(cim, 4.3)
 AM_CONFIG_HEADER(config.h)
