@@ -1,0 +1,17 @@
+/libtool
+/stamp-*
+/ylwrap
+/autom4te.cache
+/config.*
+/configure
+/aclocal.m4
+/cim.spec
+/depcomp
+
+*.o
+*.lo
+*.la
+Makefile
+Makefile.in
+.deps
+.libs
