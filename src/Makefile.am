@@ -20,8 +20,8 @@
 bin_PROGRAMS = cim
 
 cim_SOURCES = error.c pargen.c name.c dekl.c linegen.c strgen.c \
-              extspec.c transcall.c expgen.c lex.c getopt1.c \
-              getopt.c parser.y filelist.c newstr.c cimcomp.c \
+              extspec.c transcall.c expgen.c getopt1.c \
+              getopt.c parser.y lex.c filelist.c newstr.c cimcomp.c \
               mellbuilder.c expbuilder.c sentbuilder.c sentchecker.c \
               expchecker.c computeconst.c sentgen.c obstack.c \
               mapline.c senttrans.c salloc.c passes.c dump.c
