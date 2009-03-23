@@ -24,3 +24,20 @@
 /* genexp.c */
 #define STACK_SIZE 100       /* Size of stack used by genexp */
 #define MAX_ARRAY_DIM 100    /* The maximum number of dimensions for arrays */
+
+/* Define the adress of the first data location.  */
+#define FIRST_DATA_LOCATION ((int)(&__start_data_segment))
+
+/* Define MAX_INT */
+#if SIZEOF_LONG == 8
+#define MAX_INT (~(1L<<63))
+#else
+#define MAX_INT (~(1L<<31))
+#endif
+
+/* Define TYPE_32_INT */
+#if SIZEOF_LONG == 8
+#define TYPE_32_INT int
+#else
+#define TYPE_32_INT long
+#endif
