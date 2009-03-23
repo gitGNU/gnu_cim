@@ -290,7 +290,7 @@ FOR_LIST        :       FOR_LIST_ELEMENT        { mout(MENDSEP);
                 |       FOR_LIST_ELEMENT
                         HPAREXPSEPARATOR
                         FOR_LIST                { mout(MLISTSEP);
-						  $$=KFORLIST}
+						  $$=KFORLIST;}
                 ;
 FOR_LIST_ELEMENT:       EXPRESSION
                         MBEE_F_L_EL_R_PT        
