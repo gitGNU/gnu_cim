@@ -18,7 +18,7 @@
  */
 
 #include "cim.h"
-#include "config.h"
+#include "limit.h"
 
 /******************************************************************************
                                             INTEGER PROCEDURE ENTIER(r)      */

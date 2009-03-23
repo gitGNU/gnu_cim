@@ -18,7 +18,7 @@
  */
 
 #include "cim.h"
-#include "config.h"
+#include "limit.h"
 
 #if STDC_HEADERS
 #include <stdlib.h>
