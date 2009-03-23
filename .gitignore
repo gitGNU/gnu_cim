@@ -1,3 +1,8 @@
+/INSTALL
+/install-sh
+/ltmain.sh
+/missing
+/mkinstalldirs
 /libtool
 /stamp-*
 /ylwrap
@@ -8,6 +13,7 @@
 /cim.spec
 /depcomp
 
+TAGS
 *.o
 *.lo
 *.la
