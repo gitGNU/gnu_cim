@@ -178,7 +178,7 @@ eclean()
 static 
 epush(re)exp_t *re;
 {
-  obstack_ptr_grow (&os_stack, re);
+  obstack_grow (&os_stack, &re, sizeof (void *));
 }
 
 /******************************************************************************

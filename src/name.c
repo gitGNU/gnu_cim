@@ -49,6 +49,7 @@ tag (t)
 {
   int leng;
   long hash;
+  void *ptr= NULL;
   void * * list, * *prevlist = NULL;
 
   leng= strlen (t);
@@ -64,7 +65,7 @@ tag (t)
       prevlist = list;
     }
 
-  obstack_ptr_grow(&os_name, NULL);
+  obstack_grow(&os_name, &ptr, sizeof (void *));
   obstack_grow0 (&os_name, t, leng);
   obstack_1grow (&os_name, FALSE);
   list= (void * *)obstack_finish (&os_name);

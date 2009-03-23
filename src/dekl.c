@@ -109,7 +109,7 @@ static decl_t *arrayparam;
 static 
 ppush(rd)decl_t *rd;
 {
-  obstack_ptr_grow (&os_pref, rd);
+  obstack_grow (&os_pref, &rd, sizeof (void *));
 }
 
 static 
