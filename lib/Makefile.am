@@ -93,7 +93,7 @@ noinst_HEADERS = epsilon.h file.h random.h text.h trigno.h align.h \
 
 include_HEADERS = cim.h
 
-INCLUDES = -I$(top_srcdir)
+AM_CPPFLAGS = -I$(top_srcdir)
 
 EXTRA_DIST = simset.sim simulation.sim simfile.atr simenvir.atr \
              simulation.atr simset.atr libcim-atr.a

@@ -42,7 +42,7 @@ SCFLAGS = $(CFLAGS)
 SLDFLAGS = $(LDFLAGS)
 SLIBS = $(LIBS)
 
-INCLUDES = -I$(top_srcdir)
+AM_CPPFLAGS = -I$(top_srcdir)
 
 cimcomp.o: cimcomp.c Makefile
 	$(COMPILE) '-DSCC="$(SCC)"' '-DSCFLAGS="$(SCFLAGS)"' '-DSLDFLAGS="$(SLDFLAGS)"' '-DSLIBS="$(SLIBS)"' '-DLIBDIR="$(libdir)"' '-DINCLUDEDIR="$(includedir)"' -c $(srcdir)/cimcomp.c

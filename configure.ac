@@ -17,8 +17,9 @@ dnl along with this program; if not, write to the Free Software
 dnl Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA. */
 
 AC_REVISION($Revision: 1.16 $)dnl
-AC_INIT
+AC_INIT(cim, 4.3)
 AC_CONFIG_SRCDIR([src/cimcomp.c])
+AC_CONFIG_MACRO_DIR([m4])
 
 AC_CANONICAL_TARGET
 changequote(,)dnl
@@ -30,7 +31,7 @@ AC_DEFINE_UNQUOTED(OS_TYPE_VERSION,"`echo $target_os | tr a-z A-Z`", "Define os 
 AC_DEFINE_UNQUOTED(MANUFACTURER,"`echo $target_vendor | tr a-z A-Z`", "Define manufacturer derived from system type")
 AC_DEFINE_UNQUOTED(OS_TYPE,"`echo $target_os_x_version | tr a-z A-Z`", "Define os type derived from system type")
 
-AM_INIT_AUTOMAKE(cim, 4.3)
+AM_INIT_AUTOMAKE
 AM_CONFIG_HEADER(config.h)
 AM_PROG_LIBTOOL
 
@@ -93,6 +94,16 @@ CIM_WL_FLAG
 CIM_LINK_STATIC_FLAG
 CIM_PIC_FLAG
 
-AC_CONFIG_FILES([Makefile cim.spec src/Makefile lib/Makefile test/Makefile man/Makefile doc/Makefile util/Makefile util/cim2latex util/cim2ps util/cimindent])
+AC_CONFIG_FILES([
+    Makefile cim.spec
+    src/Makefile
+    lib/Makefile
+    test/Makefile
+    man/Makefile
+    doc/Makefile
+    util/Makefile
+    util/cim2latex
+    util/cim2ps
+    util/cimindent])
 AC_CONFIG_COMMANDS([default],[test -z "$CONFIG_HEADERS" || echo timestamp > stamp-h],[])
 AC_OUTPUT
