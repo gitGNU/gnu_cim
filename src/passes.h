@@ -14,8 +14,8 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA. */
 
-extern passes_init ();
-extern passes_do ();
-extern passes_reinit ();
+void passes_init (void);
+int passes_do (void);
+void passes_reinit (void);
 
 extern sent_t *main_sent;

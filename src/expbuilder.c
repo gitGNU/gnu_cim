@@ -37,14 +37,14 @@ static struct obstack os_stack;
 /******************************************************************************
 								EBUILDERINIT */
 
-ebuilder_init ()
+void ebuilder_init (void)
 {
   obstack_init(&os_stack);
 }
 
 
 
-ebuilder_init_pass2 ()
+void ebuilder_init_pass2 (void)
 {
   lineno=1;
 }
@@ -52,8 +52,7 @@ ebuilder_init_pass2 ()
 /******************************************************************************
  								      NEWEXP */
 
-exp_t *
-newexp()
+exp_t *newexp(void)
 {
   exp_t *re;
   re= (exp_t *) salloc (sizeof (exp_t));
@@ -64,8 +63,7 @@ newexp()
 /******************************************************************************
 								     MAKEEXP */
 
-exp_t *
-makeexp (token, left, right) int token; exp_t *left, *right;
+exp_t *makeexp (int token, exp_t *left, exp_t *right)
 {
   exp_t *re;
   re= newexp();
@@ -83,8 +81,7 @@ makeexp (token, left, right) int token; exp_t *left, *right;
 /******************************************************************************
 								     CONCEXP */
 
-exp_t *
-concexp (left, right) exp_t *left, *right;
+exp_t *concexp (exp_t *left, exp_t *right)
 {
   if (left==NULL) return right;
   if (right==NULL) return left;
@@ -94,8 +91,7 @@ concexp (left, right) exp_t *left, *right;
 /******************************************************************************
 								 REPLACENODE */
 
-exp_t *
-replacenode (rep, token) exp_t **rep; int token;
+exp_t *replacenode (exp_t **rep, int token)
 {
   exp_t *rex;
   rex= newexp ();
@@ -113,9 +109,7 @@ replacenode (rep, token) exp_t **rep; int token;
 /******************************************************************************
                                                                 COPYTREE     */
 
-exp_t *
-copytree (re)
-     exp_t *re;
+exp_t *copytree (exp_t *re)
 {
   exp_t *rex;
   if (re == NULL) return NULL;
@@ -149,8 +143,7 @@ copytree (re)
 /******************************************************************************
 								  REMOVE_DOT */
 
-remove_dot (rep)
-     exp_t **rep;
+void remove_dot (exp_t **rep)
 {
   if (is_after_dot ((*rep)))
     {
@@ -164,8 +157,7 @@ remove_dot (rep)
 /******************************************************************************
 								      ECLEAN */
 
-static 
-eclean()
+static void eclean(void )
 {
   void *p;
   p= obstack_finish (&os_stack);
@@ -175,8 +167,7 @@ eclean()
 /******************************************************************************
 								       EPUSH */
 
-static 
-epush(re)exp_t *re;
+static epush(exp_t *re)
 {
   obstack_grow (&os_stack, &re, sizeof (void *));
 }
@@ -184,8 +175,7 @@ epush(re)exp_t *re;
 /******************************************************************************
 								        EPOP */
 
-static 
-exp_t *epop()
+static exp_t *epop(void)
 {
   exp_t *re;
   re= * ((exp_t * *)obstack_next_free (&os_stack) - 1);
@@ -196,8 +186,7 @@ exp_t *epop()
 /******************************************************************************
 								       ELOOK */
 
-exp_t *
-elook()
+exp_t *elook(void)
 {
   return *((exp_t * *)obstack_next_free (&os_stack) - 1);
 }
@@ -208,7 +197,7 @@ elook()
 
 /* Bygger opp et uttrykstree, Alle operatorene leses postfix */
 
-ebuild ()
+void ebuild (void)
 {
   exp_t *re;
 

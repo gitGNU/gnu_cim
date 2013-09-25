@@ -24,12 +24,12 @@ struct stamp
     char lest_inn;
   };
 
-void gettimestamp ();
-extern extspec_init ();
-extern extspec_reinit ();
+void gettimestamp (void);
+void extspec_init (void);
+void extspec_reinit (void);
 extern char *directive_timestamp;
 extern char *timestamp;
-extern lesinn_external_spec ();
-extern more_modules ();
+void lesinn_external_spec (char *ident, char *filename, char kind);
+void more_modules (void);
 extern struct stamp *first_stamp;
-extern skrivut_external_spec ();
+void write_all_ext (void);

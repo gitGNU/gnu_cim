@@ -62,8 +62,7 @@ static int antmap = 1;
 
 /******************************************************************************
                                                                 MAPLINEINIT  */
-int 
-mapline_init (sourcename, ifdefp) char *sourcename; void *ifdefp;
+int mapline_init (char *sourcename, void *ifdefp)
 {
   obstack_init (&os_map);
   obstack_init (&os_mapstack);
@@ -74,8 +73,7 @@ mapline_init (sourcename, ifdefp) char *sourcename; void *ifdefp;
 
 /******************************************************************************
                                                                    NOFILMAP  */
-int
-no_filemap ()
+int no_filemap (void)
 {
   return mapstackp==NULL;
 }
@@ -83,10 +81,7 @@ no_filemap ()
 
 /******************************************************************************
                                                                  PUSHFILMAP  */
-int
-pushfilmap (filename, ifdefp)
-     char *filename;
-     void *ifdefp;
+int pushfilmap (char *filename, void *ifdefp)
 {
   FILE *file;
   mapstack_t *prev= mapstackp;
@@ -134,16 +129,14 @@ pushfilmap (filename, ifdefp)
 
 /******************************************************************************
                                                                  INCLUDEFILE */
-FILE *
-include_file ()
+FILE *include_file (void)
 {
   return mapstackp->file;
 }
 
 /******************************************************************************
                                                              INCLUDEIFDEFNIV */
-void *
-include_ifdefp ()
+void *include_ifdefp (void)
 {
   return mapstackp->ifdefp;
 }
@@ -151,8 +144,7 @@ include_ifdefp ()
 /******************************************************************************
                                                                   POPFILMAP  */
 
-void
-popfilmap ()
+void popfilmap (void)
 {
   mapstack_t *prev= mapstackp->prev;
   setfilmap (mapstackp->filename, mapstackp->line);
@@ -162,10 +154,7 @@ popfilmap ()
 
 /******************************************************************************
                                                                    SETFILMAP */
-void
-setfilmap (filename, line)
-     char *filename;
-     long line;
+void setfilmap (char *filename, long line)
 {
   antmap++;
   mappos->filename = filename ? filename : lastmappos->filename;
@@ -179,9 +168,7 @@ setfilmap (filename, line)
 /******************************************************************************
   						                  GETMAPLINE */
 
-long 
-getmapline (line)
-     long line;
+long getmapline (long line)
 {
   if (mapindeks->fromline > line)
     mapindeks = firstmappos;
@@ -193,9 +180,7 @@ getmapline (line)
 /******************************************************************************
   						                  GETMAPFILE */
 
-char *
-getmapfile (line)
-     long line;
+char *getmapfile (long line)
 {
   if (mapindeks->fromline > line)
     mapindeks = firstmappos;
@@ -207,8 +192,7 @@ getmapfile (line)
 /******************************************************************************
                                                                       GENMAP */
 
-void 
-genmap ()
+void genmap (void)
 {
   int i;
   map_t *m = firstmappos;

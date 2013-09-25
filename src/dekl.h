@@ -191,17 +191,17 @@ struct _block
 #define CCCPROC      8		/* Ekstern C-prosedyre */
 
 
-extern begin_block ();
-extern end_block ();
-extern reg_decl ();
-extern reg_inner ();
-extern decl_t *new_decl ();
-extern block_t *firstclass ();
-extern in_block ();
-extern out_block ();
+void begin_block (char kind);
+void end_block (char *rtname, char codeclass);
+void reg_decl (char *ident, char type, char kind, char categ);
+void reg_inner (void);
+decl_t *new_decl (void);
+extern block_t *firstclass (void);
+void in_block (void);
+void out_block (void);
 extern decl_t *reg_this ();
 
-extern remove_block ();
+void remove_block (block_t *rb);
 
 extern char *prefquantident;
 extern int localused;
@@ -211,33 +211,37 @@ extern block_t *ssblock;
 extern block_t *sblock;
 extern block_t *eblock;
 extern int cblev;
-extern char subclass ();
+char subclass (decl_t *rdx, decl_t *rdy);
 extern char insert_with_codeclass;
 extern decl_t *cprevdecl;
 
 extern decl_t *commonprefiks;
-extern decl_t *commonqual ();
-extern decl_t *find_global ();
-extern decl_t *find_local ();
-extern decl_t *find_decl ();
+decl_t *commonqual (decl_t *rdx, decl_t *rdy);
+decl_t *find_global (char *ident, char virt);
+decl_t *find_local (char *ident, decl_t *rd, char virt);
+decl_t *find_decl (char *ident, block_t *rb, char virt);
 
-extern decl_t *first_param ();
-extern decl_t *next_param ();
-extern more_param ();
+decl_t *first_param (decl_t *rd);
+decl_t *next_param (decl_t *rd);
+int more_param (decl_t *rd);
 
 extern int arrdim;
 extern decl_t *last_array;
-extern set_array_dim ();
-extern char danger_proc ();
+void set_array_dim (int arrdim);
+char danger_proc (decl_t *rd);
 
 extern block_t *seenthrough;
-extern body ();
+int body (decl_t *rd);
 extern decl_t *classtext;
-extern char subordinate ();
-extern same_param ();
-extern decl_init ();
-extern decl_init_pass2 ();
-extern decl_init_pass1 ();
-extern decl_reinit ();
+char subordinate (decl_t *rda, decl_t*rdb);
+int same_param (block_t *rb1, block_t *rb2);
+void decl_init (void);
+void decl_init_pass2 (void);
+void decl_init_pass1 (void);
+void decl_reinit (void);
+
+void regwhen (block_t *rb, decl_t *rd);
+void reginsp (block_t *rb, decl_t *rd);
+decl_t *reg_this (char *ident);
 
 extern char yaccerror;

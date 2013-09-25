@@ -27,4 +27,11 @@
  * av feilmeldinger. */
 
 extern int anterror;
-
+void lerror (int errcode);
+void yerror (int errcode, char *txt);
+void d1error (int errcode, char *name);
+void d2error (int errcode, decl_t *rd1, decl_t *rd2);
+char *textnumber (int i);
+void serror (int errcode, char *name, int ant);
+void gerror (int errcode, char *name);
+void merror (int errcode, char *name);

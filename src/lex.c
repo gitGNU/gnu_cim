@@ -96,8 +96,7 @@ char staticblock = OFF;
  * Samt fjerne ^@ fra input
  * Dette skal dog ikke gjøres innenfor text eller karakter -konstanter */
 
-static int 
-input ()
+static int input (void)
 {
   int yytchar;
   if (end_of_file)
@@ -172,9 +171,7 @@ input ()
 /******************************************************************************
                                                              PRINT_LEXSYMBOL */
 
-print_lexsymbol (lextok, yylvalp)
-     int lextok;
-     YYSTYPE *yylvalp;
+void print_lexsymbol (int lextok, YYSTYPE *yylvalp)
 {
   int yyleng;
   switch (lextok)
@@ -492,10 +489,7 @@ print_lexsymbol (lextok, yylvalp)
 
 /* Rutine for } lage et heltall gitt et tall som er kodet tekstlig. */
 
-static long 
-radix (r, t)
-     int r;
-     char *t;
+static long radix (int r, char *t)
 {
   long maxint_div_r = MAX_INT / r;
 
@@ -534,8 +528,7 @@ radix (r, t)
 /******************************************************************************
 				                    SCANNAME & SCANNOWS      */
 
-static 
-scan_nows ()
+static void scan_nows (void)
 {
   obstack_free (&os_lex, yytext);
   while (lexchar != '\n' && lexchar != EOF 
@@ -548,8 +541,7 @@ scan_nows ()
   yytext= obstack_finish (&os_lex);
 }
 
-static 
-scan_name ()
+static scan_name (void)
 {
   obstack_free (&os_lex, yytext);
   while ((isalnum (lexchar) || lexchar == '_'))
@@ -565,8 +557,7 @@ scan_name ()
 /******************************************************************************
 				                              SCANIFDEF      */
 
-static 
-scan_ifdef ()
+static void scan_ifdef (void)
 {
   char scan;
   char elsedef;
@@ -689,8 +680,7 @@ scan_ifdef ()
 /******************************************************************************
 				                              SCANDIRFLAGS   */
 
-static 
-scan_dirflags ()
+static void scan_dirflags (void)
 {
   while (lexchar == ' ' | lexchar == '\t')
     newlexchar;
@@ -737,8 +727,7 @@ scan_dirflags ()
 /******************************************************************************
                                                                    DIRLINE   */
 
-static 
-scan_dirline ()
+static void scan_dirline (void)
 {
   FILE *file;
   lineno += antnewline;
@@ -988,7 +977,7 @@ scan_dirline ()
 /******************************************************************************
                                                                    INITLEX   */
 
-lex_init ()
+void lex_init (void)
 {
   obstack_init (&os_lex);
   first_object_allocated_ptr_lex= obstack_alloc (&os_lex, 0);
@@ -997,8 +986,7 @@ lex_init ()
   first_object_allocated_ptr_ifdef= obstack_alloc (&os_ifdef, 0);
 }
 
-int 
-lex_init_pass1 (sourcename) char *sourcename;
+int lex_init_pass1 (char *sourcename)
 {
   yytext= obstack_finish (&os_lex);
   ifdefp= obstack_alloc (&os_ifdef, sizeof (ifdefstack_t));
@@ -1012,7 +1000,7 @@ lex_init_pass1 (sourcename) char *sourcename;
   return FALSE;
 }
 
-lex_reinit ()
+void lex_reinit (void)
 {
   obstack_free (&os_lex, first_object_allocated_ptr_lex);
   obstack_free (&os_ifdef, first_object_allocated_ptr_ifdef);
@@ -1022,9 +1010,7 @@ lex_reinit ()
 
 /* Hjelpe-prosedyre for } bygge opp et konstant-tektsobjekt. */
 
-static char *
-putcharacter (character)
-     unsigned char character;
+static char *putcharacter (unsigned char character)
 {
   static char s[10];
   if (external == TRUE)
@@ -1043,9 +1029,7 @@ putcharacter (character)
  *  for } bygge opp et konstant-tekstobjekt.
  *  Denne rutinen kalles for hvert tegn som skal inn i tekst-objektet. */
 
-static 
-putchartext (character)
-     unsigned char character;
+static putchartext ( unsigned char character)
 {
   char *s;
   s = putcharacter (character);
@@ -1065,8 +1049,7 @@ putchartext (character)
  * Disser er sstrcmp() og sstrlen() (sjekker.c).
  */
 
-static char *
-gettext ()
+static char *gettext (void)
 {
   char *s;
 
@@ -1084,8 +1067,7 @@ gettext ()
 
 /* Returnerer et token til parser. */
 
-int 
-yylex ()
+int yylex (void)
 {
   char first_lexchar;
   int reported;
@@ -1885,7 +1867,7 @@ yylex ()
 /******************************************************************************
                                                        SCAN_AND_WRITE_TOKENS */
 
-scan_and_write_tokens ()
+void scan_and_write_tokens (void)
 {
   int token;
   long line = 1L;

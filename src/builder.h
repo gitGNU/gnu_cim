@@ -40,17 +40,21 @@ struct _exp
 
 /* expbuilder.c */
 
-extern exp_t *newexp();
-extern exp_t *makeexp();
-extern exp_t *concexp();
-extern exp_t *replacenode(); 
-extern exp_t *elook();
-extern remove_dot ();
+void ebuilder_init (void);
+void ebuilder_init_pass2 (void);
+
+exp_t *makeexp (int token, exp_t *left, exp_t *right);
+exp_t *concexp (exp_t *left, exp_t *right);
+exp_t *replacenode (exp_t **rep, int token);
+exp_t *elook(void);
+void remove_dot (exp_t **rep);
+
+void ebuild (void);
 
 extern int token;
 extern int build_lineno;
 
-extern exp_t *copytree ();
+exp_t *copytree (exp_t *re);
 
 /* sentbuilder.c */
 
@@ -68,13 +72,14 @@ struct _sent
   int last_line;
 };
 
-extern void insert_thunk ();
-extern void insert_after_sent ();
-extern void insert_before_sent ();
-extern void remove_sent ();
-sent_t *new_sent();
-sent_t *sbuild();
-void set_flag ();
+void sbuilder_init(void);
+void insert_thunk (exp_t *rex, int token);
+void insert_after_sent (sent_t *parent, sent_t *after, sent_t *new);
+void insert_before_sent (sent_t *parent, sent_t *before, sent_t *new);
+void remove_sent(sent_t *parent, sent_t *rem);
+sent_t * new_sent(int token);
+sent_t *sbuild(void);
+void set_flag (void);
 
 extern char nonetest;
 extern char indextest;

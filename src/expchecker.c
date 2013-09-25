@@ -51,8 +51,7 @@ static decl_t *varargscharvar;
 static decl_t *varargstextvalue;
 static decl_t *varargs;
 
-void 
-exp_checker_init_pass2 ()
+void exp_checker_init_pass2 (void)
 {
   absfunction = find_global (tag ("ABS"), TRUE);
   minfunction = find_global (tag ("MIN"), TRUE);
@@ -124,10 +123,7 @@ exp_checker_init_pass2 ()
 
 #define SERROR(melding) sserror(melding,re)
 
-static 
-sserror (melding, re)
-     int melding;
-     exp_t *re;
+static void sserror (int melding, exp_t *re)
 {
   if (RD && RD->categ == CNEW)
     {
@@ -164,11 +160,7 @@ sserror (melding, re)
                                                                 KONVTYPE     */
 
 /*VARARGS2 */
-static 
-konvtype (re, type, qual)
-     exp_t **re;
-     char type;
-     decl_t *qual;
+static void konvtype (exp_t **re, char type, decl_t *qual)
 {
   exp_t *rex;
   decl_t *rd;
@@ -227,24 +219,18 @@ konvtype (re, type, qual)
 /******************************************************************************
                                                                 SAMETYPE     */
 
-static 
-sametype (rel, rer)
-     exp_t **rel,
-     **rer;
+static void sametype (exp_t **rel, exp_t **rer)
 {
   if ((*rel)->type == TINTG && (*rer)->type == TREAL)
-    konvtype (rel, TREAL);
+    konvtype (rel, TREAL, NULL);
   else if ((*rel)->type == TREAL && (*rer)->type == TINTG)
-    konvtype (rer, TREAL);
+    konvtype (rer, TREAL, NULL);
 }
 
 /******************************************************************************
                                                                ARGUMENTERROR */
 
-static 
-argumenterror (melding, re)
-     int melding;
-     exp_t *re;
+static argumenterror (int melding, exp_t *re)
 {
   int i = 1;
   if (TYPE == TERROR)
@@ -263,9 +249,7 @@ argumenterror (melding, re)
 /******************************************************************************
                                                                 SET_PARAM    */
 
-static 
-set_param (re)
-     exp_t *re;
+static void set_param (exp_t *re)
 {
   re->right->rd = first_param (re->rd);
   {
@@ -284,9 +268,7 @@ set_param (re)
 /******************************************************************************
                                                                 EXP_CHECK    */
 
-static 
-exp_check (re)
-     exp_t *re;
+static void exp_check (exp_t *re)
 {
 
   /* Sjekker først at nodene har riktige typer */
@@ -1010,8 +992,7 @@ exp_check (re)
 /******************************************************************************
                                                            MAIN_EXP_CHECK      */
 
-void 
-main_exp_check (re) exp_t *re;
+void main_exp_check (exp_t *re)
 {
   exp_check (re);
   computeconst (re);

@@ -40,9 +40,7 @@ static int naref;
 /******************************************************************************
 								  WRITE_DECL */
 
-static 
-write_decl (rd, type, output_refs)
-     decl_t *rd; char *type, output_refs; 
+static void write_decl (decl_t *rd, char *type, char output_refs)
 {
   if (!output_refs)
     {
@@ -54,9 +52,7 @@ write_decl (rd, type, output_refs)
 /******************************************************************************
 								  WRITE_REFS */
 
-static 
-write_refs (rb, rd, atrib, output_refs) 
-     block_t *rb; decl_t *rd; char *atrib, output_refs;
+static void write_refs (block_t *rb, decl_t *rd, char *atrib, char output_refs)
 {
 
   /* TBD Hvis rd alltil hadde vært forskjellig fra NULL kunne rb sløyfes
@@ -76,10 +72,7 @@ write_refs (rb, rd, atrib, output_refs)
 /******************************************************************************
                                                         DECLSTRUCTURE        */
 
-static 
-declstructure (rd, output_refs)
-     decl_t *rd;
-     char output_refs;
+static void declstructure (decl_t *rd, char output_refs)
 {
   char write = 0;
   if (rd->kind == KSIMPLE)
@@ -221,9 +214,7 @@ declstructure (rd, output_refs)
  * 0,til sin superklasse p} plass n-1,dens superklasse p} plass n-2
  * osv. */
 
-static 
-skrivprefikspp (rd)
-     decl_t *rd;
+static void skrivprefikspp (decl_t *rd)
 {
   if (rd != NULL)
     {
@@ -241,9 +232,7 @@ skrivprefikspp (rd)
 /******************************************************************************
                                                     BLOCKMAINSTRUCTURE       */
 
-static 
-blockmainstructure (rb, output_refs)
-     block_t *rb; char output_refs;
+static void blockmainstructure (block_t *rb, char output_refs)
 {
   int i;
   decl_t *rd;
@@ -302,12 +291,11 @@ blockmainstructure (rb, output_refs)
     declstructure (rd, output_refs);
 }
 
+static void specifier_structure (block_t *rb);
 /******************************************************************************
                                                         BLOCKSTRUCTURE       */
 
-static 
-blockstructure (rb)
-     block_t *rb;
+static blockstructure (block_t *rb)
 {
   int i;
   decl_t *rd;
@@ -617,8 +605,7 @@ blockstructure (rb)
     }
 }
 
-specifier_proc_structure (rd)
-     decl_t *rd;
+static void specifier_proc_structure (decl_t *rd)
 {
   decl_t *rdi;
   if (rd->kind == KPROC)
@@ -642,8 +629,7 @@ specifier_proc_structure (rd)
     }
 }
 
-specifier_structure (rb)
-     block_t *rb;
+static void specifier_structure (block_t *rb)
 {				/* Kaller på param_structure som skriver ut
 				 * structer for evt. parameterspesifikasjoner 
 				 * til virtuelle  og formelle prosedyre-
@@ -684,7 +670,7 @@ specifier_structure (rb)
 /******************************************************************************
                                                                 STRUCTURE    */
 
-structure ()
+void structure (void)
 {
   block_t *block;
   if (separat_comp)
@@ -716,8 +702,7 @@ structure ()
 /******************************************************************************
 								UPDATEGLNULL */
 
-static void 
-do_for_each_stat_pointer (block) block_t *block;
+static void do_for_each_stat_pointer (block_t *block)
 {
   decl_t *rd;
   switch (block->quant.kind)
@@ -752,8 +737,7 @@ do_for_each_stat_pointer (block) block_t *block;
 /******************************************************************************
 								UPDATEGLNULL */
 
-static void 
-update_gl_null (block) block_t *block;
+static void update_gl_null (block_t *block)
 {
   decl_t *rd;
   switch (block->quant.kind)
@@ -786,8 +770,7 @@ update_gl_null (block) block_t *block;
 /******************************************************************************
 								UPDATEGLOBJ */
 
-static void 
-update_gl_obj (block) block_t *block;
+static void update_gl_obj (block_t *block)
 {
   decl_t *rd;
   switch (block->quant.kind)
@@ -825,7 +808,7 @@ update_gl_obj (block) block_t *block;
 /******************************************************************************
                                                             STAT_POINTERS    */
 
-stat_pointers ()
+void stat_pointers (void)
 {
   block_t *block;
   struct stamp *st;

@@ -107,13 +107,13 @@ static char *first_object_allocated_ptr_extspec;
 
 /******************************************************************************
                                                               INITEXTSPEC    */
-extspec_init ()
+void extspec_init (void)
 {
   obstack_init (&os_extspec);
   first_object_allocated_ptr_extspec= obstack_alloc (&os_extspec, 0);
 }
 
-extspec_reinit ()
+void extspec_reinit (void)
 {
   obstack_free (&os_extspec, first_object_allocated_ptr_extspec);
 }
@@ -121,8 +121,7 @@ extspec_reinit ()
 /******************************************************************************
                                                                   GETNAME    */
 
-static char * 
-getname (f) FILE *f;
+static char * getname (FILE *f)
 {
   int c;
   char *s, *sx;
@@ -157,8 +156,7 @@ static char timestampchars[63] =
 /******************************************************************************
                                                           GETTIMESTAMP       */
 
-void 
-gettimestamp ()
+void gettimestamp (void)
 {
 #if GET_TIME_OF_DAY
   struct timeval tp;
@@ -215,9 +213,7 @@ gettimestamp ()
 /******************************************************************************
                                                  GENATRFILENAMEFROMID        */
 
-static char *
-genatrfilenamefromid (ident)
-     char *ident;
+static char *genatrfilenamefromid (char *ident)
 {
   int i;
   char *s, *sx;
@@ -236,9 +232,7 @@ genatrfilenamefromid (ident)
 /******************************************************************************
                                               GENATRFILENAMEFROMFILENAME     */
 
-static char *
-genatrfilenamefromfilename (filename)
-char *filename;
+static char *genatrfilenamefromfilename (char *filename)
 {
   char *s, *sx;
   int len = strlen (filename);
@@ -264,10 +258,7 @@ char *filename;
 /******************************************************************************
                                                               EXTERNAL_IS_IN */
 
-static char 
-external_is_in (ident, kind)
-     char *ident;
-     char kind;
+static char external_is_in (char *ident, char kind)
 {
   decl_t *rd;
   block_t *rb;
@@ -284,11 +275,9 @@ external_is_in (ident, kind)
 /******************************************************************************
                                                                     NEXTDECL */
 
-static char *lesinn ();
+static char *lesinn (char *filename);
 
-static 
-nextdecl (f, filename, timestamp)
-     FILE *f; char *filename, *timestamp;
+static nextdecl (FILE *f, char *filename, char *timestamp)
 {
   char type, kind, categ;
   char tegn;
@@ -425,9 +414,7 @@ nextdecl (f, filename, timestamp)
 /******************************************************************************
                                                                       LESINN */
 
-static char *
-lesinn (filename)
-     char *filename;
+static char *lesinn (char *filename)
 {
   struct stamp *st;
   char *timestamp;
@@ -493,10 +480,7 @@ found:
 /******************************************************************************
                                                         LESINN_EXTERNAL_SPEC */
 
-lesinn_external_spec (ident, filename, kind)
-     char *ident;
-     char *filename;
-     char kind;
+void lesinn_external_spec (char *ident, char *filename, char kind)
 {
   char *hprefquantident;
   block_t *hcblock;
@@ -535,7 +519,7 @@ static char link;
 
 /******************************************************************************
                                                            WRITE_INDENTATION */
-write_indentation (f, level) FILE *f; int level;
+static void write_indentation (FILE *f, int level)
 {
   int i;
   fprintf (f, "\n");
@@ -544,8 +528,7 @@ write_indentation (f, level) FILE *f; int level;
 
 /******************************************************************************
                                                               WRITE_CHAR_MIF */
-static 
-write_char_mif (f, c) FILE *f; unsigned char c;
+static void write_char_mif (FILE *f, unsigned char c)
 {
   if ((isprint (c)
 #if ISO_LATIN
@@ -559,8 +542,7 @@ write_char_mif (f, c) FILE *f; unsigned char c;
 
 /******************************************************************************
                                                               WRITE_TEXT_MIF */
-static 
-write_text_mif (f, s) FILE *f; unsigned char *s;
+static void write_text_mif (FILE *f, unsigned char *s)
 {
   int i;
   fprintf (f, "= \"");
@@ -584,9 +566,7 @@ write_text_mif (f, s) FILE *f; unsigned char *s;
 /******************************************************************************
                                                               WRITE_DECL_MIF */
 
-static 
-write_decl_mif (f, rd, level)
-       FILE *f; decl_t *rd; int level;
+static write_decl_mif (FILE *f, decl_t *rd, int level)
 {
   if (rd->kind == KBLOKK || rd->kind == KPRBLK || rd->kind == KFOR || 
       rd->kind == KINSP) return;
@@ -814,7 +794,7 @@ write_decl_mif (f, rd, level)
 /******************************************************************************
                                                                WRITE_ALL_MIF */
 
-write_all_mif ()
+static void write_all_mif (void)
 {
   /* Trenger ikke skrive ut lokale deklarasjoner i procedyrer */
 
@@ -863,9 +843,7 @@ write_all_mif ()
 /******************************************************************************
                                                               WRITE_DECL_EXT */
 
-static 
-write_decl_ext (f, rd)
-       FILE *f; decl_t *rd;
+static write_decl_ext (FILE *f, decl_t *rd)
 {
   if (rd->kind == KBLOKK || rd->kind == KPRBLK || rd->kind == KFOR || 
       rd->kind == KINSP) ;
@@ -958,7 +936,7 @@ write_decl_ext (f, rd)
 /******************************************************************************
                                                                WRITE_ALL_EXT */
 
-write_all_ext ()
+void write_all_ext (void)
 {
   /* Trenger ikke skrive ut lokale deklarasjoner i procedyrer */
 
@@ -1010,7 +988,7 @@ write_all_ext ()
 /******************************************************************************
                                                                 MORE_MODULES */
 
-more_modules ()
+void more_modules (void)
 {
   FILE *f;
   struct stamp *st;

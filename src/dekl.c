@@ -106,22 +106,19 @@ static decl_t *arrayparam;
 
 /******************************************************************************
 						      PCLEAN, PPUSH and PPOP */
-static 
-ppush(rd)decl_t *rd;
+static void ppush(decl_t *rd)
 {
   obstack_grow (&os_pref, &rd, sizeof (void *));
 }
 
-static 
-pclean()
+static void pclean(void)
 {
   void *p;
   p= obstack_finish (&os_pref);
   obstack_free (&os_pref, p);
 }
 
-static 
-decl_t *ppop()
+static decl_t *ppop(void)
 {
   decl_t *rd;
   if (obstack_next_free (&os_pref) == obstack_base (&os_pref))
@@ -136,14 +133,12 @@ decl_t *ppop()
 						        NEW-DECL/BLOCK       */
 
 
-decl_t *
-new_decl()
+decl_t *new_decl(void)
 {
   return (decl_t *) salloc (sizeof (decl_t));
 }
 
-static block_t *
-new_block()
+static block_t *new_block(void)
 {
   block_t *rb;
   rb= (block_t *) salloc (sizeof (block_t));
@@ -154,7 +149,7 @@ new_block()
 /******************************************************************************
                                                                   DECL_INIT  */
 
-decl_init ()
+void decl_init (void)
 {
   obstack_init(&os_pref);
   first_object_allocated_ptr_pref= obstack_alloc (&os_pref, 0);
@@ -168,7 +163,7 @@ decl_init ()
 
 /* decl_init_pass1 kalles før selve innlesingen */
 
-decl_init_pass1 ()
+void decl_init_pass1 (void)
 {
   block_t *rb;
   decl_t *rd;
@@ -216,7 +211,7 @@ decl_init_pass1 ()
 
 /* decl_init_pass2 kalles før sjekkingen starter */
 
-decl_init_pass2 ()
+void decl_init_pass2 (void)
 {
   decl_t *rd;
   end_block (NULL,CCNO);
@@ -269,7 +264,7 @@ decl_init_pass2 ()
 
 /* Decl_reinit kalles før sjekkingen starter */
 
-decl_reinit ()
+void decl_reinit (void)
 {
    obstack_free (&os_pref, first_object_allocated_ptr_pref);
 }
@@ -285,7 +280,7 @@ decl_reinit ()
  * settes disse arrayenes dimensjon (dim). Så lengde next også er en array
  * skal også denne ha dimmensjonen arrdim.( integer array a,b(...); */
 
-set_array_dim (arrdim) int arrdim;
+void set_array_dim (int arrdim)
 {
   while (last_array != NULL)
     {
@@ -302,9 +297,7 @@ set_array_dim (arrdim) int arrdim;
 /* Newnotseen kalles hver gang det er noe udeklarert
  * Den legger alle disse inn i en liste med de ukjente */
 
-static decl_t *
-newnotseen (ident)
-     char *ident;
+static decl_t *newnotseen (char *ident)
 {
   if (lastunknowns == NULL)
     unknowns->parloc = lastunknowns = new_decl ();
@@ -330,11 +323,7 @@ newnotseen (ident)
  *  deklarasjonspakka, hvis ikke returneres NULL                         
  *  HVIS virt==TRUE skal det først letes i evt. virtuell liste */
 
-decl_t *
-find_decl (ident, rb, virt)
-     char *ident;
-     block_t *rb;
-     char virt;
+decl_t *find_decl (char *ident, block_t *rb, char virt)
 {
   decl_t *rd;
   if ((rb->quant.kind == KINSP) && (rb->when != NULL))
@@ -375,10 +364,7 @@ find_decl (ident, rb, virt)
  * Stopper ved f\rste forekomst, fins den ikke kalles newnotseen 
  * Hvis virt==true skal det først letes i evt. virtuell liste */
 
-decl_t *
-find_global (ident, virt)
-     char *ident;
-     char virt;
+decl_t *find_global (char *ident, char virt)
 {
   decl_t *rd;
   block_t *rb;
@@ -404,9 +390,7 @@ find_global (ident, virt)
 
 /* Sjekker om parameterene er de samme */
 
-same_param (rb1, rb2)
-     block_t *rb1,
-      *rb2;
+int same_param (block_t *rb1, block_t *rb2)
 {
   decl_t *rd1,
    *rd2;
@@ -452,9 +436,7 @@ same_param (rb1, rb2)
 
 /* Gjør rd1 lik rd2 ved å kopiere atributter */
 
-static makeequal (rd1, rd2)
-     decl_t *rd1,
-      *rd2;
+static void makeequal (decl_t *rd1, decl_t *rd2)
 {
   rd1->ident = rd2->ident;
   rd1->line = rd2->line;
@@ -478,10 +460,7 @@ static makeequal (rd1, rd2)
 /* Finner felles kvalifikasjon for to klasser
  * NULL hviss ingen slik finnes */
 
-decl_t *
-commonqual (rdx, rdy)
-     decl_t *rdx,
-      *rdy;
+decl_t *commonqual (decl_t *rdx, decl_t *rdy)
 {				/* Hvis rdx eller rdy peker på
 				 * commonprefiks (som har plev=-1) s} vil 
 				 * den leveres som felles kvalifikasjon, som
@@ -513,10 +492,7 @@ commonqual (rdx, rdy)
 
 /* Er rdx en subklasse til rdy, returnerer TRUE eller FALSE */
 
-char 
-subclass (rdx, rdy)
-     decl_t *rdx,
-      *rdy;
+char subclass (decl_t *rdx, decl_t *rdy)
 {
   if (rdx == rdy)
     return (TRUE);
@@ -531,10 +507,7 @@ subclass (rdx, rdy)
 /******************************************************************************
                                                                 SUBORDINATE  */
 
-char 
-subordinate (rda, rdb)
-     decl_t *rda,
-      *rdb;
+char subordinate (decl_t *rda, decl_t*rdb)
 {
   return ((rda->type != TREF && rda->type == rdb->type)
 	  || rdb->type == TNOTY || (rda->type == TREF && rdb->type == TREF
@@ -552,8 +525,7 @@ subordinate (rda, rdb)
 
 /* Kalles fra  syntakssjekkeren hver gang en ny blokk entres */
 
-begin_block (kind)
-     char kind;
+void begin_block (char kind)
 {
   decl_t *rd2;
   if (yaccerror)
@@ -678,9 +650,7 @@ begin_block (kind)
 /* Kalles  fra  syntakssjekkeren hver gang en blokk terminerer */
 
 /*VARARGS0 */
-end_block (rtname, codeclass)
-     char *rtname;
-     char codeclass;
+void end_block (char *rtname, char codeclass)
 {
 #ifdef DEBUG
   if (option_input)
@@ -715,8 +685,7 @@ end_block (rtname, codeclass)
 /* Reg_decl kalles fra syntakssjekkeren
  * hver gang  vi leser  en deklarasjon */
 
-reg_decl (ident, type, kind, categ)
-     char *ident, type, kind, categ;
+void reg_decl (char *ident, char type, char kind, char categ)
 {
   decl_t *pd,
    *pdx = NULL;
@@ -900,7 +869,7 @@ reg_decl (ident, type, kind, categ)
 /* Kalles fra syntakssjekkeren hver gang  
  * inner oppdages, sjekker da lovligheten */
 
-reg_inner ()
+void reg_inner (void)
 {
 #ifdef DEBUG
   if (option_input)
@@ -1110,11 +1079,7 @@ dump ()
 
 /* Setter/fjerner protected merket når klasser entres/forlates */
 
-static 
-setprotectedvirt (rb, rd, protected)
-     block_t *rb;
-     decl_t *rd;
-     char protected;
+static setprotectedvirt (block_t *rb, decl_t *rd, char protected)
 {
   block_t *rbx;
   decl_t *rdx;
@@ -1140,10 +1105,7 @@ setprotectedvirt (rb, rd, protected)
     }
 }
 
-static 
-setprotected (rb, protected)
-     block_t *rb;
-     char protected;
+static void setprotected (block_t *rb, char protected)
 {
   block_t *rbx;
   decl_t *rd;
@@ -1177,9 +1139,7 @@ setprotected (rb, protected)
  * Oppdager ulovlig prefiks og feil prefiksnivå 
  * Oppdager ved merking sirkulær prefikskjede */
 
-static 
-setprefchain (rd)
-     decl_t *rd;
+static void setprefchain (decl_t *rd)
 {
   decl_t *rdx;
   if (rd->plev <= 0 && rd->identqual==NULL)
@@ -1246,10 +1206,7 @@ setprefchain (rd)
 /* Setter opp prefikskjeden og kvalifikasjonen til pekere        
  * gjør kall på setprefchain og sjekker  kvalifikasjonen */
 
-static decl_t *
-setqualprefchain (rd, param)
-     decl_t *rd;
-     int param;
+static decl_t *setqualprefchain (decl_t *rd, int param)
 {
   decl_t *rdx;
   for (; rd != NULL; rd = rd->next)
@@ -1290,9 +1247,7 @@ setqualprefchain (rd, param)
  * Prefikskjeden og kvalifikasjoner settes ved kall på setqualprefchain 
  * den sjekker også konsistensen for type kind og categ */
 
-static 
-sjekkdekl (rb)
-     block_t *rb;
+static void sjekkdekl (block_t *rb)
 {
   decl_t *rd = NULL,
    *rdx = NULL,
@@ -1651,8 +1606,7 @@ sjekkdekl (rb)
 /******************************************************************************
   							      FIRSTCLASS     */
 
-block_t *
-firstclass ()
+block_t *firstclass (void)
 {				/* Retunerer med blev for den n{rmeste
 				 * klassen eller prefiksblokk sett
 				 * fra cblock */
@@ -1673,7 +1627,7 @@ firstclass ()
                                                                    INBLOCK   */
 
 /* In_block kalles fra sjekkeren hver  gang en  blokk  entres */
-nextblock ()
+static void nextblock (void)
 {
   if (lblock == NULL)
     lblock = ssblock;
@@ -1690,7 +1644,7 @@ nextblock ()
   cblock= lblock;
 }
 
-in_block ()
+void in_block (void)
 {
   nextblock ();
   cblev = cblock->blev;
@@ -1705,7 +1659,7 @@ in_block ()
 
 /* Out_block kalles fra sjekkeren hver gang  en blokk  forlates */
 
-out_block ()
+void out_block (void)
 {
   if (cblock->quant.kind == KCLASS || cblock->quant.kind == KPRBLK)
     setprotected (cblock, TRUE);
@@ -1727,7 +1681,7 @@ out_block ()
                                                                 REGWHEN      */
 
 
-regwhen (rb, rd) block_t *rb; decl_t *rd;
+void regwhen (block_t *rb, decl_t *rd)
 {
   rb->quant.prefqual->descr->when= rd;
 }
@@ -1736,7 +1690,7 @@ regwhen (rb, rd) block_t *rb; decl_t *rd;
                                                                 REGINSP      */
 
 
-reginsp (rb, rd) block_t *rb; decl_t *rd;
+void reginsp (block_t *rb, decl_t *rd)
 {
   if (rd == NULL)
     {
@@ -1753,9 +1707,7 @@ reginsp (rb, rd) block_t *rb; decl_t *rd;
 /* Kalles fra sjekkeren hver gang this oppdages,
  * sjekker da lovligheten */
 
-decl_t *
-reg_this (ident)
-     char *ident;
+decl_t *reg_this (char *ident)
 {
   decl_t *rd,
    *rdt,
@@ -1819,11 +1771,7 @@ reg_this (ident)
  * Den registrerer også localused 
  * Hvis virt==TRUE skal det først letes i evt. virtuell liste */
 
-decl_t *
-find_local (ident, rd, virt)
-     char *ident;
-     decl_t *rd;
-     char virt;
+decl_t *find_local (char *ident, decl_t *rd, char virt)
 {
   seenthrough = NULL;
   if (rd != NULL && rd->descr != NULL)
@@ -1845,9 +1793,7 @@ find_local (ident, rd, virt)
  * til en prosedyre eller klasse 
  * Får som input forrige parameter */
 
-decl_t *
-next_param (rd)
-     decl_t *rd;
+decl_t *next_param (decl_t *rd)
 {
   decl_t *rdx;
   int plev;
@@ -1875,9 +1821,7 @@ next_param (rd)
   return (sluttparam);
 }
 
-static decl_t *
-firstclassparam (rd)
-     decl_t *rd;
+static decl_t *firstclassparam (decl_t *rd)
 {
   decl_t *rdx,
    *rdy;
@@ -1901,9 +1845,7 @@ firstclassparam (rd)
 
 
 
-decl_t *
-first_param (rd)
-     decl_t *rd;
+decl_t *first_param (decl_t *rd)
 {
   decl_t *rdx;
   if (rd->kind == KCLASS)
@@ -1941,8 +1883,7 @@ first_param (rd)
 
 /* Forlanges det flere parametere */
 
-more_param (rd)
-     decl_t *rd;
+int more_param (decl_t *rd)
 {
   if (rd == sluttparam)
     return (FALSE);
@@ -1971,8 +1912,7 @@ more_param (rd)
 
 /* Er vi inne i en prosedyre kropp */
 
-body (rd)
-     decl_t *rd;
+int body (decl_t *rd)
 {
   block_t *rb, *rbx;
   rbx = cblock;
@@ -1995,9 +1935,7 @@ body (rd)
 
 /* Er prosedyren farlig og m] isoleres i uttrykk */
 
-char 
-danger_proc (rd)
-     decl_t *rd;
+char danger_proc (decl_t *rd)
 {
   switch (rd->descr->codeclass)
     {
@@ -2018,7 +1956,7 @@ danger_proc (rd)
 /*****************************************************************************
                                                                 REMOVEBLOCK */
 
-remove_block (rb) block_t *rb;
+void remove_block (block_t *rb)
 {
   decl_t *rd;
   if (rb->quant.encl->parloc->descr == rb) 

@@ -36,9 +36,7 @@ static char *first_object_allocated_ptr_salloc;
 /******************************************************************************
                                                                      XMALLOC */
 
-char *
-xmalloc (size)
-     unsigned int size;
+char *xmalloc (unsigned int size)
 {
   char *ptr = malloc (size);
   if (! ptr)
@@ -52,8 +50,7 @@ xmalloc (size)
 /******************************************************************************
                                                                       SALLOC */
 
-char *
-salloc (size) int size;
+char *salloc (int size)
 {
   char *p;
   p= obstack_alloc (&os_salloc, size);
@@ -64,7 +61,7 @@ salloc (size) int size;
 /******************************************************************************
                                                                  SALLOC_INIT */
 
-salloc_init ()
+void salloc_init (void)
 {
   obstack_init(&os_salloc);
   first_object_allocated_ptr_salloc= obstack_alloc (&os_salloc, 0);
@@ -73,7 +70,7 @@ salloc_init ()
 /******************************************************************************
                                                                SALLOC_REINIT */
 
-salloc_reinit ()
+void salloc_reinit (void)
 {
   obstack_free (&os_salloc, first_object_allocated_ptr_salloc);
 }

@@ -36,8 +36,7 @@ sent_t module;
 /******************************************************************************
                                                                        SPUSH */
 
-static 
-spush(re)exp_t *re;
+static spush(sent_t *re)
 {
   obstack_grow (&os_stack, &re, sizeof (void *));
 }
@@ -45,8 +44,7 @@ spush(re)exp_t *re;
 /******************************************************************************
                                                                         SPOP */
 
-static sent_t *
-spop()
+static sent_t *spop(void)
 {
   sent_t *rs;
   rs= * ((sent_t * *)obstack_next_free (&os_stack) - 1);
@@ -58,8 +56,7 @@ spop()
 /******************************************************************************
                                                                        SLOOK */
 
-sent_t *
-slook()
+static sent_t *slook(void)
 {
   return *((sent_t * *)obstack_next_free (&os_stack) - 1);
 }
@@ -67,7 +64,7 @@ slook()
 /******************************************************************************
                                                                 SBUILDERINIT */
 
-sbuilder_init()
+void sbuilder_init(void)
 {
   obstack_init(&os_stack);
   module.token= MMODULE;
@@ -81,8 +78,7 @@ char stripsideeffects = OFF;
 /******************************************************************************
                                                                      NEWSENT */
 
-sent_t *
-new_sent(token) int token;
+sent_t * new_sent(int token)
 {
   sent_t *new;
   new= (sent_t *) salloc (sizeof (sent_t));
@@ -96,8 +92,7 @@ new_sent(token) int token;
 /******************************************************************************
                                                                   CREATESENT */
 
-static sent_t *
-create_sent(token, exp) int token; exp_t *exp;
+static sent_t *create_sent(int token, exp_t *exp)
 {
   sent_t *new= new_sent (token), *parent;
 
@@ -123,8 +118,7 @@ create_sent(token, exp) int token; exp_t *exp;
 /******************************************************************************
                                                                   INSERTSENT */
 
-void 
-insert_after_sent (parent, after, new) sent_t *parent, *after, *new;
+void insert_after_sent (sent_t *parent, sent_t *after, sent_t *new)
 {
   if (after == NULL)
     {
@@ -156,8 +150,7 @@ insert_after_sent (parent, after, new) sent_t *parent, *after, *new;
     }
 }
 
-void 
-insert_before_sent (parent, before, new) sent_t *parent, *before, *new;
+void insert_before_sent (sent_t *parent, sent_t *before, sent_t *new)
 {
   if (before == NULL)
     insert_after_sent (parent, parent->last, new);
@@ -168,8 +161,7 @@ insert_before_sent (parent, before, new) sent_t *parent, *before, *new;
 /******************************************************************************
                                                                   REMOVESENT */
 
-void 
-remove_sent(parent, rem) sent_t *parent, *rem;
+void remove_sent(sent_t *parent, sent_t *rem)
 {
   if (rem->next == NULL)
     {
@@ -195,8 +187,7 @@ remove_sent(parent, rem) sent_t *parent, *rem;
 /******************************************************************************
                                                                    SETFLAG   */
 
-void 
-set_flag ()
+void set_flag (void)
 {
   unsigned char token;
   token= min();
@@ -228,8 +219,7 @@ set_flag ()
 /******************************************************************************
                                                                       SBUILD */
 
-sent_t *
-sbuild()
+sent_t *sbuild(void)
 {
   token= min();
   while (1)
@@ -314,8 +304,7 @@ sbuild()
 /******************************************************************************
 								INSERT_THUNK */
 
-void 
-insert_thunk (rex, token) exp_t *rex; int token;
+void insert_thunk (exp_t *rex, int token)
 {
   sent_t *new= new_sent (token);
   if (token == MTHUNKSIMPLEVALUE)

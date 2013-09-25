@@ -50,9 +50,7 @@
  *  MIFE:         Samme som ovenfor
  *  MELSE:        Samme som ovenfor */
 
-char 
-setdanger_const (re)
-     exp_t *re;
+char setdanger_const (exp_t *re)
 {
   char sub_danger;
   if (LEFT != NULL)
@@ -116,10 +114,7 @@ setdanger_const (re)
                                                                 SSTRCMP      */
 
 #define convbslstr(s) ((s[i]-'0')*64+(s[i+1]-'0')*8+s[i+2]-'0')
-static int 
-sstrcmp (s, t)
-     char s[],
-       t[];
+static int sstrcmp (char s[], char t[])
 {
   int i,
     ss,
@@ -156,9 +151,7 @@ sstrcmp (s, t)
 /******************************************************************************
                                                                      SSTRLEN */
 
-int
-sstrlen (s)
-     char s[];
+int sstrlen (char s[])
 {
   int i = 0,
     ii = 0;
@@ -193,9 +186,7 @@ sstrlen (s)
  * Den fjerner noder med token lik MREAINT 
  * og MINTREA mellom multippel assign.*/
 
-char 
-computeconst (re)
-     exp_t *re;
+char computeconst (exp_t *re)
 {
   char lconst,
     rconst;

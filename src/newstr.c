@@ -29,8 +29,7 @@ static struct obstack os_newstr;
 
 /******************************************************************************
                                                                   INITNEWSTR */
-void 
-init_newstr ()
+void init_newstr (void)
 {
   obstack_init(&os_newstr);
 }
@@ -38,9 +37,7 @@ init_newstr ()
 /******************************************************************************
                                                                  NEWSTRGROW1 */
 
-void 
-newstr_grown(s1, n)
-     char *s1; int n;
+void newstr_grown(char *s1, int n)
 {
   obstack_grow (&os_newstr, s1, n);
 }
@@ -48,9 +45,7 @@ newstr_grown(s1, n)
 /******************************************************************************
                                                                  NEWSTRGROW1 */
 
-void 
-newstr_grow1(s1)
-     char *s1;
+void newstr_grow1(char *s1)
 {
   obstack_grow (&os_newstr, s1, strlen(s1));
 }
@@ -69,8 +64,7 @@ newstr_grow2(s1, s2)
 /******************************************************************************
                                                                 NEWSTRFINISH */
 
-char *
-newstr_finish()
+char *newstr_finish(void)
 {
   obstack_1grow (&os_newstr, 0);
   return obstack_finish (&os_newstr);;
@@ -79,9 +73,7 @@ newstr_finish()
 /******************************************************************************
                                                                   NEWSTRCAT1 */
 
-char * 
-newstrcat1(s1)
-     char *s1;
+char *newstrcat1(char *s1)
 {
   obstack_grow0 (&os_newstr, s1, strlen(s1));
   return obstack_finish (&os_newstr);;
@@ -102,9 +94,7 @@ newstrcat2(s1, s2)
 /******************************************************************************
                                                                   NEWSTRCAT3 */
 
-char * 
-newstrcat3(s1, s2, s3)
-     char *s1, *s2, *s3;
+char *newstrcat3(char *s1, char *s2, char *s3)
 {
   obstack_grow (&os_newstr, s1, strlen(s1));
   obstack_grow (&os_newstr, s2, strlen(s2));
@@ -115,9 +105,7 @@ newstrcat3(s1, s2, s3)
 /******************************************************************************
                                                                   NEWSTRCAT4 */
 
-char * 
-newstrcat4(s1, s2, s3, s4)
-     char *s1, *s2, *s3, *s4;
+char *newstrcat4(char *s1, char *s2, char *s3, char *s4)
 {
   obstack_grow (&os_newstr, s1, strlen(s1));
   obstack_grow (&os_newstr, s2, strlen(s2));
@@ -129,9 +117,7 @@ newstrcat4(s1, s2, s3, s4)
 /******************************************************************************
                                                                   NEWSTRCAT5 */
 
-char * 
-newstrcat5(s1, s2, s3, s4, s5)
-     char *s1, *s2, *s3, *s4, *s5;
+char *newstrcat5(char *s1, char *s2, char *s3, char *s4, char *s5)
 {
   obstack_grow (&os_newstr, s1, strlen(s1));
   obstack_grow (&os_newstr, s2, strlen(s2));
@@ -144,9 +130,7 @@ newstrcat5(s1, s2, s3, s4, s5)
 /******************************************************************************
                                                                   NEWSTRCAT6 */
 
-char * 
-newstrcat6(s1, s2, s3, s4, s5, s6)
-     char *s1, *s2, *s3, *s4, *s5, *s6;
+char *newstrcat6(char *s1, char *s2, char *s3, char *s4, char *s5, char *s6)
 {
   obstack_grow (&os_newstr, s1, strlen(s1));
   obstack_grow (&os_newstr, s2, strlen(s2));

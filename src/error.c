@@ -42,9 +42,8 @@ int anterror;
 
 /******************************************************************************
                                                                   STARTERROR */
-static 
-starterror (line)
-     long line;
+static void
+starterror (long line)
 {
   anterror++;
   if (line == 0)
@@ -58,8 +57,7 @@ starterror (line)
 
 /* Feil som oppdages av LEX */
 
-lerror (errcode)
-     int errcode;
+void lerror (int errcode)
 {
   if (option_nowarning && (errcode == 8 || errcode == 32))
     return;
@@ -181,9 +179,7 @@ lerror (errcode)
 /* Feil som oppdages av YACC */
 
 /*VARARGS1 */
-yerror (errcode, txt)
-     int errcode;
-     char *txt;
+void yerror (int errcode, char *txt)
 {
   char c;
   starterror (lineno);
@@ -251,9 +247,7 @@ yerror (errcode, txt)
 /* Feil som oppdages av DECL PASS 1 */
 
 /*VARARGS1 */
-d1error (errcode, name)
-     int errcode;
-     char *name;
+void d1error (int errcode, char *name)
 {
   starterror (lineno);
   switch (errcode)
@@ -294,10 +288,7 @@ d1error (errcode, name)
 /* Feil som oppdages av DECL PASS 2 */
 
 /*VARARGS1 */
-d2error (errcode, rd1, rd2)
-     int errcode;
-     decl_t *rd1,
-      *rd2;
+void d2error (int errcode, decl_t *rd1, decl_t *rd2)
 {
   char *name1 = rd1->ident;
   starterror (errcode == 79 ? lineno : rd1->line);
@@ -412,9 +403,7 @@ d2error (errcode, rd1, rd2)
 /******************************************************************************
                                 				TEXTNUMBER   */
 
-char *
-textnumber (i)
-     int i;
+char *textnumber (int i)
 {
   static char s[10];
   switch (i)
@@ -461,10 +450,7 @@ textnumber (i)
 /* Feil som oppdages av SJEKKEREN */
 
 /*VARARGS1 */
-serror (errcode, name, ant)
-     int errcode,
-       ant;
-     char *name;
+void serror (int errcode, char *name, int ant)
 {
   char *antt;
   if (option_nowarning && errcode >= 81 && errcode <= 83 )
@@ -652,9 +638,7 @@ serror (errcode, name, ant)
 /* Feil som oppdages av kodegeneratoren */
 
 /*VARARGS1 */
-gerror (errcode, name)
-     int errcode;
-     char *name;
+void gerror (int errcode, char *name)
 {
   starterror (lineno);
   switch (errcode)
@@ -685,9 +669,7 @@ gerror (errcode, name)
 /* Feil som oppdages under innlesing av eksterne moduler */
 
 /*VARARGS1 */
-merror (errcode, name)
-     int errcode;
-     char *name;
+void merror (int errcode, char *name)
 {
   if (option_nowarning && errcode == 3 && option_atr)
     return;

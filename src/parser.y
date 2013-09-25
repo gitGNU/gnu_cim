@@ -30,7 +30,7 @@
 #include <obstack.h>
 char *xmalloc();
 void free();
-
+void yyerror (char s[]);
 #define obstack_chunk_alloc xmalloc
 #define obstack_chunk_free free
 
@@ -922,7 +922,7 @@ ARGUMENT_LIST   :       EXPRESSION              { mout(MENDSEP);
 
 /* Oppdages feil så blir denne procedyren kalt */
 
-yyerror (s)char s[];
+void yyerror (char s[])
   {
      yaccerror=TRUE;
 #if 0
@@ -940,7 +940,7 @@ yyerror (s)char s[];
                                                                              
 #ifdef yylex
 #undef yylex
-ylex()
+int ylex(void)
 {
   long i;
   i=yylex();
@@ -960,13 +960,13 @@ ylex()
 /******************************************************************************
                                                                  INIT_PARSER */
 
-parser_init ()
+void parser_init (void)
 {
   obstack_init (&os_block);
   first_object_allocated_ptr_block= obstack_alloc (&os_block, 0);
 }
 
-parser_init_pass1 ()
+void parser_init_pass1 (void)
 {
   activateid=tag("activat");
   varargsid=tag("...");
@@ -989,7 +989,7 @@ parser_init_pass1 ()
   blockp->rem=FALSE;
 }
 
-parser_reinit ()
+void parser_reinit (void)
 {
   obstack_free (&os_block, first_object_allocated_ptr_block);
 }

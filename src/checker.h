@@ -24,9 +24,9 @@ int sstrlen ();
 
 /* In sentchecker.c */
 
-void sent_check ();
+void sent_check (sent_t *parent_sent, char res_labels);
 
 /* In expchecker.c */
 
-void exp_checker_init_pass2 ();
-void main_expcheck ();
+void exp_checker_init_pass2 (void);
+void main_exp_check (exp_t *re);

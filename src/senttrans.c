@@ -23,8 +23,7 @@
 /******************************************************************************
                                                                  SORTPROCARR */
 
-static void 
-sort_proc_arr (parent_sent) sent_t *parent_sent;
+static void sort_proc_arr (sent_t *parent_sent)
 {
   int line= parent_sent->line;
   sent_t *proc=NULL, *sent, *nextsent, *new;
@@ -84,8 +83,7 @@ sort_proc_arr (parent_sent) sent_t *parent_sent;
 /******************************************************************************
                                                                SENTLISTTRANS */
 
-static void 
-sent_list_trans (parent_sent) sent_t *parent_sent;
+static void sent_list_trans (sent_t *parent_sent)
 {
   sent_t *sent;
 
@@ -105,8 +103,7 @@ sent_list_trans (parent_sent) sent_t *parent_sent;
 /******************************************************************************
                                                                  MODULETRANS */
 
-static void 
-module_trans (sent) sent_t *sent;
+static void module_trans (sent_t *sent)
 {     
   if (! separat_comp)
     insert_before_sent (sent, NULL, new_sent (MGOTOSTOP));
@@ -116,8 +113,7 @@ module_trans (sent) sent_t *sent;
 /******************************************************************************
                                                                   BLOCKTRANS */
 
-static void 
-block_trans (sent) sent_t *sent;
+static void block_trans (sent_t *sent)
 {
   cblock= sent->cblock;
   sort_proc_arr (sent);
@@ -127,8 +123,7 @@ block_trans (sent) sent_t *sent;
 /******************************************************************************
                                                                 PRBLOCKTRANS */
 
-static void 
-prblock_trans (sent) sent_t *sent;
+static void prblock_trans (sent_t *sent)
 {
   cblock= sent->cblock;
   sort_proc_arr (sent);
@@ -139,8 +134,7 @@ prblock_trans (sent) sent_t *sent;
 /******************************************************************************
                                                               PROCEDURETRANS */
 
-static void 
-procedure_trans (sent) sent_t *sent;
+static void procedure_trans (sent_t *sent)
 {
   cblock= sent->cblock;
   sort_proc_arr (sent);
@@ -150,8 +144,7 @@ procedure_trans (sent) sent_t *sent;
 /******************************************************************************
                                                                   CLASSTRANS */
 
-static void 
-class_trans (sent) sent_t *sent;
+static void class_trans (sent_t *sent)
 {
   cblock= sent->cblock;
   sort_proc_arr (sent);
@@ -161,8 +154,7 @@ class_trans (sent) sent_t *sent;
 /******************************************************************************
                                                                 INSPECTTRANS */
 
-static void 
-inspect_trans (sent) sent_t *sent;
+static void inspect_trans (sent_t *sent)
 {
   cblock= sent->cblock;
   sent->iexp= transcall (sent->exp->up, sent->exp, 1, 1, 1); 
@@ -172,8 +164,7 @@ inspect_trans (sent) sent_t *sent;
 /******************************************************************************
                                                                      DOTRANS */
 
-static void 
-do_trans (sent) sent_t *sent;
+static void do_trans (sent_t *sent)
 {
   cblock= sent->cblock;
   sent_list_trans (sent);
@@ -182,8 +173,7 @@ do_trans (sent) sent_t *sent;
 /******************************************************************************
                                                                    WHENTRANS */
 
-static void 
-when_trans (sent) sent_t *sent;
+static void when_trans (sent_t *sent)
 {
   cblock= sent->cblock;
   sent_list_trans (sent);
@@ -192,8 +182,7 @@ when_trans (sent) sent_t *sent;
 /******************************************************************************
                                                               OTHERWISETRANS */
 
-static void 
-otherwise_trans (sent) sent_t *sent;
+static void otherwise_trans (sent_t *sent)
 {
   cblock= sent->cblock;
   sent_list_trans (sent);
@@ -202,8 +191,7 @@ otherwise_trans (sent) sent_t *sent;
 /******************************************************************************
                                                                 FORELEMTRANS */
 
-static void 
-forelem_trans (re, rex) exp_t *re, *rex;
+static void forelem_trans (exp_t *re, exp_t *rex)
 {
   exp_t *rey, *red;
   exp_t *reinit, *retest, *restep;
@@ -270,8 +258,7 @@ forelem_trans (re, rex) exp_t *re, *rex;
 /******************************************************************************
                                                                   FORDOTRANS */
 
-static void 
-fordo_trans (sent) sent_t *sent;
+static void fordo_trans (sent_t *sent)
 {
   exp_t *re, *rex;
   cblock= sent->cblock;
@@ -285,8 +272,7 @@ fordo_trans (sent) sent_t *sent;
 /******************************************************************************
                                                                   WHILETRANS */
 
-static void 
-while_trans (sent) sent_t *sent;
+static void while_trans (sent_t *sent)
 {
   sent->iexp= transcall (sent->exp->up, sent->exp, 1, 1, 1); 
   sent_list_trans (sent);
@@ -295,8 +281,7 @@ while_trans (sent) sent_t *sent;
 /******************************************************************************
                                                                      IFTRANS */
 
-static void 
-if_trans (sent) sent_t *sent;
+static void if_trans (sent_t *sent)
 {
   sent->iexp= transcall (sent->exp->up, sent->exp, 1, 1, 1);
   sent_list_trans (sent);
@@ -305,8 +290,7 @@ if_trans (sent) sent_t *sent;
 /******************************************************************************
                                                                    ELSETRANS */
 
-static void 
-else_trans (sent) sent_t *sent;
+static void else_trans (sent_t *sent)
 {
   sent_list_trans (sent);
 }
@@ -314,8 +298,7 @@ else_trans (sent) sent_t *sent;
 /******************************************************************************
                                                                    THENTRANS */
 
-static void 
-then_trans (sent) sent_t *sent;
+static void then_trans (sent_t *sent)
 {
   sent_list_trans (sent);
 }
@@ -323,8 +306,7 @@ then_trans (sent) sent_t *sent;
 /******************************************************************************
                                                                    GOTOTRANS */
 
-static void 
-goto_trans (sent) sent_t *sent;
+static void goto_trans (sent_t *sent)
 {
   sent->iexp= transcall (sent->exp->up, sent->exp, 1, 1, 1);
 }
@@ -332,16 +314,14 @@ goto_trans (sent) sent_t *sent;
 /******************************************************************************
                                                                   INNERTRANS */
 
-static void 
-inner_trans (sent) sent_t *sent;
+static void inner_trans (sent_t *sent)
 {
 }
 
 /******************************************************************************
                                                               ENDSWITCHTRANS */
 
-static void 
-endswitch_trans (sent) sent_t *sent;
+static void endswitch_trans (sent_t *sent)
 {
   exp_t *rex, *rey;
   for (rex = sent->exp->right; rex->token != MENDSEP; rex = rex->right)
@@ -358,8 +338,7 @@ endswitch_trans (sent) sent_t *sent;
 /******************************************************************************
                                                               ENDASSIGNTRANS */
 
-static void 
-endassign_trans (sent) sent_t *sent;
+static void endassign_trans (sent_t *sent)
 {
   sent->iexp= transcall (sent->exp->up, sent->exp, 1, 1, 1);
 }
@@ -367,8 +346,7 @@ endassign_trans (sent) sent_t *sent;
 /******************************************************************************
                                                                ENDARRAYTRANS */
 
-static void 
-endarray_trans (sent) sent_t *sent;
+static void endarray_trans (sent_t *sent)
 {
   sent->iexp= transcall (sent->exp, sent->exp->right, 1, 1, 1);
 }
@@ -376,22 +354,21 @@ endarray_trans (sent) sent_t *sent;
 /******************************************************************************
                                                                ENDLABELTRANS */
 
-static void 
-endlabel_trans (sent) sent_t *sent;
+static void endlabel_trans (sent_t *sent)
 {
 }
 
 /******************************************************************************
                                                                GOTOSTOPTRANS */
 
-goto_stop_trans (sent) sent_t *sent;
+void goto_stop_trans (sent_t *sent)
 {
 }
 
 /******************************************************************************
                                                                   THUNKTRANS */
 
-thunk_trans (sent) sent_t *sent;
+void thunk_trans (sent_t *sent)
 {
   cblock= sent->cblock;
   inthunk= sent->exp->value.thunk.inthunk;
@@ -402,8 +379,7 @@ thunk_trans (sent) sent_t *sent;
 /******************************************************************************
                                                                    SENTTRANS */
 
-void 
-sent_trans (sent) sent_t *sent;
+void sent_trans (sent_t *sent)
 {
   switch (sent->token)
     {

@@ -29,14 +29,12 @@ int lediglabel = STARTLABEL;
 /******************************************************************************
                              NEWLABEL & TYPELABEL & EXITLABEL & GOTOLABEL    */
 
-int 
-newlabel ()
+int newlabel (void )
 {
   return (lediglabel++);
 }
 
-typelabel (l)
-     int l;
+void typelabel (int l)
 {
   fprintf (ccode, "__l%d:", l);
   not_reached = FALSE;
@@ -44,21 +42,19 @@ typelabel (l)
   genline ();
 }
 
-gotoswitch ()
+void gotoswitch (void)
 {
   fprintf (ccode, "goto __sw;");
   last_line = 0;
 }
 
-exitlabel (l)
-     int l;
+void exitlabel (int l)
 {
   gotoswitch ();
   typelabel (l);
 }
 
-exitcondlabel (l)
-     int l;
+void exitcondlabel (int l)
 {
   fprintf (ccode, "goto __sw;__l%d:", l);
   not_reached = FALSE;
@@ -66,8 +62,7 @@ exitcondlabel (l)
   genline ();
 }
 
-gotolabel (l)
-     int l;
+void gotolabel (int l)
 {
   fprintf (ccode, "goto __l%d;", l);
 }
@@ -78,22 +73,19 @@ gotolabel (l)
 /* LOKALE HOPP */
 static int ledigllabel;
 
-int 
-newllabel ()
+int newllabel (void)
 {
   return (ledigllabel++);
 }
 
-typellabel (l)
-     int l;
+void typellabel (int l)
 {
   fprintf (ccode, "__ll%d:", l);
   not_reached = FALSE;
   last_line = 0;
 }
 
-gotollabel (l)
-     int l;
+void gotollabel (int l)
 {
   fprintf (ccode, "goto __ll%d;", l);
 }
@@ -102,7 +94,7 @@ gotollabel (l)
 /******************************************************************************
                                                         GENLINE              */
 
-genline ()
+void genline (void)
 {
   if (true_last_line != lineno)
     {

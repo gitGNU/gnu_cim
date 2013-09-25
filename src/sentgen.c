@@ -29,8 +29,7 @@ char *mainroutine = "main";
 /******************************************************************************
                                                                  SENTLISTGEN */
 
-void 
-sent_list_gen (parent_sent, lab) sent_t *parent_sent; int lab;
+static void sent_list_gen (sent_t *parent_sent, int lab)
 {
   sent_t *sent;
 
@@ -53,7 +52,7 @@ sent_list_gen (parent_sent, lab) sent_t *parent_sent; int lab;
 /******************************************************************************
                                                                      GENINIT */
 
-gen_init ()
+static void gen_init (void)
 {
 #if 0
   fprintf (ccode, "/*Cim_ccode*/\n");
@@ -69,7 +68,7 @@ gen_init ()
 /******************************************************************************
                                                                    MODULEGEN */
 
-module_gen (sent) sent_t *sent;
+static void module_gen (sent_t *sent)
 {
   int i;
 
@@ -174,7 +173,7 @@ module_gen (sent) sent_t *sent;
 /******************************************************************************
                                                                     BLOCKGEN */
 
-block_gen (sent) sent_t *sent;
+static void block_gen (sent_t *sent)
 {
   cblock= sent->cblock;
   cblev= cblock->blev;
@@ -197,7 +196,7 @@ block_gen (sent) sent_t *sent;
 /******************************************************************************
                                                                   PRBLOCKGEN */
 
-prblock_gen (sent) sent_t *sent;
+static void prblock_gen (sent_t *sent)
 {
   int labexit;
   if (not_reached == FALSE)
@@ -231,12 +230,12 @@ prblock_gen (sent) sent_t *sent;
 /******************************************************************************
                                                                 PROCEDUREGEN */
 
-procedure_gen (sent) sent_t *sent;
+static void procedure_gen (sent_t *sent)
 {
   cblock= sent->cblock;
   cblev= cblock->blev;
   fprintf (ccode, "/* START PROCEDURE %s */", sent->cblock->quant.ident);
-  sent_list_gen (sent);
+  sent_list_gen (sent, 0);
   if (not_reached == FALSE)
     {
       genline ();
@@ -267,7 +266,7 @@ procedure_gen (sent) sent_t *sent;
 /******************************************************************************
                                                                     CLASSGEN */
 
-class_gen (sent) sent_t *sent;
+static void class_gen (sent_t *sent)
 {
   cblock= sent->cblock;
   cblev= cblock->blev;
@@ -282,7 +281,7 @@ class_gen (sent) sent_t *sent;
 /******************************************************************************
                                                                   INSPECTGEN */
 
-inspect_gen (sent) sent_t *sent;
+static void inspect_gen (sent_t *sent)
 {
   int labnull, labexit;
   if (not_reached == FALSE)
@@ -338,7 +337,7 @@ inspect_gen (sent) sent_t *sent;
 /******************************************************************************
                                                                        DOGEN */
 
-do_gen (sent, labexit) sent_t *sent; int labexit;
+static void do_gen (sent_t *sent, int labexit)
 {
   cblock= sent->cblock;
   cblev= cblock->blev;
@@ -355,7 +354,7 @@ do_gen (sent, labexit) sent_t *sent; int labexit;
 /******************************************************************************
                                                                      WHENGEN */
 
-when_gen (sent, labexit) sent_t *sent; int labexit;
+static void when_gen (sent_t *sent, int labexit)
 {
   int labnextcase;
   cblock= sent->cblock;
@@ -382,19 +381,16 @@ when_gen (sent, labexit) sent_t *sent; int labexit;
 /******************************************************************************
                                                                 OTHERWISEGEN */
 
-otherwise_gen (sent) sent_t *sent;
+static void otherwise_gen (sent_t *sent)
 {
 }
 
 /******************************************************************************
                                                        GFORELEM              */
 /* Genererer kode for en for løkke for ett liste element                     */
-static 
-forelemgen (re, rex, labcontinue, labdo, labexit, single, 
-		   notlastdefault, listnrp)
-     exp_t *re, *rex;
-     int labcontinue, labdo, labexit, single, notlastdefault;
-     int *listnrp;
+static int forelemgen (exp_t *re, exp_t *rex,
+		   int labcontinue, int labdo, int labexit, int single, int notlastdefault,
+		   int *listnrp)
 {
   exp_t *rey;
   int labnext;
@@ -479,9 +475,7 @@ forelemgen (re, rex, labcontinue, labdo, labexit, single,
 /******************************************************************************
                                                       FORGEN                 */
 /* Genererer kode for en for l|kke med et antall liste elementer             */
-forgen (re, labcontinue, labdo, labexit)
-     exp_t *re;
-     int labcontinue, labdo, labexit;
+static int forgen (exp_t *re, int labcontinue, int labdo, int labexit)
 {
   int notlastdefault=FALSE;
   exp_t *rex;
@@ -518,7 +512,7 @@ forgen (re, labcontinue, labdo, labexit)
 /******************************************************************************
                                                                     FORDOGEN */
 
-fordo_gen (sent) sent_t *sent;
+static void fordo_gen (sent_t *sent)
 {
   int labcontinue, labdo, labexit, iterate;
   if (not_reached == FALSE)
@@ -553,7 +547,7 @@ fordo_gen (sent) sent_t *sent;
 /******************************************************************************
                                                                     WHILEGEN */
 
-while_gen (sent) sent_t *sent;
+static void while_gen (sent_t *sent)
 {
   int labstart, labexit;
   if (not_reached == FALSE)
@@ -581,7 +575,7 @@ while_gen (sent) sent_t *sent;
 /******************************************************************************
                                                                        IFGEN */
 
-if_gen (sent) sent_t *sent;
+static void if_gen (sent_t *sent)
 {
   int labelse, labexit;
   if (not_reached == FALSE)
@@ -623,7 +617,7 @@ if_gen (sent) sent_t *sent;
 /******************************************************************************
                                                                      GOTOGEN */
 
-goto_gen (sent) sent_t *sent;
+static void goto_gen (sent_t *sent)
 {
   if (not_reached == FALSE)
     genline ();
@@ -637,7 +631,7 @@ goto_gen (sent) sent_t *sent;
 /******************************************************************************
                                                                     INNERGEN */
 
-inner_gen (sent, lab) sent_t *sent; int lab;
+static void inner_gen (sent_t *sent, int lab)
 {
   genline ();
   fprintf (ccode, "__rinner(%d);", sent->cblock->quant.plev);
@@ -647,7 +641,7 @@ inner_gen (sent, lab) sent_t *sent; int lab;
 /******************************************************************************
                                                                     ENTRYGEN */
 
-entry_gen (sent) sent_t *sent;
+static void entry_gen (sent_t *sent)
 {
   typelabel (sent->cblock->ent);
 }
@@ -655,7 +649,7 @@ entry_gen (sent) sent_t *sent;
 /******************************************************************************
                                                                BLOCKENTRYGEN */
 
-block_entry_gen (sent) sent_t *sent;
+static void block_entry_gen (sent_t *sent)
 {
   typellabel (sent->cblock->ent);
 }
@@ -663,7 +657,7 @@ block_entry_gen (sent) sent_t *sent;
 /******************************************************************************
                                                            PROCEDUREENTRYGEN */
 
-procedure_entry_gen (sent) sent_t *sent;
+static void procedure_entry_gen (sent_t *sent)
 {
   decl_t *rd= sent->cblock->parloc;
   int i;
@@ -693,7 +687,7 @@ procedure_entry_gen (sent) sent_t *sent;
 /******************************************************************************
                                                                 ENDSWITCHGEN */
 
-endswitch_gen (sent) sent_t *sent;
+static void endswitch_gen (sent_t *sent)
 {
   exp_t *re= sent->exp, *rex;
   int i = 1;
@@ -729,7 +723,7 @@ endswitch_gen (sent) sent_t *sent;
 /******************************************************************************
                                                                 ENDASSIGNGEN */
 
-endassign_gen (sent) sent_t *sent;
+static void endassign_gen (sent_t *sent)
 {
   if (not_reached == FALSE)
     genline ();
@@ -743,7 +737,7 @@ endassign_gen (sent) sent_t *sent;
 /******************************************************************************
                                                                  ENDARRAYGEN */
 
-endarray_gen (sent) sent_t *sent;
+static void endarray_gen (sent_t *sent)
 {
   exp_t *re= sent->exp, *re1, *re2;
   int i;
@@ -867,7 +861,7 @@ endarray_gen (sent) sent_t *sent;
 /******************************************************************************
                                                                   ENDDECLGEN */
 
-enddecl_gen (sent, lab) sent_t *sent;
+static void enddecl_gen (sent_t *sent, int lab)
 {
   if (not_reached == FALSE)
     genline ();
@@ -881,7 +875,7 @@ enddecl_gen (sent, lab) sent_t *sent;
 /******************************************************************************
                                                                  ENDLABELGEN */
 
-endlabel_gen (sent) sent_t *sent;
+static void endlabel_gen (sent_t *sent)
 {
   exp_t *re= sent->exp;
   if (not_reached == FALSE)
@@ -905,7 +899,7 @@ endlabel_gen (sent) sent_t *sent;
 
 /******************************************************************************
                                                                  GOTOSTOPGEN */
-goto_stop_gen (sent) sent_t *sent;
+static void goto_stop_gen (sent_t *sent)
 {
   fprintf (ccode, "goto __slutt;");
 }
@@ -914,7 +908,7 @@ goto_stop_gen (sent) sent_t *sent;
 /******************************************************************************
                                                                     THUNKGEN */
 
-thunk_gen (sent) sent_t *sent;
+static void thunk_gen (sent_t *sent)
 {
   int labbypass;
   cblock= sent->cblock;
@@ -947,8 +941,7 @@ thunk_gen (sent) sent_t *sent;
 /******************************************************************************
                                                                      SENTGEN */
 
-void 
-sent_gen (sent, lab) sent_t *sent;
+void sent_gen (sent_t *sent, int lab)
 {
   switch (sent->token)
     {

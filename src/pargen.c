@@ -24,12 +24,7 @@
 /******************************************************************************
                                                               GEN_CONV_AND_Q */
 
-static 
-gen_conv_and_q (rex, procedure, transported, copied_all)
-     exp_t *rex;
-     char procedure,
-       transported,
-       copied_all;
+static void gen_conv_and_q (exp_t *rex, char procedure, char transported, char copied_all)
 {
   char writetest = TRUE;
   if ((rex->rd->prefqual == rex->left->qual) ||
@@ -151,11 +146,7 @@ gen_conv_and_q (rex, procedure, transported, copied_all)
 /******************************************************************************
                                                                GEN_ARIT_CONV */
 
-static 
-gen_arit_conv (rex, transported, copied_all)
-     exp_t *rex;
-     char transported,
-       copied_all;
+static void gen_arit_conv (exp_t *rex, char transported, char copied_all)
 {
   if (transported != copied_all || rex->left->type != rex->rd->type)
     {
@@ -185,11 +176,7 @@ gen_arit_conv (rex, transported, copied_all)
 /******************************************************************************
                                                                     GEN_CONV */
 
-static 
-gen_conv (rex, procedure, copied_all)
-     exp_t *rex;
-     char procedure,
-       copied_all;
+static void gen_conv (exp_t *rex, char procedure, char copied_all)
 {
   if (rex->rd->categ == CVAR || rex->rd->categ == CNAME	)
     {
@@ -218,10 +205,7 @@ gen_conv (rex, procedure, copied_all)
  * til den formelle nameparameter structen ved generering av thunker for
  * den aktuelle parameteren. */
 
-static 
-send_to_formal_par (rex, addressthunk)
-     exp_t *rex;
-     char addressthunk;
+static void send_to_formal_par (exp_t *rex, char addressthunk)
 {
   /* Hvis hdot = FALSE er denne rutinen kalt for en label     eller array
    * name. Structen for disse har ikke et .h felt som finnes i structene for
@@ -258,8 +242,7 @@ send_to_formal_par (rex, addressthunk)
  * genereres det ogs} kode som utf|rer evt. konverteringer og 
  * kvalifikasjonstester */
 
-gen_thunk_simple_address (rex)
-     exp_t *rex;
+void gen_thunk_simple_address (exp_t *rex)
 {
   switch (rex->left->token)
     {
@@ -323,8 +306,7 @@ gen_thunk_simple_address (rex)
 /******************************************************************************
                                                     GEN_THUNK_SIMPLE_VALUE   */
 
-gen_thunk_simple_value (rex)
-     exp_t *rex;
+void gen_thunk_simple_value (exp_t *rex)
 {
   switch (rex->left->type)
     {
@@ -377,9 +359,7 @@ gen_thunk_simple_value (rex)
 /******************************************************************************
                                                        GENSIMPLEPAR          */
 
-static 
-gensimplepar (rex)
-     exp_t *rex;
+static void gensimplepar (exp_t *rex)
 {
   int i;
 /***** ENKEL INTEGER, REAL, CHAR, REF,TEXT ELLER BOOL  PARAMETER     ****/
@@ -634,11 +614,7 @@ gensimplepar (rex)
 /******************************************************************************
                                                               GENLABELPAREXP */
 
-static 
-genlabelparexp (rex, formellpar, thunk)
-     exp_t *rex,
-      *formellpar;
-     char thunk;
+static void genlabelparexp (exp_t *rex, exp_t *formellpar, char thunk)
 {
   /* Denne rutinen kalles i forbindelse med } generere kode for  label
    * parameteroverf|ring hvor den aktuelle parameteren er et uttrykk (eks.
@@ -707,8 +683,7 @@ genlabelparexp (rex, formellpar, thunk)
 /******************************************************************************
                                                              GEN_THUNK_LABLE */
 
-gen_thunk_lable (rex)
-     exp_t *rex;
+void gen_thunk_lable (exp_t *rex)
 {
   /* genlabelparexp skriver ut uttrykket, og tilordner ment, ent og ob for
    * hver gren i uttrykket. (if-i-uttrykk) Den skriver ogs} ut kallet for
@@ -720,9 +695,7 @@ gen_thunk_lable (rex)
 /******************************************************************************
                                                            GENLABELSWITCHPAR */
 
-static 
-genlabelswitchpar (rex)
-     exp_t *rex;
+static void genlabelswitchpar (exp_t *rex)
 {
   int i;
 
@@ -841,8 +814,7 @@ genlabelswitchpar (rex)
 /******************************************************************************
                                                              GEN_THUNK_ARRAY */
 
-gen_thunk_array (rex)
-     exp_t *rex;
+void gen_thunk_array (exp_t *rex)
 {
   fprintf (ccode, "__er=(__dhp)");
   genvalue (rex->left);
@@ -852,9 +824,7 @@ gen_thunk_array (rex)
 /******************************************************************************
                                                                  GENARRAYPAR */
 
-static 
-genarraypar (rex)
-     exp_t *rex;
+static void genarraypar (exp_t *rex)
 {
   int i;
   switch (rex->rd->categ)
@@ -938,8 +908,7 @@ genarraypar (rex)
 /******************************************************************************
                                                          GEN_THUNK_PROCEDURE */
 
-gen_thunk_procedure (rex)
-     exp_t *rex;
+void gen_thunk_procedure (exp_t *rex)
 {
   fprintf (ccode, "__sl=");
   if (nonetest == ON)
@@ -960,9 +929,7 @@ gen_thunk_procedure (rex)
 /******************************************************************************
                                                              GENPROCEDUREPAR */
 
-static 
-genprocedurepar (rex)
-     exp_t *rex;
+static void genprocedurepar (exp_t *rex)
 {
   int i;
   /* OVERF\RING AV PROSEDYRER SOM PARAMETERE */
@@ -1080,8 +1047,7 @@ genprocedurepar (rex)
 /******************************************************************************
                                                                 GENPROCPARAM */
 
-genprocparam (re)
-     exp_t *re;
+void genprocparam (exp_t *re)
 {
   exp_t *rex;
 
@@ -1127,8 +1093,7 @@ genprocparam (re)
 /******************************************************************************
                                                       GENPREDEFPROCCALL      */
 
-genpredefproccall (re)
-     exp_t *re;
+void genpredefproccall (exp_t *re)
 {
   int i;
   /* Hvis danger = TRUE s} skal returverdien legges p} stakken */
@@ -1232,8 +1197,7 @@ genpredefproccall (re)
  * parametere til eksterne C-prosedyrer. */
 
 
-static decl_t *
-getfirstclassattribut (rd) decl_t *rd;
+static decl_t *getfirstclassattribut (decl_t *rd)
 {
   decl_t *rdd;
   
@@ -1255,8 +1219,7 @@ getfirstclassattribut (rd) decl_t *rd;
  * rex->left->rd angir den aktuelle parameteren, mens rex->rd angir den
  * formelle. */
 
-static 
-par_to_cproc (rex) exp_t *rex;
+static void par_to_cproc (exp_t *rex)
 {
   decl_t *rd;
   switch (rex->rd->kind)
@@ -1363,7 +1326,7 @@ par_to_cproc (rex) exp_t *rex;
 
 /******************************************************************************
   GENCPROCCALL      */
-gencproccall (re) exp_t *re;
+void gencproccall (exp_t *re)
 {
   exp_t *rex;
   

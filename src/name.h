@@ -16,7 +16,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA. */
 
-extern init_name ();
-extern char *tag ();
-extern define_name ();
-extern char ifdef_name ();
+void init_name (void);
+char *tag (char t[]);
+void define_name (char *t, char d);
+char ifdef_name (char *t);

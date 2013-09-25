@@ -29,16 +29,8 @@ static int dim;
 
 static int stackno;
 
-static exp_t *
-savepar (ret, re, up, ident, type, first, 
-			    minval, minref, mintxt)
-     exp_t *ret,
-       *re;
-     char up;
-     char *ident;
-     char type;
-     char first;
-     int minval, minref, mintxt;
+static exp_t *savepar (exp_t *ret, exp_t *re, char up, char *ident,
+		       char type, char first, int minval, int minref, int mintxt)
 {
   exp_t *rex;
 
@@ -138,9 +130,7 @@ savepar (ret, re, up, ident, type, first,
 
 char usedentry[STACK_SIZE + 1];
 
-static 
-findsubentry (re)
-     exp_t *re;
+static void findsubentry (exp_t *re)
 {
   switch (re->token)
     {
@@ -176,11 +166,7 @@ findsubentry (re)
 /******************************************************************************
                                                            FINDALLENTRY      */
 
-int 
-findallentry (ret, re, type, min)
-     exp_t *ret,
-      *re;
-     int type, min;
+int findallentry (exp_t *ret, exp_t *re, int type, int min)
 {
   int i,
     max = 0;
@@ -250,11 +236,7 @@ findallentry (ret, re, type, min)
 /******************************************************************************
                                                                  ANT_STACK   */
 
-long 
-ant_stack (ret, re, minval, minref, mintxt)
-     exp_t *ret,
-       *re;
-     int minval, minref, mintxt;
+long ant_stack (exp_t *ret, exp_t *re, int minval, int minref, int mintxt)
 {
 #if ACSTACK_IN_OBJ
   return (0);
@@ -272,12 +254,7 @@ ant_stack (ret, re, minval, minref, mintxt)
 /* This routine traverse a expression tree upwards.
  * For every leftside */
 
-static exp_t * 
-genstack (ret, re, only_pointers, minval, minref, mintxt)
-     exp_t *ret,
-      *re;
-     char only_pointers;
-     int minval, minref, mintxt;
+static exp_t *genstack (exp_t *ret, exp_t *re, char only_pointers, int minval, int minref, int mintxt)
 {
   int i;
   exp_t *rex, *reconc=NULL;
@@ -399,9 +376,7 @@ genstack (ret, re, only_pointers, minval, minref, mintxt)
  * genvalue() kalles. Brukes i forbindelse med if i uttrykk og i forbindelse
  * med ORELSE og ANDTHEN */
 
-static char 
-workbeforetest (re)
-     exp_t *re;
+static char workbeforetest (exp_t *re)
 {
   int token;			/* token er deklarert som int fordi
 				 * kompilatoren ga warning om at constant 136 
@@ -425,10 +400,7 @@ workbeforetest (re)
 /******************************************************************************
                                                                   TRANSPARAM */
 
-static
-transparam (ret, re, minval, minref, mintxt) 
-     exp_t *ret, *re;
-     int minval, minref, mintxt;
+static void transparam (exp_t *ret, exp_t *re, int minval, int minref, int mintxt)
 {
   exp_t *rex, *rexp, *rey;
   char index_is_const = TRUE;
@@ -520,11 +492,7 @@ transparam (ret, re, minval, minref, mintxt)
 /******************************************************************************
                                                               TRANSCALL      */
 
-exp_t *
-transcall (ret, re, minval, minref, mintxt)
-     exp_t *ret,
-      *re;
-     int minval, minref, mintxt;
+exp_t *transcall (exp_t *ret, exp_t *re, int minval, int minref, int mintxt)
 {
   exp_t *rex, *reconc=NULL;
   short entry;
@@ -657,8 +625,9 @@ transcall (ret, re, minval, minref, mintxt)
 		  /* er en NAME parameter. Det skal sjekkes om */
 		  /* denne variabelen er brukt flere ganger i uttrykket */
 		  for (rex= re; rex->right->token != MENDSEP; rex= rex->right);
-		  reconc= concexp (reconc, savepar (ret, re, 
-						    rex->left->rd, TRUE,
+		  reconc= concexp (reconc, savepar (ret, re, TRUE,  /* TBD IS THIS CORRECT, and the following */
+						    rex->left->rd->ident,
+						    rex->left->rd->type, TRUE,
 						    minval, minref, mintxt));
 		}
 

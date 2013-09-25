@@ -39,56 +39,60 @@ extern char not_reached;
 
 extern int lediglabel;
 
-/* gen.c */
-
-extern newlabel();
-extern typelabel();
-extern gotoswitch();
-extern exitlabel();
-extern exitcondlabel ();
-extern gotolabel();
-
-extern newllabel();
-extern typellabel();
-extern gotollabel();
-
-extern genline();
-
 /* transcall.c */
-extern int findallentry();
-extern exp_t *transcall();
-extern long ant_stack();
+int findallentry (exp_t *ret, exp_t *re, int type, int min);
+exp_t *transcall (exp_t *ret, exp_t *re, int minval, int minref, int mintxt);
+long ant_stack (exp_t *ret, exp_t *re, int minval, int minref, int mintxt);
 
 /* genexp.c */
 
-extern void gen_for_val();
+void gen_ref_stack (int i);
+void gen_int_stack (int i);
+void gen_textconst (exp_t *re);
+
+void gen_for_val(int i);
 extern void gen_con_val();
 
-extern gen();
-extern gensl();
-extern genchain();
-extern gentype ();
+void gen (exp_t *re);
+void gensl (exp_t *re, char atr, char nonetest);
+void genchain (block_t *rb, char atr);
+void gentype (exp_t *re);
 
-extern genmodulemark();
-extern gen_adr_prot();
+void genmodulemark(char *maintimestamp);
+void gen_adr_prot (FILE *code, decl_t *rd);
 
-extern genvalue();
+void genvalue (exp_t *re);
+void gen_con_ref (int i);
 
 /* genpar.c */
-extern genprocparam ();
-extern genpredefproccall ();
-extern gencproccall ();
-extern gen_thunk_simple_address ();
-extern gen_thunk_simple_value ();
-extern gen_thunk_lable ();
-extern gen_thunk_array ();
-extern gen_thunk_procedure ();
+void genprocparam (exp_t *rex);
+void genpredefproccall (exp_t *rex);
+void gencproccall (exp_t *rex);
+void gen_thunk_simple_address (exp_t *rex);
+void gen_thunk_simple_value (exp_t *rex);
+void gen_thunk_lable (exp_t *rex);
+void gen_thunk_array (exp_t *rex);
+void gen_thunk_procedure (exp_t *rex);
 
 /* genstr.c */
-extern init_structure();
-extern int newlabel();
+void init_structure(void);
+void structure(void);
+void stat_pointers (void);
 
 /* sentgen.c */
 
-extern void sent_gen ();
+void sent_gen (sent_t *sent, int lab);
+
+/* linegen.c */
+int newlabel(void);
+void typelabel (int l);
+void gotoswitch (void);
+void exitlabel (int l);
+void exitcondlabel (int l);
+void gotolabel (int l);
+
+int newllabel (void);
+void typellabel (int l);
+void gotollabel (int l);
+void genline (void);
 

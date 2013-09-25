@@ -32,8 +32,7 @@ int inthunk;			/* Brukes i forbindelse med uttrykk i
 /******************************************************************************
                                                                          GEN */
 
-gen (re)
-     exp_t *re;
+void gen (exp_t *re)
 {
   genvalue (transcall (re->up, re, 1, 1, 1));
   gen_sent_marker();
@@ -44,10 +43,7 @@ gen (re)
 /******************************************************************************
                                                                 GENSL        */
 
-gensl (re, atr, nonetest)
-     exp_t *re;
-     char atr,
-       nonetest;
+void gensl (exp_t *re, char atr, char nonetest)
 {
   if (is_after_dot (re))
     {
@@ -82,9 +78,7 @@ gensl (re, atr, nonetest)
 /******************************************************************************
                                                                GENCHAIN     */
 
-genchain (rb, atr)
-     block_t *rb;
-     char atr;
+void genchain (block_t *rb, char atr)
 {
   int i;
   if (rb->stat)
@@ -139,8 +133,7 @@ genchain (rb, atr)
 /******************************************************************************
                                                                 GENTYPE      */
 
-gentype (re)
-     exp_t *re;
+void gentype (exp_t *re)
 {
   switch (re->type)
     {
@@ -170,8 +163,7 @@ gentype (re)
 /******************************************************************************
                                                             GEN_ADR_PROT     */
 
-gen_adr_prot (code, rd) FILE *code;
-     decl_t *rd;
+void gen_adr_prot (FILE *code, decl_t *rd)
 {
   fprintf (code, "&__p%d%s"
 	   ,rd->descr->timestamp == 0 ? rd->descr->blno : rd->descr->ptypno
@@ -184,7 +176,7 @@ gen_adr_prot (code, rd) FILE *code;
 /******************************************************************************
 							       GENMODULEMARK */
 
-genmodulemark(maintimestamp) char *maintimestamp;
+void genmodulemark(char *maintimestamp)
 {
   if (maintimestamp)
     fprintf (ccode, "__m_%s", maintimestamp);
@@ -201,8 +193,7 @@ genmodulemark(maintimestamp) char *maintimestamp;
 #define STACK_REF 4
 #define STACK_TXT 5
 
-static void
-gen_attr_object (i, type) int i; int type;
+static void gen_attr_object (int i, int type)
 {
   block_t *rb;
   int j;
@@ -240,8 +231,7 @@ gen_attr_object (i, type) int i; int type;
 
 /******************************************************************************
                                                                 GEN_FOR_VAL  */
-void
-gen_for_val (i) int i;
+void gen_for_val (int i)
 {
   gen_attr_object (i, FOR_VAL);
   fprintf (ccode, "f%d", i);
@@ -249,8 +239,7 @@ gen_for_val (i) int i;
 
 /******************************************************************************
                                                                 GEN_CON_VAL  */
-void
-gen_con_ref (i) int i;
+void gen_con_ref (int i)
 {
   gen_attr_object (i, CON_REF);
   fprintf (ccode, "c%d", i);
@@ -259,7 +248,7 @@ gen_con_ref (i) int i;
 /******************************************************************************
                                                               GEN_INT_STACK  */
 
-gen_int_stack (i) int i;
+void gen_int_stack (int i)
 {
 #if ACSTACK_IN_OBJ
   gen_attr_object (i, STACK_VAL);
@@ -273,7 +262,7 @@ gen_int_stack (i) int i;
 /******************************************************************************
                                                               GEN_REA_STACK  */
 
-gen_rea_stack (i) int i;
+static void gen_rea_stack (int i)
 {
 #if ACSTACK_IN_OBJ
   gen_attr_object (i, STACK_VAL);
@@ -287,7 +276,7 @@ gen_rea_stack (i) int i;
 /******************************************************************************
                                                               GEN_CHA_STACK  */
 
-gen_cha_stack (i) int i;
+static void gen_cha_stack (int i)
 {
 #if ACSTACK_IN_OBJ
   gen_attr_object (i, STACK_VAL);
@@ -301,7 +290,7 @@ gen_cha_stack (i) int i;
 /******************************************************************************
                                                               GEN_TXT_STACK  */
 
-gen_txt_stack (i) int i;
+static void gen_txt_stack (int i)
 {
 #if ACSTACK_IN_OBJ
   gen_attr_object (i, STACK_TXT);
@@ -314,7 +303,7 @@ gen_txt_stack (i) int i;
 /******************************************************************************
                                                               GEN_REF_STACK  */
 
-gen_ref_stack (i) int i;
+void gen_ref_stack (int i)
 {
 #if ACSTACK_IN_OBJ
   gen_attr_object (i, STACK_REF);
@@ -327,8 +316,7 @@ gen_ref_stack (i) int i;
 /******************************************************************************
                                                                 GENVALUE     */
 
-genvalue (re)
-     exp_t *re;
+void genvalue (exp_t *re)
 {
   exp_t *rex;
   static exp_t *ree;
@@ -1600,7 +1588,7 @@ genvalue (re)
 /*****************************************************************************
 						              GEN_TEXTCONST */
 
-gen_textconst (re) exp_t *re;
+void gen_textconst (exp_t *re)
 {
   if (re->value.tval.id == NOTEXT)
     {

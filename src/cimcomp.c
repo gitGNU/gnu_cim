@@ -116,53 +116,48 @@ char *progname;
                                                                TRAP-ROUTINES */
 #if HAVE_SIGFPE
 static RETSIGTYPE
-float_trap ()
+float_trap (void)
 {
   lerror (25);
 }
 #endif
 
 #if HAVE_SIGSEGV
-static RETSIGTYPE
-seg_trap ()
+static RETSIGTYPE seg_trap (void)
 {
   lerror (26);
 }
 #endif
 
 #if HAVE_SIGILL
-static RETSIGTYPE
-illegal_trap ()
+static RETSIGTYPE illegal_trap (void)
 {
   lerror (28);
 }
 #endif
 
 #if HAVE_SIGTRAP
-static RETSIGTYPE
-trace_trap ()
+static RETSIGTYPE trace_trap (void)
 {
   lerror (29);
 }
 #endif
 
 #if HAVE_SIGBUS
-static RETSIGTYPE
-bus_trap ()
+static RETSIGTYPE bus_trap (void)
 {
   lerror (27);
 }
 #endif
 
 #if HAVE_SIGSYS
-static RETSIGTYPE
-sys_trap ()
+static RETSIGTYPE sys_trap (void)
 {
   lerror (30);
 }
 #endif
 
-static init_trap_routines()
+static init_trap_routines(void)
 {
 #if HAVE_SIGFPE
   signal (SIGFPE, float_trap);
@@ -201,8 +196,7 @@ xgetenv (name, var)
 }
 #endif
 
-static 
-get_all_env()
+static void get_all_env(void)
 {
 #if HAVE_GETENV
   xgetenv ("CIMLIBDIR", &systemlibdir);
@@ -215,9 +209,7 @@ get_all_env()
 /******************************************************************************
                                                                STRINGTOUPPER */
 
-static char *
-stringtoupper (s)
-     char *s;
+static char *stringtoupper (char *s)
 {
   char *st;
   for (st = s; *st != '\0'; st++)
@@ -228,8 +220,7 @@ stringtoupper (s)
 
 /******************************************************************************
                                                                     BASENAME */
-static char *
-basename (str) char *str;
+static char *basename (char *str)
 {
   int i,j;
   for (i = strlen (str) - 2; i >= 0; i--)
@@ -252,8 +243,7 @@ basename (str) char *str;
 /******************************************************************************
                                                                   PRINT_HELP */
 
-static int 
-print_help(status)int status;
+static int print_help(int status)
 {
   fprintf(stderr,"Usage: %s"
 	  " [-a] [--atr]"
@@ -309,10 +299,7 @@ print_help(status)int status;
 
 /******************************************************************************
                                                                 PARSEOPTIONS */
-static 
-parseoptions (argc, argv)
-     int argc;
-     char *argv[];
+static int parseoptions (int argc, char *argv[])
 {
   int c;
   int index;
@@ -597,10 +584,7 @@ parseoptions (argc, argv)
 /******************************************************************************
                                                                         MAIN */
 
-main (argc, argv, envp)
-     int argc;
-     char *argv[];
-     char *envp[];
+main (int argc, char *argv[], char envp[])
 {
   char *archname;
   char *kom;

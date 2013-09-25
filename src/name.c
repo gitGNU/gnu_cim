@@ -43,9 +43,7 @@ static void *hashlist[NAMEPRIMEVALUE];
 /******************************************************************************
                                                                    TAG       */
 
-char *
-tag (t)
-     char t[];
+char *tag (char t[])
 {
   int leng;
   long hash;
@@ -81,15 +79,14 @@ tag (t)
 /******************************************************************************
                                                     DEFINENAME & IFDEFNAME   */
 
-define_name (t, d) char *t; char d;
+void define_name (char *t, char d)
 {
   while (*t != 0) t++;
   t++;
   *t= d;
 }
 
-char
-ifdef_name (t) char *t;
+char ifdef_name (char *t)
 {
   while (*t != 0) t++;
   t++;
@@ -100,7 +97,7 @@ ifdef_name (t) char *t;
 /******************************************************************************
                                                                     INITNAME */
 
-init_name ()
+void init_name (void)
 {
   obstack_init(&os_name);
   define_name (tag ("CIM"), TRUE);

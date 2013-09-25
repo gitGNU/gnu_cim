@@ -33,7 +33,7 @@ char *mpointer;
 /******************************************************************************
                                                                 MBUILDERINIT */
 
-mbuilder_init()
+void mbuilder_init(void)
 {
   obstack_init(&os_mell);
 }
@@ -41,7 +41,7 @@ mbuilder_init()
 /******************************************************************************
                                                                         MOUT */
 
-mout(x)unsigned char x;
+void mout(unsigned char x)
 {
   obstack_1grow(&os_mell, x);
 }
@@ -49,7 +49,7 @@ mout(x)unsigned char x;
 /******************************************************************************
                                                                     MOUTIVAL */
 
-mout_ival(x)long x;
+void mout_ival(long x)
 {
   obstack_grow(&os_mell, &x, sizeof (long));
 }
@@ -57,7 +57,7 @@ mout_ival(x)long x;
 /******************************************************************************
                                                                     MOUTRVAL */
 
-mout_rval(x)double x;
+void mout_rval(double x)
 {
   obstack_grow(&os_mell, &x,sizeof (double));
 }
@@ -65,7 +65,7 @@ mout_rval(x)double x;
 /******************************************************************************
                                                                     MOUTTVAL */
 
-mout_tval(x)char *x;
+void mout_tval(char *x)
 {
   obstack_grow(&os_mell, &x, sizeof (char *));
 }
@@ -73,7 +73,7 @@ mout_tval(x)char *x;
 /******************************************************************************
                                                                       MOUTID */
 
-mout_id(x)char *x;
+void mout_id(char *x)
 {
   obstack_grow(&os_mell, &x, sizeof (char *));
 }
@@ -81,7 +81,7 @@ mout_id(x)char *x;
 /******************************************************************************
                                                               MBUILDERREINIT */
 
-mbuilder_init_pass2()
+void mbuilder_init_pass2(void)
 {
   long i;
   i= obstack_object_size(&os_mell);
@@ -92,8 +92,7 @@ mbuilder_init_pass2()
 /******************************************************************************
                                                                          MIN */
 
-int 
-min()
+int min(void)
 {
   unsigned char x;
   if (mpointer>=last_object_allocated_ptr_mell) return -1;
@@ -104,8 +103,7 @@ min()
 /******************************************************************************
                                                                      MINIVAL */
 
-long 
-min_ival()
+long min_ival(void)
 {
   long x;
   memmove (&x,mpointer,sizeof(long));
@@ -116,8 +114,7 @@ min_ival()
 /******************************************************************************
                                                                      MINRVAL */
 
-double 
-min_rval()
+double min_rval(void)
 {
   double x;
   memmove (&x,mpointer,sizeof (double));
@@ -128,8 +125,7 @@ min_rval()
 /******************************************************************************
                                                                      MINTVAL */
 
-char *
-min_tval()
+char *min_tval(void)
 {
   char *x;
   memmove(&x,mpointer,sizeof(char *));
@@ -140,8 +136,7 @@ min_tval()
 /******************************************************************************
                                                                        MINID */
 
-char *
-min_id()
+char *min_id(void)
 {
   char *x;
   memmove (&x,mpointer,sizeof(char *));
@@ -152,8 +147,7 @@ min_id()
 /******************************************************************************
                                                                        MINID */
 
-void 
-mbuilder_reinit()
+void mbuilder_reinit(void)
 {
   if (first_object_allocated_ptr_mell == 0)
     first_object_allocated_ptr_mell= (char *)obstack_finish (&os_mell);

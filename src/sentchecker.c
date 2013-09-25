@@ -26,8 +26,7 @@
 /******************************************************************************
                                                                    SENTCHECK */
 
-void 
-sent_check (parent_sent, res_labels) sent_t *parent_sent; char res_labels;
+void sent_check (sent_t *parent_sent, char res_labels)
 {
   sent_t *sent, *next_sent, *when_sent;
   char remove_when_clauses=FALSE;

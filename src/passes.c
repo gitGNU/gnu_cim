@@ -31,7 +31,7 @@
 
 sent_t *main_sent;
 
-passes_init ()
+void passes_init (void)
 {
   extspec_init ();
   mbuilder_init();
@@ -42,7 +42,7 @@ passes_init ()
   ebuilder_init ();
 }
 
-passes_do ()
+int passes_do (void)
 {
   passes_init ();
   if (lex_init_pass1 (sourcename)) return (TRUE);
@@ -77,7 +77,7 @@ passes_do ()
       mbuilder_reinit();
       decl_init_pass2 ();
       exp_checker_init_pass2 ();
-      sent_gen (main_sent);
+      sent_gen (main_sent, 0);
 
       if (separat_comp && (anterror == 0 || option_atr))
 	write_all_ext ();
@@ -96,7 +96,7 @@ passes_do ()
 
 /* Reinitialization */
 
-passes_reinit ()
+void passes_reinit (void)
 {
   mbuilder_reinit();
   decl_reinit ();

@@ -18,12 +18,12 @@
 
 #include <stdio.h>
 
-extern void init_filelist ();
-char insert_name_in_dirlist ();
-char insert_name_in_archlist ();
-char insert_name_in_linklist ();
-char *get_names_in_linklist ();
-char * transform_name();
-FILE *searc_and_open_name_in_archlist ();
-void new_lib ();
+void init_filelist (void);
+char insert_name_in_dirlist (char *name);
+char insert_name_in_archlist (char *name);
+char insert_name_in_linklist (char *name, char first);
+char *get_names_in_linklist (void);
+char * transform_name(char *name, char *fromsuffix, char *tosuffix);
+FILE *searc_and_open_name_in_archlist (char *name, char link);
+void new_lib (char *name);
 

@@ -22,8 +22,9 @@ extern char nameasvar;
 extern char sensitive;
 extern char staticblock;
 
-extern yylex ();
-extern lex_init ();
-extern lex_init_pass1 ();
-extern lex_reinit ();
-extern scan_and_write_tokens ();
+int yylex (void);
+void lex_init (void);
+int lex_init_pass1 (char *sourcename);
+void lex_reinit (void);
+void scan_and_write_tokens (void);
+void print_lexsymbol (int lextok, YYSTYPE *yylvalp);

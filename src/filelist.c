@@ -55,8 +55,7 @@ static filelist_t dirlist, archlist, linklist;
 /******************************************************************************
                                                                 INITFILELIST */
 
-void 
-init_filelist ()
+void init_filelist (void)
 {
   obstack_init (&os_filelist);
 }
@@ -65,15 +64,14 @@ init_filelist ()
 /******************************************************************************
                                                                   CLEAR_LIST */
 
-clear_list (listp) filelist_t *listp;
+static void clear_list (filelist_t *listp)
 {
   listp->first=listp->last=0;
 }
 /******************************************************************************
                                                                      IS_NAME */
 
-char 
-is_name (listp, name) filelist_t *listp; char *name;
+static char is_name (filelist_t *listp, char *name)
 {
   fileelem_t *elem;
   for (elem= listp->first; elem!=NULL; elem= elem->next)
@@ -84,8 +82,7 @@ is_name (listp, name) filelist_t *listp; char *name;
 /******************************************************************************
                                                                    GET_NAMES */
 
-char *
-get_names (listp) filelist_t *listp;
+static char *get_names (filelist_t *listp)
 {
   fileelem_t *elem;
   for (elem= listp->first; elem!=NULL; elem= elem->next)
@@ -98,8 +95,7 @@ get_names (listp) filelist_t *listp;
 /******************************************************************************
                                                        GET_NAMES_IN_LINKLIST */
 
-char * 
-get_names_in_linklist ()
+char * get_names_in_linklist (void)
 {
   return get_names(&linklist);
 }
@@ -107,8 +103,7 @@ get_names_in_linklist ()
 /******************************************************************************
                                                                  INSERT_NAME */
 
-char 
-insert_name (listp, name, first) filelist_t *listp; char *name, first;
+static char insert_name (filelist_t *listp, char *name, char first)
 {
   fileelem_t *new;
   new= (fileelem_t *) obstack_alloc (&os_filelist, sizeof (fileelem_t));
@@ -139,8 +134,7 @@ insert_name (listp, name, first) filelist_t *listp; char *name, first;
 /******************************************************************************
                                                       INSERT_NAME_IN_DIRLIST */
 
-char 
-insert_name_in_dirlist (name) char *name;
+char insert_name_in_dirlist (char *name)
 {
   if (name==NULL)
     {
@@ -156,8 +150,7 @@ insert_name_in_dirlist (name) char *name;
 /******************************************************************************
                                                      INSERT_NAME_IN_ARCHLIST */
 
-char 
-insert_name_in_archlist (name) char *name;
+char insert_name_in_archlist (char *name)
 {
   return insert_name (&archlist, name, FALSE);
 }
@@ -165,8 +158,7 @@ insert_name_in_archlist (name) char *name;
 /******************************************************************************
                                                      INSERT_NAME_IN_LINKLIST */
 
-char 
-insert_name_in_linklist (name, first) char *name, first;
+char insert_name_in_linklist (char *name, char first)
 {
   return insert_name (&linklist, name, first);
 }
@@ -174,9 +166,7 @@ insert_name_in_linklist (name, first) char *name, first;
 /******************************************************************************
                                                               TRANSFORM_NAME */
 
-char * 
-transform_name(name, fromsuffix, tosuffix) 
-  char *name, *fromsuffix, *tosuffix;
+char *transform_name(char *name, char *fromsuffix, char *tosuffix)
 {
   newstr_grown (name, strlen(name) - strlen(fromsuffix));
   newstr_grow1 (tosuffix);
@@ -186,9 +176,7 @@ transform_name(name, fromsuffix, tosuffix)
 /******************************************************************************
                                                                    OPEN_NAME */
 
-FILE *
-open_name (dirlist, linklist, name, link) 
-  filelist_t *dirlist, *linklist; char *name; char link;
+static FILE *open_name (filelist_t *dirlist, filelist_t *linklist, char *name, char link)
 {
   FILE *f;
   fileelem_t *elem;
@@ -217,9 +205,7 @@ open_name (dirlist, linklist, name, link)
 /******************************************************************************
                                                              SHORT_FILE_NAME */
 
-char * 
-short_file_name (f)
-     FILE *f;
+static char *short_file_name (FILE *f)
 {
   int i,
     c;
@@ -243,8 +229,7 @@ short_file_name (f)
 /******************************************************************************
                                                  OPEN_AND_POSITION_ARCH_NAME */
 
-FILE *
-open_and_position_arch_name (archname, name) char *archname, *name;
+static FILE *open_and_position_arch_name (char *archname, char *name)
 {
   FILE *f;
   char *string_table=NULL;
@@ -315,9 +300,7 @@ open_and_position_arch_name (archname, name) char *archname, *name;
 /******************************************************************************
                                              SEARC_AND_OPEN_NAME_IN_ARCHLIST */
 
-FILE *
-searc_and_open_name_in_archlist (name, link)
-char *name; char link;
+FILE *searc_and_open_name_in_archlist (Char *name, char link)
 {
   FILE *f;
   fileelem_t *elem;
@@ -343,9 +326,7 @@ char *name; char link;
 /******************************************************************************
                                                        SEARC_AND_INSERT_NAME */
 
-char 
-searc_and_insert_name (dirlistp, listp, name) 
-  filelist_t *dirlistp, *listp; char *name;
+static char searc_and_insert_name (Filelist_t *dirlistp, filelist_t *listp, char *name)
 {
   FILE *f;
   fileelem_t *elem;
@@ -374,9 +355,7 @@ searc_and_insert_name (dirlistp, listp, name)
 #define LIBSUFFIX ".a"
 #define LIBARCHSUFFIX "-atr.a"
 
-void 
-new_lib (name) 
-  char *name;
+void new_lib (char *name)
 {
   searc_and_insert_name (&dirlist, &archlist, 
 			 transform_name (newstrcat3 (LIBPREFIX, name, 
