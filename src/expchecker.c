@@ -516,8 +516,8 @@ static void exp_check (exp_t *re)
 	TYPE = TREAL;
       exp_check (LEFT);
       exp_check (RIGHT);
-      konvtype (&LEFT, TYPE);
-      konvtype (&RIGHT, TYPE);
+      konvtype (&LEFT, TYPE, NULL);
+      konvtype (&RIGHT, TYPE, NULL);
       if (LEFTTYPE != TYPE || RIGHTTYPE != TYPE)
 	SERROR (97);
       break;
@@ -527,7 +527,7 @@ static void exp_check (exp_t *re)
       TYPE = TREAL;
       if ((LEFTTYPE == TINTG || LEFTTYPE == TREAL) &&
 	  RIGHTTYPE == TREAL)
-	konvtype (&LEFT, TREAL);
+	konvtype (&LEFT, TREAL, NULL);
       else if (LEFTTYPE == TREAL && RIGHTTYPE == TINTG)
 	TOKEN = MPRIMARYRI;
       else if (LEFTTYPE == TINTG && RIGHTTYPE == TINTG)

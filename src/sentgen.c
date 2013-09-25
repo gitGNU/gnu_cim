@@ -134,7 +134,7 @@ static void module_gen (sent_t *sent)
 	fprintf (ccode, "__curent_map=__mapmain;");
     }
 
-  sent_list_gen (sent);
+  sent_list_gen (sent, 0);
 
   if (separat_comp)
     {
@@ -187,7 +187,7 @@ static void block_gen (sent_t *sent)
   fprintf (ccode, ");");
 
   gotollabel (sent->cblock->ent = newllabel ());
-  sent_list_gen (sent);
+  sent_list_gen (sent, 0);
   
   if (not_reached == FALSE)
     fprintf (ccode, "__rbe();");
@@ -326,7 +326,7 @@ static void inspect_gen (sent_t *sent)
       cblock= sent->last->cblock;
       cblev= cblock->blev;
       
-      sent_list_gen (sent->last);
+      sent_list_gen (sent->last, 0);
   
       if (not_reached == FALSE)
 	genline ();
@@ -342,7 +342,7 @@ static void do_gen (sent_t *sent, int labexit)
   cblock= sent->cblock;
   cblev= cblock->blev;
 
-  sent_list_gen (sent);
+  sent_list_gen (sent, 0);
 
   if (not_reached == FALSE)
     {
@@ -368,7 +368,7 @@ static void when_gen (sent_t *sent, int labexit)
 
   gotollabel (labnextcase = newllabel ());
 
-  sent_list_gen (sent);
+  sent_list_gen (sent, 0);
 
   if (not_reached == FALSE)
     {
@@ -484,7 +484,7 @@ static int forgen (exp_t *re, int labcontinue, int labdo, int labexit)
   int listnr=0;
 
   if (re->right->right->token == MENDSEP)
-    return forelemgen (re, re->right, labcontinue, labdo, labexit, TRUE);
+    return forelemgen (re, re->right, labcontinue, labdo, labexit, TRUE, 0, NULL);
 
   gen_for_val(cblock->fornest);
   fprintf (ccode, "=1;");
@@ -531,7 +531,7 @@ static void fordo_gen (sent_t *sent)
 
   typellabel (labdo);
 
-  sent_list_gen (sent);
+  sent_list_gen (sent, 0);
 
   if (iterate)
     {
@@ -562,7 +562,7 @@ static void while_gen (sent_t *sent)
   fprintf (ccode, "))");
   gotollabel (labexit= newllabel ());
 
-  sent_list_gen (sent);
+  sent_list_gen (sent, 0);
 
   if (not_reached == FALSE)
     {
@@ -592,13 +592,13 @@ static void if_gen (sent_t *sent)
   if (sent->last->token == MTHEN)
     {
       gotollabel (labexit);
-      sent_list_gen (sent->first);      
+      sent_list_gen (sent->first, 0);      
     }
   else
     {
       gotollabel (labelse= newllabel ());
 
-      sent_list_gen (sent->first);      
+      sent_list_gen (sent->first, 0);      
 
       if (not_reached == FALSE)
       {
@@ -607,7 +607,7 @@ static void if_gen (sent_t *sent)
       }
       typellabel (labelse);
 
-      sent_list_gen (sent->last);      
+      sent_list_gen (sent->last, 0);      
     }
   if (not_reached == FALSE)
     genline ();
