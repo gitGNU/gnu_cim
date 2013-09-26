@@ -16,8 +16,12 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA. */
 
+#ifndef BUILDER_H
+#define BUILDER_H
+
 #include "dekl.h"
 #include "lex.h"
+#include "mellbuilder.h"
 
 #define is_after_dot(re) (re->up->token==MDOT && re->up->right==re)
 
@@ -84,3 +88,4 @@ void set_flag (void);
 extern char nonetest;
 extern char indextest;
 extern char stripsideeffects;
+#endif

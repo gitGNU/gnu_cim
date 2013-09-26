@@ -20,7 +20,6 @@
 #include <obstack.h>
 
 #include "const.h"
-#include "mellbuilder.h"
 #include "builder.h"
 #include "salloc.h"
 

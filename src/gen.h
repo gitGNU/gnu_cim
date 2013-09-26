@@ -17,10 +17,8 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA. */
 
 #include "const.h"
-#include "mellbuilder.h"
 #include "cimcomp.h"
 #include "builder.h"
-#include "lex.h"
 
 #define USEDREF 1
 #define USEDTXT 2

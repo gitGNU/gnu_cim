@@ -26,6 +26,8 @@
  * Dette tabellverket brukes s} i forbindelse med utskrift              
  * av feilmeldinger. */
 
+#include "dekl.h"
+
 extern int anterror;
 void lerror (int errcode);
 void yerror (int errcode, char *txt);

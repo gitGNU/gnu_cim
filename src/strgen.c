@@ -19,7 +19,6 @@
 /* Legger ut C-kode for hvert blokk objekt. */
 
 #include "const.h"
-#include "dekl.h"
 #include "cimcomp.h"
 #include "error.h"
 #include "extspec.h"

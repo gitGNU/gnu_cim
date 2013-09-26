@@ -19,7 +19,6 @@
 #ifdef DEBUG
 
 #include <stdio.h>
-#include "mellbuilder.h"
 #include "builder.h"
 #include "dump.h"
 

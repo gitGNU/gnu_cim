@@ -16,6 +16,9 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA. */
 
+#ifndef DEKL_H
+#define DEKL_H
+
 #if STDC_HEADERS
 #include <float.h>
 #endif
@@ -245,3 +248,4 @@ void reginsp (block_t *rb, decl_t *rd);
 decl_t *reg_this (char *ident);
 
 extern char yaccerror;
+#endif

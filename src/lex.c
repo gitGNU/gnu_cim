@@ -22,7 +22,6 @@
 
 #include <ctype.h>
 #include "gen.h"
-#include "parser.h"
 #include "name.h"
 #include "filelist.h"
 #include "error.h"

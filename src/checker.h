@@ -18,6 +18,8 @@
 
 /* In computeconst.c */
 
+#include "builder.h"
+
 char computeconst ();
 char setdanger_const ();
 int sstrlen ();

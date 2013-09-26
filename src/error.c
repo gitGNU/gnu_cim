@@ -27,7 +27,6 @@
  * av feilmeldinger. */
 
 #include "const.h"
-#include "dekl.h"
 #include "cimcomp.h"
 #include "error.h"
 #include "lex.h"
