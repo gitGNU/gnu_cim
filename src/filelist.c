@@ -300,7 +300,7 @@ static FILE *open_and_position_arch_name (char *archname, char *name)
 /******************************************************************************
                                              SEARC_AND_OPEN_NAME_IN_ARCHLIST */
 
-FILE *searc_and_open_name_in_archlist (Char *name, char link)
+FILE *searc_and_open_name_in_archlist (char *name, char link)
 {
   FILE *f;
   fileelem_t *elem;
@@ -326,7 +326,7 @@ FILE *searc_and_open_name_in_archlist (Char *name, char link)
 /******************************************************************************
                                                        SEARC_AND_INSERT_NAME */
 
-static char searc_and_insert_name (Filelist_t *dirlistp, filelist_t *listp, char *name)
+static char searc_and_insert_name (filelist_t *dirlistp, filelist_t *listp, char *name)
 {
   FILE *f;
   fileelem_t *elem;
