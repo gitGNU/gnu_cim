@@ -16,13 +16,13 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA. */
 
-/* In computeconst.c */
-
 #include "builder.h"
 
-char computeconst ();
-char setdanger_const ();
-int sstrlen ();
+/* In computeconst.c */
+
+char computeconst (exp_t *re);
+char setdanger_const (exp_t *re);
+int sstrlen (char s[]);
 
 /* In sentchecker.c */
 

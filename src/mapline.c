@@ -24,6 +24,7 @@
 #include "newstr.h"
 #include "filelist.h"
 #include <obstack.h>
+#include "mapline.h"
 
 char *xmalloc();
 void free();

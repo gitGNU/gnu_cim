@@ -24,8 +24,7 @@
 
 /******************************************************************************
                                                                 TOKEN_PRINT  */
-static
-token_print (token) int token;
+static void token_print (int token)
 {
   switch (token)
     {
@@ -332,8 +331,7 @@ token_print (token) int token;
 
 /******************************************************************************
                                                                 VALUE_PRINT  */
-static
-value_print (value, token) val_t value; int token;
+static void value_print (val_t value, int token)
 {
   switch (token)
     {
@@ -511,8 +509,7 @@ value_print (value, token) val_t value; int token;
                                                                PRINT_INDENT  */
 
 
-static
-print_indent (level, marker) int level; char marker;
+static void print_indent (int level, char marker)
 {
   int i;
   for (i=0; i<level; i++) 
@@ -521,8 +518,7 @@ print_indent (level, marker) int level; char marker;
 
 /******************************************************************************
                                                                    EXP_DUMP  */
-void
-exp_dump (exp, level) exp_t *exp; int level;
+void exp_dump (exp_t *exp, int level)
 {
   print_indent (level, '.');
   token_print (exp->token);
@@ -539,8 +535,7 @@ exp_dump (exp, level) exp_t *exp; int level;
 
 /******************************************************************************
                                                                   SENT_DUMP  */
-void
-sent_dump (parent_sent, level) sent_t *parent_sent; int level;
+void sent_dump (sent_t *parent_sent, int level)
 {
   sent_t *sent;
   print_indent (level, '_');

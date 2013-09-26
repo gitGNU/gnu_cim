@@ -16,5 +16,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA. */
 
-extern char *xmalloc();
-char *salloc();
+char *xmalloc (unsigned int size);
+char *salloc (int size);
+void salloc_init (void);
+void salloc_reinit (void);

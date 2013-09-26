@@ -17,7 +17,7 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA. */
 
 #include <obstack.h>
-
+#include "mellbuilder.h"
 char *xmalloc();
 void free();
 

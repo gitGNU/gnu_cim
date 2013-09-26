@@ -17,14 +17,14 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA. */
 
 
-extern void init_newstr();
-extern void newstr_grown();
-extern void newstr_grow1();
-extern void newstr_grow2();
-extern char *newstr_finish();
-extern char * newstrcat1();
-extern char * newstrcat2();
-extern char * newstrcat3();
-extern char * newstrcat4();
-extern char * newstrcat5();
-extern char * newstrcat6();
+void init_newstr (void);
+void newstr_grown(char *s1, int n);
+void newstr_grow1(char *s1);
+void newstr_grow2(char *s1, char *s2);
+char *newstr_finish(void);
+char *newstrcat1(char *s1);
+char *newstrcat2(char *s1, char *s2);
+char *newstrcat3(char *s1, char *s2, char *s3);
+char *newstrcat4(char *s1, char *s2, char *s3, char *s4);
+char *newstrcat5(char *s1, char *s2, char *s3, char *s4, char *s5);
+char *newstrcat6(char *s1, char *s2, char *s3, char *s4, char *s5, char *s6);

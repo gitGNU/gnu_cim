@@ -18,6 +18,7 @@
 
 #include <stdio.h>
 #include <obstack.h>
+#include "newstr.h"
 
 char *xmalloc();
 void free();
@@ -53,9 +54,7 @@ void newstr_grow1(char *s1)
 /******************************************************************************
                                                                  NEWSTRGROW1 */
 
-void 
-newstr_grow2(s1, s2)
-     char *s1, *s2;
+void newstr_grow2(char *s1, char *s2)
 {
   obstack_grow (&os_newstr, s1, strlen(s1));
   obstack_grow (&os_newstr, s2, strlen(s2));
@@ -82,9 +81,7 @@ char *newstrcat1(char *s1)
 /******************************************************************************
                                                                   NEWSTRCAT2 */
 
-char * 
-newstrcat2(s1, s2)
-     char *s1, *s2;
+char *newstrcat2(char *s1, char *s2)
 {
   obstack_grow (&os_newstr, s1, strlen(s1));
   obstack_grow0 (&os_newstr, s2, strlen(s2));

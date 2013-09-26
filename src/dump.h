@@ -16,5 +16,5 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA. */
 
-extern void sent_dump();
-extern void exp_dump();
+void sent_dump (sent_t *parent_sent, int level);
+void exp_dump (exp_t *exp, int level);

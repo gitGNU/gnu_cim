@@ -18,13 +18,13 @@
 
 #include <stdio.h>
 
-extern int mapline_init ();
-extern int pushfilmap ();
-extern void popfilmap ();
-extern void setfilmap ();
-extern long getmapline ();
-extern char *getmapfile ();
-extern void genmap ();
-extern void * include_ifdefp ();
-extern FILE *include_file ();
-extern int no_filemap ();
+int mapline_init (char *sourcename, void *ifdefp);
+int pushfilmap (char *filename, void *ifdefp);
+void popfilmap (void);
+void setfilmap (char *filename, long line);
+long getmapline (long line);
+char *getmapfile (long line);
+void genmap (void);
+void *include_ifdefp (void);
+FILE *include_file (void);
+int no_filemap (void);

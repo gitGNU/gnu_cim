@@ -361,14 +361,14 @@ static void endlabel_trans (sent_t *sent)
 /******************************************************************************
                                                                GOTOSTOPTRANS */
 
-void goto_stop_trans (sent_t *sent)
+static void goto_stop_trans (sent_t *sent)
 {
 }
 
 /******************************************************************************
                                                                   THUNKTRANS */
 
-void thunk_trans (sent_t *sent)
+static void thunk_trans (sent_t *sent)
 {
   cblock= sent->cblock;
   inthunk= sent->exp->value.thunk.inthunk;

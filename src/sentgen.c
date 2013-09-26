@@ -21,6 +21,7 @@
 #include "extspec.h"
 #include "error.h"
 #include "passes.h"
+#include "dump.h"
 
 char not_reached;
 
