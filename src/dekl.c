@@ -221,9 +221,9 @@ void decl_init_pass2 (void)
   /* og inspect sysout, da neste blokk ikke er en connection blokk */
   lblock= NULL;
   in_block ();
-  in_block (find_global (tag ("INFILE"), TRUE));
+  in_block ();
   cblock->when = find_global (tag ("INFILE"), TRUE);
-  in_block (find_global (tag ("PRINTFILE"), TRUE));
+  in_block ();
   cblock->when = find_global (tag ("PRINTFILE"), TRUE);
   sblock = cblock = cblock->next_block;
 
