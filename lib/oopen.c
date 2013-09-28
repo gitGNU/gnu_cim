@@ -27,10 +27,7 @@ FILE *fopen ();
 /******************************************************************************
                                          BOOLEAN PROCEDURE OPEN              */
 
-char 
-__roopen (p, t)
-     __bs1FILE *p;
-     __txtvp t;
+char __roopen (__bs1FILE *p, __txtvp t)
 {
   if (!p->open)
     {

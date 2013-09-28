@@ -26,8 +26,7 @@
 /* Denne rutinen kalles for aa terminere en thunk og pr|ver } deallokere
  * objektet. */
 
-void
-__reth ()
+void __reth (void)
 {
   __dhp x;
   __goto = __pb->ex;

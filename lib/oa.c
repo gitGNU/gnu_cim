@@ -35,8 +35,7 @@
  * men de har terminert og blitt deallokert.
  * Hvis den kun finner array-objekter returnerer rutinen TRUE eller FALSE. */
 
-__roa (x)
-     __dhp x;
+int __roa (__dhp x)
 {
   if (x < __min)
     return (__FALSE);

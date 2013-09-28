@@ -23,9 +23,7 @@
 /******************************************************************************
                                              REAL PROCEDURE TANH(r)          */
 
-double 
-__rtanh (r)
-     double r;
+double __rtanh (double r)
 {
   return (tanh (r));
 }

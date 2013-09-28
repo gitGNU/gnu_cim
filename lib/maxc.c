@@ -22,10 +22,7 @@
 /******************************************************************************
                                               CHARACTER PROCEDURE MAX(c1,c2) */
 
-char 
-__rmaxc (c1, c2)
-     char c1,
-       c2;
+char __rmaxc (char c1, char c2)
 {
   if ((unsigned char) c1 > (unsigned char) c2)
     return (c1);

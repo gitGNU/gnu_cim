@@ -23,8 +23,7 @@
 /******************************************************************************
                                                REF(infile) PROCEDURE SYSIN   */
 
-__dhp 
-__rsysin ()
+__dhp __rsysin (void)
 {
   return ((__dhp) & __sysin);
 }

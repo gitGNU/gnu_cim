@@ -22,9 +22,7 @@
 /******************************************************************************
                                           BOOLEAN PROCEDURE DIGIT(c)         */
 
-char 
-__rdigit (c)
-     char c;
+char __rdigit (char c)
 {
   return (c >= '0' && c <= '9');
 }

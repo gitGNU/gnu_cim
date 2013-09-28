@@ -23,10 +23,7 @@
 /******************************************************************************
                                          TEXT PROCEDURE INTEXT(t)            */
 
-__txtvp
-__ribintext (p, t)
-     __bs8FILE *p;
-     __txtvp t;
+__txtvp __ribintext (__bs8FILE *p, __txtvp t)
 {
   __rtsetpos (t, 1L);
   while (__rtmore (t) & !((__bs7FILE *) p)->endfile)

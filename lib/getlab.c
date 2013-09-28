@@ -38,12 +38,7 @@
  * ret, mret -> Returadressen
  * Returnerer: Adressen til labelen i modul og __ev og objekt-pekeren i er */
 
-char
-__rgetlab (p, as, ret, mret)
-     __labelnamepar *p;
-     long as;
-     int ret;
-     void (*mret) ();
+char __rgetlab (__labelnamepar *p, long as, int ret, void (*mret) ())
 {
   switch (p->namekind)
     {

@@ -22,9 +22,7 @@
 /******************************************************************************
                                           INTEGER PROCEDURE ISORANK(c)       */
 
-long 
-__risorank (c)
-     char c;
+long __risorank (char c)
 {
   return ((unsigned char) c);
 }

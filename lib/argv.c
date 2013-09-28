@@ -19,8 +19,7 @@
 
 #include "cim.h"
 
-long
-__rargv ()
+long __rargv (void)
 {
   return (__argv);
 }

@@ -21,9 +21,7 @@
 /******************************************************************************
                                                   RutineCallProperProcedure  */
 
-void
-__rcpp (ppx)
-     __pty ppx;
+void __rcpp (__pty ppx)
 {
   __dhp x;
   x = __ralloc ((long) ppx->size);

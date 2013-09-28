@@ -23,10 +23,7 @@
 /******************************************************************************
                                                 TEXT PROCEDURE FILENAME      */
 
-__txtvp 
-__rfilename (as, p)
-     __bs1FILE *p;
-     long as;
+__txtvp __rfilename (long as, __bs1FILE *p)
 {
   return (__rcopy (as, &p->filename));
 }

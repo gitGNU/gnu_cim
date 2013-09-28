@@ -23,10 +23,7 @@
 /******************************************************************************
                                               INTEGER PROCEDURE POISSON	     */
 
-long 
-__rpoisson (a, U)
-     double a;
-     long *U;
+long __rpoisson (double a, long *U)
 {
   double expna,
     prod;

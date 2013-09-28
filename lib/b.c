@@ -22,9 +22,7 @@
 /******************************************************************************
                                                                 RutineBlock  */
 
-void
-__rb (ppx)
-     __pty ppx;
+void __rb (__pty ppx)
 {
   __dhp x;
   x = __ralloc ((long) ppx->size);

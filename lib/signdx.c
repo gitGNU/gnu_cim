@@ -22,9 +22,7 @@
 /******************************************************************************
                                               INTEGER PROCEDURE SIGN(r)      */
 
-long 
-__rsigndx (i,j)
-     long i;double j;
+long __rsigndx (long i, double j)
 {
   return (((double)i > j) ? 1 : ((double)i < j) ? -1 : 0);
 }

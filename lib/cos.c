@@ -23,9 +23,7 @@
 /******************************************************************************
                                              REAL PROCEDURE COS(r)           */
 
-double 
-__rcos (r)
-     double r;
+double __rcos (double r)
 {
   return (cos (r));
 }

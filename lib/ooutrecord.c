@@ -23,9 +23,7 @@
 /******************************************************************************
                                         PROCEDURE OUTRECORD                  */
 
-__dhp 
-__rooutrecord (p)
-     __bs2FILE *p;
+__dhp __rooutrecord (__bs2FILE *p)
 {
   char *s;
   register long i,

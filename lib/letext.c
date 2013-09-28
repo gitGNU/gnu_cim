@@ -22,10 +22,7 @@
 /******************************************************************************
                                                         Rutine for t1 <= t2  */
 
-char 
-__rletext (t1x, t2x)
-     __txtvp t1x,
-       t2x;
+char __rletext (__txtvp t1x, __txtvp t2x)
 {
   long i = 0,
     j = 0;

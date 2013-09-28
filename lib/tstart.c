@@ -22,9 +22,7 @@
 /******************************************************************************
                                  INTEGER PROCEDURE START (text attributt)    */
 
-long 
-__rtstart (t)
-     __txtvp t;
+long __rtstart (__txtvp t)
 {
   if (t->obj == __NULL)
     return (1);

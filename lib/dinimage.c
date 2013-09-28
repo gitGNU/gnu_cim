@@ -23,9 +23,7 @@
 /******************************************************************************
                                          PROCEDURE INIMAGE                   */
 
-__dhp 
-__rdinimage (p)
-     __bs5FILE *p;
+__dhp __rdinimage (__bs5FILE *p)
 {
   char *c,
     c1,

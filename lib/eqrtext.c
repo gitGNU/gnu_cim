@@ -22,10 +22,7 @@
 /******************************************************************************
                                                Runtine for == og =/= testen  */
 
-char 
-__reqrtext (t1x, t2x)
-     __txtvp t1x,
-       t2x;
+char __reqrtext (__txtvp t1x, __txtvp t2x)
 {
   if (t1x->obj == t2x->obj && t1x->length == t2x->length && t1x->start == t2x->start)
     return (__TRUE);

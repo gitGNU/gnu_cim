@@ -21,9 +21,7 @@
 /******************************************************************************
                                              INTEGER PROCEDURE ABS(r)        */
 
-long 
-__rabsi (i)
-     long i;
+long __rabsi (long i)
 {
   if (i < 0)
     return (-i);

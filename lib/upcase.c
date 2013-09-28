@@ -22,9 +22,7 @@
 /******************************************************************************
                                           TEXT PROCEDURE UPCASE(t)           */
 
-__txtvp
-__rupcase (t)
-     __txtvp t;
+__txtvp __rupcase (__txtvp t)
 {
   register long i;
   unsigned char *s;

@@ -22,8 +22,7 @@
 /******************************************************************************
                                                                 RutineERROR  */
 
-__rerror (s)
-     char *s;
+void __rerror (char *s)
 {
   __rprintfilline ();
   (void) fprintf (stderr, "%s: %s\n", __progname, s);

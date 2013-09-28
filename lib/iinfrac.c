@@ -23,9 +23,7 @@
 /******************************************************************************
                                            INTEGER PROCEDURE INFRAC          */
 
-long 
-__riinfrac (p)
-     __bs2FILE *p;
+long __riinfrac (__bs2FILE *p)
 {
   __txt t;
   long infrac;

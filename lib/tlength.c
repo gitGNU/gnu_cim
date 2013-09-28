@@ -22,9 +22,7 @@
 /******************************************************************************
                                  INTEGER PROCEDURE LENGTH (text attributt)   */
 
-long 
-__rtlength (t)
-     __txtvp t;
+long __rtlength (__txtvp t)
 {
   return (t->length);
 }

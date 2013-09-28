@@ -22,9 +22,7 @@
 /******************************************************************************
                                    INTEGER PROCEDURE GETINT (text attributt) */
 
-long 
-__rtgetint (t)
-     __txtvp t;
+long __rtgetint (__txtvp t)
 {
   char *s;
   int sign;

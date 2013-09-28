@@ -22,10 +22,7 @@
                                              INTEGER PROCEDURE POWII(i,j)    */
 
 #if 1
-long 
-__rpowii (i, j)
-     long i,
-       j;
+long __rpowii (long i, long j)
 {
   long k = 1,
     result;
@@ -60,10 +57,7 @@ __rpowii (i, j)
     }
 }
 #else
-long 
-__rpowii (i, j)
-     long i,
-       j;
+long __rpowii (long i;long j)
 {
   long k,
     result;

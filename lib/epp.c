@@ -23,8 +23,7 @@
 /******************************************************************************
                                                   RutineEndProperProcedure   */
 
-void
-__repp ()
+void __repp (void)
 {
   __dhp x;
   long size;

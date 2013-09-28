@@ -22,9 +22,7 @@
 /******************************************************************************
                                                         RutineEndClass       */
 
-void
-__rendclass (plev)
-     int plev;
+void __rendclass (int plev)
 {
   __dhp p;
   if (plev == 0)

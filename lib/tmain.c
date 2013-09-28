@@ -22,9 +22,7 @@
 /******************************************************************************
                                  TEXT PROCEDURE MAIN (text attributt)        */
 
-__txtvp 
-__rtmain (t)
-     __txtvp t;
+__txtvp __rtmain (__txtvp t)
 {
   if (t->obj == __NULL)
     {

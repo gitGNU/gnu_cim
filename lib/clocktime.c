@@ -38,8 +38,7 @@
 #include<sys/resource.h>
 #endif
 
-double 
-__rclocktime ()
+double __rclocktime (void)
 {
 #if HAVE_SYS_RESOURCE_H && HAVE_GETTIMEOFDAY
   struct timeval tip;

@@ -22,11 +22,7 @@
 /******************************************************************************
                                                         RutineCall           */
 
-void
-__rcall (ob, ret, mret)
-     __dhp ob;
-     int ret;
-     void (*mret) ();
+void __rcall (__dhp ob, int ret, void (*mret) ())
 {
   if (ob == __NULL)
     __rerror ("Call: NONE-pointer");

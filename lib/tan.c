@@ -23,9 +23,7 @@
 /******************************************************************************
                                              REAL PROCEDURE TAN(r)           */
 
-double 
-__rtan (r)
-     double r;
+double __rtan (double r)
 {
   return (tan (r));
 }

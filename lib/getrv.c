@@ -40,12 +40,7 @@
  * ret, mret -> Returadressen.
  * Returnerer: Peker-verdien i er. (ogs} hvis en thunk kalles) */
 
-char
-__rgetrv (p, as, ret, mret)
-     __refnamepar *p;
-     long as;
-     int ret;
-     void (*mret) ();
+char __rgetrv (__refnamepar *p, long as, int ret, void (*mret) ())
 {
   char tconv;
   __pty q;

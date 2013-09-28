@@ -23,11 +23,7 @@
 /******************************************************************************
                                             LONG REAL PROCEDURE ERLANG	     */
 
-double 
-__rerlang (a, b, U)
-     double a,
-       b;
-     long *U;
+double __rerlang (double a, double b, long *U)
 {
   double sum = 0;
   long ci,

@@ -23,9 +23,7 @@
 /******************************************************************************
                                                                LENGTH        */
 
-long 
-__rlength (p)
-     __bs2FILE *p;
+long __rlength (__bs2FILE *p)
 {
   return ((long) p->IMAGE.length);
 }

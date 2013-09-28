@@ -23,9 +23,7 @@
 /******************************************************************************
                                          PROCEDURE OUTIMAGE                  */
 
-__dhp 
-__rdoutimage (p)
-     __bs5FILE *p;
+__dhp __rdoutimage (__bs5FILE *p)
 {
   char *c;
   long i,

@@ -34,9 +34,7 @@ extern char *__progname;
 #include <sys/utsname.h>
 #endif
 
-__txtvp 
-__rsimulaid (as)
-     long as;
+__txtvp __rsimulaid (long as)
 {
   char simulaid[MAX_SIMULAID_LEN];
   char siteid[MAX_SITEID_LEN];

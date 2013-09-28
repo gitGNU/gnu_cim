@@ -22,10 +22,7 @@
 /******************************************************************************
                                              RutineRis         (test)        */
 
-char
-__ris (bpx, p)
-     __dhp bpx;
-     __pty p;
+char __ris (__dhp bpx, __pty p)
 {
   if (bpx == __NULL || bpx->pp != p)
     return (__FALSE);

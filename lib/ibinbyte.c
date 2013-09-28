@@ -23,9 +23,7 @@
 /******************************************************************************
                                          (SHORT) INTEGER PROCEDURE INBYTE    */
 
-long 
-__ribinbyte (p)
-     __bs8FILE *p;
+long __ribinbyte (__bs8FILE *p)
 {
   long c;
   if (((__bs7FILE *) p)->endfile == __TRUE)

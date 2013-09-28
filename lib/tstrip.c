@@ -22,9 +22,7 @@
 /******************************************************************************
                                   TEXT PROCEDURE STRIP (text attributt)      */
 
-__txtvp 
-__rtstrip (t)
-     __txtvp t;
+__txtvp __rtstrip (__txtvp t)
 {
   long pos;
 

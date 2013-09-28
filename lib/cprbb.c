@@ -22,10 +22,7 @@
 /******************************************************************************
                                                RutineCallPrefiksBlockBegin   */
 
-void
-__rcprbb (ret, mret)
-     int ret;
-     void (*mret) ();
+void __rcprbb (int ret, void (*mret) ())
 {
   __goto = __pb->pp->pref[0]->adr;
   __pb->ex.ent = ret;

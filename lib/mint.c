@@ -22,10 +22,7 @@
 /******************************************************************************
                                              TEXT PROCEDURE MIN(t1,t2)       */
 
-void 
-__rmint (t1, t2)
-     __txtvp t1,
-       t2;
+void __rmint (__txtvp t1, __txtvp t2)
 {
   if (__rlttext (t2, t1) == __TRUE)
     __et = *t2;

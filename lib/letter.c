@@ -22,9 +22,7 @@
 /******************************************************************************
                                           BOOLEAN PROCEDURE LETTER(c)        */
 
-char 
-__rletter (c)
-     char c;
+char __rletter (char c)
 {
   return (c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z');
 }

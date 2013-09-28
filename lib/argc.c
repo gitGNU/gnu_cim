@@ -23,8 +23,7 @@
                                                               ARGC & ARGV    */
 
 
-long
-__rargc ()
+long __rargc (void)
 {
   return (__argc);
 }

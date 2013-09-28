@@ -22,10 +22,7 @@
 /******************************************************************************
                                               BOOLEAN  PROCEDURE DRAW	     */
 
-char 
-__rdraw (a, U)
-     double a;
-     long *U;
+char __rdraw (double a, long *U)
 {
   return (BASICU < a);
 }

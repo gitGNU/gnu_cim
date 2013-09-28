@@ -22,10 +22,7 @@
 /******************************************************************************
                                   PROCEDURE SETPOS (text attributt)          */
 
-__txtvp 
-__rtsetpos (t, i)
-     __txtvp t;
-     long i;
+__txtvp __rtsetpos (__txtvp t, long i)
 {
   t->pos = ((i < 1 || i > t->length + 1) ? t->length + 1 : i);
   return (t);

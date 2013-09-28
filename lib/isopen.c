@@ -23,9 +23,7 @@
 /******************************************************************************
                                                 INTEGER PROCEDURE ISOPEN     */
 
-char 
-__risopen (p)
-     __bs1FILE *p;
+char __risopen (__bs1FILE *p)
 {
   return (p->open);
 }

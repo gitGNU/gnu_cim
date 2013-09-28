@@ -27,9 +27,7 @@
 /******************************************************************************
                                          INTEGER PROCEDURE LINE              */
 
-long 
-__rpline (p)
-     __bs6FILE *p;
+long __rpline (__bs6FILE *p)
 {
   return (p->line);
 }

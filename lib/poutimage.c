@@ -23,9 +23,7 @@
 /******************************************************************************
                                          PROCEDURE OUTIMAGE                  */
 
-__dhp 
-__rpoutimage (p)
-     __bs6FILE *p;		/* Skriver ikke ut etterfolgende blanke */
+__dhp __rpoutimage (__bs6FILE *p)		/* Skriver ikke ut etterfolgende blanke */
 {
   char *s;
   long i;

@@ -30,9 +30,7 @@ FILE *fopen ();
 /******************************************************************************
                                          BOOLEAN PROCEDURE ENDFILE           */
 
-char 
-__riendfile (p)
-     __bs4FILE *p;
+char __riendfile (__bs4FILE *p)
 {
   return (p->endfile);
 }

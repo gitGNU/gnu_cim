@@ -35,11 +35,7 @@
 #define q3 0.10353775285
 #define q4 0.0038560700634
 
-double 
-__rnormal (a, b, U)
-     double a,
-       b;
-     long *U;
+double __rnormal (double a, double b, long *U)
 {
   static double y,
     x,

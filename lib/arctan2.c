@@ -23,10 +23,7 @@
 /******************************************************************************
                                              REAL PROCEDURE ARCTAN2(r)       */
 
-double 
-__rarctan2 (r, s)
-     double r,
-       s;
+double __rarctan2 (double r, double s)
 {
   return (atan2 (r, s));
 }

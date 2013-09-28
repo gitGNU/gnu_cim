@@ -22,11 +22,7 @@
 /******************************************************************************
                                             LONG REAL PROCEDURE LINEAR	     */
 
-double 
-__rlinear (A, B, U)
-     __arrp A,
-       B;
-     long *U;
+double __rlinear (__arrp A, __arrp B, long *U)
 {
   long j;
   double basic,

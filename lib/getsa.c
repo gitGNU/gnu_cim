@@ -39,12 +39,7 @@
  * ret, mret -> Returadressen
  * Returnerer: Adressen i er og __ev (også hvis en thunk kalles) */
 
-char
-__rgetsa (p, as, ret, mret)
-     __simplenamepar *p;
-     long as;
-     int ret;
-     void (*mret) ();
+char __rgetsa (__simplenamepar *p, long as, int ret, void (*mret) ())
 {
   switch (p->namekind)
     {

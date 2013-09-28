@@ -23,9 +23,7 @@
 /******************************************************************************
                                          BOOLEAN PROCEDURE OPEN              */
 
-char 
-__ribopen (p)
-     __bs8FILE *p;
+char __ribopen (__bs8FILE *p)
 {
   if (!((__bs1FILE *) p)->open)
     {

@@ -22,9 +22,7 @@
 /******************************************************************************
                                  BOOLEAN PROCEDURE CONSTANT (text attributt) */
 
-char 
-__rtconstant (t)
-     __txtvp t;
+char __rtconstant (__txtvp t)
 {
   if (t->obj == __NULL)
     return (__TRUE);

@@ -23,10 +23,7 @@
 /******************************************************************************
                                          PROCEDURE OUTTEXT(t)                */
 
-__dhp 
-__roouttext (p, t)
-     __bs2FILE *p;
-     __txtvp t;
+__dhp __roouttext (__bs2FILE *p, __txtvp t)
 {
   register long i;
   char *s;

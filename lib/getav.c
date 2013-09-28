@@ -45,13 +45,7 @@
  * ret, mret -> Returadressen
  * Returnerer: Verdien i __ev eller ef, (ogs} hvis en thunk kalles) */
 
-char
-__rgetav (ftype, p, as, ret, mret)
-     char ftype;
-     __aritnamepar *p;
-     long as;
-     int ret;
-     void (*mret) ();
+char __rgetav (char ftype, __aritnamepar *p, long as, int ret, void (*mret) ())
 {
   char tconv;
   switch (p->namekind)

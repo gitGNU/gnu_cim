@@ -23,9 +23,7 @@
 /******************************************************************************
                                          INTEGER PROCEDURE LOCATION          */
 
-long 
-__rdblocation (p)
-     __bs10FILE *p;
+long __rdblocation (__bs10FILE *p)
 {
   return (p->loc);
 }

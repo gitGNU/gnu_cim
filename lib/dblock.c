@@ -25,12 +25,7 @@
                                          PROCEDURE LOCK(t,i,j)               */
 
 /*ARGSUSED */
-long 
-__rdblock (p, t, i, j)
-     __bs10FILE *p;
-     double t;
-     long i,
-       j;
+long __rdblock (__bs10FILE *p, double t, long i, long j)
 {
   long lock = -1;
   if (t > 0.0)

@@ -23,9 +23,7 @@
 /******************************************************************************
                                          PROCEDURE BREAKOUTIMAGE             */
 
-__dhp 
-__robreakoutimage (p)
-     __bs2FILE *p;
+__dhp __robreakoutimage (__bs2FILE *p)
 {
   char *s;
   register long i,

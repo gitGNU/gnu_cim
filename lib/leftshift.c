@@ -22,9 +22,7 @@
 /******************************************************************************
                                Hjelperutine som shifter en tekst til venstre */
 
-__rleftshift (t, j)
-     __txtvp t;
-     long j;
+void __rleftshift (__txtvp t, long j)
 {
   long i,
     l;

@@ -28,9 +28,7 @@
 /* PS !!! HVIS DET IKKE SKAL V]RE NOEN TESTER INNE I LOCATE S] KAN ALLE
  * KALL rdlocate(((__bs5FILE *)p)->loc) SLETTES. */
 
-long 
-__rdlocation (p)
-     __bs5FILE *p;
+long __rdlocation (__bs5FILE *p)
 {
   return (p->loc);
 }

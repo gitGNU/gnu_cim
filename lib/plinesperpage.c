@@ -24,10 +24,7 @@
 /******************************************************************************
                                          INTEGER PROCEDURE LINESPERPAGE      */
 
-long 
-__rplinesperpage (p, n)
-     __bs6FILE *p;
-     long n;
+long __rplinesperpage (__bs6FILE *p, long n)
 {
   long i;
   i = p->lines_per_page;

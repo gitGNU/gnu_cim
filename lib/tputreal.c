@@ -23,11 +23,7 @@
 /******************************************************************************
                                  PROCEDURE PUTREAL (text attributt)          */
 
-__txtvp 
-__rtputreal (t, r, n)
-     __txtvp t;
-     double r;
-     long n;
+__txtvp __rtputreal (__txtvp t, double r, long n)
 {
   static char cs[__RTPUTTEXTLENGTH + 1],
     fcs[__RTPUTTEXTFORMATLENGTH + 1];

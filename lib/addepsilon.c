@@ -28,9 +28,7 @@
  * Andre rutine er en treg men portabel variant. */
 
 #if FLOAT_IEEE | FLOAT_VAX | FLOAT_IBM
-double 
-__raddepsilon (r)
-     double r;
+double __raddepsilon (double r)
 {
   union
     {
@@ -110,9 +108,7 @@ __raddepsilon (r)
   return (value.d);
 }
 #else
-double 
-__raddepsilon (r)
-     double r;
+double __raddepsilon (double r)
 {
   double s = MIN_DOUBLE,
     t,

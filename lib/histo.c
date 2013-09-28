@@ -22,12 +22,7 @@
 /******************************************************************************
                                                       PROCEDURE HISTO	     */
 
-void 
-__rhisto (A, B, c, d)
-     __arrp A,
-       B;
-     double c,
-       d;
+void __rhisto (__arrp A, __arrp B, double c, double d)
 {
   long j;
   if (A->h.dim != 1 || B->h.dim != 1)

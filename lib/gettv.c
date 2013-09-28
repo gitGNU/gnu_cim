@@ -42,12 +42,7 @@
  * Returnerer: med en peker til text-verdien (enten i __et eller til den
  *             text-variabelen. */
 
-char
-__rgettv (p, as, ret, mret)
-     __textnamepar *p;
-     long as;
-     int ret;
-     void (*mret) ();
+char __rgettv (__textnamepar *p, long as, int ret, void (*mret))
 {
   switch (p->namekind)
     {

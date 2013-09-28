@@ -24,10 +24,7 @@
 /******************************************************************************
                                          BOOLEAN PROCEDURE OPEN              */
 
-char 
-__rdopen (p, t)
-     __bs5FILE *p;
-     __txtvp t;
+char __rdopen (__bs5FILE *p, __txtvp t)
 {
   long loc;
   if (!((__bs1FILE *) p)->open)

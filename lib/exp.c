@@ -23,9 +23,7 @@
 /******************************************************************************
                                              REAL PROCEDURE EXP(r)           */
 
-double 
-__rexp (r)
-     double r;
+double __rexp (double r)
 {
   return (exp (r));
 }

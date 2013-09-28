@@ -26,10 +26,7 @@
  * C-prosedyre. Rutinen allokerer plass i C-space ved } bruke malloc.
  * Rutinen bruker RCOPYTEXTTOC for } kopiere selve tekstene */
 
-char **
-__rcopytextarrtoc (p, byvalue)
-     __arrp p;
-     char byvalue;
+char **__rcopytextarrtoc (__arrp p, char byvalue)
 {
   long sizeofhode,
     size,

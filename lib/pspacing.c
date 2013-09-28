@@ -23,10 +23,7 @@
 /******************************************************************************
                                          PROCEDURE SPACING                   */
 
-__dhp 
-__rpspacing (p, n)
-     __bs6FILE *p;
-     long n;
+__dhp __rpspacing (__bs6FILE *p, long n)
 {
   if (0 <= n && n <= p->lines_per_page)
     p->spacing = n;

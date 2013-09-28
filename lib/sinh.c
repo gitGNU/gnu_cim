@@ -23,9 +23,7 @@
 /******************************************************************************
                                              REAL PROCEDURE SINH(r)          */
 
-double 
-__rsinh (r)
-     double r;
+double __rsinh (double r)
 {
   return (sinh (r));
 }

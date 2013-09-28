@@ -22,10 +22,7 @@
 /******************************************************************************
                                              INTEGER PROCEDURE HISTD	     */
 
-long 
-__rhistd (A, U)
-     __arrp A;
-     long *U;
+long __rhistd (__arrp A, long *U)
 {
   double sum = 0.0,
     weight;

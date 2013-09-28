@@ -23,9 +23,7 @@
 /******************************************************************************
                                          CHARACTER PROCEDURE INCHAR          */
 
-char 
-__riinchar (p)
-     __bs2FILE *p;
+char __riinchar (__bs2FILE *p)
 {
   if (!__rtmore (&(p->IMAGE)))
     {				/* Sorger for at riktige inimage kalles */

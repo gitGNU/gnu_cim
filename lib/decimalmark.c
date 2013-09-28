@@ -22,9 +22,7 @@
 /******************************************************************************
                                           CHARACTER PROCEDURE DECIMALMARK(c) */
 
-char 
-__rdecimalmark (c)
-     char c;
+char __rdecimalmark (char c)
 {
   char s;
   if (c != '.' && c != ',')

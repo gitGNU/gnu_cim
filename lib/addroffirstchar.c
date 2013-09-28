@@ -22,9 +22,7 @@
 /******************************************************************************
                                                      RADDROFFIRSTCHAR        */
 
-char *
-__raddroffirstchar (t)
-     __txtvp t;
+char *__raddroffirstchar (__txtvp t)
 {
   if (t->obj == __NULL)
     return (__nullstr);

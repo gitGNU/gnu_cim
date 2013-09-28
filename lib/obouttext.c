@@ -23,10 +23,7 @@
 /******************************************************************************
                                          PROCEDURE OUTTEXT(t)                */
 
-__dhp 
-__robouttext (p, t)
-     __bs9FILE *p;
-     __txtvp t;
+__dhp __robouttext (__bs9FILE *p, __txtvp t)
 {
   __rtsetpos (t, 1L);
   while (__rtmore (t))

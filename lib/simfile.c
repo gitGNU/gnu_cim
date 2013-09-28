@@ -198,7 +198,7 @@ __bs6FILE __syserr =
  (__textref) & __stderrimage, OUTPUT_LINE_LENGTH, 1, 1,
  1, MAX_INT, 1, 0};
 
-void __m_FILE()
+void __m_FILE(void)
 { goto __s;
 
 /* C - k o d e n   f o r   C L A S S   B A S I C I O */
@@ -290,7 +290,7 @@ case 30: goto __l30;case 31: goto __l31;
 }
 }
 
-void __init_FILE()
+void __init_FILE (void)
 {
   /*  I N I T I E R I N G   a v   B A S I C I O */
 #if 0  

@@ -23,9 +23,7 @@
 /******************************************************************************
                                          INTEGER PROCEDURE MAXLOC            */
 
-long 
-__rdmaxloc (p)
-     __bs5FILE *p;
+long __rdmaxloc (__bs5FILE *p)
 {
   if (!((__bs1FILE *) p)->open)
     __rerror ("Maxloc: File not open");

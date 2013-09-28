@@ -22,9 +22,7 @@
 /******************************************************************************
                                                         RutineSYSTEMERROR    */
 
-void
-__rsystemerror (s)
-     char *s;
+void __rsystemerror (char *s)
 {
   __rprintfilline ();
   (void) fprintf (stderr, "SYSTEM-ERROR: %s\n", s);

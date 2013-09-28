@@ -23,9 +23,7 @@
 /******************************************************************************
                                              REAL PROCEDURE LOG10(r)         */
 
-double 
-__rlog10 (r)
-     double r;
+double __rlog10 (double r)
 {
   return (log10 (r));
 }

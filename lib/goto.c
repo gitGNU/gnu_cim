@@ -18,14 +18,11 @@
  */
 
 #include "cim.h"
-#include "simfile.h"
 
 /******************************************************************************
                                                         RutineGoto           */
 
-void
-__rgoto (ob)
-     __dhp ob;
+void __rgoto (__dhp ob)
 {
   __dhp x;
 

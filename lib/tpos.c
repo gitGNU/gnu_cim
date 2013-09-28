@@ -22,9 +22,7 @@
 /******************************************************************************
                                   INTEGER PROCEDURE POS (text attributt)     */
 
-long 
-__rtpos (t)
-     __txtvp t;
+long __rtpos (__txtvp t)
 {
   if (t->obj == __NULL)
     return (1);

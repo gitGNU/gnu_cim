@@ -22,10 +22,7 @@
 /******************************************************************************
                                    TEXT PROCEDURE COPY                      */
 
-__txtvp 
-__rcopy (as, t)
-     __txtvp t;
-     long as;
+__txtvp __rcopy (long as, __txtvp t)
 {
   long i,
     j = 0;

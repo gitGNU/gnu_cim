@@ -23,9 +23,7 @@
 /******************************************************************************
                                              REAL PROCEDURE COSH(r)          */
 
-double 
-__rcosh (r)
-     double r;
+double __rcosh (double r)
 {
   return (cosh (r));
 }

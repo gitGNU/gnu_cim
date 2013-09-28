@@ -23,10 +23,7 @@
 /******************************************************************************
                                                 REAL PROCEDURE POWRI(r,i)    */
 
-double 
-__rpowri (r, i)
-     double r;
-     long i;
+double __rpowri (double r, long i)
 {
   long k = 1,
     s;

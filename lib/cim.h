@@ -557,8 +557,8 @@ extern char *__nullstr;
 extern char *__progname;
 extern long __argc;
 extern long __argv;
-extern long __rargc ();
-extern long __rargv ();
+long __rargc (void);
+long __rargv (void);
 
 extern __map *__curent_map;
 
@@ -576,244 +576,299 @@ extern __dh __niu,
 extern __dhp __p;
 
 /******************************************************************************
-            External declaration of run-time routines that do not return int */
+            External declaration of run-time routines                        */
 
 /* RTCK.C */
-extern __dhp __rca ();
+__dhp __rca (__arrp a);
 extern __dhp __ralloc ();
-extern char __rin ();
-extern char __rrin ();
-extern char __ris ();
-extern char __rgetav ();
-extern char __rgetcbv ();
-extern char __rgetrv ();
-extern char __rgettv ();
-extern char __rgetproc ();
-extern char __rgetlab ();
-extern char __rgeta ();
-extern char __rgetsa ();
+char __rin (__dhp bpx, __pty p);
+char __rrin (__pty q, __pty p);
+char __ris (__dhp bpx, __pty p);
+char __rgeta (__arraynamepar *p, long as, int ret, void (*mret) ());
+char __rgetcbv (__charboolnamepar *p, long as, int ret, void (*mret) ());
+char __rgetrv (__refnamepar *p, long as, int ret, void (*mret) ());
+char __rgettv (__textnamepar *p, long as, int ret, void (*mret));
+char __rgetproc (__procname *p, long as, int ret, void (*mret) ());
+char __rgetlab (__labelnamepar *p, long as, int ret, void (*mret) ());
+char __rgetsa (__simplenamepar *p, long as, int ret, void (*mret) ());
+void __rreturn (long vret, int ret, void (*mret) ());
+void __rundump (__txtvp t, int ret, void (*mret) ());
+void __rdump (__txtvp t, int ret, void (*mret) ());
+void __rcall (__dhp ob, int ret, void (*mret) ());
+void __rresume (__dhp ob, int ret, void (*mret) ());
+void __rexchange (__dhp sh, __dhp ob, int ret, void (*mret) ());
+char __rgetav (char ftype, __aritnamepar *p, long as, int ret, void (*mret) ());
+
+void __rcp (__pty ppx, long as);
+void __rterror (__txtvp t);
+void __renddecl (int plev);
+void __rep (void);
+void __rdetach (__dhp ob, int ret, void (*mret) ());
+void __rrs (void);
+void __rcpb (int ret, void (*mret) ());
+void __rss (long as);
+void __rcprb (__pty ppx);
+void __reth (void);
+void __rgbc (void);
+void __do_for_each_pointer (__dhp p, void (*doit) (), void (*doit_notest) ());
+void __rgoto (__dhp ob);
+void __rsystemerror (char *s);
+void __rendclass (int plev);
+void __rinitier (__dhp *fra, __dhp *til);
+void __rinner (int plev);
+void __rwarning (char *s);
+int __roa (__dhp x);
+__dhp __ralloc (long size);
+
+
+void __rccb (int ret, void (*mret) ());
+void __rerror (char *s);
+void __rct (long as);
+void __rslutt (void);
+void __rstart (int argc, char *argv[]);
+void __rb (__pty ppx);
+void __rtrace (void);
+void __repp (void);
 
 /* RTBASICIO.C */
-extern __dhp __rsysin ();
-extern __dhp __rsysout ();
-extern __dhp __rsyserr ();
+__dhp __rsysin (void);
+__dhp __rsysout (void);
+__dhp __rsyserr (void);
 
 /* ENVIRONMENT.C */
 
+void __init_SIMENVIR (void);
+void __rprintfilline (void);
+void __rhisto (__arrp A, __arrp B, double c, double d);
+/*
+RETSIGTYPE __rsys_trap (void);
+RETSIGTYPE __rillegal_trap (void);
+RETSIGTYPE __rseg_trap (void);
+RETSIGTYPE __rfloat_trap (void);
+*/
+
 /* Basic operations */
-extern double __rabsr ();
-extern long __rabsi ();
-extern long __rsigndi ();
-extern long __rsigndr ();
-extern long __rmod ();
-extern long __rrem ();
-extern long __rentier ();
-extern long __rintrea ();
-extern double __raddepsilon ();
-extern double __rsubepsilon ();
-extern long __rlowerbound ();
-extern long __rupperbound ();
-extern long __ridiv0();
-extern double __rrdiv0();
+double __rabsr (double r);
+long __rabsi (long i);
+long __rsigni (long i);
+long __rsigndx (long i, double j);
+long __rsignr (double e);
+long __rsigndi (long i, long j);
+long __rsigndr (double e, double f);
+long __rmod (long i, long j);
+long __rrem (long i, long j);
+long __rentier (double r);
+long __rintrea (double r);
+double __raddepsilon (double r);
+double __rsubepsilon (double r);
+long __rlowerbound (__arrp a, long i);
+long __rupperbound (__arrp a, long i);
+long __ridiv0 (long i);
+double __rrdiv0(double i);
 
 /* Power functions */
-extern long __rpowii ();
-extern double __rpowri ();
+double __rpow (double x, double r);
+double __rpowri (double r, long i);
 extern double __rpow ();
 
 /* Text utilities */
-extern char __rchar ();
-extern char __risochar ();
-extern long __rrank ();
-extern long __risorank ();
-extern char __rdigit ();
-extern char __rletter ();
-extern char __rlowten ();
-extern char __rdecimalmark ();
-extern __txtvp __rupcase ();
-extern __txtvp __rlowcase ();
+char __rchar (long i);
+char __risochar (long i);
+long __rrank (char c);
+long __risorank (char c);
+char __rdigit (char c);
+char __rletter (char c);
+char __rlowten (char c);
+char __rdecimalmark (char c);
+char __rcompstr (char *s1, char *s2, int n);
 
 /* Mathematical functions */
-extern double __rsqrt ();
-extern double __rsin ();
-extern double __rcos ();
-extern double __rtan ();
-extern double __rarcsin ();
-extern double __rarccos ();
-extern double __rarctan ();
-extern double __rarctan2 ();
-extern double __rsinh ();
-extern double __rcosh ();
-extern double __rtanh ();
-extern double __rln ();
-extern double __rlog10 ();
-extern double __rexp ();
-extern double __rcotan ();
+double __rsqrt (double r);
+double __rsin (double r);
+double __rcos (double r);
+double __rtan (double r);
+double __rarcsin (double r);
+double __rarccos (double r);
+double __rarctan (double r);
+double __rarctan2 (double r, double s);
+double __rsinh (double r);
+double __rcosh (double r);
+double __rtanh (double r);
+double __rln (double r);
+double __rlog10 (double r);
+double __rexp (double r);
+double __rcotan (double r);
 
 /* Extremum functions */
-extern void __rmint ();
-extern char __rminc ();
-extern long __rmini ();
-extern double __rminr ();
-extern void __rmaxt ();
-extern char __rmaxc ();
-extern long __rmaxi ();
-extern double __rmaxr ();
+void __rmint (__txtvp t1, __txtvp t2);
+char __rminc (char c1, char c2);
+long __rmini (long i1, long i2);
+double __rminr (double r1, double r2);
+void __rmaxt (__txtvp t1, __txtvp t2);
+char __rmaxc (char c1, char c2);
+long __rmaxi (long i1, long i2);
+double __rmaxr (double r1, double r2);
 
 /* Environmental enquiries */
-extern __txtvp __rsimulaid();
+__txtvp __rsimulaid (long as);
 
 /* Random drawing */
-extern char __rdraw ();
-extern long __rrandint ();
-extern double __runiform ();
-extern double __rnormal ();
-extern double __rnegexp ();
-extern long __rpoisson ();
-extern double __rerlang ();
-extern long __rdiscrete ();
-extern double __rlinear ();
-extern long __rhistd ();
+char __rdraw (double a, long *U);
+long __rrandint (long a, long b, long *U);
+double __runiform (double a, double b, long *U);
+double __rnormal (double a, double b, long *U);
+double __rnegexp (double a, long *U);
+long __rpoisson (double a, long *U);
+double __rerlang (double a, double b, long *U);
+long __rdiscrete (__arrp A, long *U);
+double __rlinear (__arrp A, __arrp B, long *U);
+long __rhistd (__arrp A, long *U);
 
 /* Calendar and timing utilities */
-extern __txtvp __rdatetime ();
-extern double __rcputime ();
-extern double __rclocktime ();
+__txtvp __rdatetime (long as);
+double __rcputime (void);
+double __rclocktime (void);
 
 /* RTTEXT.C */
-extern char __rtconstant ();
-extern long __rtstart ();
-extern long __rtlength ();
-extern char __rtmore ();
-extern char __rtgetchar ();
-extern double __rtgetreal ();
-extern long __rtgetfrac ();
-extern long __rtgetint ();
-extern long __rtpos ();
-extern __txtvp __rtmain ();
-extern __txtvp __rtputchar ();
-extern __txtvp __rtputint ();
-extern __txtvp __rtputfix ();
-extern __txtvp __rtputreal ();
-extern __txtvp __rtputfrac ();
-extern __txtvp __rtsetpos ();
-extern __txtvp __rtsub ();
-extern __txtvp __rtstrip ();
-extern __txtvp __rcopy ();
-extern __txtvp __rblanks ();
-extern __txtvp __rconc ();
+char __rtconstant (__txtvp t);
+long __rtstart (__txtvp t);
+long __rtlength (__txtvp t);
+char __rtmore (__txtvp t);
+char __rtgetchar (__txtvp t);
+double __rtgetreal (__txtvp t);
+long __rtgetfrac (__txtvp t);
+long __rtgetint (__txtvp t);
+long __rtpos (__txtvp t);
+__txtvp __rtmain (__txtvp t);
+__txtvp __rtputchar (__txtvp t, char c);
+__txtvp rtputint (__txtvp t, long i);
+__txtvp __rtputfix (__txtvp t, double r, long n);
+__txtvp __rtputreal (__txtvp t, double r, long n);
+__txtvp __rtputfrac (__txtvp t, long i, long n);
+__txtvp __rtsetpos (__txtvp t, long i);
+__txtvp __rtsub (__txtvp t, long i, long n);
+__txtvp __rtstrip (__txtvp t);
+__txtvp __rcopy (long as, __txtvp t);
+__txtvp __rblanks (long as, long n);
+__txtvp __rconc (long as, __txtvp t1x, __txtvp t2x);
 extern __txtvp __rtextvalassign ();
-extern __txtvp __rtextassign ();
+__txtvp __rtextassign (__txtvp t1x, __txtvp t2x);
+char __reqrtext (__txtvp t1x, __txtvp t2x);
 extern char __reqrtext ();
-extern char __reqrtext ();
-extern char __reqtext ();
-extern char __rlttext ();
-extern char __rletext ();
+char __reqtext (__txtvp t1x, __txtvp t2x);
+char __rlttext (__txtvp t1x, __txtvp t2x);
+char __rletext (__txtvp t1x, __txtvp t2x);
+__txtvp __rupcase (__txtvp t);
+__txtvp __rlowcase (__txtvp t);
+__txtvp __rtputint (__txtvp t, long ii);
+void __rleftshift (__txtvp t, long j);
 
 /* FILESYSTEM.C */
 
 extern long __rfsize ();
 
 /* Class file */
-extern __txtvp __rfilename ();
-extern char __risopen ();
-extern char __rsetaccess ();
+__txtvp __rfilename (long as, __bs1FILE *p);
+char __risopen (__bs1FILE *p);
+char __rsetaccess (__bs1FILE *p, __txtvp t);
 
 /* File class imagefile */
-extern long __rpos ();
-extern char __rmore ();
-extern long __rlength ();
-extern __dhp __rsetpos ();
+void __rfield (__bs2FILE *p, long w);
+long __rpos (__bs2FILE *p);
+char __rmore (__bs2FILE *p);
+long __rlength (__bs2FILE *p);
+__dhp __rsetpos (__bs2FILE *p, long i);
 
 /* Imagefile class infile */
-extern char __riendfile ();
-extern char __riopen ();
-extern char __riclose ();
-extern char __riinrecord ();
-extern char __riinchar ();
-extern char __rilastitem ();
-extern long __riinint ();
-extern double __riinreal ();
-extern long __riinfrac ();
-extern __txtvp __riintext ();
-extern __dhp __riinimage ();
+char __riendfile (__bs4FILE *p);
+char __riopen (__bs1FILE *p, __txtvp t);
+char __riclose (__bs1FILE *p);
+char __riinrecord (__bs2FILE *p);
+char __riinchar (__bs2FILE *p);
+char __rilastitem (__bs2FILE *p);
+long __riinint (__bs2FILE *p);
+double __riinreal (__bs2FILE *p);
+long __riinfrac (__bs2FILE *p);
+__txtvp __riintext (long as, __bs2FILE *p, long w);
+__dhp __riinimage (__bs2FILE *p);
 
 /* Imagefile class outfile */
-extern char __roopen ();
-extern char __roclose ();
-extern __dhp __rooutimage ();
-extern __dhp __rooutrecord ();
-extern __dhp __robreakoutimage ();
-extern __dhp __rooutchar ();
+char __roopen (__bs1FILE *p, __txtvp t);
+char __roclose (__bs1FILE *p);
+__dhp __rooutimage (__bs2FILE *p)		/* Skriver ikke ut etterfolgende blanke */;
+__dhp __rooutrecord (__bs2FILE *p);
+__dhp __robreakoutimage (__bs2FILE *p);
+__dhp __rooutchar (__bs2FILE *p, char c);
 extern __dhp __roouttext ();
-extern __dhp __rooutint ();
-extern __dhp __rooutfix ();
-extern __dhp __rooutreal ();
-extern __dhp __rooutfrac ();
+__dhp __rooutint (__bs2FILE *p, long i, long w);
+__dhp __rooutfix (__bs2FILE *p, double r, long i, long  w);
+__dhp __rooutreal (__bs2FILE *p, double r, long i, long w);
+__dhp __rooutfrac (__bs2FILE *p, long i, long n, long  w);
 
 /* Outfile class printfile */
-extern long __rpline ();
-extern long __rppage ();
-extern char __rpopen ();
-extern char __rpclose ();
-extern long __rplinesperpage ();
-extern __dhp __rpspacing ();
-extern __dhp __rpeject ();
-extern __dhp __rpoutimage ();
-extern __dhp __rpoutrecord ();
+long __rpline (__bs6FILE *p);
+long __rppage (__bs6FILE *p);
+char __rpopen (__bs6FILE *p, __txtvp t);
+char __rpclose (__bs6FILE *p);
+long __rplinesperpage (__bs6FILE *p, long n);
+__dhp __rpspacing (__bs6FILE *p, long n);
+__dhp __rpeject (__bs6FILE *p, long n);
+__dhp __rpoutimage (__bs6FILE *p);
+__dhp __rpoutrecord (__bs6FILE *p);
 
 /* Imagefile class directfile */
-extern long __rdlocation ();
-extern char __rdendfile ();
-extern char __rdlocked ();
-extern char __rdcheckpoint ();
-extern char __rdunlock ();
-extern long __rdlock ();
-extern char __rdopen ();
-extern char __rdclose ();
-extern long __rdlastloc ();
-extern long __rdmaxloc ();
-extern char __rddeleteimage ();
-extern __dhp __rdlocate ();
-extern __dhp __rdoutimage ();
-extern __dhp __rdinimage ();
+char __rdlocked (__bs5FILE *p);
+long __rdlocation (__bs5FILE *p);
+char __rdendfile (__bs5FILE *p);
+long __rdlock (__bs5FILE *p, double t, long i, long j);
+char __rdcheckpoint (__bs5FILE *p);
+char __rdunlock (__bs5FILE *p);
+char __rdopen (__bs5FILE *p, __txtvp t);
+char __rdclose (__bs5FILE *p);
+long __rdlastloc (__bs5FILE *p);
+long __rdmaxloc (__bs5FILE *p);
+char __rddeleteimage (__bs5FILE *p);
+__dhp __rdlocate (__bs5FILE *p, long i);
+__dhp __rdoutimage (__bs5FILE *p);
+__dhp __rdinimage (__bs5FILE *p);
 
 /* File class bytefile */
 
-extern long __rbytesize ();
+long __rbytesize (__bs7FILE *p);
 
 /* Bytefile class inbytefile */
-extern __txtvp __ribintext ();
-extern long __ribinbyte ();
-extern char __ribendfile ();
-extern char __ribopen ();
-extern char __ribclose ();
+__txtvp __ribintext (__bs8FILE *p, __txtvp t);
+long __ribinbyte (__bs8FILE *p);
+char __ribendfile (__bs8FILE *p);
+char __ribopen (__bs8FILE *p);
+char __ribclose (__bs8FILE *p);
 
 /* Bytefile class outbytefile */
-extern char __robopen ();
-extern char __robclose ();
-extern __dhp __roboutbyte ();
-extern __dhp __robouttext ();
+char __robopen (__bs9FILE *p);
+char __robclose (__bs9FILE *p);
+__dhp __roboutbyte (__bs9FILE *p, long x);
+__dhp __robouttext (__bs9FILE *p, __txtvp t);
 
 /* Bytefile class directbytefile */
-extern __txtvp __rdbintext ();
-extern long __rdblocation ();
-extern long __rdbmaxloc ();
-extern char __rdblocked ();
-extern long __rdblock ();
-extern char __rdbunlock ();
-extern char __rdbopen ();
-extern char __rdbclose ();
-extern long __rdblastloc ();
-extern __dhp __rdblocate ();
-extern __dhp __rdboutbyte ();
-extern __dhp __rdbouttext ();
+__txtvp __rdbintext (__bs10FILE *p, __txtvp t);
+long __rdblocation (__bs10FILE *p);
+long __rdbmaxloc (__bs10FILE *p);
+long __rdblock (__bs10FILE *p, double t, long i, long j);
+char __rdbunlock (__bs10FILE *p);
+char __rdbopen (__bs10FILE *p);
+char __rdbclose (__bs10FILE *p);
+long __rdblastloc (__bs10FILE *p);
+__dhp __rdblocate (__bs10FILE *p, long i);
+__dhp __rdboutbyte (__bs10FILE *p, long x);
+__dhp __rdbouttext (__bs10FILE *p, __txtvp t);
+long __rdbinbyte (__bs10FILE *p);
+char __rdbendfile (__bs10FILE *p);
 
 /* Environment to C */
-extern char *__rcopytexttoc ();
-extern char *__raddroffirstchar ();
-extern char *__raddroffirstelem ();
-extern char **__rcopytextarrtoc ();
-extern char *__rcopyarrtoc ();
+char *__rcopytexttoc (__txtvp t);
+char *__raddroffirstchar (__txtvp t);
+char *__raddroffirstelem (__arrp p);
+char **__rcopytextarrtoc (__arrp p, char byvalue);
+char *__rcopyarrtoc (__arrp p);
 
-extern char *xmalloc();
+char *xmalloc (unsigned int size);

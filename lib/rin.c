@@ -25,10 +25,7 @@
 /* Utf|rer en slags intest som brukes ved overforing av name parametere.
  * Rin() brukes ved vanlige in tester */
 
-char
-__rrin (q, p)
-     __pty q,
-       p;
+char __rrin (__pty q, __pty p)
 {
   if (
 #if __CHAR_UNSIGNED__

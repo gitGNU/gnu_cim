@@ -24,9 +24,7 @@
 /******************************************************************************
                                                       PROCEDURE TERROR	     */
 
-void 
-__rterror (t)
-     __txtvp t;
+void __rterror (__txtvp t)
 {
   long i;
   __rprintfilline ();

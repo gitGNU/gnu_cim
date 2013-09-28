@@ -23,10 +23,7 @@
 /******************************************************************************
                                                   REAL PROCEDURE POW(x,r)    */
 
-double 
-__rpow (x, r)
-     double x,
-       r;
+double __rpow (double x, double r)
 {
   if (x < 0.0 | (x == 0.0 & r <= 0.0))
     __rerror ("Power: Illegal parameters");

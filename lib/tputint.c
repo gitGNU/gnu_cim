@@ -22,10 +22,7 @@
                                  PROCEDURE PUTINT (text attributt)          */
 
 #if 0				/* Denne rutinen virker ikke for minint */
-__txtvp 
-rtputint (t, i)
-     __txtvp t;
-     long i;
+__txtvp rtputint (__txtvp t;long i)
 {
   long j;
   char *s,
@@ -66,10 +63,7 @@ rtputint (t, i)
 
 #else
 
-__txtvp 
-__rtputint (t, ii)
-     __txtvp t;
-     long ii;
+__txtvp __rtputint (__txtvp t, long ii)
 {
   static char cs[__RTPUTTEXTLENGTH + 1];
   long i,

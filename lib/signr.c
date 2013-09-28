@@ -23,9 +23,7 @@
 /******************************************************************************
                                               INTEGER PROCEDURE SIGN(r)      */
 
-long 
-__rsignr (e)
-     double e;
+long __rsignr (double e)
 {
   return ((e > 0.0) ? 1 : (e < 0.0) ? -1 : 0);
 }

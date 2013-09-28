@@ -22,10 +22,7 @@
 /******************************************************************************
                                              RutineIn (test)                 */
 
-char
-__rin (bpx, p)
-     __dhp bpx;
-     __pty p;
+char __rin (__dhp bpx, __pty p)
 {
   if (bpx == __NULL ||
 #if __CHAR_UNSIGNED__

@@ -22,9 +22,7 @@
 /******************************************************************************
                                           INTEGER PROCEDURE RANK(c)          */
 
-long 
-__rrank (c)
-     char c;
+long __rrank (char c)
 {
   return ((unsigned char) c);
 }

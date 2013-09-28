@@ -23,8 +23,7 @@
 /******************************************************************************
                                                         RutinePRINTFILLINE   */
 
-void
-__rprintfilline ()
+void __rprintfilline (void)
 {
   __map *mapindeks = __curent_map;
   if (__curent_map)

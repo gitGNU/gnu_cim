@@ -23,9 +23,7 @@
 /******************************************************************************
                                          (SHORT) INTEGER PROCEDURE INBYTE    */
 
-long 
-__rdbinbyte (p)
-     __bs10FILE *p;
+long __rdbinbyte (__bs10FILE *p)
 {
   long c;
   if (p->writeonly)

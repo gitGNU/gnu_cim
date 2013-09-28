@@ -23,8 +23,7 @@
 /******************************************************************************
                                             REF(printfile) PROCEDURE SYSOUT  */
 
-__dhp 
-__rsysout ()
+__dhp __rsysout (void)
 {
   return ((__dhp) & __sysout);
 }

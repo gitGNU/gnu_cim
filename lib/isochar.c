@@ -22,9 +22,7 @@
 /******************************************************************************
                                           CHARACTER PROCEDURE ISOCHAR(i)     */
 
-char 
-__risochar (i)
-     long i;
+char __risochar (long i)
 {
   if (i < 0 || i > 255)
     __rerror ("Isochar: Parameter outside limits");

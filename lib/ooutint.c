@@ -23,11 +23,7 @@
 /******************************************************************************
                                          PROCEDURE OUTINT(i,w)              */
 
-__dhp 
-__rooutint (p, i, w)
-     __bs2FILE *p;
-     long i,
-       w;
+__dhp __rooutint (__bs2FILE *p, long i, long w)
 {
   __txt ti;
   long k;

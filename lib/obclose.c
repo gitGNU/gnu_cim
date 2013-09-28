@@ -23,9 +23,7 @@
 /******************************************************************************
                                          BOOLEAN PROCEDURE CLOSE             */
 
-char 
-__robclose (p)
-     __bs9FILE *p;
+char __robclose (__bs9FILE *p)
 {
   if (((__bs1FILE *) p)->open)
     {

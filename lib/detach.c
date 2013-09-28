@@ -23,11 +23,7 @@
 /******************************************************************************
                                                         RutineDetach         */
 
-void
-__rdetach (ob, ret, mret)
-     __dhp ob;
-     int ret;
-     void (*mret) ();
+void __rdetach (__dhp ob, int ret, void (*mret) ())
 {
   __dhp p;
   if (ob->pp->kind == __KPRBLK)

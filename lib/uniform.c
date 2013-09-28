@@ -22,11 +22,7 @@
 /******************************************************************************
                                             LONG REAL PROCEDURE UNIFORM	     */
 
-double 
-__runiform (a, b, U)
-     double a,
-       b;
-     long *U;
+double __runiform (double a, double b, long *U)
 {
   if (b < a)
     __rerror ("Runiform: Second parameter is lower than first parameter");

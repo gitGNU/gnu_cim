@@ -25,9 +25,7 @@
 
 /* ikke en attributt prosedyre */
 
-__rfield (p, w)
-     __bs2FILE *p;
-     long w;
+void __rfield (__bs2FILE *p, long w)
 {
   if (w > p->IMAGE.length)
     __rerror ("Outint, outfix etc: Width on out field is greater than IMAGE.length");

@@ -25,9 +25,7 @@
 /* Denne rutinen brukes for } overf|re en array by reference til en
  * C-prosedyre. Rutinen returnerer med en peker til f|rste element */
 
-char *
-__raddroffirstelem (p)
-     __arrp p;
+char *__raddroffirstelem (__arrp p)
 {
   return ((char *) ((long) p + sizeof (__ah) + 
 		    sizeof (__arrlimit) * p->h.dim));

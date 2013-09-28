@@ -23,11 +23,7 @@
 /******************************************************************************
                                    TEXT CONCAT                               */
 
-__txtvp 
-__rconc (as, t1x, t2x)
-     __txtvp t1x,
-       t2x;
-     long as;
+__txtvp __rconc (long as, __txtvp t1x, __txtvp t2x)
 {
   long i,
     j = 0,

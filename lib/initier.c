@@ -22,10 +22,7 @@
 /******************************************************************************
                                                         RutineInitier        */
 
-void
-__rinitier (fra, til)
-     __dhp *fra,
-      *til;
+void __rinitier (__dhp *fra, __dhp *til)
 {
   while ((long) fra < (long) til)
     *fra++ = 0;

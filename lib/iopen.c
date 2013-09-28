@@ -23,10 +23,7 @@
 /******************************************************************************
                                          BOOLEAN PROCEDURE OPEN              */
 
-char 
-__riopen (p, t)
-     __bs1FILE *p;
-     __txtvp t;
+char __riopen (__bs1FILE *p, __txtvp t)
 {
   long i;
   char *s;

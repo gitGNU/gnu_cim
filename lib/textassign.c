@@ -22,10 +22,7 @@
 /******************************************************************************
                                                  rtextassign                 */
 
-__txtvp 
-__rtextassign (t1x, t2x)
-     __txtvp t1x,
-       t2x;
+__txtvp __rtextassign (__txtvp t1x, __txtvp t2x)
 {
   *t1x = *t2x;
   return (t1x);

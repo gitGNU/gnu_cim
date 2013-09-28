@@ -23,9 +23,7 @@
 /******************************************************************************
                                              REAL PROCEDURE COTAN(r)         */
 
-double 
-__rcotan (r)
-     double r;
+double __rcotan (double r)
 {
   double s;
   s = sin (r);

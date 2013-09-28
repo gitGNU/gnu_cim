@@ -25,10 +25,7 @@
 /******************************************************************************
                                                             SETPOS           */
 
-__dhp 
-__rsetpos (p, i)
-     __bs2FILE *p;
-     long i;
+__dhp __rsetpos (__bs2FILE *p, long i)
 {
   p->IMAGE.pos = ((i < 1 || i > p->IMAGE.length + 1) ? p->IMAGE.length + 1 : i);
   return ((__dhp) p);

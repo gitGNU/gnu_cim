@@ -23,11 +23,7 @@
 /******************************************************************************
                                  PROCEDURE PUTFIX (text attributt)           */
 
-__txtvp 
-__rtputfix (t, r, n)
-     __txtvp t;
-     double r;
-     long n;
+__txtvp __rtputfix (__txtvp t, double r, long n)
 {
   static char cs[__RTPUTTEXTLENGTH + 1],
     fcs[__RTPUTTEXTFORMATLENGTH + 1];

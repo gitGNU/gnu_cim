@@ -23,9 +23,7 @@
 /******************************************************************************
                                          INTEGER PROCEDURE LASTLOC           */
 
-long 
-__rdblastloc (p)
-     __bs10FILE *p;
+long __rdblastloc (__bs10FILE *p)
 {
   long i;
   if (fseek (((__bs1FILE *) p)->file, 0L, 2) == __EOF)

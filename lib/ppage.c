@@ -22,9 +22,7 @@
 /******************************************************************************
                                          INTEGER PROCEDURE PAGE              */
 
-long 
-__rppage (p)
-     __bs6FILE *p;
+long __rppage (__bs6FILE *p)
 {
   return (p->page);
 }

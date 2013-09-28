@@ -23,9 +23,7 @@
 /******************************************************************************
                                          PROCEDURE OUTIMAGE                  */
 
-__dhp 
-__rooutimage (p)
-     __bs2FILE *p;		/* Skriver ikke ut etterfolgende blanke */
+__dhp __rooutimage (__bs2FILE *p)		/* Skriver ikke ut etterfolgende blanke */
 {
   char *s;
   long i;

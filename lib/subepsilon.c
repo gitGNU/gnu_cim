@@ -22,9 +22,7 @@
                                              REAL PROCEDURE SUBEPSILON(r)    */
 
 #if FLOAT_IEEE | FLOAT_VAX | FLOAT_IBM
-double 
-__rsubepsilon (r)
-     double r;
+double __rsubepsilon (double r)
 {
   union
     {
@@ -104,9 +102,7 @@ __rsubepsilon (r)
   return (value.d);
 }
 #else
-double 
-__rsubepsilon (r)
-     double r;
+double __rsubepsilon (double r)
 {
   double s = MIN_DOUBLE,
     t,

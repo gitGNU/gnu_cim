@@ -23,9 +23,7 @@
 /******************************************************************************
                                            BOOLEAN PROCEDURE LOCKED          */
 
-char 
-__rdblocked (p)
-     __bs10FILE *p;
+char __rdblocked (__bs10FILE *p)
 {
   return (p->locked);
 }

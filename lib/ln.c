@@ -23,9 +23,7 @@
 /******************************************************************************
                                              REAL PROCEDURE LN(r)            */
 
-double 
-__rln (r)
-     double r;
+double __rln (double r)
 {
   return (log (r));
 }

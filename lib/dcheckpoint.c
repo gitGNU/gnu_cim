@@ -23,9 +23,7 @@
 /******************************************************************************
                                          BOOLEAN PROCEDURE CHECKPOINT        */
 
-char 
-__rdcheckpoint (p)
-     __bs5FILE *p;
+char __rdcheckpoint (__bs5FILE *p)
 {
   if (fflush (((__bs1FILE *) p)->file) == __EOF)
     return (__FALSE);

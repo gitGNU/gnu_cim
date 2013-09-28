@@ -24,9 +24,7 @@
 /******************************************************************************
                                            REAL PROCEDURE INREAL             */
 
-double 
-__riinreal (p)
-     __bs2FILE *p;
+double __riinreal (__bs2FILE *p)
 {
   __txt t;
   double inreal;

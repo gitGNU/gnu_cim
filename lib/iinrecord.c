@@ -23,9 +23,7 @@
 /******************************************************************************
                                          BOOLEAN PROCEDURE INRECORD          */
 
-char 
-__riinrecord (p)
-     __bs2FILE *p;
+char __riinrecord (__bs2FILE *p)
 {
   long i,
     j;

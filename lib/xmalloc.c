@@ -21,9 +21,7 @@
 
 extern char *malloc();
 
-char *
-xmalloc (size)
-     unsigned int size;
+char *xmalloc (unsigned int size)
 {
   char *ptr = malloc (size);
   if (! ptr) __rerror ("Xmalloc: Virtual memory exhausted");

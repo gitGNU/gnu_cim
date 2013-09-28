@@ -23,10 +23,7 @@
 /******************************************************************************
                                          PROCEDURE OUTCHAR(c)                */
 
-__dhp 
-__rooutchar (p, c)
-     __bs2FILE *p;
-     char c;
+__dhp __rooutchar (__bs2FILE *p, char c)
 {
   if (!__rtmore (&(p->IMAGE)))
     {				/* Sorger for at riktige outimage kalles */

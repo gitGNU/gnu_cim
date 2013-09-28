@@ -23,9 +23,7 @@
 /******************************************************************************
                                          BOOLEAN PROCEDURE ENDFILE           */
 
-char 
-__rdendfile (p)
-     __bs5FILE *p;
+char __rdendfile (__bs5FILE *p)
 {
   return (p->endfile);
 }

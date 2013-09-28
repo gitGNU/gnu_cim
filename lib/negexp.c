@@ -23,10 +23,7 @@
 /******************************************************************************
                                             LONG REAL PROCEDURE NEGEXP	     */
 
-double 
-__rnegexp (a, U)
-     double a;
-     long *U;
+double __rnegexp (double a, long *U)
 {
   if (a <= 0.0)
     __rerror ("Negexp: First parameter is lower than zero");

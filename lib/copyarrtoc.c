@@ -25,9 +25,7 @@
 /* Denne rutinen brukes for } overf|re en array by value til en
  * C-prosedyre. Rutinen allokerer plass i C-space ved } bruke malloc. */
 
-char *
-__rcopyarrtoc (p)
-     __arrp p;
+char *__rcopyarrtoc (__arrp p)
 {
   long sizeofhode,
     size,

@@ -21,11 +21,7 @@
 /******************************************************************************
                                  TEXT PROCEDURE SUB (text attributt)         */
 
-__txtvp 
-__rtsub (t, i, n)
-     __txtvp t;
-     long i,
-       n;
+__txtvp __rtsub (__txtvp t, long i, long n)
 {
   if (i <= 0 || n < 0 || i + n > t->length + 1)
     __rerror ("Sub: Outside text frame");

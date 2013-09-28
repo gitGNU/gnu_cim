@@ -18,14 +18,11 @@
  */
 
 #include "file.h"
-#include "simfile.h"
 
 /******************************************************************************
                                         PROCEDURE OUTRECORD                  */
 
-__dhp 
-__rpoutrecord (p)
-     __bs6FILE *p;
+__dhp __rpoutrecord (__bs6FILE *p)
 {
   char *s;
   register long i,

@@ -22,10 +22,7 @@
 /******************************************************************************
                                                         RutineCallProcedure  */
 
-void
-__rcp (ppx, as)
-     long as;
-     __pty ppx;
+void __rcp (__pty ppx, long as)
 {
   __dhp x;
   if (as)

@@ -22,10 +22,7 @@
 /******************************************************************************
                                              INTEGER PROCEDURE REM(i,j)      */
 
-long 
-__rrem (i, j)
-     long i,
-       j;
+long __rrem (long i, long j)
 {
   if (j == 0)
     __rerror ("Rem: Second parameter is equal zero");

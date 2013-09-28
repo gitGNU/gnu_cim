@@ -27,9 +27,7 @@
 /******************************************************************************
                                          BOOLEAN PROCEDURE ENDFILE           */
 
-char 
-__rdbendfile (p)
-     __bs10FILE *p;
+char __rdbendfile (__bs10FILE *p)
 {
   return (((__bs1FILE *) p)->open && p->loc > __rdblastloc (p));
 }

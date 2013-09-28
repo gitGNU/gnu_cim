@@ -22,9 +22,7 @@
 /******************************************************************************
                                 CHARACTER PROCEDURE GETCHAR (text attributt) */
 
-char 
-__rtgetchar (t)
-     __txtvp t;
+char __rtgetchar (__txtvp t)
 {
   if (t->obj == __NULL)
     __rerror ("Getchar: Notext");

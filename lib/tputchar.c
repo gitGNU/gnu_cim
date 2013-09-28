@@ -22,10 +22,7 @@
 /******************************************************************************
                                  PROCEDURE PUTCHAR (text attributt)          */
 
-__txtvp 
-__rtputchar (t, c)
-     __txtvp t;
-     char c;
+__txtvp __rtputchar (__txtvp t, char c)
 {
   if (t->obj == __NULL)
     __rerror ("Putchar: Notext");

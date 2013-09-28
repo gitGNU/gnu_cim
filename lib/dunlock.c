@@ -23,9 +23,7 @@
 /******************************************************************************
                                          BOOLEAN PROCEDURE UNLOCK            */
 
-char 
-__rdunlock (p)
-     __bs5FILE *p;
+char __rdunlock (__bs5FILE *p)
 {
   char c;
   c = __rdcheckpoint (p);

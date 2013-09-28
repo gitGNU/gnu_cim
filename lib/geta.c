@@ -37,12 +37,7 @@
  * ret, mret -> Returadressen
  * Returnerer: Peker til arrayet i er. */
 
-char
-__rgeta (p, as, ret, mret)
-     __arraynamepar *p;
-     long as;
-     int ret;
-     void (*mret) ();
+char __rgeta (__arraynamepar *p, long as, int ret, void (*mret) ())
 {
   switch (p->namekind)
     {

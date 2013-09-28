@@ -23,9 +23,7 @@
 /******************************************************************************
                                         INTEGER PROCEDURE LASTLOC            */
 
-long 
-__rdlastloc (p)
-     __bs5FILE *p;
+long __rdlastloc (__bs5FILE *p)
 {
   long pos,
     len;

@@ -23,9 +23,7 @@
 /******************************************************************************
                                          BOOLEAN PROCEDURE DELETEIMAGE       */
 
-char 
-__rddeleteimage (p)
-     __bs5FILE *p;
+char __rddeleteimage (__bs5FILE *p)
 {
   long c1,
     i,

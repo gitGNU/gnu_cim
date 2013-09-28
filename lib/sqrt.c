@@ -23,9 +23,7 @@
 /******************************************************************************
                                              REAL PROCEDURE SQRT(r)          */
 
-double 
-__rsqrt (r)
-     double r;
+double __rsqrt (double r)
 {
   if (r < 0.0)
     __rerror ("Sqrt: Illegal negative argument");

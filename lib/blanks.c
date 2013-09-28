@@ -23,10 +23,7 @@
 /******************************************************************************
                                    TEXT PROCEDURE BLANKS                     */
 
-__txtvp 
-__rblanks (as, n)
-     long n;
-     long as;
+__txtvp __rblanks (long as, long n)
 {
   long pos;
   if (n < 0)

@@ -22,11 +22,7 @@
 /******************************************************************************
                                               INTEGER PROCEDURE RANDINT	     */
 
-long 
-__rrandint (a, b, U)
-     long a,
-       b,
-      *U;
+long __rrandint (long a, long b, long *U)
 {
   long u;
   double r;

@@ -23,9 +23,7 @@
 /******************************************************************************
                                          BOOLEAN PROCEDURE OPEN              */
 
-char 
-__rdbopen (p)
-     __bs10FILE *p;
+char __rdbopen (__bs10FILE *p)
 {
   if (!((__bs1FILE *) p)->open)
     {

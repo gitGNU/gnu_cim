@@ -22,9 +22,7 @@
 /******************************************************************************
                                                         RutineInner          */
 
-void
-__rinner (plev)
-     int plev;
+void __rinner (int plev)
 {
   if (plev <
 #if __CHAR_UNSIGNED__

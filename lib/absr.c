@@ -23,9 +23,7 @@
 /******************************************************************************
                                              REAL PROCEDURE ABS(r)           */
 
-double 
-__rabsr (r)
-     double r;
+double __rabsr (double r)
 {
   if (r < 0.0)
     return (-r);

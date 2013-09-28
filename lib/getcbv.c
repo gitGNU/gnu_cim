@@ -37,12 +37,7 @@
  * ret, mret  -> Returadressen
  * Returnerer: Verdien i ec, (ogs} hvis en thunk kalles) */
 
-char
-__rgetcbv (p, as, ret, mret)
-     __charboolnamepar *p;
-     long as;
-     int ret;
-     void (*mret) ();
+char __rgetcbv (__charboolnamepar *p, long as, int ret, void (*mret) ())
 {
   switch (p->namekind)
     {

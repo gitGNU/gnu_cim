@@ -22,9 +22,7 @@
 /******************************************************************************
                                   BOOLEAN PROCEDURE MORE (text attributt)    */
 
-char 
-__rtmore (t)
-     __txtvp t;
+char __rtmore (__txtvp t)
 {
   if (t->obj == __NULL)
     return (__FALSE);

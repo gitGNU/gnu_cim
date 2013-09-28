@@ -25,9 +25,7 @@
 /******************************************************************************
                                          BOOLEAN PROCEDURE ENDFILE           */
 
-char 
-__ribendfile (p)
-     __bs8FILE *p;
+char __ribendfile (__bs8FILE *p)
 {
   return (((__bs7FILE *) p)->endfile);
 }

@@ -24,12 +24,7 @@
 /******************************************************************************
                                        PROCEDURE OUTREAL(r,i,w)              */
 
-__dhp 
-__rooutreal (p, r, i, w)
-     __bs2FILE *p;
-     double r;
-     long i,
-       w;
+__dhp __rooutreal (__bs2FILE *p, double r, long i, long w)
 {
   __txt ti;
   long k;

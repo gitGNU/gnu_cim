@@ -23,8 +23,7 @@
 /******************************************************************************
                                             REF(printfile) PROCEDURE SYSERR  */
 
-__dhp 
-__rsyserr ()
+__dhp __rsyserr (void)
 {
   return ((__dhp) & __syserr);
 }

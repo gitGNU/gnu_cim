@@ -22,12 +22,7 @@
 /******************************************************************************
                                                     RutineGetTextAdress      */
 
-char
-__rgetta (p, as, ret, mret)
-     __textnamepar *p;
-     long as;
-     int ret;
-     void (*mret) ();
+char __rgetta (__textnamepar *p, long as, int ret, void (*mret) ())
 {
   switch (p->namekind)
     {

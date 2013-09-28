@@ -23,9 +23,7 @@
 /******************************************************************************
                                             INTEGER PROCEDURE ENTIER(r)      */
 
-long 
-__rentier (r)
-     double r;
+long __rentier (double r)
 {
   long j;
   if ((r >= ((double) MAX_INT) + 1.0) ||

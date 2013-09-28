@@ -22,9 +22,7 @@
 /******************************************************************************
                                                                RutineWARNING */
 
-void
-__rwarning (s)
-     char *s;
+void __rwarning (char *s)
 {
   __rprintfilline ();
   (void) fprintf (stderr, "%s: %s\n", __progname, s);

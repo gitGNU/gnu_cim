@@ -28,9 +28,7 @@ double strtod ();
 /******************************************************************************
                                      REAL PROCEDURE GETREAL (text attributt) */
 
-double 
-__rtgetreal (t)
-     __txtvp t;
+double __rtgetreal (__txtvp t)
 {
   char *s;
   int sign;

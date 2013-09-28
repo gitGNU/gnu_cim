@@ -22,9 +22,7 @@
 /******************************************************************************
                                                         RutineEndDecl        */
 
-void
-__renddecl (plev)
-     int plev;
+void __renddecl (int plev)
 {
   if (plev <
 #if __CHAR_UNSIGNED__

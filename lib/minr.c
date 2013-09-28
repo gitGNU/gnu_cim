@@ -23,10 +23,7 @@
 /******************************************************************************
                                               REAL PROCEDURE MIN(r1,r2)      */
 
-double 
-__rminr (r1, r2)
-     double r1,
-       r2;
+double __rminr (double r1, double r2)
 {
   if (r1 > r2)
     return (r2);

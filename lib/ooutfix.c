@@ -24,12 +24,7 @@
 /******************************************************************************
                                         PROCEDURE OUTFIX(r,i,w)              */
 
-__dhp 
-__rooutfix (p, r, i, w)
-     __bs2FILE *p;
-     double r;
-     long i,
-       w;
+__dhp __rooutfix (__bs2FILE *p, double r, long i, long  w)
 {
   __txt ti;
   long k;

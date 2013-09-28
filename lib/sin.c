@@ -23,9 +23,7 @@
 /******************************************************************************
                                              REAL PROCEDURE SIN(r)           */
 
-double 
-__rsin (r)
-     double r;
+double __rsin (double r)
 {
   return (sin (r));
 }

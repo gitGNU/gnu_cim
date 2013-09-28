@@ -22,10 +22,7 @@
 /******************************************************************************
                                               INTEGER PROCEDURE MIN(i1,i2)   */
 
-long 
-__rmini (i1, i2)
-     long i1,
-       i2;
+long __rmini (long i1, long i2)
 {
   if (i1 > i2)
     return (i2);

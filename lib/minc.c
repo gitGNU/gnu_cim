@@ -22,10 +22,7 @@
 /******************************************************************************
                                               CHARACTER PROCEDURE MIN(c1,c2) */
 
-char 
-__rminc (c1, c2)
-     char c1,
-       c2;
+char __rminc (char c1, char c2)
 {
   if ((unsigned char) c1 > (unsigned char) c2)
     return (c2);

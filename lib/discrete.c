@@ -22,10 +22,7 @@
 /******************************************************************************
                                              INTEGER PROCEDURE DISCRETE	     */
 
-long 
-__rdiscrete (A, U)
-     __arrp A;
-     long *U;
+long __rdiscrete (__arrp A, long *U)
 {
   long j;
   double basic;

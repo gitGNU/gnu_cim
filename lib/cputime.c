@@ -45,8 +45,7 @@
 #endif
 #endif
 
-double 
-__rcputime ()
+double __rcputime (void)
 {
 #if HAVE_SYS_RESOURCE_H && HAVE_GETRESOURCE
   struct rusage rus;

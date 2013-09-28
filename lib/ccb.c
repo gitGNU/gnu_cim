@@ -22,10 +22,7 @@
 /******************************************************************************
                                                 RutineCallClassBegin         */
 
-void
-__rccb (ret, mret)
-     int ret;
-     void (*mret) ();
+void __rccb (int ret, void (*mret) ())
 {
 /* __pb->dt=__executing; Er implisitt satt */
   __pb->pm = __FALSE;

@@ -64,10 +64,7 @@ extern __start_data_segment;
 #define DUMP_STR_LEN 26
 #define DUMP_BUFFER_SIZE 4096
 
-__rdump (t, ret, mret)
-     __txtvp t;
-     int ret;
-     void (*mret) ();
+void __rdump (__txtvp t;int ret;void (*mret) ())
 {
   char s[DUMP_BUFFER_SIZE];
   long sp,
@@ -142,10 +139,7 @@ __rdump (t, ret, mret)
   close (f);
 }
 
-__rundump (t, ret, mret)
-     __txtvp t;
-     int ret;
-     void (*mret) ();
+void __rundump (__txtvp t;int ret;void (*mret) ())
 {
 
   char s[DUMP_BUFFER_SIZE];

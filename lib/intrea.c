@@ -23,9 +23,7 @@
 /******************************************************************************
                                             INTEGER PROCEDURE INTREA(r)      */
 
-long 
-__rintrea (r)
-     double r;
+long __rintrea (double r)
 {
   long j;
   r += 0.5;

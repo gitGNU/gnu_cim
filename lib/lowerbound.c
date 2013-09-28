@@ -22,10 +22,7 @@
 /******************************************************************************
    		  			  INTEGER PROCEDURE LOWERBOUND(A,I)  */
 
-long 
-__rlowerbound (a, i)
-     __arrp a;
-     long i;
+long __rlowerbound (__arrp a, long i)
 {
   if (i < 1 || i > a->h.dim)
     __rerror ("Lowerbound: Illegal dimension");

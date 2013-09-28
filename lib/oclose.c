@@ -23,9 +23,7 @@
 /******************************************************************************
                                          BOOLEAN PROCEDURE CLOSE             */
 
-char 
-__roclose (p)
-     __bs1FILE *p;
+char __roclose (__bs1FILE *p)
 {
   if (p->open)
     {

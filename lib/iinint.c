@@ -23,9 +23,7 @@
 /******************************************************************************
                                            INTEGER PROCEDURE ININT           */
 
-long 
-__riinint (p)
-     __bs2FILE *p;
+long __riinint (__bs2FILE *p)
 {
   __txt t;
   long inint;

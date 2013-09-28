@@ -22,10 +22,7 @@
 /******************************************************************************
                                                                       RETURN */
 
-__rreturn (vret, ret, mret)
-     long vret;
-     int ret;
-     void (*mret) ();
+void __rreturn (long vret, int ret, void (*mret) ())
 {
   __vreturn = vret;
   __return.ent = ret;

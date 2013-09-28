@@ -25,9 +25,7 @@
 /******************************************************************************
                                          INTEGER PROCEDURE BYTESIZE          */
 
-long 
-__rbytesize (p)
-     __bs7FILE *p;
+long __rbytesize (__bs7FILE *p)
 {
   return (p->bytesize);
 }

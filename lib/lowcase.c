@@ -22,9 +22,7 @@
 /******************************************************************************
                                           TEXT PROCEDURE LOWCASE(t)          */
 
-__txtvp
-__rlowcase (t)
-     __txtvp t;
+__txtvp __rlowcase (__txtvp t)
 {
   register long i;
   unsigned char *s;

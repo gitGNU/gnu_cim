@@ -23,10 +23,7 @@
 /******************************************************************************
                                               REAL PROCEDURE MAX(r1,r2)      */
 
-double 
-__rmaxr (r1, r2)
-     double r1,
-       r2;
+double __rmaxr (double r1, double r2)
 {
   if (r1 > r2)
     return (r1);

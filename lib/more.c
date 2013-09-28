@@ -23,9 +23,7 @@
 /******************************************************************************
                                                               MORE           */
 
-char 
-__rmore (p)
-     __bs2FILE *p;
+char __rmore (__bs2FILE *p)
 {
   if (p->IMAGE.obj == __NULL)
     return (__FALSE);

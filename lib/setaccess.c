@@ -28,11 +28,7 @@
 /* Hjelpe rutine som sammenligner to stringer.Sm} og store bokstaver */
 /* omhverandre                                                       */
 
-char 
-__rcompstr (s1, s2, n)
-     char *s1,
-      *s2;
-     int n;
+char __rcompstr (char *s1, char *s2, int n)
 {				/* String s2 best}r av store bokstaver */
   int i;
   char c;
@@ -45,10 +41,7 @@ __rcompstr (s1, s2, n)
   return (__TRUE);
 }
 
-char 
-__rsetaccess (p, t)
-     __bs1FILE *p;
-     __txtvp t;
+char __rsetaccess (__bs1FILE *p, __txtvp t)
 {
   long length;
   char *s;

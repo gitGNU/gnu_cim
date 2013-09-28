@@ -26,10 +26,7 @@
 /* N}r det skal lages et bibliotek kompileres denne rutinen alltid sammen
  * med den neste da de avhenger av hverandre */
 
-__dhp 
-__rpeject (p, n)
-     __bs6FILE *p;
-     long n;
+__dhp __rpeject (__bs6FILE *p, long n)
 {
   long i;
 

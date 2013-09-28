@@ -22,10 +22,7 @@
 /******************************************************************************
                                                  rtextvalassign              */
 
-__txtvp 
-__rtextvalassign (t1x, t2x)
-     __txtvp t1x,
-       t2x;
+__txtvp __rtextvalassign (__txtvp t1x, __txtvp t2x)
 {
   long i = 0;
   register char *p1x,

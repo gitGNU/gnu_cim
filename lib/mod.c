@@ -22,10 +22,7 @@
 /******************************************************************************
                                              INTEGER PROCEDURE MOD(i,j)      */
 
-long 
-__rmod (i, j)
-     long i,
-       j;
+long __rmod (long i, long j)
 {
   long res;
   if (j == 0)

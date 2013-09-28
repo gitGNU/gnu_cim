@@ -23,11 +23,7 @@
 /******************************************************************************
                                           TEXT PROCEDURE INTEXT              */
 
-__txtvp 
-__riintext (as, p, w)
-     __bs2FILE *p;
-     long as,
-       w;
+__txtvp __riintext (long as, __bs2FILE *p, long w)
 {
   long i;
   __er = (__dhp) p;

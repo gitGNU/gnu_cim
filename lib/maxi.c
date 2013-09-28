@@ -22,10 +22,7 @@
 /******************************************************************************
                                               INTEGER PROCEDURE MAX(i1,i2)   */
 
-long 
-__rmaxi (i1, i2)
-     long i1,
-       i2;
+long __rmaxi (long i1, long i2)
 {
   if (i1 > i2)
     return (i1);

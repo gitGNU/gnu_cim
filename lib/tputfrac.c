@@ -22,11 +22,7 @@
 /******************************************************************************
                                  PROCEDURE PUTFRAC (text attributt)          */
 
-__txtvp 
-__rtputfrac (t, i, n)
-     __txtvp t;
-     long i;
-     long n;
+__txtvp __rtputfrac (__txtvp t, long i, long n)
 {
   char *s,
     minus;

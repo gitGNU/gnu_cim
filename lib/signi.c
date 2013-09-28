@@ -21,9 +21,7 @@
 
 /******************************************************************************
                                               INTEGER PROCEDURE SIGN(r)      */
-long 
-__rsigni (i)
-     long i;
+long __rsigni (long i)
 {
   return ((i > 0) ? 1 : (i < 0) ? -1 : 0);
 }

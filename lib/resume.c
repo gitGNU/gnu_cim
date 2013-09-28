@@ -18,16 +18,11 @@
  */
 
 #include "cim.h"
-#include "simfile.h"
 
 /******************************************************************************
                                                         RutineResume         */
 
-void
-__rresume (ob, ret, mret)
-     __dhp ob;
-     int ret;
-     void (*mret) ();
+void __rresume (__dhp ob, int ret, void (*mret) ())
 {
   __dhp sh;
 

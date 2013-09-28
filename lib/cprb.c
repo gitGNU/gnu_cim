@@ -22,9 +22,7 @@
 /******************************************************************************
                                                      RutineCallPrefiksBlock  */
 
-void
-__rcprb (ppx)
-     __pty ppx;
+void __rcprb (__pty ppx)
 {
   __pb = __ralloc ((long) ppx->size);
   __pb->pp = ppx;

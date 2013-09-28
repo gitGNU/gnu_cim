@@ -22,9 +22,7 @@
 /******************************************************************************
                                           CHARACTER PROCEDURE LOWTEN(c)      */
 
-char 
-__rlowten (c)
-     char c;
+char __rlowten (char c)
 {
   char s;
   if (isdigit (c) || c == '+' || c == '-' 

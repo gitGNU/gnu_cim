@@ -30,9 +30,7 @@
  * Dessuten kalles den ogs} fra add_to_pointers i det tilfellet 
  * at poolen blir flyttet */
 
-static
-do_for_stack_pointers (doit)
-     void (*doit) ();
+static do_for_stack_pointers (void (*doit) ())
 {
   int i,
     ar,
@@ -57,10 +55,7 @@ do_for_stack_pointers (doit)
  * Dessuten kalles den ogs} fra add_to_pointers i det tilfellet 
  * at poolen blir flyttet */
 
-__do_for_each_pointer (p, doit, doit_notest)
-     __dhp p;
-     void (*doit) (),
-  (*doit_notest) ();
+void __do_for_each_pointer (__dhp p, void (*doit) (), void (*doit_notest) ())
 {
   __dhp *ph,
    *qh;
@@ -126,9 +121,7 @@ __do_for_each_pointer (p, doit, doit_notest)
 
 /* Denne rutinen finner st|rrelsen p} et data objekt inklusive alignment */
 
-static long
-get_size (p)
-     __dhp p;
+static long get_size (__dhp p)
 {
   long size;
   switch ((int) p->pp)
@@ -163,9 +156,7 @@ static __dhp p;
  * hjelp av GB-ordet. Objekter blir kjedet inn rett bak p.
  * P peker en hver tid p} det objektet som er under prosessering. */
 
-static
-do_add_to_list (qp)
-     __dhp *qp;
+static do_add_to_list (__dhp *qp)
 {
   __dhp q;
   if ((q = *qp) != __NULL)
@@ -186,9 +177,7 @@ do_add_to_list (qp)
  * til et objekt ligger i objektets GB-ord. 
  * Denne informasjonen er lagt i GB-ordet av GBC pass 2 */
 
-static
-do_update_pointer (qp)
-     __dhp *qp;
+static do_update_pointer (__dhp *qp)
 {
   if (*qp != __NULL)
     *qp = (*qp)->gl;
@@ -203,8 +192,7 @@ do_update_pointer (qp)
  * 3. pass oppdaterer pekere
  * 4. pass skyver de aksesserbare objektene sammen */
 
-void
-__rgbc ()
+void __rgbc (void)
 {
   static __dhp hppp;
   static __dhp hpp;
@@ -334,16 +322,13 @@ static long disp;
 static char *new_fri,
  *new_min;
 
-static
-do_add_to_pointer (qp)
-     __dhp *qp;
+static do_add_to_pointer (__dhp *qp)
 {
   if (*qp >= __min & *qp < __fri)
     *qp = (__dhp) ((char *) (*qp) + disp);
 }
 
-static
-add_to_pointers ()
+static add_to_pointers (void)
 {
   char *p;
 
@@ -377,9 +362,7 @@ add_to_pointers ()
  * Blir poolen flyttet s} blir add_to_pointers kalt for } oppdatere pekere,
  * og nytt omr}de blir fylt med nuller. */
 
-__dhp
-__ralloc (size)
-     long size;
+__dhp __ralloc (long size)
 {
   void __rgbc ();
   static __dhp mem;

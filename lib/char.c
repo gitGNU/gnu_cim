@@ -22,9 +22,7 @@
 /******************************************************************************
                                           CHARACTER PROCEDURE CHAR(i)        */
 
-char 
-__rchar (i)
-     long i;
+char __rchar (long i)
 {
   if (i < 0 || i > 255)
     __rerror ("Char: Parameter outside limits");

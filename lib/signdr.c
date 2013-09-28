@@ -23,9 +23,7 @@
 /******************************************************************************
                                               INTEGER PROCEDURE SIGN(r)      */
 
-long 
-__rsigndr (e,f)
-     double e,f;
+long __rsigndr (double e, double f)
 {
   return ((e > f) ? 1 : (e < f) ? -1 : 0);
 }

@@ -40,9 +40,7 @@
 #define DATETIMETEXTLENGTH 19L
 #endif
 
-__txtvp 
-__rdatetime (as)
-     long as;
+__txtvp __rdatetime (long as)
 {
 #if HAVE_GETTIMEOFDAY
   struct timeval tip;

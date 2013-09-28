@@ -23,10 +23,7 @@
 /******************************************************************************
                                          PROCEDURE LOCATE(i)                 */
 
-__dhp 
-__rdblocate (p, i)
-     __bs10FILE *p;
-     long i;
+__dhp __rdblocate (__bs10FILE *p, long i)
 {
   if ((i < 1) | (i > p->maxloc))
     __rerror ("Locate: Parameter out of range");

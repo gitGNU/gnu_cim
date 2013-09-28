@@ -25,9 +25,7 @@
 /******************************************************************************
                                          BOOLEAN PROCEDURE OPEN              */
 
-char 
-__robopen (p)
-     __bs9FILE *p;
+char __robopen (__bs9FILE *p)
 {
   if (!((__bs1FILE *) p)->open)
     {

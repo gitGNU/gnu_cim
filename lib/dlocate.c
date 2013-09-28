@@ -23,10 +23,7 @@
 /******************************************************************************
                                          PROCEDURE LOCATE                    */
 
-__dhp 
-__rdlocate (p, i)
-     __bs5FILE *p;
-     long i;
+__dhp __rdlocate (__bs5FILE *p, long i)
 {
   if ((i < 1) | (i > p->maxloc))
     __rerror ("Locate: Parameter out of range");

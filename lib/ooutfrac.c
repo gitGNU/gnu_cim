@@ -23,12 +23,7 @@
 /******************************************************************************
                                        PROCEDURE OUTFRAC(i,n,w)              */
 
-__dhp 
-__rooutfrac (p, i, n, w)
-     __bs2FILE *p;
-     long i;
-     long n,
-       w;
+__dhp __rooutfrac (__bs2FILE *p, long i, long n, long  w)
 {
   __txt ti;
   long k;

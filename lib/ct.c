@@ -33,9 +33,7 @@
  *               som ligger p} rt-stakkene.
  * Returnerer: Ingen ting. */
 
-void
-__rct (as)
-     long as;
+void __rct (long as)
 {
   __dhp x;
   if (as)

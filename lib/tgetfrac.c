@@ -22,9 +22,7 @@
 /******************************************************************************
                                   INTEGER PROCEDURE GETFRAC (text attributt) */
 
-long 
-__rtgetfrac (t)
-     __txtvp t;
+long __rtgetfrac (__txtvp t)
 {
   char *s;
   int sign;

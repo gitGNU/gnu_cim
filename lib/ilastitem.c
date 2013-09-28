@@ -23,9 +23,7 @@
 /******************************************************************************
                                          BOOLEAN PROCEDURE LASTITEM          */
 
-char 
-__rilastitem (p)
-     __bs2FILE *p;
+char __rilastitem (__bs2FILE *p)
 {
   char c;
   if (p->IMAGE.obj == __NULL)

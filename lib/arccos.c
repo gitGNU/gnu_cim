@@ -23,9 +23,7 @@
 /******************************************************************************
                                              REAL PROCEDURE ARCCOS(r)        */
 
-double 
-__rarccos (r)
-     double r;
+double __rarccos (double r)
 {
   return (acos (r));
 }

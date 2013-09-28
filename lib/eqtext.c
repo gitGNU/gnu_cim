@@ -21,10 +21,7 @@
 /******************************************************************************
                                                  Runtine for = og <> testen  */
 
-char 
-__reqtext (t1x, t2x)
-     __txtvp t1x,
-       t2x;
+char __reqtext (__txtvp t1x, __txtvp t2x)
 {
   long i = 0;
   register char *p1x,

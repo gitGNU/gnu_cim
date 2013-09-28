@@ -38,12 +38,7 @@
  * ret, mret -> Returadressen
  * Returnerer: Peker til prototypen i pp og prosedyrens statiske link i sl*/
 
-char
-__rgetproc (p, as, ret, mret)
-     __procname *p;
-     long as;
-     int ret;
-     void (*mret) ();
+char __rgetproc (__procname *p, long as, int ret, void (*mret) ())
 {
   switch (p->namekind)
     {

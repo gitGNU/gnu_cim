@@ -22,12 +22,7 @@
 /******************************************************************************
                                                         RutineExchange       */
 
-void
-__rexchange (sh, ob, ret, mret)
-     __dhp sh,
-       ob;
-     int ret;
-     void (*mret) ();
+void __rexchange (__dhp sh, __dhp ob, int ret, void (*mret) ())
 {
   __goto = ob->ex;
   __lb = ob->dl;

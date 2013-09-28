@@ -22,9 +22,7 @@
 /******************************************************************************
                                                         RutineSaveStack      */
 
-void
-__rss (as)
-     long as;
+void __rss (long as)
 {
   long size,
     i,

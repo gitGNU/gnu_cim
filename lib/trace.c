@@ -22,8 +22,7 @@
 /******************************************************************************
                                                                RutineTRACE   */
 
-void
-__rtrace ()
+void __rtrace (void)
 {
   __rprintfilline ();
   (void) fprintf (stderr, "TRACE:\n");

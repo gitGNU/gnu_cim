@@ -23,9 +23,7 @@
 /******************************************************************************
                                            INTEGER PROCEDURE MAXLOC          */
 
-long 
-__rdbmaxloc (p)
-     __bs10FILE *p;
+long __rdbmaxloc (__bs10FILE *p)
 {
   return (p->maxloc);
 }

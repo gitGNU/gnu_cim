@@ -18,15 +18,11 @@
  */
 
 #include "file.h"
-#include "simfile.h"
 
 /******************************************************************************
                                                     RUTINEOPTIONS            */
 
-static char
-__roptions (antarg, arg1)
-     long antarg;
-     char arg1[];
+static char __roptions (long antarg, char arg1[])
 {
   long i,
     size = 0;
@@ -57,9 +53,7 @@ __roptions (antarg, arg1)
 /******************************************************************************
                                                          RutineAllocDynMem   */
 
-static void
-__rallocdynmem (size)
-     long size;
+static void __rallocdynmem (long size)
 {
   __min = (__dhp) calloc ((unsigned) (size), (unsigned) 1);
   if (!__min)
@@ -77,24 +71,21 @@ __rallocdynmem (size)
 #endif
 
 #if HAVE_SIGFPE
-RETSIGTYPE
-__rfloat_trap ()
+RETSIGTYPE __rfloat_trap (void)
 {
   __rerror ("Arithmetic overflow");
 }
 #endif
 
 #if HAVE_SIGSEGV
-RETSIGTYPE
-__rseg_trap ()
+RETSIGTYPE __rseg_trap (void)
 {
   __rerror ("System error: Segmentation violation");
 }
 #endif
 
 #if HAVE_SIGILL
-RETSIGTYPE
-__rillegal_trap ()
+RETSIGTYPE __rillegal_trap (void)
 {
   __rerror ("System error: Illegal instruction");
 }
@@ -102,31 +93,26 @@ __rillegal_trap ()
 #endif
 
 #if HAVE_SIGTRAP
-RETSIGTYPE
-__rtrace_trap ()
+RETSIGTYPE __rtrace_trap (void)
 {
   __rerror ("System error: Trace trap");
 }
 #endif
 
 #if HAVE_SIGSYS
-RETSIGTYPE
-__rsys_trap ()
+RETSIGTYPE __rsys_trap (void)
 {
   __rerror ("System error: Bad argument to system call");
 }
 #endif
 
 #if HAVE_SIGBUS
-RETSIGTYPE
-__rbus_trap ()
+RETSIGTYPE __rbus_trap (void)
 {
   __rerror ("System error: Bus error");
 }
 #endif
-__rstart (argc, argv)
-     int argc;
-     char *argv[];
+void __rstart (int argc, char *argv[])
 {
 #if CLOCK
   clock ();
@@ -189,7 +175,7 @@ __rstart (argc, argv)
 
 /******************************************************************************
                                                                RUTINESLUTT   */
-__rslutt ()
+void __rslutt (void)
 {
   if (__gc && ((__bs1FILE *) __blokk0FILE.c2)->open)
     {

@@ -23,9 +23,7 @@
 /******************************************************************************
                                                  PROCEDURE INIMAGE           */
 
-__dhp 
-__riinimage (p)
-     __bs2FILE *p;
+__dhp __riinimage (__bs2FILE *p)
 {
   long i,
     j;

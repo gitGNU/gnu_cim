@@ -22,10 +22,7 @@
 /******************************************************************************
                                          PROCEDURE OUTBYTE(x)                */
 
-__dhp 
-__roboutbyte (p, x)
-     __bs9FILE *p;
-     long x;
+__dhp __roboutbyte (__bs9FILE *p, long x)
 {
   if (!((__bs1FILE *) p)->open)
     __rerror ("Outbyte: File closed");

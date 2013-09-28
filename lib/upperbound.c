@@ -22,10 +22,7 @@
 /******************************************************************************
    		  			  INTEGER PROCEDURE UPPERBOUND(A,I)  */
 
-long 
-__rupperbound (a, i)
-     __arrp a;
-     long i;
+long __rupperbound (__arrp a, long i)
 {
   if (i < 1 || i > a->h.dim)
     __rerror ("Upperbound: Illegal dimension");

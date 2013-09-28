@@ -23,9 +23,7 @@
 /******************************************************************************
                                              REAL PROCEDURE ARCSIN(r)        */
 
-double 
-__rarcsin (r)
-     double r;
+double __rarcsin (double r)
 {
   return (asin (r));
 }
