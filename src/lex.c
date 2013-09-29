@@ -383,7 +383,7 @@ void print_lexsymbol (int lextok, YYSTYPE *yylvalp)
 	printf ("'%c' ", (char) yylvalp->ival);
       break;
     case HTEXTKONST:
-      sprintf ((char *) yytext, "\"%s\"", yylvalp->ival);
+      sprintf ((char *) yytext, "\"%s\"", yylvalp->tval);
       for (yyleng = 0; yytext[yyleng]; yyleng++)
 	if (yytext[yyleng] == '\\')
 	  {
