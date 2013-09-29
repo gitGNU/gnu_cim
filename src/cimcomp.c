@@ -584,7 +584,7 @@ static int parseoptions (int argc, char *argv[])
 /******************************************************************************
                                                                         MAIN */
 
-main (int argc, char *argv[], char envp[])
+main (int argc, char *argv[], char *envp[])
 {
   char *archname;
   char *kom;
