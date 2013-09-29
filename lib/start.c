@@ -20,6 +20,10 @@
 #define INCLUDE_SIMFILE_H
 #include "file.h"
 
+#if STDC_HEADERS
+#include <stdlib.h>
+#endif
+
 /******************************************************************************
                                                     RUTINEOPTIONS            */
 

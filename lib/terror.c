@@ -18,8 +18,12 @@
  */
 
 #include "cim.h"
+#include "config.h"
 
 #include <stdio.h>
+#if STDC_HEADERS
+#include <stdlib.h>
+#endif
 
 /******************************************************************************
                                                       PROCEDURE TERROR	     */

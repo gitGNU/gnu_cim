@@ -19,7 +19,7 @@
 
 #include "cim.h"
 #include <stdio.h>
-#include "../config.h"
+#include "config.h"
 
 /******************************************************************************
                                               TEXT PROCEDURE DATETIME        */

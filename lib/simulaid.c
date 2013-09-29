@@ -18,7 +18,7 @@
  */
 
 #include "cim.h"
-#include "../config.h"
+#include "config.h"
 
 /******************************************************************************
                                               TEXT PROCEDURE SIMULAID        */
@@ -30,8 +30,16 @@ extern char *__progname;
 #define MAX_PROGNAME_LEN 100
 #define MAX_SIMULAID_LEN (100+MAX_SITEID_LEN+MAX_HOSTNAME_LEN\
 			  +3*MAX_INT_LEN+MAX_PROGNAME_LEN)
+
+#include <stdio.h>
 #if HAVE_SYS_UTSNAME_H
 #include <sys/utsname.h>
+#endif
+
+#if STDC_HEADERS || HAVE_STRING_H
+#include <string.h>
+#else
+#include <strings.h>
 #endif
 
 __txtvp __rsimulaid (long as)

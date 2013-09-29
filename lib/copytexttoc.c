@@ -26,6 +26,12 @@
  * C-prosedyre. Rutinen allokerer plass i C-space ved } bruke malloc, for s}
  * } kopiere teksten over i dette omr}det. Teksten blir terminert med 0 */
 
+#if STDC_HEADERS || HAVE_STRING_H
+#include <string.h>
+#else
+#include <strings.h>
+#endif
+
 char *__rcopytexttoc (__txtvp t)
 {
   char *p;

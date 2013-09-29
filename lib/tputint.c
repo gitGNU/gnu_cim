@@ -18,6 +18,15 @@
  */
 
 #include "cim.h"
+#include <stdio.h>
+#include "config.h"
+
+#if STDC_HEADERS || HAVE_STRING_H
+#include <string.h>
+#else
+#include <strings.h>
+#endif
+
 /******************************************************************************
                                  PROCEDURE PUTINT (text attributt)          */
 

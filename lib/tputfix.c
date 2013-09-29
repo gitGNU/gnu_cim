@@ -20,6 +20,14 @@
 #include "cim.h"
 #include "config.h"
 
+#if STDC_HEADERS || HAVE_STRING_H
+#include <string.h>
+#else
+#include <strings.h>
+#endif
+
+#include <stdio.h>
+
 /******************************************************************************
                                  PROCEDURE PUTFIX (text attributt)           */
 

@@ -23,6 +23,7 @@
 /******************************************************************************
                                              REAL PROCEDURE ARCTAN2(r)       */
 
+#include <math.h>
 double __rarctan2 (double r, double s)
 {
   return (atan2 (r, s));

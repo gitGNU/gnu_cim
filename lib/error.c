@@ -18,6 +18,10 @@
  */
 
 #include "file.h"
+#if STDC_HEADERS
+#include <stdlib.h>
+#endif
+
 
 /******************************************************************************
                                                                 RutineERROR  */

@@ -19,6 +19,14 @@
 
 #include "cim.h"
 #include "align.h"
+#include "config.h"
+
+#if STDC_HEADERS || HAVE_STRING_H
+#include <string.h>
+#else
+#include <strings.h>
+#endif
+
 
 /******************************************************************************
                                                         RutineBlockEnd       */

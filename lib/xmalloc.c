@@ -18,8 +18,11 @@
  */
 
 #include "cim.h"
+#include "config.h"
 
-extern char *malloc();
+#if STDC_HEADERS
+#include <stdlib.h>
+#endif
 
 char *xmalloc (unsigned int size)
 {
