@@ -480,6 +480,20 @@ typedef struct
   }
 __map;
 
+#ifdef INCLUDE_SIMFILE_H
+#include "simfile.h"
+#else
+typedef void __bs1FILE;
+typedef void __bs2FILE;
+typedef void __bs4FILE;
+typedef void __bs5FILE;
+typedef void __bs6FILE;
+typedef void __bs7FILE;
+typedef void __bs8FILE;
+typedef void __bs9FILE;
+typedef void __bs10FILE;
+#endif
+
 /******************************************************************************
                                                           External variables */
 

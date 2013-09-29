@@ -17,8 +17,8 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#define INCLUDE_SIMFILE_H
 #include "cim.h"
-#include "simfile.h"
 
 /******************************************************************************
                                                               MORE           */

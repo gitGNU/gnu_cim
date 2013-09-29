@@ -16,10 +16,10 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA. */
 
+#define INCLUDE_SIMFILE_H
 #include "config.h"
 #include "cim.h"
 #include "limit.h"
-#include "simfile.h"
 
 #if STDC_HEADERS
 #include <stdlib.h>

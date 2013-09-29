@@ -17,8 +17,8 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#define INCLUDE_SIMFILE_H
 #include "file.h"
-#include "simfile.h"
 
 /* LASTITEM, INCHAR, INTEXT, ININT, INREAL og INFRAC er lik de i INFILE
  * OUTCHAR, OUTTEXT, OUTINT, OUTREAL, OUTFRAC og OUTFIX er lik de i OUTFILE */
