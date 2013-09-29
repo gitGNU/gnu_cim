@@ -115,7 +115,7 @@ static void module_gen (sent_t *sent)
     }
   else
     {
-      fprintf (ccode, "int %s(int __argc, char *__argv[]) {"
+      fprintf (ccode, "int %s(int __argc, char *__argv[]){"
 	       "__progname= __argv[0];"
 	       ,mainroutine);
 
@@ -224,7 +224,7 @@ static void prblock_gen (sent_t *sent)
   
   sent_list_gen (sent, sent->cblock->ent+1);
   if (not_reached == FALSE)
-    fprintf (ccode, "__rendclass(%d);", sent->cblock->quant.plev);
+    fprintf (ccode, "__rendclass(%ld);", sent->cblock->quant.plev);
   exitlabel (labexit);
 }
 
@@ -274,7 +274,7 @@ static void class_gen (sent_t *sent)
   fprintf (ccode, "/* START CLASS %s */", sent->cblock->quant.ident);
   sent_list_gen (sent, sent->cblock->ent+1);
   genline ();
-  fprintf (ccode, "__rendclass(%d);", sent->cblock->quant.plev);
+  fprintf (ccode, "__rendclass(%ld);", sent->cblock->quant.plev);
   gotoswitch ();
   fprintf (ccode, "/* SLUTT CLASS %s */", sent->cblock->quant.ident);
 }
@@ -361,7 +361,7 @@ static void when_gen (sent_t *sent, int labexit)
   cblock= sent->cblock;
   cblev= cblock->blev;
 
-  fprintf (ccode, "if(__pp->plev < %d || __pp->pref[%d]!= ", 
+  fprintf (ccode, "if(__pp->plev < %ld || __pp->pref[%ld]!= ", 
 	   sent->exp->rd->plev, sent->exp->rd->plev);
 
   gen_adr_prot (ccode, sent->exp->rd);
@@ -635,7 +635,7 @@ static void goto_gen (sent_t *sent)
 static void inner_gen (sent_t *sent, int lab)
 {
   genline ();
-  fprintf (ccode, "__rinner(%d);", sent->cblock->quant.plev);
+  fprintf (ccode, "__rinner(%ld);", sent->cblock->quant.plev);
   exitlabel (lab+1);
 }
 
@@ -673,9 +673,9 @@ static void procedure_entry_gen (sent_t *sent)
 			  ,rd->encl->blno,rd->ident);
 	  fprintf (ccode, ")!=__NULL && (");
 	  if (rd->prefqual->plev >= DEF_PLEV_TAB_SIZE)
-	    fprintf (ccode, "__bp->pp->plev<%d || ",
+	    fprintf (ccode, "__bp->pp->plev<%ld || ",
 			    rd->prefqual->plev);
-	  fprintf (ccode, "__bp->pp->pref[%d]!= ",
+	  fprintf (ccode, "__bp->pp->pref[%ld]!= ",
 			  rd->prefqual->plev);
 	  gen_adr_prot (ccode, rd->prefqual);
 	  fprintf (ccode, "))?(__dhp)__rerror(__errqual):__bp);");
@@ -869,7 +869,7 @@ static void enddecl_gen (sent_t *sent, int lab)
   else
     not_reached= FALSE;
 
-  fprintf (ccode, "__renddecl(%d);", sent->cblock->quant.plev);
+  fprintf (ccode, "__renddecl(%ld);", sent->cblock->quant.plev);
   exitlabel (lab);
 }
 

@@ -660,7 +660,7 @@ static void genlabelparexp (exp_t *rex, exp_t *formellpar, char thunk)
       else
 	fprintf (ccode, "((__bs%d *)__pb)->%s.adr.ent=",
 			formellpar->rd->encl->blno, formellpar->rd->ident);
-      fprintf (ccode, "%d;", rex->rd->plev);
+      fprintf (ccode, "%ld;", rex->rd->plev);
 
       if (thunk)
 	fprintf (ccode, "__ev.adr.ment=");
@@ -787,7 +787,7 @@ static void genlabelswitchpar (exp_t *rex)
 	  if (rex->left->rd->plev == 0)
 	    rex->left->rd->plev = newlabel ();
 	  
-	  fprintf (ccode, "((__bs%d *)__pb)->%s.adr.ent=%d;"
+	  fprintf (ccode, "((__bs%d *)__pb)->%s.adr.ent=%ld;"
 		   "((__bs%d *)__pb)->%s.ob=",
 		   rex->rd->encl->blno, rex->rd->ident,
 		   rex->left->rd->plev,

@@ -365,7 +365,7 @@ void print_lexsymbol (int lextok, YYSTYPE *yylvalp)
       printf ("& ");
       break;
     case HINTEGERKONST:
-      printf ("%d ", yylvalp->ival);
+      printf ("%ld ", yylvalp->ival);
       break;
     case HREALKONST:
       sprintf ((char *) yytext, "%.16e", yylvalp->rval);
@@ -379,7 +379,7 @@ void print_lexsymbol (int lextok, YYSTYPE *yylvalp)
     case HCHARACTERKONST:
       if (iscntrl (yylvalp->ival)
 	  || yylvalp->ival == '\'')
-	printf ("'!%d!'", yylvalp->ival);
+	printf ("'!%ld!'", yylvalp->ival);
       else
 	printf ("'%c' ", yylvalp->ival);
       break;

@@ -103,7 +103,7 @@ static char *first_object_allocated_ptr_extspec;
 #define NO_MARKER '$'
 #define inchar(f) getc(f)
 #define getval(f, i)  { int tmp;fscanf(f,"%d",&tmp);i=tmp;}
-#define getconst(f, i)  { fscanf(f,"%d",&i);}
+#define getconst(f, i)  { fscanf(f,"%ld",&i);}
 
 /******************************************************************************
                                                               INITEXTSPEC    */
@@ -753,12 +753,12 @@ static write_decl_mif (FILE *f, decl_t *rd, int level)
 		  s[i]='&';
 		  break;
 		}
-	    fprintf (f, s);
+	    fprintf (f, "%s", s);
 	  }
 	else if (rd->type == TCHAR)
 	  write_char_mif (f, rd->value.ival);
 	else
-	  fprintf (f, "= %d", rd->value.ival);
+	  fprintf (f, "= %ld", rd->value.ival);
       if (rd->kind == KARRAY && rd->type != TLABEL)
 	{
 	  int i;
@@ -917,17 +917,17 @@ static write_decl_ext (FILE *f, decl_t *rd)
       if (rd->type == TREF)
 	fprintf (f, "%s ", rd->prefqual->ident);
       else if (rd->type == TLABEL)
-	fprintf (f, "%d", rd->plev);
+	fprintf (f, "%ld", rd->plev);
 
       if (rd->categ == CCONST)
 	if (rd->type == TTEXT)
-	  fprintf (f, "%d %s "
+	  fprintf (f, "%ld %s "
 			  ,strlen (rd->value.tval.txt)
 			  ,rd->value.tval.txt);
 	else if (rd->type == TREAL)
 	  fprintf (f, "%.16e ", rd->value.rval);
 	else
-	  fprintf (f, "%d ", rd->value.ival);
+	  fprintf (f, "%ld ", rd->value.ival);
       if (rd->kind == KARRAY)
 	fprintf (f, "%c", (rd->dim + ((short) '0')));
     }

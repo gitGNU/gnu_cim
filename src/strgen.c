@@ -512,15 +512,15 @@ static blockstructure (block_t *rb)
 				rd->match->plev = newlabel ();
 
 			      if (rd->match->encl->timestamp != 0)
-				fprintf (ccode, "%d,__m_%s,",
+				fprintf (ccode, "%ld,__m_%s,",
 					 rd->match->plev,
 					 rd->match->encl->timestamp);
 			  
 			      else if (separat_comp)
-				fprintf (ccode, "%d,__m_%s,",
+				fprintf (ccode, "%ld,__m_%s,",
 					 rd->match->plev, timestamp);
 			      else
-				fprintf (ccode, "%d,__NULL,",
+				fprintf (ccode, "%ld,__NULL,",
 					 rd->match->plev);
 			    }
 			  else
@@ -531,7 +531,7 @@ static blockstructure (block_t *rb)
 		}
 	    }
 
-	  fprintf (ccode, "extern __ptyp __p%d%s;__pty   __pl%d%s[%d]={", 
+	  fprintf (ccode, "extern __ptyp __p%d%s;__pty   __pl%d%s[%ld]={", 
 		   rb->blno, timestamp,
 		   rb->blno, timestamp,
 		   (rb->quant.prefqual==NULL)?1:
@@ -539,7 +539,7 @@ static blockstructure (block_t *rb)
 		    rb->quant.plev + 1 : DEF_PLEV_TAB_SIZE));
 	  skrivprefikspp (&rb->quant);
 
-	  fprintf (ccode, "};\n__ptyp __p%d%s={'%c',%d,%d,sizeof(__bs%d),%d,",
+	  fprintf (ccode, "};\n__ptyp __p%d%s={'%c',%ld,%d,sizeof(__bs%d),%d,",
 		   rb->blno, timestamp,
 		   rb->quant.kind,
 		   rb->quant.plev,

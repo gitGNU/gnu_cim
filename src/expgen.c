@@ -345,7 +345,7 @@ void genvalue (exp_t *re)
 
       {
 	long l;
-	fprintf (ccode, "__rccb(%d,", l = newlabel ());
+	fprintf (ccode, "__rccb(%ld,", l = newlabel ());
 	genmodulemark(NULL);
 	fprintf (ccode, ");");
 	if (separat_comp && re->rd->descr->timestamp)
@@ -1030,7 +1030,7 @@ void genvalue (exp_t *re)
 	      if (re->rd->encl->timestamp != 0)
 		{
 		  /* Skal hoppe til en label i en annen modul */
-		  fprintf (ccode, "__goto.ent=%d;__goto.ment=", 
+		  fprintf (ccode, "__goto.ent=%ld;__goto.ment=", 
 			   re->rd->plev);
 		  genmodulemark(re->rd->encl->timestamp);
 		  fprintf (ccode, ";");
@@ -1218,10 +1218,10 @@ void genvalue (exp_t *re)
 	  fprintf (ccode, ")");
 	}
       if (re->qual->plev >= DEF_PLEV_TAB_SIZE)
-	fprintf (ccode, "->pp->plev<%d || __bp",
+	fprintf (ccode, "->pp->plev<%ld || __bp",
 			re->qual->plev);
 
-      fprintf (ccode, "->pp->pref[%d] != ",
+      fprintf (ccode, "->pp->pref[%ld] != ",
 		      re->qual->plev);
       gen_adr_prot (ccode, re->qual);
       fprintf (ccode, ")?(__dhp)__rerror(__errqual):__bp)");
@@ -1251,9 +1251,9 @@ void genvalue (exp_t *re)
 	  genvalue (re->left);
 	  fprintf (ccode, ")!=__NULL && (");
 	  if (re->qual->plev >= DEF_PLEV_TAB_SIZE)
-	    fprintf (ccode, "__bp->pp->plev<%d || ",
+	    fprintf (ccode, "__bp->pp->plev<%ld || ",
 			    re->qual->plev);
-	  fprintf (ccode, "__bp->pp->pref[%d]!= ",
+	  fprintf (ccode, "__bp->pp->pref[%ld]!= ",
 			  re->qual->plev);
 	  gen_adr_prot (ccode, re->qual);
 	  fprintf (ccode, "))?(__dhp)__rerror(__errqual):__bp)");
