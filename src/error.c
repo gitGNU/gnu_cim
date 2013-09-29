@@ -37,6 +37,14 @@
 #include <stdlib.h>
 #endif
 
+#include "config.h"
+
+#if STDC_HEADERS || HAVE_STRING_H
+#include <string.h>
+#else
+#include <strings.h>
+#endif
+
 int anterror;
 
 /******************************************************************************

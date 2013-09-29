@@ -23,11 +23,16 @@
 #include "extspec.h"
 #include "newstr.h"
 #include "filelist.h"
+#include "config.h"
+
+#if STDC_HEADERS
+#include <stdlib.h>
+#endif
+
 #include <obstack.h>
 #include "mapline.h"
 
 char *xmalloc();
-void free();
 
 #define obstack_chunk_alloc xmalloc
 #define obstack_chunk_free free

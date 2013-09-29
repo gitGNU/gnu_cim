@@ -30,9 +30,9 @@
 
 #if STDC_HEADERS || HAVE_STRING_H
 #include <string.h>
-#else /* not STDC_HEADERS and not HAVE_STRING_H */
+#else
 #include <strings.h>
-#endif /* not STDC_HEADERS and not HAVE_STRING_H */
+#endif
 
 #ifdef TIME_WITH_SYS_TIME
 #include <sys/time.h>
@@ -53,7 +53,6 @@ double strtod ();
 
 #include <obstack.h>
 char *xmalloc();
-void free();
 
 #define obstack_chunk_alloc xmalloc
 #define obstack_chunk_free free

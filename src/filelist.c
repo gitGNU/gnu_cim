@@ -21,12 +21,16 @@
 #include "const.h"
 #include "newstr.h"
 #include "filelist.h"
+#include "config.h"
+
+#if STDC_HEADERS
+#include <stdlib.h>
+#endif
 
 #include <stdio.h>
 #include <obstack.h>
 
 char *xmalloc();
-void free();
 
 #define obstack_chunk_alloc xmalloc
 #define obstack_chunk_free free

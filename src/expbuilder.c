@@ -22,9 +22,19 @@
 #include "const.h"
 #include "builder.h"
 #include "salloc.h"
+#include "config.h"
+
+#if STDC_HEADERS || HAVE_STRING_H
+#include <string.h>
+#else
+#include <strings.h>
+#endif
+
+#if STDC_HEADERS
+#include <stdlib.h>
+#endif
 
 char *xmalloc();
-void free();
 
 #define obstack_chunk_alloc xmalloc
 #define obstack_chunk_free free

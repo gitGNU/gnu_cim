@@ -33,9 +33,9 @@
 
 #if STDC_HEADERS || HAVE_STRING_H
 #include <string.h>
-#else /* not STDC_HEADERS and not HAVE_STRING_H */
+#else
 #include <strings.h>
-#endif /* not STDC_HEADERS and not HAVE_STRING_H */
+#endif
 
 #if HAVE_UNISTD_H
 #include <unistd.h>

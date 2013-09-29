@@ -25,8 +25,6 @@
 #include <stdlib.h>
 #endif
 
-void free();
-
 #define obstack_chunk_alloc xmalloc
 #define obstack_chunk_free free
 

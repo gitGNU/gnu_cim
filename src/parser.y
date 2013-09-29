@@ -29,7 +29,6 @@
 #include <stdio.h>
 #include <obstack.h>
 char *xmalloc();
-void free();
 void yyerror (char s[]);
 #define obstack_chunk_alloc xmalloc
 #define obstack_chunk_free free
