@@ -47,6 +47,7 @@ struct _exp
 void ebuilder_init (void);
 void ebuilder_init_pass2 (void);
 
+exp_t *newexp (void);
 exp_t *makeexp (int token, exp_t *left, exp_t *right);
 exp_t *concexp (exp_t *left, exp_t *right);
 exp_t *replacenode (exp_t **rep, int token);

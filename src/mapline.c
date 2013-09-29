@@ -31,6 +31,7 @@
 
 #include <obstack.h>
 #include "mapline.h"
+#include "name.h"
 
 char *xmalloc();
 

@@ -21,6 +21,7 @@
 #include "builder.h"
 #include "checker.h"
 #include "expmacros.h"
+#include "name.h"
 
 static decl_t *absfunction;
 static decl_t *absfunctionr;
