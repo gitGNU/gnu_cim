@@ -30,4 +30,4 @@ test: stamp
 
 stamp: test.sim
 	$(CIM) $(CIMFLAGS) -c -e $(srcdir)/test.sim
-	$(LIBTOOL) $(CC) -o test test.o ../lib/libcim.la -lm
+	$(LIBTOOL) --tag=CC --mode=link $(CC) $(CFLAGS) -o test test.o ../lib/libcim.la -lm
