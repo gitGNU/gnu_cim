@@ -40,7 +40,7 @@ __txtvp __rtputreal (__txtvp t, double r, long n)
   if (t->obj->h.konstant)
     __rerror ("Putreal: Constant text object");
   s = t->obj->string;
-  (void) sprintf (fcs, "%%.%d%s", (n > 0) ? n - 1 : 0, "le");
+  (void) sprintf (fcs, "%%.%ld%s", (n > 0) ? n - 1 : 0, "le");
   (void) sprintf		/* ARGSUSED */
     (cs, fcs, r);
   if ((cs[0] == 'I') | (cs[1] == 'I'))	/* Test p} om det er lik uendelig */

@@ -40,7 +40,7 @@ __txtvp __rtputfix (__txtvp t, double r, long n)
   if (t->obj->h.konstant)
     __rerror ("Putfix: Constant text object");
   s = t->obj->string;
-  (void) sprintf (fcs, "%%.%d%s", n, "lf");
+  (void) sprintf (fcs, "%%.%ld%s", n, "lf");
   (void) sprintf (cs, fcs, r);
   if ((cs[0] == 'I') | (cs[1] == 'I'))	/* Test p} om det er lik uendelig */
     __rerror ("Illegal real number");

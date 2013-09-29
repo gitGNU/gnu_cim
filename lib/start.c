@@ -43,9 +43,9 @@ static char __roptions (long antarg, char arg1[])
     {
       __maxsize = __poolsize = size;
       if (arg1[1] == 'k' || arg1[1] == 'K')
-	(void) fprintf (stderr, "Poolsize is changed to %dK\n", __poolsize);
+	(void) fprintf (stderr, "Poolsize is changed to %ldK\n", __poolsize);
       else
-	(void) fprintf (stderr, "Poolsize is changed to %dM\n", 
+	(void) fprintf (stderr, "Poolsize is changed to %ldM\n", 
 			__poolsize / 1024);
     }
   return (__TRUE);
@@ -187,9 +187,9 @@ void __rslutt (void)
 	{
 	  printf (" Poolsize changed to ");
 	  if (__poolsize >= 1024)
-	    printf ("%dM while running.", __poolsize / 1024);
+	    printf ("%ldM while running.", __poolsize / 1024);
 	  else
-	    printf ("%dK while running.", __poolsize);
+	    printf ("%ldK while running.", __poolsize);
 	}
       printf ("\n");
 
