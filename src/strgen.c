@@ -712,7 +712,7 @@ static void do_for_each_stat_pointer (block_t *block)
     case KPRBLK:
       if (block->stat)
 	fprintf (ccode, "if(((__dhp)&__blokk%d%s)->gl!=__NULL|force)"
-		 "__do_for_each_pointer(&__blokk%d%s,doit,doit_notest);\n"
+		 "__do_for_each_pointer((__dhp)&__blokk%d%s,doit,doit_notest);\n"
 		 ,block->blno, timestamp, block->blno, 
 		 block->timestamp?block->timestamp:timestamp);
     }
@@ -814,18 +814,18 @@ void stat_pointers (void)
 
   if (!separat_comp)
     { /* TBD __init(){__init_FILE();__init_SIMENVIR(); should be removed */
-      fprintf (ccode, "\n__init(){__init_FILE();__init_SIMENVIR();}\n");
+      fprintf (ccode, "\nvoid __init(void){__init_FILE();__init_SIMENVIR();}\n");
       fprintf 
 	(ccode, 
-	 "__do_for_each_stat_pointer(doit,doit_notest,force)void(*doit)(),(*doit_notest)();int force;{\n");
+	 "__do_for_each_stat_pointer(void(*doit)(),void(*doit_notest)(),int force){\n");
 
       do_for_each_stat_pointer (sblock);
 
-      fprintf (ccode, "}\n__update_gl_to_obj(){\n");
+      fprintf (ccode, "}\nvoid __update_gl_to_obj(void){\n");
       update_gl_obj (sblock);
 
 
-      fprintf (ccode, "}\n__update_gl_to_null(){\n");
+      fprintf (ccode, "}\n__update_gl_to_null(void){\n");
       update_gl_null (sblock);
 
       fprintf (ccode, "}\n");

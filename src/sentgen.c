@@ -115,7 +115,7 @@ static void module_gen (sent_t *sent)
     }
   else
     {
-      fprintf (ccode, "%s(__argc,__argv)int __argc;char *__argv[];{"
+      fprintf (ccode, "int %s(int __argc, char *__argv[]) {"
 	       "__progname= __argv[0];"
 	       ,mainroutine);
 
