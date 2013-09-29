@@ -1035,7 +1035,7 @@ static putchartext ( unsigned char character)
 }
 
 /******************************************************************************
-                                   				GETTEXT      */
+                                   			  GETQUOTEDTEXT      */
 
 /* Denne rutinen bygger opp et internt konstant-tekstobjekt og returnerer
  * en peker til det. Teksten er bygget opp p} en slik m}te at den 
@@ -1047,7 +1047,7 @@ static putchartext ( unsigned char character)
  * Disser er sstrcmp() og sstrlen() (sjekker.c).
  */
 
-static char *gettext (void)
+static char *getquotedtext (void)
 {
   char *s;
 
@@ -1744,7 +1744,7 @@ int yylex (void)
 		    else
 		      {
 			unput (lexchar);
-			yylval.tval = gettext ();
+			yylval.tval = getquotedtext ();
 			notintext = TRUE;
 			return (HTEXTKONST);
 		      }
@@ -1754,7 +1754,7 @@ int yylex (void)
 	      {
 		antnewline++;
 		lerror (4);
-		yylval.tval = gettext ();
+		yylval.tval = getquotedtext ();
 		notintext = TRUE;
 		return (HTEXTKONST);
 	      }
@@ -1762,7 +1762,7 @@ int yylex (void)
 	      {
 		unput (lexchar);
 		lerror (5);
-		yylval.tval = gettext ();
+		yylval.tval = getquotedtext ();
 		notintext = TRUE;
 		return (HTEXTKONST);
 	      }
