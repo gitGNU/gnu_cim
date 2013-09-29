@@ -636,7 +636,7 @@ __dhp __ralloc (long size);
 
 
 void __rccb (int ret, void (*mret) ());
-void __rerror (char *s);
+void *__rerror (char *s);
 void __rct (long as);
 void __rslutt (void);
 void __rstart (int argc, char *argv[]);
