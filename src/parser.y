@@ -789,7 +789,7 @@ MBEE_CONSTANT	:	/* EMPTY */
 					  if(type==TREF)yerror (7);
 					  categ=CCONSTU;
 						  mout(MIDENTIFIER);
-						  mout_id($<token>0);} 
+						  mout_id($<ident>0);} 
 			EXPRESSION		{ mout(MASSIGN);
 						  mout(MCONST);}
 		;
