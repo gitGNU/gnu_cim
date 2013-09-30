@@ -70,7 +70,7 @@ void __do_for_each_pointer (__dhp p, void (*doit) (), void (*doit_notest) ())
   long i,
     j;
 
-  switch ((int) p->pp)
+  switch ((long int) p->pp)
     {
     case __TEXT:
       break;
@@ -131,7 +131,7 @@ void __do_for_each_pointer (__dhp p, void (*doit) (), void (*doit_notest) ())
 static long get_size (__dhp p)
 {
   long size;
-  switch ((int) p->pp)
+  switch ((long int) p->pp)
     {
     case __TEXT:
       size = ((__textref) p)->h.size + sizeof (__th) + 1;
