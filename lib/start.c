@@ -184,7 +184,7 @@ void __rslutt (void)
 {
   if (__gc && ((__bs1FILE *) __blokk0FILE.c2)->open)
     {
-      __rpoutimage (__blokk0FILE.c2);
+      __rpoutimage ((__bs6FILE *) __blokk0FILE.c2);
 
       printf ("%d garbage collection(s) in %.1f seconds.", __gc, __gbctime);
       if (__chpoolsize)
@@ -198,7 +198,7 @@ void __rslutt (void)
       printf ("\n");
 
     }
-  __riclose (__rsysin ());
-  __roclose (__rsysout ());
-  __roclose (__rsyserr ());
+  __riclose ((__bs1FILE *) __rsysin ());
+  __roclose ((__bs1FILE *) __rsysout ());
+  __roclose ((__bs1FILE *) __rsyserr ());
 }

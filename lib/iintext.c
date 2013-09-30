@@ -26,9 +26,8 @@
 __txtvp __riintext (long as, __bs2FILE *p, long w)
 {
   long i;
-  __er = (__dhp) p;
   (void) __rblanks (as, w);
   for (i = 0; i < w; i++)
-    __et.obj->string[i] = __riinchar (__er);
+    __et.obj->string[i] = __riinchar (p);
   return (&__et);
 }
