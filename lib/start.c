@@ -76,21 +76,21 @@ static void __rallocdynmem (long size)
 #endif
 
 #if HAVE_SIGFPE
-RETSIGTYPE __rfloat_trap (void)
+RETSIGTYPE __rfloat_trap (int ignore)
 {
   __rerror ("Arithmetic overflow");
 }
 #endif
 
 #if HAVE_SIGSEGV
-RETSIGTYPE __rseg_trap (void)
+RETSIGTYPE __rseg_trap (int ignore)
 {
   __rerror ("System error: Segmentation violation");
 }
 #endif
 
 #if HAVE_SIGILL
-RETSIGTYPE __rillegal_trap (void)
+RETSIGTYPE __rillegal_trap (int ignore)
 {
   __rerror ("System error: Illegal instruction");
 }
@@ -98,21 +98,21 @@ RETSIGTYPE __rillegal_trap (void)
 #endif
 
 #if HAVE_SIGTRAP
-RETSIGTYPE __rtrace_trap (void)
+RETSIGTYPE __rtrace_trap (int ignore)
 {
   __rerror ("System error: Trace trap");
 }
 #endif
 
 #if HAVE_SIGSYS
-RETSIGTYPE __rsys_trap (void)
+RETSIGTYPE __rsys_trap (int ignore)
 {
   __rerror ("System error: Bad argument to system call");
 }
 #endif
 
 #if HAVE_SIGBUS
-RETSIGTYPE __rbus_trap (void)
+RETSIGTYPE __rbus_trap (int ignore)
 {
   __rerror ("System error: Bus error");
 }
