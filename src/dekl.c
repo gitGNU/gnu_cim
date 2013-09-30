@@ -129,7 +129,7 @@ static decl_t *ppop(void)
     return (NULL);
 
   rd= * ((decl_t * *) obstack_next_free (&os_pref) - 1);
-  obstack_blank (&os_pref, - sizeof (void *));
+  obstack_blank (&os_pref, - (int) sizeof (void *));
   return (rd);
 }
 

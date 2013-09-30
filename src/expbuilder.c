@@ -188,7 +188,7 @@ static exp_t *epop(void)
 {
   exp_t *re;
   re= * ((exp_t * *)obstack_next_free (&os_stack) - 1);
-  obstack_blank (&os_stack, - sizeof (void *));
+  obstack_blank (&os_stack, - (int) sizeof (void *));
   return (re);
 }
 

@@ -58,7 +58,7 @@ static sent_t *spop(void)
 {
   sent_t *rs;
   rs= * ((sent_t * *)obstack_next_free (&os_stack) - 1);
-  obstack_blank (&os_stack, - sizeof (void *));
+  obstack_blank (&os_stack, - (int) sizeof (void *));
   rs->last_line= lineno;
   return (rs);
 }
