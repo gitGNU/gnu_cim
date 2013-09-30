@@ -115,43 +115,42 @@ char *progname;
 /******************************************************************************
                                                                TRAP-ROUTINES */
 #if HAVE_SIGFPE
-static RETSIGTYPE
-float_trap (void)
+static RETSIGTYPE float_trap (int ignore)
 {
   lerror (25);
 }
 #endif
 
 #if HAVE_SIGSEGV
-static RETSIGTYPE seg_trap (void)
+static RETSIGTYPE seg_trap (int ignore)
 {
   lerror (26);
 }
 #endif
 
 #if HAVE_SIGILL
-static RETSIGTYPE illegal_trap (void)
+static RETSIGTYPE illegal_trap (int ignore)
 {
   lerror (28);
 }
 #endif
 
 #if HAVE_SIGTRAP
-static RETSIGTYPE trace_trap (void)
+static RETSIGTYPE trace_trap (int ignore)
 {
   lerror (29);
 }
 #endif
 
 #if HAVE_SIGBUS
-static RETSIGTYPE bus_trap (void)
+static RETSIGTYPE bus_trap (int ignore)
 {
   lerror (27);
 }
 #endif
 
 #if HAVE_SIGSYS
-static RETSIGTYPE sys_trap (void)
+static RETSIGTYPE sys_trap (int ignore)
 {
   lerror (30);
 }
