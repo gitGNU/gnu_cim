@@ -146,18 +146,7 @@ struct obstack *_obstack;
    To recover from an out of memory error,
    free up some memory, then call this again.  */
 
-int
-_obstack_begin (h, size, alignment, chunkfun, freefun)
-     struct obstack *h;
-     int size;
-     int alignment;
-#if defined (__STDC__) && __STDC__
-     POINTER (*chunkfun) (long);
-     void (*freefun) (void *);
-#else
-     POINTER (*chunkfun) ();
-     void (*freefun) ();
-#endif
+int _obstack_begin (struct obstack *h, int size, int alignment, POINTER (*chunkfun) (long), void (*freefun) (void *))
 {
   register struct _obstack_chunk *chunk; /* points to new chunk */
 
@@ -204,19 +193,7 @@ _obstack_begin (h, size, alignment, chunkfun, freefun)
   return 1;
 }
 
-int
-_obstack_begin_1 (h, size, alignment, chunkfun, freefun, arg)
-     struct obstack *h;
-     int size;
-     int alignment;
-#if defined (__STDC__) && __STDC__
-     POINTER (*chunkfun) (POINTER, long);
-     void (*freefun) (POINTER, POINTER);
-#else
-     POINTER (*chunkfun) ();
-     void (*freefun) ();
-#endif
-     POINTER arg;
+int _obstack_begin_1 (struct obstack *h, int size, int alignment, POINTER (*chunkfun) (POINTER, long), void (*freefun) (POINTER, POINTER), POINTER arg)
 {
   register struct _obstack_chunk *chunk; /* points to new chunk */
 
@@ -270,10 +247,7 @@ _obstack_begin_1 (h, size, alignment, chunkfun, freefun, arg)
    Copies any partial object from the end of the old chunk
    to the beginning of the new one.  */
 
-void
-_obstack_newchunk (h, length)
-     struct obstack *h;
-     int length;
+void _obstack_newchunk (struct obstack *h, int length)
 {
   register struct _obstack_chunk *old_chunk = h->chunk;
   register struct _obstack_chunk *new_chunk;
@@ -334,16 +308,7 @@ _obstack_newchunk (h, length)
    This is here for debugging.
    If you use it in a program, you are probably losing.  */
 
-#if defined (__STDC__) && __STDC__
-/* Suppress -Wmissing-prototypes warning.  We don't want to declare this in
-   obstack.h because it is just for debugging.  */
-int _obstack_allocated_p (struct obstack *h, POINTER obj);
-#endif
-
-int
-_obstack_allocated_p (h, obj)
-     struct obstack *h;
-     POINTER obj;
+int _obstack_allocated_p (struct obstack *h, POINTER obj)
 {
   register struct _obstack_chunk *lp;	/* below addr of any objects in this chunk */
   register struct _obstack_chunk *plp;	/* point to previous chunk if any */
@@ -368,10 +333,7 @@ _obstack_allocated_p (h, obj)
 /* This function has two names with identical definitions.
    This is the first one, called from non-ANSI code.  */
 
-void
-_obstack_free (h, obj)
-     struct obstack *h;
-     POINTER obj;
+void _obstack_free (struct obstack *h, POINTER obj)
 {
   register struct _obstack_chunk *lp;	/* below addr of any objects in this chunk */
   register struct _obstack_chunk *plp;	/* point to previous chunk if any */
@@ -402,10 +364,7 @@ _obstack_free (h, obj)
 
 /* This function is used from ANSI code.  */
 
-void
-obstack_free (h, obj)
-     struct obstack *h;
-     POINTER obj;
+void obstack_free (struct obstack *h, POINTER obj)
 {
   register struct _obstack_chunk *lp;	/* below addr of any objects in this chunk */
   register struct _obstack_chunk *plp;	/* point to previous chunk if any */
@@ -434,9 +393,7 @@ obstack_free (h, obj)
     abort ();
 }
 
-int
-_obstack_memory_used (h)
-     struct obstack *h;
+int _obstack_memory_used (struct obstack *h)
 {
   register struct _obstack_chunk* lp;
   register int nbytes = 0;
@@ -460,8 +417,7 @@ _obstack_memory_used (h)
 # endif
 #endif
 
-static void
-print_and_abort ()
+static void print_and_abort (void)
 {
   fputs (_("memory exhausted\n"), stderr);
   exit (obstack_exit_failure);
