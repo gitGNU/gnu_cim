@@ -108,7 +108,7 @@ static void module_gen (sent_t *sent)
     {
       fprintf (ccode, "void ");
       genmodulemark(NULL);
-      fprintf (ccode, "(){");
+      fprintf (ccode, "(void){");
       if (!option_line)
 	fprintf (ccode, "__curent_map=__map%s;", timestamp);
       fprintf (ccode, "goto __s;");
