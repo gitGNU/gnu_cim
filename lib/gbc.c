@@ -163,7 +163,7 @@ static __dhp p;
  * hjelp av GB-ordet. Objekter blir kjedet inn rett bak p.
  * P peker en hver tid p} det objektet som er under prosessering. */
 
-static do_add_to_list (__dhp *qp)
+static void do_add_to_list (__dhp *qp)
 {
   __dhp q;
   if ((q = *qp) != __NULL)
@@ -184,7 +184,7 @@ static do_add_to_list (__dhp *qp)
  * til et objekt ligger i objektets GB-ord. 
  * Denne informasjonen er lagt i GB-ordet av GBC pass 2 */
 
-static do_update_pointer (__dhp *qp)
+static void do_update_pointer (__dhp *qp)
 {
   if (*qp != __NULL)
     *qp = (*qp)->gl;
@@ -222,16 +222,16 @@ void __rgbc (void)
   do_add_to_list (&__pb);
   do_add_to_list (&__sl);
   do_add_to_list (&__er);
-  do_add_to_list (&__t1.obj);
-  do_add_to_list (&__t2.obj);
+  do_add_to_list ((__dhp *) &__t1.obj);
+  do_add_to_list ((__dhp *) &__t2.obj);
 
   do_for_stack_pointers (do_add_to_list);
 
   __do_for_each_stat_pointer (do_add_to_list, do_add_to_list, __FALSE);
 
-  __do_for_each_pointer (&__sysin, do_add_to_list, do_add_to_list);
-  __do_for_each_pointer (&__sysout, do_add_to_list, do_add_to_list);
-  __do_for_each_pointer (&__syserr, do_add_to_list, do_add_to_list);
+  __do_for_each_pointer ((__dhp) &__sysin, do_add_to_list, do_add_to_list);
+  __do_for_each_pointer ((__dhp) &__sysout, do_add_to_list, do_add_to_list);
+  __do_for_each_pointer ((__dhp) &__syserr, do_add_to_list, do_add_to_list);
 
   while (p != &__nil)
     {
@@ -263,9 +263,9 @@ void __rgbc (void)
   do_for_stack_pointers (do_update_pointer);
 
   __do_for_each_stat_pointer (do_update_pointer, do_update_pointer, __FALSE);
-  __do_for_each_pointer (&__sysin, do_update_pointer, do_update_pointer);
-  __do_for_each_pointer (&__sysout, do_update_pointer, do_update_pointer);
-  __do_for_each_pointer (&__syserr, do_update_pointer, do_update_pointer);
+  __do_for_each_pointer ((__dhp) &__sysin, do_update_pointer, do_update_pointer);
+  __do_for_each_pointer ((__dhp) &__sysout, do_update_pointer, do_update_pointer);
+  __do_for_each_pointer ((__dhp) &__syserr, do_update_pointer, do_update_pointer);
 
   p = __min;
 
@@ -282,8 +282,8 @@ void __rgbc (void)
   do_update_pointer (&__pb);
   do_update_pointer (&__sl);
   do_update_pointer (&__er);
-  do_update_pointer (&__t1.obj);
-  do_update_pointer (&__t2.obj);
+  do_update_pointer ((__dhp *) &__t1.obj);
+  do_update_pointer ((__dhp *) &__t2.obj);
 
   /* PAS 4 */
   p = q = __min;
@@ -329,22 +329,22 @@ static long disp;
 static char *new_fri,
  *new_min;
 
-static do_add_to_pointer (__dhp *qp)
+static void do_add_to_pointer (__dhp *qp)
 {
   if (*qp >= __min & *qp < __fri)
     *qp = (__dhp) ((char *) (*qp) + disp);
 }
 
-static add_to_pointers (void)
+static void add_to_pointers (void)
 {
   char *p;
 
   do_for_stack_pointers (do_add_to_pointer);
 
   __do_for_each_stat_pointer (do_add_to_pointer, do_add_to_pointer, __TRUE);
-  __do_for_each_pointer (&__sysin, do_add_to_pointer, do_add_to_pointer);
-  __do_for_each_pointer (&__sysout, do_add_to_pointer, do_add_to_pointer);
-  __do_for_each_pointer (&__syserr, do_add_to_pointer, do_add_to_pointer);
+  __do_for_each_pointer ((__dhp) &__sysin, do_add_to_pointer, do_add_to_pointer);
+  __do_for_each_pointer ((__dhp) &__sysout, do_add_to_pointer, do_add_to_pointer);
+  __do_for_each_pointer ((__dhp) &__syserr, do_add_to_pointer, do_add_to_pointer);
 
   p = new_min;
 
