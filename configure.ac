@@ -16,15 +16,14 @@ dnl You should have received a copy of the GNU General Public License
 dnl along with this program; if not, write to the Free Software
 dnl Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA. */
 
-AC_REVISION($Revision: 1.16 $)dnl
 AC_INIT(cim, 4.3)
 AC_CONFIG_SRCDIR([src/cimcomp.c])
 AC_CONFIG_MACRO_DIR([m4])
 
 AC_CANONICAL_TARGET
-changequote(,)dnl
+changequote(,)
 target_os_x_version=`echo $target_os|sed -e 's/\([^0-9.]*\)[0-9.]*/\1/'`
-changequote([,])dnl
+changequote([,])
 AC_DEFINE_UNQUOTED(SYSTEM_TYPE,"$target", "Define the system type we are running")
 AC_DEFINE_UNQUOTED(CPU_TYPE,"`echo $target_cpu | tr a-z A-Z`", "Define cpu type derived from system type")
 AC_DEFINE_UNQUOTED(OS_TYPE_VERSION,"`echo $target_os | tr a-z A-Z`", "Define os type including version derived from system type")
@@ -48,7 +47,7 @@ dnl leave CURRENT and AGE unchanged (C:R:A becomes C:R+1:A)
 dnl
 dnl Else leave CURRENT, REVISION and AGE unchanged.
 
-LIB_CURRENT=3
+LIB_CURRENT=5
 LIB_REVISION=0
 LIB_AGE=0
 AC_SUBST(LIB_CURRENT)
@@ -105,5 +104,4 @@ AC_CONFIG_FILES([
     util/cim2latex
     util/cim2ps
     util/cimindent])
-AC_CONFIG_COMMANDS([default],[test -z "$CONFIG_HEADERS" || echo timestamp > stamp-h],[])
 AC_OUTPUT

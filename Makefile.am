@@ -21,7 +21,4 @@ ACLOCAL_AMFLAGS = -I m4
 SUBDIRS = doc man src lib util test 
 EXTRA_DIST = cim.spec
 
-
-
-
 noinst_HEADERS = limit.h

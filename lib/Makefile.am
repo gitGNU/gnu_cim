@@ -23,13 +23,11 @@ RANLIB=:
 CIM = $(top_builddir)/src/cim
 CIMFLAGS = -H -L -L$(srcdir) -I$(srcdir) -S
 
-lib_LIBRARIES = libcim-atr.a
+datadir = $(libdir)
+data_DATA = libcim-atr.a
 
-libcim_atr_a_SOURCES = 
-
-libcim_atr_a_LIBADD = $(srcdir)/simenvir.atr $(srcdir)/simfile.atr \
-                      $(srcdir)/simset.sim $(srcdir)/simulation.sim \
-                      $(srcdir)/simset.atr $(srcdir)/simulation.atr
+libcim-atr.a: $(srcdir)/simenvir.atr $(srcdir)/simfile.atr $(srcdir)/simset.atr $(srcdir)/simulation.atr
+	$(AR) -r libcim-atr.a $(srcdir)/simenvir.atr $(srcdir)/simfile.atr $(srcdir)/simset.atr $(srcdir)/simulation.atr
 
 simulation.c simulation.atr: simulation.sim simset.atr
 	$(CIM) $(CIMFLAGS) $(srcdir)/simulation.sim

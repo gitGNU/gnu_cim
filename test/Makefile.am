@@ -29,5 +29,8 @@ SUFFIXES = .sim
 test: stamp
 
 stamp: test.sim
-	$(CIM) $(CIMFLAGS) -c -e $(srcdir)/test.sim
+	$(CIM) $(CIMFLAGS) -c -e -t $(srcdir)/test.sim
 	$(LIBTOOL) --tag=CC --mode=link $(CC) $(CFLAGS) -o test test.o ../lib/libcim.la -lm
+
+clean-local:
+	-rm test test.o test.c test.shl
