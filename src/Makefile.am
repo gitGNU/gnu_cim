@@ -29,12 +29,13 @@ cim_SOURCES = error.c pargen.c name.c dekl.c linegen.c strgen.c \
 cim_LDADD = @ALLOCA@
 
 noinst_HEADERS = cimcomp.h const.h dekl.h gen.h name.h error.h \
-                 getopt.h parser.h filelist.h newstr.h lex.h \
+                 getopt.h filelist.h newstr.h lex.h \
                  extspec.h mellbuilder.h builder.h checker.h \
                  obstack.h mapline.h expmacros.h trans.h salloc.h \
                  passes.h dump.h
 
 AM_YFLAGS= -d
+BUILT_SOURCES = parser.h
 
 # Variables controlling compilation of the generated C-code
 SCC = $(CC)
