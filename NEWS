@@ -3,10 +3,19 @@ GNU Cim NEWS
 Copyright (C) 1997-99 Sverre Hvammen Johansen
 See the end for copying conditions.
 
+Version 5:
+
+* Verson 5 implements the compiler, runtime ststem, and the
+generated C code using prototyped functions.
+
+* Many bugfixes, especally bugs where int and long was used
+  incorrectly.  Such bugs shows up on 64-bit platforms where int is
+  32 bit but long is 64 bit.
+
 Version 4:
 
 * Version 4 is experimental. If you want a stable compiler, please use
-  version 3 instead. We are planing support for some more optimizations.
+  version 3 instead.
 
 Version 3:
 
