@@ -502,6 +502,7 @@ static void value_print (val_t value, int token)
     case MSIGNDI:
     case MSIGNDR:
     case MASSIGNADD:
+      break;
     }
 }
 
