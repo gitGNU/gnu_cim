@@ -101,7 +101,7 @@ static exp_t *savepar (exp_t *ret, exp_t *re, char up, char *ident,
 		    makeexp(rex->type==TTEXT? MREFASSIGNT:MASSIGN, 
 			    restack2=makeexp (MSTACK, NULL,NULL), re);
 		  
-		  restack1->value.entry= restack2->value.ival= stackno;
+		  restack1->value.entry= restack2->value.entry= stackno;
 		  restack1->type= restack2->type= type;
 		  return reconc;
 		}
@@ -138,13 +138,13 @@ static void findsubentry (exp_t *re)
       switch (re->type)
 	{
 	case TREF:
-	  usedentry[re->value.ival] |= USEDREF;
+	  usedentry[re->value.entry] |= USEDREF;
 	  break;
 	case TTEXT:
-	  usedentry[re->value.ival] |= USEDTXT;
+	  usedentry[re->value.entry] |= USEDTXT;
 	  break;
 	default:
-	  usedentry[re->value.ival] |= USEDVAL;
+	  usedentry[re->value.entry] |= USEDVAL;
 	  break;
 	}
       break;
