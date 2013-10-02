@@ -156,7 +156,7 @@ static RETSIGTYPE sys_trap (int ignore)
 }
 #endif
 
-static init_trap_routines(void)
+static void init_trap_routines(void)
 {
 #if HAVE_SIGFPE
   signal (SIGFPE, float_trap);
@@ -183,10 +183,7 @@ static init_trap_routines(void)
 
 #if HAVE_GETENV
 extern char *getenv ();
-static 
-xgetenv (name, var)
-     char *name;
-     char **var;
+static void xgetenv (char *name, char **var)
 {
   char *value;
   value = getenv (name);
