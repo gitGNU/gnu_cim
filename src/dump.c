@@ -344,7 +344,7 @@ static void value_print (val_t value, int token)
     case MCHARACTERKONST:
     case MINTEGERKONST:
     case MBOOLEANKONST:
-      printf ("ival: %d ", value.ival);
+      printf ("ival: %ld ", value.ival);
       break;
     case MREALKONST:
       printf ("rval: %.16le ", value.rval);
@@ -360,7 +360,7 @@ static void value_print (val_t value, int token)
     case MNAMEWRITEACESS:
     case MPROCARG:
     case MCONC:
-      printf ("n_of_stack_elements: %d ", value.n_of_stack_elements);
+      printf ("n_of_stack_elements: %ld ", value.n_of_stack_elements);
       break;
     case MNAMEREADTEXT:
     case MTEXTADR:
