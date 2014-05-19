@@ -16,7 +16,7 @@ dnl You should have received a copy of the GNU General Public License
 dnl along with this program; if not, write to the Free Software
 dnl Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA. */
 
-AC_INIT(cim, 5.0)
+AC_INIT(cim, 5.1)
 AC_CONFIG_SRCDIR([src/cimcomp.c])
 AC_CONFIG_MACRO_DIR([m4])
 
