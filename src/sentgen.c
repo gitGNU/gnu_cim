@@ -22,6 +22,8 @@
 #include "error.h"
 #include "passes.h"
 #include "dump.h"
+#include "checker.h"
+#include "trans.h"
 
 char not_reached;
 
@@ -61,7 +63,7 @@ static void gen_init (void)
     {
       fprintf (ccode, "int __start_data_segment=1;\n");
     }
-  fprintf (ccode, "#include \"%s/cim.h\"\n", 
+  fprintf (ccode, "#include \"%s/cim.h\"\n",
 	   includedir);
 #endif
 }
@@ -78,7 +80,7 @@ static void module_gen (sent_t *sent)
     {
       fprintf (ccode, "int __start_data_segment=1;\n");
     }
-  fprintf (ccode, "#include \"%s/cim.h\"\n", 
+  fprintf (ccode, "#include \"%s/cim.h\"\n",
 	   includedir);
 
 #ifdef DEBUG
@@ -189,7 +191,7 @@ static void block_gen (sent_t *sent)
 
   gotollabel (sent->cblock->ent = newllabel ());
   sent_list_gen (sent, 0);
-  
+
   if (not_reached == FALSE)
     fprintf (ccode, "__rbe();");
 }
@@ -221,7 +223,7 @@ static void prblock_gen (sent_t *sent)
   genmodulemark(NULL);
   fprintf (ccode, ");");
   gotoswitch ();
-  
+
   sent_list_gen (sent, sent->cblock->ent+1);
   if (not_reached == FALSE)
     fprintf (ccode, "__rendclass(%ld);", sent->cblock->quant.plev);
@@ -247,13 +249,13 @@ static void procedure_gen (sent_t *sent)
 	  else if (sent->cblock->quant.type == TTEXT)
 	    fprintf (ccode, "__et=((__bs%d *)__lb)->et;", sent->cblock->blno);
 	  else if (sent->cblock->quant.type == TREAL)
-	    fprintf (ccode, "__ev.f=((__bs%d *)__lb)->ef;", 
+	    fprintf (ccode, "__ev.f=((__bs%d *)__lb)->ef;",
 		     sent->cblock->blno);
 	  else if (sent->cblock->quant.type == TINTG)
-	    fprintf (ccode, "__ev.i=((__bs%d *)__lb)->ev;", 
+	    fprintf (ccode, "__ev.i=((__bs%d *)__lb)->ev;",
 			    sent->cblock->blno);
 	  else
-	    fprintf (ccode, "__ev.c=((__bs%d *)__lb)->ec;", 
+	    fprintf (ccode, "__ev.c=((__bs%d *)__lb)->ec;",
 			    sent->cblock->blno);
 	  fprintf (ccode, "__rep();");
 	}
@@ -326,9 +328,9 @@ static void inspect_gen (sent_t *sent)
       typellabel (labnull);
       cblock= sent->last->cblock;
       cblev= cblock->blev;
-      
+
       sent_list_gen (sent->last, 0);
-  
+
       if (not_reached == FALSE)
 	genline ();
     }
@@ -361,7 +363,7 @@ static void when_gen (sent_t *sent, int labexit)
   cblock= sent->cblock;
   cblev= cblock->blev;
 
-  fprintf (ccode, "if(__pp->plev < %ld || __pp->pref[%ld]!= ", 
+  fprintf (ccode, "if(__pp->plev < %ld || __pp->pref[%ld]!= ",
 	   sent->exp->rd->plev, sent->exp->rd->plev);
 
   gen_adr_prot (ccode, sent->exp->rd);
@@ -421,9 +423,9 @@ static int forelemgen (exp_t *re, exp_t *rex,
 	  fprintf (ccode, "= %d;", ++*listnrp);
 	  gotollabel (labdo);
 	  fprintf (ccode, "}");
-	  
+
 	  gotollabel ( labnext= newllabel ());
-	  
+
 	  fprintf (ccode, "   case %d:", *listnrp);
 	}
       genvalue (rey->right->right); fprintf (ccode, ";");
@@ -492,17 +494,17 @@ static int forgen (exp_t *re, int labcontinue, int labdo, int labexit)
 
   gotollabel (labnext= newllabel ());
   typellabel (labcontinue);
-				
+
   fprintf (ccode, "switch (");
   gen_for_val(cblock->fornest);
-  fprintf (ccode, " ){"); 
+  fprintf (ccode, " ){");
 
   typellabel (labnext);
 
   for (rex = re->right; rex->token != MENDSEP; rex = rex->right)
     {
-      notlastdefault= 
-	forelemgen (re, rex, labcontinue, labdo, labexit, FALSE, 
+      notlastdefault=
+	forelemgen (re, rex, labcontinue, labdo, labexit, FALSE,
 		    notlastdefault, &listnr);
     }
   gotollabel (labexit);
@@ -525,7 +527,7 @@ static void fordo_gen (sent_t *sent)
   cblev= cblock->blev;
 
   labcontinue= newllabel ();
-  labdo= newllabel (); 
+  labdo= newllabel ();
   labexit= newllabel ();
 
   iterate= forgen (sent->exp, labcontinue, labdo, labexit);
@@ -593,13 +595,13 @@ static void if_gen (sent_t *sent)
   if (sent->last->token == MTHEN)
     {
       gotollabel (labexit);
-      sent_list_gen (sent->first, 0);      
+      sent_list_gen (sent->first, 0);
     }
   else
     {
       gotollabel (labelse= newllabel ());
 
-      sent_list_gen (sent->first, 0);      
+      sent_list_gen (sent->first, 0);
 
       if (not_reached == FALSE)
       {
@@ -608,7 +610,7 @@ static void if_gen (sent_t *sent)
       }
       typellabel (labelse);
 
-      sent_list_gen (sent->last, 0);      
+      sent_list_gen (sent->last, 0);
     }
   if (not_reached == FALSE)
     genline ();
@@ -682,7 +684,7 @@ static void procedure_entry_gen (sent_t *sent)
 	}
       rd = rd->next;
     }
-  
+
 }
 
 /******************************************************************************
@@ -752,10 +754,10 @@ static void endarray_gen (sent_t *sent)
   genvalue (sent->iexp); fprintf (ccode, ";");
   for (re1 = re->left; re1->token != MENDSEP; re1 = re1->right)
     {
-      fprintf (ccode, "        /* Array %s  */", 
+      fprintf (ccode, "        /* Array %s  */",
 		      re1->left->value.ident);
-      /* Legger inn kode som sjekker at ovre grense > nedre grense Hvis dette 
-       * er en deklarasjon av flere array,  f.eks integer array a,b(1:10), s} 
+      /* Legger inn kode som sjekker at ovre grense > nedre grense Hvis dette
+       * er en deklarasjon av flere array,  f.eks integer array a,b(1:10), s}
        * er det ikke n|dvendig } foreta sjekkingen av grensene mer enn en
        * gang. */
       if (re1->up == re)
@@ -763,11 +765,11 @@ static void endarray_gen (sent_t *sent)
 	  for (re2 = re->right; re2->token != MENDSEP; re2 = re2->right)
 	    {
 	      if ((MINTEGERKONST == (
-				      re2->left->left->token == MUSUBI 
+				      re2->left->left->token == MUSUBI
 				     ? re2->left->left->left->token :
 				      re2->left->left->token)) &&
 		  (MINTEGERKONST == (
-				      re2->left->right->token == MUSUBI 
+				      re2->left->right->token == MUSUBI
 				     ? re2->left->right->left->token :
 				      re2->left->right->token)))
 		{		/* KONSTANTER (kan ogs} v{re med minus foran

@@ -6,6 +6,8 @@ project(cim)
 #
 configure_file(config.h.in config.h @ONLY)
 
+add_definitions(-DHAVE_CONFIG_H)
+
 #
 # Build subdirectories.
 #

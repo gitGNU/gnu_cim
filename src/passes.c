@@ -28,6 +28,8 @@
 #include "gen.h"
 #include "trans.h"
 #include "passes.h"
+#include "extspec.h"
+#include "salloc.h"
 
 sent_t *main_sent;
 

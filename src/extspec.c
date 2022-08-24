@@ -27,6 +27,7 @@
 #include "cimcomp.h"
 #include "extspec.h"
 #include "name.h"
+#include "error.h"
 
 #if STDC_HEADERS || HAVE_STRING_H
 #include <string.h>
@@ -51,7 +52,9 @@
 double strtod ();
 #endif
 
-#include <obstack.h>
+#include "obstack.h"
+#include <ctype.h>
+
 char *xmalloc();
 
 #define obstack_chunk_alloc xmalloc
@@ -59,7 +62,7 @@ char *xmalloc();
 static struct obstack os_extspec;
 static char *first_object_allocated_ptr_extspec;
 
-/* HUSK AT REKKEF\LGEN SKAL V[RE categ,type,kind 
+/* HUSK AT REKKEF\LGEN SKAL V[RE categ,type,kind
  *
  * Filen starter alltid med <tidsmerke><LF>
  *
@@ -134,10 +137,10 @@ static char * getname (FILE *f)
   return sx;
 }
 
-/* fscanf leter frem til neste \n eller blank (eller til slutten) men lar 
- * \n eller blank bli igjen.                                              
- * Hvis \n er forste tegn n}r fscanf kalles s} kastes dette tegnet.Men    
- * getc kalles etter fscanf s} vil denne returnere med \n.Derfor m} dette 
+/* fscanf leter frem til neste \n eller blank (eller til slutten) men lar
+ * \n eller blank bli igjen.
+ * Hvis \n er forste tegn n}r fscanf kalles s} kastes dette tegnet.Men
+ * getc kalles etter fscanf s} vil denne returnere med \n.Derfor m} dette
  * tegnet leses av etter at hvert navn er lest inn
  * For å overføre filnavn id til deklarasjonslageret */
 
@@ -146,10 +149,10 @@ char *directive_timestamp="";
 struct stamp *first_stamp;
 
 static char timestampchars[63] =
-{'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 
- 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 
- 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 
- 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 
+{'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
+ 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
+ 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
+ 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
  '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '_'};
 
 /******************************************************************************
@@ -167,7 +170,7 @@ void gettimestamp (void)
 
   if (strcmp (directive_timestamp, ""))
     timestamp= directive_timestamp;
-  else if (option_reuse_timestamp && (f = searc_and_open_name_in_archlist 
+  else if (option_reuse_timestamp && (f = searc_and_open_name_in_archlist
 				      (extcodename, TRUE)) != NULL)
     {
       if (option_verbose)
@@ -235,10 +238,10 @@ static char *genatrfilenamefromfilename (char *filename)
 {
   char *s, *sx;
   int len = strlen (filename);
-  
-  if (len >=4 && !strcmp (&filename[len - 4], ".atr")) 
+
+  if (len >=4 && !strcmp (&filename[len - 4], ".atr"))
     return (tag (filename));
-      
+
   if (len >=4 && !(strcmp (&filename[len - 4], ".sim")
                   && strcmp (&filename[len - 4], ".SIM")
                   && strcmp (&filename[len - 4], ".cim")
@@ -276,7 +279,7 @@ static char external_is_in (char *ident, char kind)
 
 static char *lesinn (char *filename);
 
-static nextdecl (FILE *f, char *filename, char *timestamp)
+static int nextdecl (FILE *f, char *filename, char *timestamp)
 {
   char type, kind, categ;
   char tegn;
@@ -428,14 +431,14 @@ static char *lesinn (char *filename)
   {
     char r_buff[12];
     r_buff[0] = '\0';
-    fscanf (f, "%11s\n", r_buff);	
+    fscanf (f, "%11s\n", r_buff);
     if (strcmp (r_buff, "/*Cim_atr*/"))
       merror (5, filename);
   }
 
   /* Leser tidsmerke */
 
-  timestamp= getname (f); 
+  timestamp= getname (f);
 
   for (st = first_stamp; st != NULL; st = st->next)
     if (st->timestamp == timestamp)
@@ -565,9 +568,9 @@ static void write_text_mif (FILE *f, unsigned char *s)
 /******************************************************************************
                                                               WRITE_DECL_MIF */
 
-static write_decl_mif (FILE *f, decl_t *rd, int level)
+static void write_decl_mif (FILE *f, decl_t *rd, int level)
 {
-  if (rd->kind == KBLOKK || rd->kind == KPRBLK || rd->kind == KFOR || 
+  if (rd->kind == KBLOKK || rd->kind == KPRBLK || rd->kind == KFOR ||
       rd->kind == KINSP) return;
   if (level == 0)
     {
@@ -670,7 +673,7 @@ static write_decl_mif (FILE *f, decl_t *rd, int level)
       rb = rd->descr;
       if (rd->categ == CEXTROUT)
 	rd->categ = CEXTR;
-	  
+
       /* evt. parametere */
       fprintf (f, " (");
       for (rdx = rb->parloc; rdx != NULL && (rdx->categ == CDEFLT || rdx->categ == CNAME ||
@@ -746,8 +749,8 @@ static write_decl_mif (FILE *f, decl_t *rd, int level)
 	    char s[100];
 	    int i;
 	    sprintf (s, "= %.16le", rd->value.rval);
-	    for (i=0; s[i]; i++) 
-	      if (s[i]=='e') 
+	    for (i=0; s[i]; i++)
+	      if (s[i]=='e')
 		{
 		  s[i]='&';
 		  break;
@@ -773,14 +776,14 @@ static write_decl_mif (FILE *f, decl_t *rd, int level)
     case CNAME:
     case CVAR:
     case CVALUE:
-      if (rd->next!=NULL && (rd->next->categ == CDEFLT || 
+      if (rd->next!=NULL && (rd->next->categ == CDEFLT ||
 			     rd->next->categ == CNAME ||
-			     rd->next->categ == CVAR || 
+			     rd->next->categ == CVAR ||
 			     rd->next->categ == CVALUE))
 	fprintf(f, ", ");
       break;
     case CLOCAL:
-      if (rd->type == TLABEL && rd->kind == KSIMPLE) 
+      if (rd->type == TLABEL && rd->kind == KSIMPLE)
 	{
 	  fprintf (f, ":");
 	  break;
@@ -821,7 +824,7 @@ static void write_all_mif (void)
 
   for (rd = sblock->parloc; rd != NULL; rd = rd->next)
     if (rd->categ == CEXTR) /* OK */ ;
-    else 
+    else
       if (rd->categ == CEXTRMAIN)
       {
 	rd->categ = CEXTR;
@@ -844,7 +847,7 @@ static void write_all_mif (void)
 
 static write_decl_ext (FILE *f, decl_t *rd)
 {
-  if (rd->kind == KBLOKK || rd->kind == KPRBLK || rd->kind == KFOR || 
+  if (rd->kind == KBLOKK || rd->kind == KPRBLK || rd->kind == KFOR ||
       rd->kind == KINSP) ;
   else if (rd->categ == CEXTR || rd->categ == CEXTRMAIN)
     fprintf (f, "&%c%c%s %s %s\n", rd->type, rd->kind
@@ -1003,13 +1006,13 @@ void more_modules (void)
       {
 	char *newlink_moduler;
 	char r_buff[12];
-	
+
 	/* Leser identifikasjon , som alltid ligger f|rst p} filen */
 	r_buff[0] = '\0';
 	fscanf (f, "%11s\n", r_buff);
 	if (strcmp (r_buff, "/*Cim_atr*/"))
 	  merror (5, st->filename);
-	
+
 	/* Leser tidsmerke */
 
 	local_timestamp= getname (f);
@@ -1017,9 +1020,9 @@ void more_modules (void)
 	  {
 	    if (option_verbose)
 	      fprintf (stderr, "Reading atr-file %s\n", st->filename);
-	    insert_name_in_linklist 
+	    insert_name_in_linklist
 	      (transform_name (st->filename, ".atr", ".o"), TRUE);
-	      
+
 	  }
       }
 }

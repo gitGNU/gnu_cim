@@ -19,7 +19,7 @@
 #include "config.h"
 #include "cimcomp.h"
 #include <stdio.h>
-#include <obstack.h>
+#include "obstack.h"
 
 #if STDC_HEADERS
 #include <stdlib.h>

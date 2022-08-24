@@ -24,13 +24,14 @@
 #include "extspec.h"
 #include "mapline.h"
 #include "name.h"
+#include "gen.h"
 
-static short plevnull;		/* Hvis en blokks prefiksniv} er 0 s} er 
+static short plevnull;		/* Hvis en blokks prefiksniv} er 0 s} er
 				 * plevnull=TRUE.Brukes for } initsialisere
-				 * offset adressene til pekerne.M} vite om 
-				 * structen til denne blokken inneholder   
-				 * deklarasjonen struct dhp h.Ellers s} m} 
-				 * .s f}lges plev ganger for } komme til h.pp 
+				 * offset adressene til pekerne.M} vite om
+				 * structen til denne blokken inneholder
+				 * deklarasjonen struct dhp h.Ellers s} m}
+				 * .s f}lges plev ganger for } komme til h.pp
 				 */
 
 
@@ -238,20 +239,20 @@ static void blockmainstructure (block_t *rb, char output_refs)
   if (rb->quant.kind == KPROC && rb->quant.type != TNOTY)
     {
       if (rb->quant.type == TTEXT)
-	write_refs (rb, NULL, "et.obj", output_refs); 
+	write_refs (rb, NULL, "et.obj", output_refs);
       else if (rb->quant.type == TREF)
-	write_refs (rb, NULL, "er", output_refs); 
+	write_refs (rb, NULL, "er", output_refs);
     }
-  
+
   {
     int mincon= 1;
-    if ((rb->quant.kind == KCLASS || rb->quant.kind == KPRBLK) && 
+    if ((rb->quant.kind == KCLASS || rb->quant.kind == KPRBLK) &&
 	rb->quant.plev > 0)
       {
 	if (rb->connest < rb->quant.prefqual->descr->connest)
 	  rb->connest= rb->quant.prefqual->descr->connest;
 	mincon= rb->quant.prefqual->descr->connest+1;
-      } 
+      }
     for (i = mincon; i <= rb->connest; i++)
       {
 	char s[10];
@@ -263,11 +264,11 @@ static void blockmainstructure (block_t *rb, char output_refs)
 #if ACSTACK_IN_OBJ
   {
     int minref= 1, mintxt= 1;
-    if ((rb->quant.kind == KCLASS || rb->quant.kind == KPRBLK) && 
+    if ((rb->quant.kind == KCLASS || rb->quant.kind == KPRBLK) &&
 	rb->quant.plev > 0)
       {
 	minref= rb->quant.prefqual->descr->maxusedref+1;
-	mintxt= rb->quant.prefqual->descr->maxusedtxt+1; 
+	mintxt= rb->quant.prefqual->descr->maxusedtxt+1;
       }
 
       for (i= minref; i <= rb->maxusedref; i++)
@@ -276,7 +277,7 @@ static void blockmainstructure (block_t *rb, char output_refs)
 	  sprintf (s, "__r%d", i);
 	  write_refs (rb, NULL, s, output_refs);
 	}
-    
+
     for (i= mintxt; i <= rb->maxusedtxt; i++)
       {
 	char s[20];
@@ -294,7 +295,7 @@ static void specifier_structure (block_t *rb);
 /******************************************************************************
                                                         BLOCKSTRUCTURE       */
 
-static blockstructure (block_t *rb)
+static void blockstructure (block_t *rb)
 {
   int i;
   decl_t *rd;
@@ -341,12 +342,12 @@ static blockstructure (block_t *rb)
 	    }
 	  else if (rb->codeclass != CCNO) break;
 	}
-      
-      if ((rb->quant.kind == KCLASS || rb->quant.kind == KPROC) 
+
+      if ((rb->quant.kind == KCLASS || rb->quant.kind == KPROC)
 	  && rb->timestamp != 0 &&
 	  rb->quant.encl->timestamp != rb->timestamp)
 	{
-	  
+
 	  if (&rb->quant == classtext || &rb->quant == commonprefiks) break;
 	  /* Definerer den eksterne modulen som extern på .h filen */
 	  fprintf (ccode, "extern void __m_%s();\n",
@@ -354,29 +355,29 @@ static blockstructure (block_t *rb)
 
 	}
 
-      if ((rb->quant.kind == KCLASS || rb->quant.kind == KPRBLK) 
+      if ((rb->quant.kind == KCLASS || rb->quant.kind == KPRBLK)
 	  && rb->timestamp == 0)
 	{
 	  fprintf (ccode, "extern __ptyp __p%d%s;\n", rb->blno,
 		   timestamp);
 	  for (rd = rb->virt; rd != NULL; rd = rd->next)
-	    if (rd->kind == KPROC && rd->match!= NULL) 
+	    if (rd->kind == KPROC && rd->match!= NULL)
 	      blockstructure (rd->match->descr);
 	}
-      
-      if ((rb->quant.kind == KCLASS && rb->quant.plev > 0) 
+
+      if ((rb->quant.kind == KCLASS && rb->quant.plev > 0)
 	  || (rb->quant.kind == KPRBLK))
 	{				/* Går gjennom prefikskjeden */
 	  blockstructure (rb->quant.prefqual->descr);
 	  plevnull = FALSE;
-	} 
+	}
       else
 	plevnull= TRUE;
 
       fprintf (ccode, "typedef struct /* %s */\n    {\n"
 	       ,rb->quant.ident == NULL ? "" : rb->quant.ident);
 
-      if ((rb->quant.kind == KCLASS && rb->quant.plev > 0) 
+      if ((rb->quant.kind == KCLASS && rb->quant.plev > 0)
 	  || (rb->quant.kind == KPRBLK))
 	fprintf (ccode, "        __bs%d s;\n",
 		 rb->quant.prefqual->descr->blno);
@@ -384,9 +385,9 @@ static blockstructure (block_t *rb)
 	fprintf (ccode, "        __dh h;\n");
 
       naref = 0;
-      /* NB !!!. Deklarasjonene må skrives ut før evt. hjelpe variable 
+      /* NB !!!. Deklarasjonene må skrives ut før evt. hjelpe variable
    * (for,inspect) og før returverdivariabelen. Slipper da å skrive
-   * ut disse i structene for virtuelle og formelle prosedyre 
+   * ut disse i structene for virtuelle og formelle prosedyre
    * spesifikasjoner. Gjelder prosedyrer. */
       blockmainstructure (rb, FALSE);
 
@@ -406,7 +407,7 @@ static blockstructure (block_t *rb)
 
       {
 	int minfor= 1, mincon=1;
-	if ((rb->quant.kind == KCLASS || rb->quant.kind == KPRBLK) && 
+	if ((rb->quant.kind == KCLASS || rb->quant.kind == KPRBLK) &&
 	    rb->quant.plev > 0)
 	  {
 	    if (rb->fornest < rb->quant.prefqual->descr->fornest)
@@ -415,7 +416,7 @@ static blockstructure (block_t *rb)
 	      rb->connest= rb->quant.prefqual->descr->connest;
 	    minfor= rb->quant.prefqual->descr->fornest+1;
 	    mincon= rb->quant.prefqual->descr->connest+1;
-	  } 
+	  }
 	for (i = minfor; i <= rb->fornest; i++)
 	  fprintf (ccode, "        short f%d;\n", i);
 	for (i = mincon; i <= rb->connest; i++)
@@ -425,7 +426,7 @@ static blockstructure (block_t *rb)
 #if ACSTACK_IN_OBJ
       {
 	int minval= 1, minref= 1, mintxt= 1;
-	if ((rb->quant.kind == KCLASS || rb->quant.kind == KPRBLK) && 
+	if ((rb->quant.kind == KCLASS || rb->quant.kind == KPRBLK) &&
 	    rb->quant.plev > 0)
 	  {
 	    if (rb->maxusedref < rb->quant.prefqual->descr->maxusedref)
@@ -435,14 +436,14 @@ static blockstructure (block_t *rb)
 	    if (rb->maxusedval < rb->quant.prefqual->descr->maxusedval)
 	      rb->maxusedval= rb->quant.prefqual->descr->maxusedval;
 	    minref= rb->quant.prefqual->descr->maxusedref+1;
-	    mintxt= rb->quant.prefqual->descr->maxusedtxt+1; 
-	    minval= rb->quant.prefqual->descr->maxusedval+1; 
-	  } 
-	for (i= minref; i<=rb->maxusedref; i++) 
+	    mintxt= rb->quant.prefqual->descr->maxusedtxt+1;
+	    minval= rb->quant.prefqual->descr->maxusedval+1;
+	  }
+	for (i= minref; i<=rb->maxusedref; i++)
 	  fprintf (ccode, "        __dhp __r%d;\n", i);
-	for (i= mintxt; i<=rb->maxusedtxt; i++) 
+	for (i= mintxt; i<=rb->maxusedtxt; i++)
 	  fprintf (ccode, "        __txt __t%d;\n", i);
-	for (i= minval; i<=rb->maxusedval; i++) 
+	for (i= minval; i<=rb->maxusedval; i++)
 	  fprintf (ccode, "        __valuetype __v%d;\n", i);
       }
 
@@ -453,8 +454,8 @@ static blockstructure (block_t *rb)
       if (rb->stat)
 	{
 	  if (rb->timestamp) fprintf (ccode, "extern ");
-	  fprintf 
-	    (ccode, "__bs%d __blokk%d%s;\n", rb->blno, rb->blno, 
+	  fprintf
+	    (ccode, "__bs%d __blokk%d%s;\n", rb->blno, rb->blno,
 	     rb->timestamp?rb->timestamp:timestamp);
 	}
 
@@ -467,7 +468,7 @@ static blockstructure (block_t *rb)
 	{
 	  if (naref)
 	    {
-	      fprintf (ccode, "short __rl%d%s[%d]={", 
+	      fprintf (ccode, "short __rl%d%s[%d]={",
 		       rb->blno, timestamp, naref);
 
 	      blockmainstructure (rb, TRUE);
@@ -480,7 +481,7 @@ static blockstructure (block_t *rb)
 	    {
 	      if (rb->navirt)
 		{
-		  fprintf (ccode, "__pty   __vl%d%s[%d]={", 
+		  fprintf (ccode, "__pty   __vl%d%s[%d]={",
 			   rb->blno, timestamp, rb->navirt);
 		  for (rd = rb->virt; rd != NULL; rd = rd->next)
 		    {
@@ -515,7 +516,7 @@ static blockstructure (block_t *rb)
 				fprintf (ccode, "%ld,__m_%s,",
 					 rd->match->plev,
 					 rd->match->encl->timestamp);
-			  
+
 			      else if (separat_comp)
 				fprintf (ccode, "%ld,__m_%s,",
 					 rd->match->plev, timestamp);
@@ -531,7 +532,7 @@ static blockstructure (block_t *rb)
 		}
 	    }
 
-	  fprintf (ccode, "extern __ptyp __p%d%s;__pty   __pl%d%s[%ld]={", 
+	  fprintf (ccode, "extern __ptyp __p%d%s;__pty   __pl%d%s[%ld]={",
 		   rb->blno, timestamp,
 		   rb->blno, timestamp,
 		   (rb->quant.prefqual==NULL)?1:
@@ -546,7 +547,7 @@ static blockstructure (block_t *rb)
 		   rb->blev, rb->blno,
 		   rb->ent);
 
-	  if (separat_comp && (rb->quant.kind == KCLASS 
+	  if (separat_comp && (rb->quant.kind == KCLASS
 			       || rb->quant.kind == KPROC ||
 			       rb->quant.kind == KPRBLK))
 	    fprintf (ccode, "__m_%s", timestamp);
@@ -554,9 +555,9 @@ static blockstructure (block_t *rb)
 	    fprintf (ccode, "0");
 
 	  fprintf (ccode, ",%d,%d,%d,%d",
-		   rb->fornest, 
+		   rb->fornest,
 		   rb->connest,
-		   naref, 
+		   naref,
 		   rb->navirt);
 
 	  if (naref)
@@ -571,14 +572,14 @@ static blockstructure (block_t *rb)
 
 	  fprintf (ccode, ",__pl%d%s", rb->blno, timestamp);
 
-	  if ((rb->quant.kind == KCLASS || rb->quant.kind == KPRBLK) 
+	  if ((rb->quant.kind == KCLASS || rb->quant.kind == KPRBLK)
 	      && rb->navirtlab)
 	    fprintf (ccode, ",__labvl%d%s};\n", rb->blno, timestamp);
 	  else
 	    fprintf (ccode, ",__NULL};\n");
 
 	}
-      rb->structure_written = TRUE;	/* merker av at det er lagt ut type for denne 
+      rb->structure_written = TRUE;	/* merker av at det er lagt ut type for denne
 				 * blokken */
 
   /* Sjekker om det må skrives ut structer for virtuelle- og formelle
@@ -611,15 +612,15 @@ static void specifier_proc_structure (decl_t *rd)
     {
       if (rd->descr->parloc != NULL)
 	{
-	  fprintf 
+	  fprintf
 	    (ccode, "typedef struct /* %s SPEC*/\n    {\n", rd->ident);
 	  fprintf (ccode, "        __dh h;\n");
-	  
+
 	  /* Skriver alle parameterne */
 	  for (rdi = rd->descr->parloc; rdi != NULL; rdi = rdi->next)
 	    declstructure (rdi, FALSE);
 	  fprintf (ccode, "    } __bs%d;\n", rd->descr->blno);
-	  
+
 	  /* Flere nivåer ? */
 	  specifier_structure (rd->descr);
 	}
@@ -630,7 +631,7 @@ static void specifier_proc_structure (decl_t *rd)
 
 static void specifier_structure (block_t *rb)
 {				/* Kaller på param_structure som skriver ut
-				 * structer for evt. parameterspesifikasjoner 
+				 * structer for evt. parameterspesifikasjoner
 				 * til virtuelle  og formelle prosedyre-
 				 * spesifikasjoner. Altså kun for de som
 				 * inneholder parametere. */
@@ -639,9 +640,9 @@ static void specifier_structure (block_t *rb)
    *rdi;
 
   /* Ser forst etter formell prosedyre spesifikasjoner */
-  for (rd = rb->parloc; rd != NULL && (rd->categ == CDEFLT 
+  for (rd = rb->parloc; rd != NULL && (rd->categ == CDEFLT
 				       || rd->categ == CNAME &&
-				       rd->categ == CVAR 
+				       rd->categ == CVAR
 				       && rd->categ == CVALUE); rd = rd->next)
     specifier_proc_structure (rd);
 
@@ -713,7 +714,7 @@ static void do_for_each_stat_pointer (block_t *block)
       if (block->stat)
 	fprintf (ccode, "if(((__dhp)&__blokk%d%s)->gl!=__NULL|force)"
 		 "__do_for_each_pointer((__dhp)&__blokk%d%s,doit,doit_notest);\n"
-		 ,block->blno, timestamp, block->blno, 
+		 ,block->blno, timestamp, block->blno,
 		 block->timestamp?block->timestamp:timestamp);
     }
   for (rd= block->parloc; rd!= NULL; rd= rd->next)
@@ -746,7 +747,7 @@ static void update_gl_null (block_t *block)
     case KBLOKK:
     case KPRBLK:
       if (block->stat)
-	fprintf (ccode, "((__dhp)&__blokk%d%s)->gl=(__dhp)0;\n",block->blno, 
+	fprintf (ccode, "((__dhp)&__blokk%d%s)->gl=(__dhp)0;\n",block->blno,
 		 block->timestamp?block->timestamp:timestamp);
     }
   for (rd= block->parloc; rd!= NULL; rd= rd->next)
@@ -779,11 +780,11 @@ static void update_gl_obj (block_t *block)
     case KBLOKK:
     case KPRBLK:
       if (block->stat)
-	fprintf 
-	  (ccode, 
+	fprintf
+	  (ccode,
 	   "if(((__dhp)&__blokk%d%s)->gl)((__dhp)&__blokk%d%s)->gl=(__dhp)&__blokk%d%s;\n"
 	   ,block->blno, block->timestamp?block->timestamp:timestamp
-	   ,block->blno, block->timestamp?block->timestamp:timestamp, 
+	   ,block->blno, block->timestamp?block->timestamp:timestamp,
 	   block->blno, block->timestamp?block->timestamp:timestamp);
     }
 
@@ -815,8 +816,8 @@ void stat_pointers (void)
   if (!separat_comp)
     { /* TBD __init(){__init_FILE();__init_SIMENVIR(); should be removed */
       fprintf (ccode, "\nvoid __init(void){__init_FILE();__init_SIMENVIR();}\n");
-      fprintf 
-	(ccode, 
+      fprintf
+	(ccode,
 	 "__do_for_each_stat_pointer(void(*doit)(),void(*doit_notest)(),int force){\n");
 
       do_for_each_stat_pointer (sblock);
@@ -831,4 +832,3 @@ void stat_pointers (void)
       fprintf (ccode, "}\n");
     }
 }
-

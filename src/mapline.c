@@ -29,9 +29,10 @@
 #include <stdlib.h>
 #endif
 
-#include <obstack.h>
+#include "obstack.h"
 #include "mapline.h"
 #include "name.h"
+#include "error.h"
 
 char *xmalloc();
 
@@ -100,11 +101,11 @@ int pushfilmap (char *filename, void *ifdefp)
 	  perror (newstrcat3 (progname, ": ", filename));
 	  return TRUE;
 	}
-    } 
+    }
   else
     {
       mapstack_t *ms;
-      
+
       for (ms= mapstackp; ms != NULL; ms= ms->prev)
 	{
 	  if (!strcmp (filename, ms->filename))
@@ -123,7 +124,7 @@ int pushfilmap (char *filename, void *ifdefp)
 	fprintf (stderr, "Reading include file %s\n", filename);
 
     }
-  mapstackp= (mapstack_t *) 
+  mapstackp= (mapstack_t *)
     obstack_alloc (&os_mapstack, sizeof (mapstack_t));
   mapstackp->line= lineno + 1 + lastmappos->line;
   mapstackp->filename= lastmappos->filename;
@@ -167,13 +168,13 @@ void setfilmap (char *filename, long line)
   mappos->filename = filename ? filename : lastmappos->filename;
   mappos->line = line - lineno - 1;
   mappos->fromline = lineno + 1;
-  mappos = (lastmappos = mappos)->neste 
+  mappos = (lastmappos = mappos)->neste
     = (map_t *) obstack_alloc (&os_map, sizeof (map_t));
   mappos->fromline = MAX_INT;
 }
 
 /******************************************************************************
-  						                  GETMAPLINE */
+						                  GETMAPLINE */
 
 long getmapline (long line)
 {
@@ -185,7 +186,7 @@ long getmapline (long line)
 }
 
 /******************************************************************************
-  						                  GETMAPFILE */
+						                  GETMAPFILE */
 
 char *getmapfile (long line)
 {
@@ -207,11 +208,9 @@ void genmap (void)
 	   ,separat_comp ? timestamp : "main", antmap);
   for (i = 1; i < antmap; i++)
     {
-      fprintf (ccode, "\"%s\",%ldL,%ldL,\n", m->filename, 
+      fprintf (ccode, "\"%s\",%ldL,%ldL,\n", m->filename,
 	       m->line, m->fromline);
       m = m->neste;
     }
   fprintf (ccode, "\"\",0L,%ldL};\n", MAX_INT);
 }
-
-

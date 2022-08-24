@@ -17,7 +17,7 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA. */
 
 #include <stdio.h>
-#include <obstack.h>
+#include "obstack.h"
 
 #include "const.h"
 #include "builder.h"
@@ -59,7 +59,7 @@ void ebuilder_init_pass2 (void)
 }
 
 /******************************************************************************
- 								      NEWEXP */
+								      NEWEXP */
 
 exp_t *newexp(void)
 {
@@ -305,6 +305,3 @@ void ebuild (void)
       token= min();
     }
 }
-
-
-

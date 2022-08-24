@@ -17,12 +17,13 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA. */
 
 #include <stdio.h>
-#include <obstack.h>
+#include "obstack.h"
 
 #include "gen.h"
 #include "salloc.h"
 #include "passes.h"
 #include "config.h"
+#include "error.h"
 
 #if STDC_HEADERS || HAVE_STRING_H
 #include <string.h>
@@ -115,7 +116,7 @@ static sent_t *create_sent(int token, exp_t *exp)
   if (parent->first == NULL)
     {
       parent->first= parent->last= new;
-    } 
+    }
   else
     {
       parent->last->next= new;
@@ -135,7 +136,7 @@ void insert_after_sent (sent_t *parent, sent_t *after, sent_t *new)
       if (parent->first == NULL)
 	{
 	  parent->first= parent->last= new;
-	} 
+	}
       else
 	{
 	  parent->first->prev= new;
@@ -149,7 +150,7 @@ void insert_after_sent (sent_t *parent, sent_t *after, sent_t *new)
 	{
 	  new->prev= after;
 	  after->next= parent->last= new;
-	} 
+	}
       else
 	{
 	  after->next->prev= new;
@@ -303,7 +304,7 @@ sent_t *sbuild(void)
 	    p= mpointer;
 	    ebuild ();
 	    if (p == mpointer)
-	      serror (71, token);
+	      serror (71, token, 0);
 	    continue;
 	  }
 	}
@@ -324,7 +325,7 @@ void insert_thunk (exp_t *rex, int token)
   new->exp= rex;
   new->cblock= cblock;
   rex->value.thunk.label= newlabel ();
-  
+
   rex->value.thunk.inthunk= inthunk+1;
   insert_before_sent (main_sent, NULL, new);
 }

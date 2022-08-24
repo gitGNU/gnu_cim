@@ -22,13 +22,15 @@
 #include "newstr.h"
 #include "filelist.h"
 #include "config.h"
+#include "error.h"
 
 #if STDC_HEADERS
 #include <stdlib.h>
 #endif
 
 #include <stdio.h>
-#include <obstack.h>
+#include <ctype.h>
+#include "obstack.h"
 
 char *xmalloc();
 
@@ -126,7 +128,7 @@ static char insert_name (filelist_t *listp, char *name, char first)
 	{
 	  new->next= listp->first;
 	  listp->first= new;
-	} 
+	}
       else
 	{
 	  listp->last= listp->last->next= new;
@@ -197,7 +199,7 @@ static FILE *open_name (filelist_t *dirlist, filelist_t *linklist, char *name, c
       if ((f = fopen (str, "r"))!= NULL)
 #endif
 	{
-	  if (link) 
+	  if (link)
 	    insert_name (linklist, transform_name (str, ".atr", ".o"), TRUE);
 	  return (f);
 	}
@@ -317,11 +319,11 @@ FILE *searc_and_open_name_in_archlist (char *name, char link)
       if (link) insert_name (&linklist, transform_name(name,".atr",".o"), TRUE);
       return (f);
     }
-  
+
   f=open_name (&dirlist, &linklist, name, link);
 
   for (elem= archlist.first; elem!=NULL; elem= elem->next)
-    if ((f= open_and_position_arch_name (elem->name, name)) != NULL) 
+    if ((f= open_and_position_arch_name (elem->name, name)) != NULL)
       return(f);
 
   return (NULL);
@@ -361,14 +363,10 @@ static char searc_and_insert_name (filelist_t *dirlistp, filelist_t *listp, char
 
 void new_lib (char *name)
 {
-  searc_and_insert_name (&dirlist, &archlist, 
-			 transform_name (newstrcat3 (LIBPREFIX, name, 
-						     LIBSUFFIX), 
+  searc_and_insert_name (&dirlist, &archlist,
+			 transform_name (newstrcat3 (LIBPREFIX, name,
+						     LIBSUFFIX),
 					 LIBSUFFIX, LIBARCHSUFFIX));
-					 
+
   insert_name (&linklist, newstrcat2 ("-l", name), FALSE);
 }
-
-
-
-
