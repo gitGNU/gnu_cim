@@ -1,6 +1,12 @@
 cmake_minimum_required(VERSION 2.9)
 project(cim)
 
+# By default, build for release with debug info.
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE "RelWithDebInfo" CACHE STRING
+        "Default build type: RelWithDebInfo" FORCE)
+endif()
+
 #
 # Create config.h.
 #
