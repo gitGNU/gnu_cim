@@ -180,7 +180,7 @@ long getmapline (long line)
 {
   if (mapindeks->fromline > line)
     mapindeks = firstmappos;
-  while (mapindeks->neste->fromline <= line)
+  while (mapindeks->neste != NULL && mapindeks->neste->fromline <= line)
     mapindeks = mapindeks->neste;
   return (line + mapindeks->line);
 }
@@ -192,7 +192,7 @@ char *getmapfile (long line)
 {
   if (mapindeks->fromline > line)
     mapindeks = firstmappos;
-  while (mapindeks->neste->fromline <= line)
+  while (mapindeks->neste != NULL && mapindeks->neste->fromline <= line)
     mapindeks = mapindeks->neste;
   return (mapindeks->filename);
 }

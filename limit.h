@@ -29,15 +29,7 @@
 #define FIRST_DATA_LOCATION ((int)(&__start_data_segment))
 
 /* Define MAX_INT */
-#if SIZEOF_LONG == 8
-#define MAX_INT (~(1L<<63))
-#else
-#define MAX_INT (~(1L<<31))
-#endif
+#define MAX_INT INT_MAX
 
 /* Define TYPE_32_INT */
-#if SIZEOF_LONG == 8
 #define TYPE_32_INT int
-#else
-#define TYPE_32_INT long
-#endif
