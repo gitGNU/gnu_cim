@@ -241,8 +241,23 @@ add_library(cim STATIC
     simfile.c
     simenvir.c
     xmalloc.c
-    #TODO: simset.c
-    #TODO: simulation.c
+    simset.c
+    simulation.c
     rdiv0.c
     idiv0.c
 )
+
+#TODO: compile simset.sim into simset.c
+#gnucim -H -L -L. -I. -S simset.sim
+
+#TODO: compile simulation.sim into simulation.c
+#gnucim -H -L -L. -I. -S simulation.sim
+
+#
+# Install the library.
+#
+install(TARGETS cim DESTINATION lib)
+install(FILES libcim-atr.a DESTINATION lib)
+install(FILES cim.h DESTINATION include)
+
+#TODO: install simfile.o simenvir.o

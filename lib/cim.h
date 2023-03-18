@@ -18,6 +18,7 @@
 
 /******************************************************************************
                                              Definition of runtime-constants */
+#include <stdlib.h>
 
 #define __FALSE 0
 #define __TRUE 1
@@ -453,7 +454,7 @@ typedef struct
   }
 __labelnamepar;
 
-/* Label var and standard transmitted parameter or 
+/* Label var and standard transmitted parameter or
  * a name, var or standard transmitted switch parameter */
 
 typedef struct			/* No thunk for switch parameter by name */
@@ -518,7 +519,7 @@ extern int __swv;
 /* Local-block, parameter-block, and static environm,ent to rcp(p)() */
 extern __dhp __lb,
   __pb;
-extern __dhp __sl;		/* Can't be a parameter since GBC must update 
+extern __dhp __sl;		/* Can't be a parameter since GBC must update
 				 * it */
 
 /* Garbage collections statistics */
@@ -643,6 +644,7 @@ void __rstart (int argc, char *argv[]);
 void __rb (__pty ppx);
 void __rtrace (void);
 void __repp (void);
+void __rbe (void);
 
 /* RTBASICIO.C */
 __dhp __rsysin (void);
@@ -651,6 +653,7 @@ __dhp __rsyserr (void);
 
 /* ENVIRONMENT.C */
 
+void __init_FILE (void);
 void __init_SIMENVIR (void);
 void __rprintfilline (void);
 void __rhisto (__arrp A, __arrp B, double c, double d);

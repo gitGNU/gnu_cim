@@ -818,7 +818,7 @@ void stat_pointers (void)
       fprintf (ccode, "\nvoid __init(void){__init_FILE();__init_SIMENVIR();}\n");
       fprintf
 	(ccode,
-	 "__do_for_each_stat_pointer(void(*doit)(),void(*doit_notest)(),int force){\n");
+	 "void __do_for_each_stat_pointer(void(*doit)(),void(*doit_notest)(),int force){\n");
 
       do_for_each_stat_pointer (sblock);
 
@@ -826,7 +826,7 @@ void stat_pointers (void)
       update_gl_obj (sblock);
 
 
-      fprintf (ccode, "}\n__update_gl_to_null(void){\n");
+      fprintf (ccode, "}\nvoid __update_gl_to_null(void){\n");
       update_gl_null (sblock);
 
       fprintf (ccode, "}\n");
