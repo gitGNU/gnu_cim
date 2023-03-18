@@ -9,21 +9,15 @@ include_directories(
 )
 
 #
-# Check for system include files.
-#
-include(CheckIncludeFile)
-check_include_file("string.h" HAVE_STRING_H)
-
-#
 # Need Bison parser.
 #
 find_package(BISON REQUIRED)
 bison_target(parser parser.y "${CMAKE_CURRENT_BINARY_DIR}/parser.c")
 
 #
-# Build 'cim' binary.
+# Build 'gnucim' binary.
 #
-add_executable(cim
+add_executable(gnucim
     error.c
     pargen.c
     name.c
@@ -55,8 +49,5 @@ add_executable(cim
     dump.c
     "${CMAKE_CURRENT_BINARY_DIR}/parser.c"
 )
-target_link_libraries(cim PUBLIC m)
-#target_compile_options(cim PRIVATE
-#    -Wall -g -O3 -ffast-math -fomit-frame-pointer -DHAVE_STRING_H=${HAVE_STRING_H}
-#)
-install(TARGETS cim DESTINATION bin)
+target_link_libraries(gnucim PUBLIC m)
+install(TARGETS gnucim DESTINATION bin)

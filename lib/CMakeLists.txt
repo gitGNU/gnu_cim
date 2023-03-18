@@ -6,15 +6,9 @@ include_directories(
 )
 
 #
-# Check for system include files.
-#
-include(CheckIncludeFile)
-check_include_file("string.h" HAVE_STRING_H)
-
-#
 # Build cim library
 #
-add_library(libcim STATIC
+add_library(cim STATIC
     sysin.c
     sysout.c
     syserr.c

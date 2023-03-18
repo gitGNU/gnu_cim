@@ -34,3 +34,11 @@
 
 /* Define TYPE_32_INT */
 #define TYPE_32_INT int
+
+#define MIN_DOUBLE DBL_MIN
+#define MAX_DOUBLE DBL_MAX
+
+#define LINES_PER_PAGE 60
+#define DYNMEMSIZEKB 512
+#define INPUT_LINE_LENGTH 80
+#define OUTPUT_LINE_LENGTH 80
