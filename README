@@ -37,23 +37,20 @@ INSTALL file.
 
 The simplest way to compile this package is:
 
-  1. `cd' to the directory containing the package's source code and 
-     type `./configure' (or `CFLAGS=-O2 LDFLAGS=-s ./configure', 
-     which is recomended when using GCC) to configure the package
-     for your system.
+  1. `cd' to the directory containing the package's source code and
+     type `cmake -B build' to configure the package for your system.
 
-     Running `configure' takes awhile.  While running, it prints some
-     messages telling which features it is checking for.
+  2. `cd' to the build directory.
 
-  2. Type `make' to compile the package
+  3. Type `make' to compile the package.
 
-  3. Type `make install' to install the package
+  4. Type `make install' to install the package.
 
 You may want to compile the run-time-system with CFLAGS=-O2, but
-have the cim compiler compile produced C-code with CFLAGS=-O0. 
+have the cim compiler compile produced C-code with CFLAGS=-O0.
 This can most easilly be done by the following steps:
 
-  1. `cd' to the directory containing the package's source code and 
+  1. `cd' to the directory containing the package's source code and
      type `CFLAGS=-O2 ./configure'
 
   2. Type `make' to compile the package.
@@ -63,7 +60,7 @@ This can most easilly be done by the following steps:
   4. type `CFLAGS=-O0 ./configure'
 
   5. type `cd src; make' followed by `make install'
-     
+
 GCC may run out of virtual memory, and therefore you may want to use a
 standard C-compiler instead. You can do that by typing `CC=cc
 ./configure'
@@ -103,8 +100,3 @@ program into separate compiled modules or use version 2 of cim
 instead.
 
 Sverre Hvammen Johansen
-
-
-
-
-

@@ -18,4 +18,4 @@ add_definitions(-DHAVE_CONFIG_H)
 # Build subdirectories.
 #
 add_subdirectory(src)
-#add_subdirectory(lib)
+add_subdirectory(lib)

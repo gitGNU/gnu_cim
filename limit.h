@@ -17,6 +17,7 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA. */
 
 #include "config.h"
+#include <limits.h>
 
 /* lex.c */
 #define MAX_TEXT_CHAR 65535  /* Max size of text-objects DO NOT EDIT */

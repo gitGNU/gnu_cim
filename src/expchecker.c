@@ -211,7 +211,7 @@ static void konvtype (exp_t **re, char type, decl_t *qual)
 	  if (((*re)->token == MNEWARG) ||
 	      (((*re)->up->left == NULL || (*re)->up->left->type != TERROR)
 	  && ((*re)->up->right == NULL || (*re)->up->right->type != TERROR)))
-	    serror (85, (*re)->up->token, 0);
+	    serror (85, "", (*re)->up->token);
 	  (*re)->type = (*re)->up->type = TERROR;
 	}
     }
