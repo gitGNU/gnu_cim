@@ -1,0 +1,94 @@
+! From: https://web.archive.org/web/20040923044631/http://www.macs.hw.ac.uk/~rjp/bookhtml/chap14.html ;
+begin
+    character array Board(1:3, 1:3);
+    integer N, M;
+    ref(Crosser) Cross_Player;
+    ref(Noughter) Nought_Player;
+
+    procedure Print_Board;
+    begin
+        integer N, M;
+        for N := 1 step 1 until 3 do
+        begin
+            for M := 1 step 1 until 3 do
+                OutChar(Board(N, M));
+            OutImage
+        end
+    end++of++Print_Board;
+
+    Boolean procedure Check_Board;
+    begin
+        comment Check for a winner;
+        integer N;
+        character Token;
+        Boolean Check;
+        for Token := 'O', 'X' do
+        begin
+            for N := 1 step 1 until 3 do
+                if (Board(N, 1)=Token and Board(N, 2)=Token and Board(N, 3)=Token) or
+                   (Board(1, N)=Token and Board(2, N)=Token and Board(3, N)=Token) then
+                begin
+                    Check := True;
+                    go to Found
+                end;
+            if (Board(1, 1)=Token and Board(2, 2)=Token and Board(3, 3)=Token) or
+               (Board(1, 3)=Token and Board(2, 2)=Token and Board(3, 1)=Token) then
+            begin
+                Check := True;
+                go to Found
+            end
+        end--of--Token--loop;
+Found:
+        if Check then
+        begin
+            OutText("Winner is ");
+            OutChar(Token);
+            OutImage;
+            Check_Board := True
+        end
+    end++of++Check_Board;
+
+    class Noughter;
+    begin
+        comment Reads in player's move and updates board;
+        integer N, M;
+        Detach;
+        while not Check_Board do
+        begin
+            OutText("Give position for nought as: n,m.");
+            OutImage;
+            N := InInt;
+            InChar;
+            M := InInt;
+            Board(N, M) := 'O';
+            Print_Board;
+            Resume(Cross_Player)
+        end--of--loop
+    end++of++Noughter;
+
+    class Crosser;
+    begin
+        comment Plays for the machine;
+        integer N, M;
+        Detach;
+        while not Check_Board do
+        begin
+            for N := 1 step 1 until 3 do
+                for M := 1 step 1 until 3 do
+                    if Board(N, M)=' ' then
+                        go to Found;
+Found:
+            Board(N, M) := 'X';
+            Print_Board;
+            Resume(Nought_Player)
+        end--of--loop
+    end++of++Crosser;
+
+    for N := 1 step 1 until 3 do
+        for M := 1 step 1 until 3 do
+            Board(N, M) := ' ';
+    Cross_Player :- new Crosser;
+    Nought_Player :- new Noughter;
+    Resume(Cross_Player)
+
+end**of**program

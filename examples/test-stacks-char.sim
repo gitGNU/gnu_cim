@@ -1,0 +1,45 @@
+! Stack implementation using the system class SIMSET;
+! Character stack;
+
+external class Stacks;
+Stacks begin
+
+    Link class Node(char);
+        character char;
+        ! User defined character stack element;
+    begin end;
+
+    ref(Stack) S;
+    ref(Node) Item;
+    character c;
+
+    ! Program body;
+
+    S :- new Stack;     ! Creating a stack;
+
+    outtext("Stack created, size = ");
+    outint(S.Size, 3);
+    outimage;
+    outtext("Enter a sentence, finish it by '.'");
+    outimage;
+    c := ' ';
+    while c <> '.' do begin
+        c := InChar;
+        Item :- new Node(c);
+        S.Push(Item);
+    end while;
+
+    outtext("Number of characters in the stack: ");
+    outint(S.Size, 3);
+    outimage;
+    outtext("The sentence inverted: ");
+    outimage;
+
+    while not S.Empty do begin
+        Item :- S.Pop;
+        c := Item.char;
+        outchar(c);
+    end while;
+    outimage;
+
+end**of**program;

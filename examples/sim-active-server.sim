@@ -1,0 +1,75 @@
+! Active server approach;
+Simulation begin
+    real        TrialDuration;          ! Experiment length [min];
+    ref(Head)   Queue;                  ! The queue;
+    integer     Servers;                ! Total number of servers;
+    integer     TrialSeedG, TrialSeedS; ! Seeds of random generators;
+    long real   TotalTime, TimeSpent;   ! Variables for statistics;
+    integer     CustomersOut;           ! Number of served customers;
+    real        MinInt, MaxInt;         ! Uniform interval between arrivals;
+    real        SMean, SStd;            ! Normal service duration;
+    ref(Server) array ServBank(1:10);   ! Max. number of servers;
+    integer     i;
+
+    Process class Generator;
+    begin
+        while true do begin
+            activate new Customer(Time);
+
+            ! Interval between arrivals: ;
+            Hold(Uniform(MinInt, MaxInt, TrialSeedG));
+        end while;
+    end of Generator;
+
+    Process class Server;
+    begin
+        ref(Customer) ServedOne;
+        while true do
+            if not Queue.Empty then begin
+                ServedOne :- Queue.First;
+                ServedOne.Out;          ! First from Queue served;
+                Hold(Normal(SMean, SStd, TrialSeedS));
+                activate ServedOne after Current
+            end
+            else begin
+                passivate;
+            end if
+    end of Server;
+
+    Process class Customer(Arrival);
+        real Arrival;
+    begin
+        for i:=1 step 1 until Servers do
+            if ServBank(i).Idle then
+                activate ServBank(i) after Current;
+        Wait(Queue);
+
+        ! Service finished;
+        ! Statistics;
+        CustomersOut := CustomersOut + 1;
+        TotalTime := TotalTime + Time - Arrival;
+    end of Customer;
+
+    ! MAIN program body: ;
+    TrialSeedG := 7;                    ! Seeds for random variables;
+    TrialSeedS := 23;
+    MinInt := 1;                        ! Min and Max intervals;
+    MaxInt := 3;
+    SMean := 8;                         ! Random normal servers;
+    SStd  := 2;
+    outtext("Enter the number of Servers : ");
+    outimage;
+    Servers := InInt;                   ! Initial numbers;
+    TrialDuration := 600;
+    Queue :- new Head;
+    for i:=1 step 1 until Servers do begin
+        ServBank(i) :- new Server;
+        activate ServBank(i)
+    end for;
+    activate new Generator;
+    Hold(TrialDuration);                ! Experiment duration;
+    TimeSpent := TotalTime / CustomersOut;
+    outtext("Average time spent in the system: ");
+    outfix(TimeSpent, 3, 10);
+    outimage;
+end of program;

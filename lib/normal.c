@@ -46,12 +46,8 @@ double __rnormal (double a, double b, long *U)
     p = 1.0 - u;
   else
     p = u;
-#if MATHLIB
   y = sqrt (-log (p * p));
-#else
-  y = __rsqrt (-__rln (p * p));
-#endif
-  x = y + ((((y * p4 + p3) * y + p2) * y + p1) * y + p0) 
+  x = y + ((((y * p4 + p3) * y + p2) * y + p1) * y + p0)
     / ((((y * q4 + q3) * y + q2) * y + q1) * y + q0);
   if (u < 0.5)
     x = -x;

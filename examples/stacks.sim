@@ -1,18 +1,19 @@
 ! Stack implementation using the system class SIMSET;
-Simset Class Stacks;
- Begin
-  Head Class Stack;
-  Begin
-    Procedure Push(x); Ref(Link) x;
-       x.Follow(This Head);
-
-    Ref(Link) Procedure Pop;
+Simset class Stacks;
+begin
+    Head class Stack;
     begin
-       Pop :- First;
-       First.Out;
-    end Pop;
+        procedure Push(x);
+            ref(Link) x;
+            x.Follow(this Head);
 
-    Integer Procedure Size;
-       Size := Cardinal;
- End Stack;
-End Stacks;
+        ref(Link) procedure Pop;
+        begin
+           Pop :- First;
+           First.Out;
+        end Pop;
+
+        integer procedure Size;
+            Size := Cardinal;
+    end Stack;
+end Stacks;
