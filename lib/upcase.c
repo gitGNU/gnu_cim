@@ -18,6 +18,7 @@
  */
 
 #include "cim.h"
+#include <ctype.h>
 
 /******************************************************************************
                                           TEXT PROCEDURE UPCASE(t)           */
@@ -30,8 +31,8 @@ __txtvp __rupcase (__txtvp t)
 
   for (i = 0; i < t->length; i++)
     s[t->start + i - 1] =
-      (isalpha (s[t->start + i - 1]) 
-       ? (islower (s[t->start + i - 1]) 
+      (isalpha (s[t->start + i - 1])
+       ? (islower (s[t->start + i - 1])
 	  ? toupper ((int) s[t->start + i - 1]) : s[t->start + i - 1])
        : s[t->start + i - 1]);
   __et.obj = t->obj;

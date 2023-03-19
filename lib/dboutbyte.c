@@ -19,6 +19,7 @@
 
 #define INCLUDE_SIMFILE_H
 #include "cim.h"
+#include <stdio.h>
 
 /******************************************************************************
                                          PROCEDURE OUTBYTE(x)                */
@@ -33,7 +34,7 @@ __dhp __rdboutbyte (__bs10FILE *p, long x)
     __rerror ("Outbyte: File overflow");
   if (p->loc < p->minwriteloc)
     __rerror ("Outbyte: Append underflow or read-only file");
-  if (p->lastop == __READ 
+  if (p->lastop == __READ
       && fseek (((__bs1FILE *) p)->file, p->loc - 1, 0) == __EOF)
     __rerror ("Outbyte: Not possible to seek");
   p->lastop = __WRITE;

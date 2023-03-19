@@ -19,6 +19,7 @@
 
 #define INCLUDE_SIMFILE_H
 #include "file.h"
+#include <stdio.h>
 
 #if STDC_HEADERS
 #include <stdlib.h>
@@ -49,7 +50,7 @@ static char __roptions (long antarg, char arg1[])
       if (arg1[1] == 'k' || arg1[1] == 'K')
 	(void) fprintf (stderr, "Poolsize is changed to %ldK\n", __poolsize);
       else
-	(void) fprintf (stderr, "Poolsize is changed to %ldM\n", 
+	(void) fprintf (stderr, "Poolsize is changed to %ldM\n",
 			__poolsize / 1024);
     }
   return (__TRUE);
@@ -117,6 +118,9 @@ RETSIGTYPE __rbus_trap (int ignore)
   __rerror ("System error: Bus error");
 }
 #endif
+
+extern __init (void);
+
 void __rstart (int argc, char *argv[])
 {
 #if CLOCK
@@ -134,7 +138,7 @@ void __rstart (int argc, char *argv[])
 
   __init ();
 
-/* SYSIN  :- new infile("...");   
+/* SYSIN  :- new infile("...");
  * SYSOUT :- new printfile("...");
  * SYSIN.open(blanks(INPUT_LINE_LENGTH));
  * SYSOUT.open(blanks(OUTPUT_LINE_LENGTH));
@@ -152,8 +156,8 @@ void __rstart (int argc, char *argv[])
   __rtextvalassign (&((__bs2FILE *) __rsysout ())->IMAGE, (__txtvp) & __tk0);
   __rtextvalassign (&((__bs2FILE *) __rsyserr ())->IMAGE, (__txtvp) & __tk0);
 
-  /* Kobler c1,c2 i blokk0 til objektene av infile og printfile * henholdsvis 
-   * 
+  /* Kobler c1,c2 i blokk0 til objektene av infile og printfile * henholdsvis
+   *
    * *  * *  * *  * *  * * sysin og sysout. */
   __blokk0FILE.c1 = __rsysin ();
   __blokk0FILE.c2 = __rsysout ();

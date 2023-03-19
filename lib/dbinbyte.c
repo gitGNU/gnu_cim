@@ -19,6 +19,7 @@
 
 #define INCLUDE_SIMFILE_H
 #include "cim.h"
+#include <stdio.h>
 
 /******************************************************************************
                                          (SHORT) INTEGER PROCEDURE INBYTE    */
@@ -30,7 +31,7 @@ long __rdbinbyte (__bs10FILE *p)
     __rerror ("Inbyte: Writeonly file");
   if (!((__bs1FILE *) p)->open)
     __rerror ("Inbyte: File closed");
-  if (p->lastop == __WRITE 
+  if (p->lastop == __WRITE
       && fseek (((__bs1FILE *) p)->file, p->loc - 1, 0) == __EOF)
     __rerror ("Outbyte: Not possible to seek");
   p->lastop = __READ;

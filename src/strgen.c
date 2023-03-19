@@ -712,7 +712,7 @@ static void do_for_each_stat_pointer (block_t *block)
     case KBLOKK:
     case KPRBLK:
       if (block->stat)
-	fprintf (ccode, "if(((__dhp)&__blokk%d%s)->gl!=__NULL|force)"
+	fprintf (ccode, "if((((__dhp)&__blokk%d%s)->gl!=__NULL)|force)"
 		 "__do_for_each_pointer((__dhp)&__blokk%d%s,doit,doit_notest);\n"
 		 ,block->blno, timestamp, block->blno,
 		 block->timestamp?block->timestamp:timestamp);

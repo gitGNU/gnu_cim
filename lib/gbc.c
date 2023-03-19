@@ -34,10 +34,10 @@
 /* Denne rutinen g}r igjennom alle stakk-pekere og gj|r utf|rer rutinen
  * doit for hver data peker.
  * Denne rutinen kalles fra pass 1 og pass 3 i GBC.
- * Dessuten kalles den ogs} fra add_to_pointers i det tilfellet 
+ * Dessuten kalles den ogs} fra add_to_pointers i det tilfellet
  * at poolen blir flyttet */
 
-static do_for_stack_pointers (void (*doit) ())
+static void do_for_stack_pointers (void (*doit) ())
 {
   int i,
     ar,
@@ -59,7 +59,7 @@ static do_for_stack_pointers (void (*doit) ())
 /* Denne rutinen g}r igjennom alle pekere for et dataobjekt
  * og utf|rer rutinen doit(_notest) for hver data peker.
  * Denne rutinen kalles fra pass 1 og pass 3 i GBC.
- * Dessuten kalles den ogs} fra add_to_pointers i det tilfellet 
+ * Dessuten kalles den ogs} fra add_to_pointers i det tilfellet
  * at poolen blir flyttet */
 
 void __do_for_each_pointer (__dhp p, void (*doit) (), void (*doit_notest) ())
@@ -180,8 +180,8 @@ static void do_add_to_list (__dhp *qp)
 /* Brukes som parameter til do_for_stack_pointers og do_for_each_pointer
  * for } f} oppdatert samtlige pekere til et objekt.
  * Den gies som parameter til de to nevnte rutinene fra GBC pass 3.
- * Den benytter seg av at adressen (etter flytting av objektet) 
- * til et objekt ligger i objektets GB-ord. 
+ * Den benytter seg av at adressen (etter flytting av objektet)
+ * til et objekt ligger i objektets GB-ord.
  * Denne informasjonen er lagt i GB-ordet av GBC pass 2 */
 
 static void do_update_pointer (__dhp *qp)
@@ -320,7 +320,7 @@ void __rgbc (void)
 /* Disse rutinene s|rger for at pekere blir oppdatert etter at pool'en er
  * flyttet. Do_add_to_pointer brukes som parameter til do_for_stack_pointers
  * og do_for_each_pointer, slik at pekerene blir oppdatert riktig.
- * Legg merke til at det er kun de pekere 
+ * Legg merke til at det er kun de pekere
  * som peker innenfor poolen som skal oppdateres.
  * Denne oppdateringen gj|res ved } traversere samtlige objekter p}
  * samme m}te som i GBC pass 3. */

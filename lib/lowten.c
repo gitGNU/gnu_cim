@@ -18,6 +18,7 @@
  */
 
 #include "cim.h"
+#include <ctype.h>
 
 /******************************************************************************
                                           CHARACTER PROCEDURE LOWTEN(c)      */
@@ -25,7 +26,7 @@
 char __rlowten (char c)
 {
   char s;
-  if (isdigit (c) || c == '+' || c == '-' 
+  if (isdigit (c) || c == '+' || c == '-'
       || c == '.' || c == ',' || c == 127 || c < 32
       || __risorank (c) > 127)
     __rerror ("Lowten: Illegal character");

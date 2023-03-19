@@ -19,6 +19,7 @@
 
 #define INCLUDE_SIMFILE_H
 #include "cim.h"
+#include <stdio.h>
 
 /******************************************************************************
                                          BOOLEAN PROCEDURE CLOSE             */
@@ -27,7 +28,7 @@ char __roclose (__bs1FILE *p)
 {
   if (p->open)
     {
-      if (((__bs1FILE *) p)->re_wind == __REWIND 
+      if (((__bs1FILE *) p)->re_wind == __REWIND
 	  && fseek (((__bs1FILE *) p)->file, 0L, 0) == __EOF)
 	__rerror ("Close: Not possible to rewind");
       if (((__bs2FILE *) p)->IMAGE.pos > 1)

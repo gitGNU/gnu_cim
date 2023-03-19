@@ -19,6 +19,7 @@
 
 #define INCLUDE_SIMFILE_H
 #include "cim.h"
+#include <stdio.h>
 
 /******************************************************************************
                                          PROCEDURE LOCATE(i)                 */

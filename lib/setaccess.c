@@ -20,6 +20,7 @@
 #define INCLUDE_SIMFILE_H
 #include "cim.h"
 #include <stdio.h>
+#include <ctype.h>
 
 /******************************************************************************
                                                 BOOLEAN PROCEDURE SETACCESS  */
@@ -73,7 +74,7 @@ char __rsetaccess (__bs1FILE *p, __txtvp t)
       p->purge = __NOPURGE;
       return (__TRUE);
     }
-  if (ppx->pref[2] == &__p5FILE || ppx->pref[2] == &__p10FILE) 
+  if (ppx->pref[2] == &__p5FILE || ppx->pref[2] == &__p10FILE)
                                               /* DIRECT FILES */
     {
       if (length == 8 && __rcompstr (s, "READONLY", 8))
@@ -113,7 +114,7 @@ char __rsetaccess (__bs1FILE *p, __txtvp t)
       if (length == 10 && __rcompstr (s, "BYTESIZE:0", 10))
 	return (__TRUE);
     }
-  if (!(ppx->pref[2] == &__p4FILE || ppx->pref[2] == &__p8FILE))	
+  if (!(ppx->pref[2] == &__p4FILE || ppx->pref[2] == &__p8FILE))
                                         /* NOT IN FILES */
     {
       if (length == 6 && __rcompstr (s, "APPEND", 6))

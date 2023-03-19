@@ -615,6 +615,7 @@ void __rexchange (__dhp sh, __dhp ob, int ret, void (*mret) ());
 char __rgetav (char ftype, __aritnamepar *p, long as, int ret, void (*mret) ());
 
 void __rcp (__pty ppx, long as);
+void __rcpp (__pty ppx);
 void __rterror (__txtvp t);
 void __renddecl (int plev);
 void __rep (void);
@@ -623,9 +624,11 @@ void __rrs (void);
 void __rcpb (int ret, void (*mret) ());
 void __rss (long as);
 void __rcprb (__pty ppx);
+void __rcprbb (int ret, void (*mret) ());
 void __reth (void);
 void __rgbc (void);
 void __do_for_each_pointer (__dhp p, void (*doit) (), void (*doit_notest) ());
+void __do_for_each_stat_pointer (void (*doit) (), void (*doit_notest) (), int force);
 void __rgoto (__dhp ob);
 void __rsystemerror (char *s);
 void __rendclass (int plev);
@@ -889,3 +892,5 @@ char **__rcopytextarrtoc (__arrp p, char byvalue);
 char *__rcopyarrtoc (__arrp p);
 
 char *xmalloc (unsigned int size);
+void __update_gl_to_obj (void);
+void __update_gl_to_null (void);
