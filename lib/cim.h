@@ -605,7 +605,7 @@ char __rgetrv (__refnamepar *p, long as, int ret, void (*mret) ());
 char __rgettv (__textnamepar *p, long as, int ret, void (*mret));
 char __rgetproc (__procname *p, long as, int ret, void (*mret) ());
 char __rgetlab (__labelnamepar *p, long as, int ret, void (*mret) ());
-char __rgetsa (__simplenamepar *p, long as, int ret, void (*mret) ());
+char __rgetsa (__aritnamepar *p, long as, int ret, void (*mret) ());
 void __rreturn (long vret, int ret, void (*mret) ());
 void __rundump (__txtvp t, int ret, void (*mret) ());
 void __rdump (__txtvp t, int ret, void (*mret) ());
