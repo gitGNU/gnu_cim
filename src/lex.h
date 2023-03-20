@@ -26,6 +26,7 @@ extern char staticblock;
 
 int ylex (void);
 int yylex (void);
+int yyparse (void);
 void lex_init (void);
 int lex_init_pass1 (char *sourcename);
 void lex_reinit (void);
