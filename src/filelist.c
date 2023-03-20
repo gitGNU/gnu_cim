@@ -252,17 +252,23 @@ static FILE *open_and_position_arch_name (char *archname, char *name)
 #endif
   if (f == NULL)
     merror (6, archname);
-  fscanf (f, "%7s", s1);
+  if (fscanf (f, "%7s", s1) != 1)
+    merror (7, archname);
   getc (f);
   if (strcmp (s1, "!<arch>"))
     merror (7, archname);
   while ((s2 = short_file_name (f)) != NULL)
     {
-      fscanf (f, "%12ld", &l);
-      fscanf (f, "%6ld", &l);
-      fscanf (f, "%6ld", &l);
-      fscanf (f, "%8ld", &l);
-      fscanf (f, "%10ld", &l);
+      if (fscanf (f, "%12ld", &l) != 1)
+	merror (8, archname);
+      if (fscanf (f, "%6ld", &l) != 1)
+	merror (8, archname);
+      if (fscanf (f, "%6ld", &l) != 1)
+	merror (8, archname);
+      if (fscanf (f, "%8ld", &l) != 1)
+	merror (8, archname);
+      if (fscanf (f, "%10ld", &l) != 1)
+	merror (8, archname);
       while ((c = getc (f)) != '`' && c != EOF);
       if (c != '`' || getc (f) != '\n')
 	merror (8, archname);

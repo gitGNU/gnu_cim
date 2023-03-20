@@ -1168,7 +1168,7 @@ void genvalue (exp_t *re)
       gen_ref_stack (re->value.stack.ref_entry);
       fprintf (ccode, "= __NULL;"
 	       "");
-      fprintf (ccode, "");
+      fputs ("", ccode);
       gen_int_stack (re->value.stack.val_entry);
       fprintf (ccode, "= ((char *)&");
       gen_txt_stack (re->value.stack.txt_entry);

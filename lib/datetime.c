@@ -71,7 +71,7 @@ __txtvp __rdatetime (long as)
 		  tmp->tm_year + 1900, tmp->tm_mon + 1, tmp->tm_mday,
 		  tmp->tm_hour, tmp->tm_min, tmp->tm_sec
 #if HAVE_GETTIMEOFDAY
-		  ,tip.tv_usec / 10000
+		  , (int)(tip.tv_usec / 10000)
 #endif
     );
   return (&__et);

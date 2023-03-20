@@ -619,10 +619,12 @@ int main (int argc, char *argv[], char *envp[])
 	 PACKAGE_VERSION, SYSTEM_TYPE);
     }
 
-  if(option_atr)
-    system (newstrcat6 ("cp -f ", extcodename, " ", extcodename,
-			 ".old", " 2>/dev/null"));
-
+  if(option_atr) {
+    if (system (newstrcat6 ("cp -f ", extcodename, " ", extcodename,
+			 ".old", " 2>/dev/null")) != 0) {
+      fprintf (stderr, "Failed to copy %s to %s.old\n", extcodename, extcodename);
+    }
+  }
   if(option_checkdiff)
     {
       rename (ccodename, newstrcat2 (ccodename, ".old"));
@@ -803,7 +805,9 @@ int main (int argc, char *argv[], char *envp[])
 	    || option_nocc || option_notempdel))
 	fprintf (shlfile, "rm -f %s\n",shlname);
       fclose (shlfile);
-      system (newstrcat2 ("chmod +x ", shlname));
+      if (system (newstrcat2 ("chmod +x ", shlname)) != 0) {
+	fprintf (stderr, "%s: Failed to set executable flag\n", shlname);
+      }
     }
   fflush (stdout);
   argv[0]= shlname;

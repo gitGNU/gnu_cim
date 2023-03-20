@@ -104,8 +104,8 @@ static char *first_object_allocated_ptr_extspec;
 #define CPROC_MARKER '^'
 #define NO_MARKER '$'
 #define inchar(f) getc(f)
-#define getval(f, i)  { int tmp;fscanf(f,"%d",&tmp);i=tmp;}
-#define getconst(f, i)  { fscanf(f,"%ld",&i);}
+#define getval(f, i)  { int tmp; if (1 == fscanf(f,"%d",&tmp)) i=tmp; else i=0; }
+#define getconst(f, i)  { if (1 != fscanf(f,"%ld",&i)) i=0; }
 
 /******************************************************************************
                                                               INITEXTSPEC    */
@@ -179,8 +179,8 @@ void gettimestamp (void)
       {
 	char r_buff[12];
 	r_buff[0] = '\0';
-	fscanf (f, "%11s\n", r_buff);
-	if (strcmp (r_buff, "/*Cim_atr*/"))
+	if (fscanf (f, "%11s\n", r_buff) == 1 &&
+	    strcmp (r_buff, "/*Cim_atr*/"))
 	  merror (5, extcodename);
       }
 
@@ -431,8 +431,8 @@ static char *lesinn (char *filename)
   {
     char r_buff[12];
     r_buff[0] = '\0';
-    fscanf (f, "%11s\n", r_buff);
-    if (strcmp (r_buff, "/*Cim_atr*/"))
+    if (fscanf (f, "%11s\n", r_buff) == 1 &&
+        strcmp (r_buff, "/*Cim_atr*/"))
       merror (5, filename);
   }
 
@@ -1009,8 +1009,8 @@ void more_modules (void)
 
 	/* Leser identifikasjon , som alltid ligger f|rst p} filen */
 	r_buff[0] = '\0';
-	fscanf (f, "%11s\n", r_buff);
-	if (strcmp (r_buff, "/*Cim_atr*/"))
+	if (fscanf (f, "%11s\n", r_buff) == 1 &&
+	    strcmp (r_buff, "/*Cim_atr*/"))
 	  merror (5, st->filename);
 
 	/* Leser tidsmerke */
