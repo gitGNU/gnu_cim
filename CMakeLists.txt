@@ -7,6 +7,8 @@ if(NOT CMAKE_BUILD_TYPE)
         "Default build type: RelWithDebInfo" FORCE)
 endif()
 
+add_compile_options(-Werror -Wno-unsequenced) # TODO: -Wall
+
 #
 # Create config.h.
 #

@@ -47,7 +47,7 @@ sent_t module;
 /******************************************************************************
                                                                        SPUSH */
 
-static spush(sent_t *re)
+static void spush(sent_t *re)
 {
   obstack_grow (&os_stack, &re, sizeof (void *));
 }
@@ -304,7 +304,7 @@ sent_t *sbuild(void)
 	    p= mpointer;
 	    ebuild ();
 	    if (p == mpointer)
-	      serror (71, token, 0);
+	      serror (71, "", token);
 	    continue;
 	  }
 	}

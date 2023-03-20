@@ -83,6 +83,8 @@ char setdanger_const (exp_t *re)
 		case MINTEGERKONST:
 		case MBOOLEANKONST:
 		  continue;
+                default:
+                  break;
 		}
 	      KONST = FALSE;
 	      break;
@@ -107,6 +109,8 @@ char setdanger_const (exp_t *re)
     case MELSE:
       re->danger = sub_danger;
       break;
+    default:
+      break;
     }
   return (sub_danger | re->danger);
 }
@@ -121,11 +125,12 @@ static int sstrcmp (char s[], char t[])
     ss,
     tt;
   i = 0;
-  if (s == NOTEXT)
+  if (s == NOTEXT) {
     if (t == NOTEXT)
       return (0);
     else
       return ((char) -1);
+  }
   while (s[i] == t[i])
     {
       if (s[i] == '\0')
@@ -161,11 +166,12 @@ int sstrlen (char s[])
   while (s[i])
     {
       ii++;
-      if (s[i++] == '\\')
+      if (s[i++] == '\\') {
 	if (s[i++] == '\n')
 	  ii--;
 	else
 	  i += 2;
+      }
     }
   if (ii >= MAX_TEXT_CHAR)
     serror (44, "", 0);

@@ -123,11 +123,11 @@ void genchain (block_t *rb, char atr)
 	  if (atr)
 	    fprintf (ccode, "((__bs%d *)__lb", rb->blno);
 	  else
-	    fprintf (ccode, "__lb", rb->blno);
+	    fprintf (ccode, "__lb");
 	  for (i = cblev + (inthunk ? 1 : 0); i > rb->blev; i--)
 	    fprintf (ccode, "->sl");
 	  if (atr)
-	    fprintf (ccode, ")->", rb->blno);
+	    fprintf (ccode, ")->");
 	}
     }
 }
@@ -943,17 +943,15 @@ void genvalue (exp_t *re)
 			fprintf (ccode,
 				 "bp)+");
 		      else
-			fprintf (ccode, "bp)+",
-				 re->rd->ident);
+			fprintf (ccode, "bp)+");
 
 		      gensl (re, TRUE, ON);
 		      fprintf (ccode, "%s.", re->rd->ident);
 
 		      if (re->rd->categ == CVAR)
-			fprintf (ccode, "ofs)", re->rd->ident);
+			fprintf (ccode, "ofs)");
 		      else
-			fprintf (ccode, "v.ofs)",
-				 re->rd->ident);
+			fprintf (ccode, "v.ofs)");
 		    }
 		}
 	    }		/* End Var eller Name-parameter */
@@ -1069,8 +1067,7 @@ void genvalue (exp_t *re)
 	      fprintf
 		(ccode, "((__arrp)");
 	      gen_ref_stack (re->value.stack.ref_entry);
-	      fprintf (ccode, ")->h.dim!=%d?__rerror(__errarr):1;",
-		 dim, re->rd->ident);
+	      fprintf (ccode, ")->h.dim!=%d?__rerror(__errarr):1;", dim);
 	    }
 	  dim= 0;
 	  for (rex = re->right; rex->token != MENDSEP; rex = rex->right)
@@ -1204,8 +1201,8 @@ void genvalue (exp_t *re)
 	genchain (re->qual->descr, FALSE);
       break;
     case MQUA:
-      /* Sjekker om det er n\dvendig } utf\re en none-test, eller om den er
-       * utf\rt lengre ned i treet. */
+      /* Checks whether it is necessary to perform a none test,
+       * or whether it has been performed further down the tree. */
       if (re->left->token != MDOT && re->left->token != MQUA &&
 	  re->left->token != MQUANOTNONE && nonetest == ON)
 	{
@@ -1229,8 +1226,8 @@ void genvalue (exp_t *re)
       fprintf (ccode, ")?(__dhp)__rerror(__errqual):__bp)");
       break;
     case MQUANOTNONE:
-      /* Sjekker om det er n\dvendig } utf\re en none-test, eller om den er
-       * utf\rt lengre ned i treet. */
+      /* Checks whether it is necessary to perform a none test,
+       * or whether it has been performed further down the tree. */
       if (re->left->token != MDOT && re->left->token != MQUA &&
 	  re->left->token != MQUANOTNONE)
 	{

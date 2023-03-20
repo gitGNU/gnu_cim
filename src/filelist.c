@@ -145,6 +145,7 @@ char insert_name_in_dirlist (char *name)
   if (name==NULL)
     {
       clear_list (&dirlist);
+      return TRUE;
     }
   else
     {

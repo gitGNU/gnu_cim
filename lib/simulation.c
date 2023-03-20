@@ -396,7 +396,7 @@ __rinner(2);goto __sw;__l9:
 # 73 "simulation.sim"
 __rendclass(2);goto __sw;/* SLUTT CLASS PROCESS *//* START PROCEDURE activat */__l14:
 # 75 "simulation.sim"
-(((__bp=((__bs230 *)__lb)->X)!=__NULL && (__bp->pp->pref[2]!= &__p225SIMULATION))?(__dhp)__rerror(__errqual):__bp);(((__bp=((__bs230 *)__lb)->Y)!=__NULL && (__bp->pp->pref[2]!= &__p225SIMULATION))?(__dhp)__rerror(__errqual):__bp);
+if((__bp=((__bs230 *)__lb)->X)!=__NULL && (__bp->pp->pref[2]!= &__p225SIMULATION))__rerror(__errqual);if((__bp=((__bs230 *)__lb)->Y)!=__NULL && (__bp->pp->pref[2]!= &__p225SIMULATION))__rerror(__errqual);
 # 85 "simulation.sim"
 ;if(!(((((__bs230 *)__lb)->X!=__NULL)&&((!((__bs225 *)((__bp=((__bs230 *)__lb)->X)==__NULL?(__dhp)__rerror(__errnone):__bp))->zzterminated_process)&&(((__bs230 *)__lb)->REAC||(((__bs225 *)((__bp=((__bs230 *)__lb)->X)==__NULL?(__dhp)__rerror(__errnone):__bp))->zzsqssuc==__NULL))))))goto __ll5;
 # 87 "simulation.sim"
@@ -530,7 +530,7 @@ __repp();goto __sw;/* SLUTT PROCEDURE HOLD *//* START PROCEDURE PASSIVATE */__l1
 # 180 "simulation.sim"
 __repp();goto __sw;/* SLUTT PROCEDURE PASSIVATE *//* START PROCEDURE WAIT */__l17:
 # 182 "simulation.sim"
-(((__bp=((__bs233 *)__lb)->S)!=__NULL && (__bp->pp->pref[1]!= &__p216SIMSET))?(__dhp)__rerror(__errqual):__bp);
+if((__bp=((__bs233 *)__lb)->S)!=__NULL && (__bp->pp->pref[1]!= &__p216SIMSET))__rerror(__errqual);
 # 184 "simulation.sim"
 ;((__bs233 *)__lb)->p=((__bs225 *)((__bp=((__bs222 *)__lb->sl)->zzsqs)==__NULL?(__dhp)__rerror(__errnone):__bp))->zzsqssuc;
 # 185 "simulation.sim"
@@ -548,7 +548,7 @@ __sl=((__bp=((__bs233 *)__lb)->p)==__NULL?(__dhp)__rerror(__errnone):__bp);__rcp
 # 193 "simulation.sim"
 __repp();goto __sw;/* SLUTT PROCEDURE WAIT *//* START PROCEDURE CANCEL */__l18:
 # 195 "simulation.sim"
-(((__bp=((__bs234 *)__lb)->x)!=__NULL && (__bp->pp->pref[2]!= &__p225SIMULATION))?(__dhp)__rerror(__errqual):__bp);
+if((__bp=((__bs234 *)__lb)->x)!=__NULL && (__bp->pp->pref[2]!= &__p225SIMULATION))__rerror(__errqual);
 # 198 "simulation.sim"
 ;if(!(((((__bs234 *)__lb)->x!=__NULL)&&(((__bs225 *)((__bp=((__bs234 *)__lb)->x)==__NULL?(__dhp)__rerror(__errnone):__bp))->zzsqssuc!=__NULL))))goto __ll41;
 # 200 "simulation.sim"

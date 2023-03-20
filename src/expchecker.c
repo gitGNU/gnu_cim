@@ -986,6 +986,8 @@ static void exp_check (exp_t *re)
 	  break;
 	}
       break;
+    default:
+      break;
     }
 }
 

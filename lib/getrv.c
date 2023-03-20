@@ -66,7 +66,7 @@ char __rgetrv (__refnamepar *p, long as, int ret, void (*mret) ())
       return (__TRUE);
     case __ADDRESS_NOTHUNK:
       __er = *(__dhp *) (((char *) p->bp) + p-> v.ofs);
-      if ((p->conv == __READTEST || p->conv == __READWRITETEST) 
+      if ((p->conv == __READTEST || p->conv == __READWRITETEST)
 	  && !__rin (__er, p->q))
 	__rerror ("Getrv: Wrong qualification");
 #if SPLIT_MODUL
@@ -83,4 +83,5 @@ char __rgetrv (__refnamepar *p, long as, int ret, void (*mret) ())
       return (__FALSE);
     }
   /* NOTREACHED */
+  return 0;
 }

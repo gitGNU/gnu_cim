@@ -260,7 +260,7 @@ __rendclass(0);goto __sw;/* SLUTT CLASS LINKAGE *//* START CLASS LINK *//* START
 # 50 "simset.sim"
 __ll1:__repp();goto __sw;/* SLUTT PROCEDURE OUT *//* START PROCEDURE FOLLOW */__l15:
 # 52 "simset.sim"
-(((__bp=((__bs213 *)__lb)->PTR)!=__NULL && (__bp->pp->pref[0]!= &__p207SIMSET))?(__dhp)__rerror(__errqual):__bp);
+if((__bp=((__bs213 *)__lb)->PTR)!=__NULL && (__bp->pp->pref[0]!= &__p207SIMSET))__rerror(__errqual);
 # 53 "simset.sim"
 __sl=__lb->sl;__rcpp(&__p212SIMSET);__rcpb(26,__m_SIMSET);goto __sw;__l26:;;
 # 54 "simset.sim"
@@ -274,7 +274,7 @@ __sl=__lb->sl;__rcpp(&__p212SIMSET);__rcpb(26,__m_SIMSET);goto __sw;__l26:;;
 # 58 "simset.sim"
 __ll2:__repp();goto __sw;/* SLUTT PROCEDURE FOLLOW *//* START PROCEDURE PRECEDE */__l16:
 # 60 "simset.sim"
-(((__bp=((__bs214 *)__lb)->PTR)!=__NULL && (__bp->pp->pref[0]!= &__p207SIMSET))?(__dhp)__rerror(__errqual):__bp);
+if((__bp=((__bs214 *)__lb)->PTR)!=__NULL && (__bp->pp->pref[0]!= &__p207SIMSET))__rerror(__errqual);
 # 61 "simset.sim"
 __sl=__lb->sl;__rcpp(&__p212SIMSET);__rcpb(27,__m_SIMSET);goto __sw;__l27:;;
 # 62 "simset.sim"
@@ -288,7 +288,7 @@ __sl=__lb->sl;__rcpp(&__p212SIMSET);__rcpb(27,__m_SIMSET);goto __sw;__l27:;;
 # 66 "simset.sim"
 __ll3:__repp();goto __sw;/* SLUTT PROCEDURE PRECEDE *//* START PROCEDURE INTO */__l17:
 # 68 "simset.sim"
-(((__bp=((__bs215 *)__lb)->S)!=__NULL && (__bp->pp->pref[1]!= &__p216SIMSET))?(__dhp)__rerror(__errqual):__bp);__sl=__lb->sl;__rcpp(&__p214SIMSET);((__bs214 *)__pb)->PTR=((__bs215 *)__lb)->S;__rcpb(28,__m_SIMSET);goto __sw;__l28:;;__repp();goto __sw;/* SLUTT PROCEDURE INTO */__l11:
+if((__bp=((__bs215 *)__lb)->S)!=__NULL && (__bp->pp->pref[1]!= &__p216SIMSET))__rerror(__errqual);__sl=__lb->sl;__rcpp(&__p214SIMSET);((__bs214 *)__pb)->PTR=((__bs215 *)__lb)->S;__rcpb(28,__m_SIMSET);goto __sw;__l28:;;__repp();goto __sw;/* SLUTT PROCEDURE INTO */__l11:
 # 42 "simset.sim"
 __renddecl(1);goto __sw;__l12:__rinner(1);goto __sw;__l13:
 # 70 "simset.sim"

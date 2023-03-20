@@ -540,7 +540,7 @@ static void scan_nows (void)
   yytext= obstack_finish (&os_lex);
 }
 
-static scan_name (void)
+static void scan_name (void)
 {
   obstack_free (&os_lex, yytext);
   while ((isalnum (lexchar) || lexchar == '_'))
@@ -784,9 +784,9 @@ static void scan_dirline (void)
 	    case 'D':
 	      if (!strcmp (yytext, "DEFINE"))
 		{
-		  while (lexchar == ' ' | lexchar == '\t')
+		  while (lexchar == ' ' || lexchar == '\t')
 		    newlexchar;
-		  if (isalpha (lexchar) | lexchar == '_')
+		  if (isalpha (lexchar) || lexchar == '_')
 		    {
 		      scan_name ();
 
@@ -876,9 +876,9 @@ static void scan_dirline (void)
 	    case 'M':
 	      if (!strcmp (yytext, "MAIN"))
 		{
-		  while (lexchar == ' ' | lexchar == '\t')
+		  while (lexchar == ' ' || lexchar == '\t')
 		    newlexchar;
-		  if (isalpha (lexchar) | lexchar == '_')
+		  if (isalpha (lexchar) || lexchar == '_')
 		    {
 		      scan_name ();
 
@@ -926,9 +926,9 @@ static void scan_dirline (void)
 	    case 'T':
 	      if (!strcmp (yytext, "TIMESTAMP"))
 		{
-		  while (lexchar == ' ' | lexchar == '\t')
+		  while (lexchar == ' ' || lexchar == '\t')
 		    newlexchar;
-		  if (isalpha (lexchar) | lexchar == '_')
+		  if (isalpha (lexchar) || lexchar == '_')
 		    {
 		      scan_name ();
 
@@ -943,9 +943,9 @@ static void scan_dirline (void)
 	    case 'U':
 	      if (!strcmp (yytext, "UNDEF"))
 		{
-		  while (lexchar == ' ' | lexchar == '\t')
+		  while (lexchar == ' ' || lexchar == '\t')
 		    newlexchar;
-		  if (isalpha (lexchar) | lexchar == '_')
+		  if (isalpha (lexchar) || lexchar == '_')
 		    {
 		      scan_name ();
 
@@ -1028,7 +1028,7 @@ static char *putcharacter (unsigned char character)
  *  for } bygge opp et konstant-tekstobjekt.
  *  Denne rutinen kalles for hvert tegn som skal inn i tekst-objektet. */
 
-static putchartext ( unsigned char character)
+static void putchartext ( unsigned char character)
 {
   char *s;
   s = putcharacter (character);
@@ -1389,7 +1389,7 @@ int yylex (void)
 	    yylval.token = HEQR;
 	    return (HREFRELOPERATOR);
 	  }
-	if (lexchar == '/')
+	if (lexchar == '/') {
 	  if (newlexchar == '=')
 	    {
 	      yylval.token = HNER;
@@ -1397,6 +1397,7 @@ int yylex (void)
 	    }
 	  else
 	    lerror (7);
+        }
 	unput (lexchar);
 	yylval.token = HEQ;
 	return (HVALRELOPERATOR);
@@ -1492,11 +1493,12 @@ int yylex (void)
 	    return (HREALKONST);
 
 	  }
-	if (lexchar == '.')
+	if (lexchar == '.') {
 	  if (newlexchar == '.')
 	    return (HDOTDOTDOT);
 	  else
 	    lerror (7);
+        }
 	unput (lexchar);
 	return (HDOT);
       case ',':
@@ -1871,7 +1873,7 @@ void scan_and_write_tokens (void)
   int token;
   long line = 1L;
   /* printf("% Cim_pp\n%line 1 %s\n",sourcename); */
-  while (token = yylex ())
+  while ((token = yylex ()))
     {
       while (line < lineno)
 	{

@@ -48,7 +48,7 @@ char __rgetlab (__labelnamepar *p, long as, int ret, void (*mret) ())
                                  * lenger peker riktig, leses disse
                                  * verdiene forer kallet. */
       __sl = p->sl;
-      __rct (as);		/* Oppretter objektet og overf|rer 
+      __rct (as);		/* Oppretter objektet og overf|rer
 				 * returadressen. */
       ((__thunkp) __pb)->h.ex.ment = mret;
       ((__thunkp) __pb)->h.ex.ent = ret;
@@ -65,4 +65,5 @@ char __rgetlab (__labelnamepar *p, long as, int ret, void (*mret) ())
       return (__FALSE);
     }
   /* NOTREACHED */
+  return 0;
 }

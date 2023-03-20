@@ -212,5 +212,5 @@ void genmap (void)
 	       m->line, m->fromline);
       m = m->neste;
     }
-  fprintf (ccode, "\"\",0L,%ldL};\n", MAX_INT);
+  fprintf (ccode, "\"\",0L,%dL};\n", MAX_INT);
 }

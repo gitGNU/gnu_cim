@@ -97,7 +97,7 @@ void sent_check (sent_t *parent_sent, char res_labels)
 	case MINSPECT:
 	  main_exp_check (sent->exp);
 	  if (sent->exp->type != TREF && sent->exp->type != TERROR)
-	    serror (73, token, 0);
+	    serror (73, "", token);
 	  in_block ();
 	  sent->cblock=cblock;
           reginsp (sent->cblock, sent->exp->qual);
@@ -171,7 +171,7 @@ void sent_check (sent_t *parent_sent, char res_labels)
 	  sent->cblock=cblock;
 	  main_exp_check (sent->exp);
 	  if (sent->exp->type != TBOOL && sent->exp->type != TERROR)
-	    serror (77, token, 0);
+	    serror (77, "", token);
 	  if (sent->first == NULL) serror (81, "", 0);
 	  sent_check (sent, res_labels);
 	  break;
@@ -180,7 +180,7 @@ void sent_check (sent_t *parent_sent, char res_labels)
 	  main_exp_check (sent->exp);
 	  if (sent->exp->type != TBOOL)
 	    if (sent->exp->type != TERROR)
-	      serror (77, token, 0);
+	      serror (77, "", token);
 	  sent_check (sent, res_labels);
 	  break;
 	case MELSE:
@@ -195,7 +195,7 @@ void sent_check (sent_t *parent_sent, char res_labels)
 	  sent->cblock=cblock;
 	  main_exp_check (sent->exp);
 	  if (sent->exp->type != TLABEL && sent->exp->type != TERROR)
-	    serror (108, token, 0);
+	    serror (108, "", token);
 	  break;
 	case MINNER:
 	  sent->cblock=cblock;
@@ -221,6 +221,8 @@ void sent_check (sent_t *parent_sent, char res_labels)
 	case MENDLABEL:
 	  sent->cblock=cblock;
 	  main_exp_check (sent->exp);
+	  break;
+	default:
 	  break;
 	}
     }

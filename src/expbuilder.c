@@ -176,7 +176,7 @@ static void eclean(void )
 /******************************************************************************
 								       EPUSH */
 
-static epush(exp_t *re)
+static void epush(exp_t *re)
 {
   obstack_grow (&os_stack, &re, sizeof (void *));
 }

@@ -671,7 +671,7 @@ static void procedure_entry_gen (sent_t *sent)
     {
       if (rd->kind == KSIMPLE && rd->type == TREF && rd->categ != CNAME)
 	{
-	  fprintf (ccode, "(((__bp=((__bs%d *)__lb)->%s"
+	  fprintf (ccode, "if((__bp=((__bs%d *)__lb)->%s"
 			  ,rd->encl->blno,rd->ident);
 	  fprintf (ccode, ")!=__NULL && (");
 	  if (rd->prefqual->plev >= DEF_PLEV_TAB_SIZE)
@@ -680,7 +680,7 @@ static void procedure_entry_gen (sent_t *sent)
 	  fprintf (ccode, "__bp->pp->pref[%ld]!= ",
 			  rd->prefqual->plev);
 	  gen_adr_prot (ccode, rd->prefqual);
-	  fprintf (ccode, "))?(__dhp)__rerror(__errqual):__bp);");
+	  fprintf (ccode, "))__rerror(__errqual);");
 	}
       rd = rd->next;
     }
@@ -937,6 +937,8 @@ static void thunk_gen (sent_t *sent)
     case MTHUNKPROCEDURE:
       gen_thunk_procedure (sent->exp);
       break;
+    default:
+      break;
     }
   gotoswitch ();
 }
@@ -1023,6 +1025,8 @@ void sent_gen (sent_t *sent, int lab)
     case MTHUNKARRAY:
     case MTHUNKPROCEDURE:
       thunk_gen (sent);
+      break;
+    default:
       break;
     }
 }

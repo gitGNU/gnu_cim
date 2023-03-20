@@ -580,8 +580,7 @@ static int parseoptions (int argc, char *argv[])
 
 /******************************************************************************
                                                                         MAIN */
-
-main (int argc, char *argv[], char *envp[])
+int main (int argc, char *argv[], char *envp[])
 {
   char *archname;
   char *kom;
@@ -613,7 +612,7 @@ main (int argc, char *argv[], char *envp[])
 	(stderr,
 	 "Cim Compiler (version: %s configuration name: %s).\n"
 	 "Copyright 1989-1998 by Sverre Hvammen Johansen, Stein Krogdahl,"
-	 "Terje Mjøs and Free Software Foundation, Inc.\n"
+	 "Terje MjÃ¸s and Free Software Foundation, Inc.\n"
 	 "Cim comes with ABSOLUTELY NO WARRANTY.\n"
 	 "This is free software, and you are welcome to redistribute it\n"
 	 "under the GNU General Public License; version 2.\n",
@@ -778,7 +777,7 @@ main (int argc, char *argv[], char *envp[])
 	       "  fi\n"
 	       "fi\n"
 	       "\n",
-	       ccomp, "", SLDFLAGS,
+	       ccomp, "-Wno-unsequenced", SLDFLAGS,
 	       WL_FLAG, LINK_STATIC_FLAG, PIC_FLAG,
 	       ccodename, ccodename,
 	       ccodename,

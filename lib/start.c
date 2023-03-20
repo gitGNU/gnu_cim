@@ -119,7 +119,7 @@ RETSIGTYPE __rbus_trap (int ignore)
 }
 #endif
 
-extern __init (void);
+extern void __init (void);
 
 void __rstart (int argc, char *argv[])
 {

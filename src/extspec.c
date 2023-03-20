@@ -741,11 +741,10 @@ static void write_decl_mif (FILE *f, decl_t *rd, int level)
       if (rd->type == TLABEL)
 	fprintf (f, "\n%% ENT %d", rd->plev);
 #endif
-      if (rd->categ == CCONST)
-	if (rd->type == TTEXT)
-	  write_text_mif (f, rd->value.tval.txt);
-	else if (rd->type == TREAL)
-	  {
+      if (rd->categ == CCONST) {
+	if (rd->type == TTEXT) {
+	  write_text_mif (f, (unsigned char*)rd->value.tval.txt);
+	} else if (rd->type == TREAL) {
 	    char s[100];
 	    int i;
 	    sprintf (s, "= %.16le", rd->value.rval);
@@ -756,11 +755,12 @@ static void write_decl_mif (FILE *f, decl_t *rd, int level)
 		  break;
 		}
 	    fprintf (f, "%s", s);
-	  }
-	else if (rd->type == TCHAR)
+	} else if (rd->type == TCHAR) {
 	  write_char_mif (f, rd->value.ival);
-	else
+	} else {
 	  fprintf (f, "= %ld", rd->value.ival);
+        }
+      }
       if (rd->kind == KARRAY && rd->type != TLABEL)
 	{
 	  int i;
@@ -844,8 +844,7 @@ static void write_all_mif (void)
 
 /******************************************************************************
                                                               WRITE_DECL_EXT */
-
-static write_decl_ext (FILE *f, decl_t *rd)
+static void write_decl_ext (FILE *f, decl_t *rd)
 {
   if (rd->kind == KBLOKK || rd->kind == KPRBLK || rd->kind == KFOR ||
       rd->kind == KINSP) ;
@@ -921,7 +920,7 @@ static write_decl_ext (FILE *f, decl_t *rd)
       else if (rd->type == TLABEL)
 	fprintf (f, "%ld", rd->plev);
 
-      if (rd->categ == CCONST)
+      if (rd->categ == CCONST) {
 	if (rd->type == TTEXT)
 	  fprintf (f, "%ld %s "
 			  ,strlen (rd->value.tval.txt)
@@ -930,6 +929,7 @@ static write_decl_ext (FILE *f, decl_t *rd)
 	  fprintf (f, "%.16e ", rd->value.rval);
 	else
 	  fprintf (f, "%ld ", rd->value.ival);
+      }
       if (rd->kind == KARRAY)
 	fprintf (f, "%c", (rd->dim + ((short) '0')));
     }
