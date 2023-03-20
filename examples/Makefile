@@ -30,3 +30,7 @@ clean:
 
 %.o:    %.sim
 	gnucim -c $<
+
+chess-with-classes:: chess.o
+test-stacks-char:: stacks.o
+test-stacks-var:: stacks.o
