@@ -31,8 +31,6 @@
 
 #include "obstack.h"
 
-char *xmalloc();
-
 #define obstack_chunk_alloc xmalloc
 #define obstack_chunk_free free
 

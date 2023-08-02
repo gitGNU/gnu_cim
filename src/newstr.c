@@ -31,8 +31,7 @@
 #include <stdlib.h>
 #endif
 
-
-char *xmalloc();
+char *xmalloc (unsigned int size);
 
 #define obstack_chunk_alloc xmalloc
 #define obstack_chunk_free free

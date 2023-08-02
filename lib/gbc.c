@@ -37,7 +37,7 @@
  * Dessuten kalles den ogs} fra add_to_pointers i det tilfellet
  * at poolen blir flyttet */
 
-static void do_for_stack_pointers (void (*doit) ())
+static void do_for_stack_pointers (void (*doit) (__dhp*))
 {
   int i,
     ar,
@@ -62,7 +62,7 @@ static void do_for_stack_pointers (void (*doit) ())
  * Dessuten kalles den ogs} fra add_to_pointers i det tilfellet
  * at poolen blir flyttet */
 
-void __do_for_each_pointer (__dhp p, void (*doit) (), void (*doit_notest) ())
+void __do_for_each_pointer (__dhp p, void (*doit) (__dhp*), void (*doit_notest) (__dhp*))
 {
   __dhp *ph,
    *qh;
@@ -371,7 +371,7 @@ static void add_to_pointers (void)
 
 __dhp __ralloc (long size)
 {
-  void __rgbc ();
+  //void __rgbc ();
   static __dhp mem;
   if (__sto != __NULL)
     {

@@ -55,8 +55,6 @@ double strtod ();
 #include "obstack.h"
 #include <ctype.h>
 
-char *xmalloc();
-
 #define obstack_chunk_alloc xmalloc
 #define obstack_chunk_free free
 static struct obstack os_extspec;

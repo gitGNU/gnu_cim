@@ -31,7 +31,6 @@
 #include "error.h"
 #include "extspec.h"
 
-char *xmalloc();
 void yyerror (char s[]);
 
 #define obstack_chunk_alloc xmalloc

@@ -511,7 +511,7 @@ extern char *__errnone,
 extern __progadr __goto,
   __return;
 extern long __vreturn;
-extern void __main_modul ();
+void __main_modul ();
 
 /* switch */
 extern int __swv;
@@ -595,7 +595,7 @@ extern __dhp __p;
 
 /* RTCK.C */
 __dhp __rca (__arrp a);
-extern __dhp __ralloc ();
+__dhp __ralloc (long);
 char __rin (__dhp bpx, __pty p);
 char __rrin (__pty q, __pty p);
 char __ris (__dhp bpx, __pty p);
@@ -689,7 +689,6 @@ double __rrdiv0(double i);
 /* Power functions */
 double __rpow (double x, double r);
 double __rpowri (double r, long i);
-extern double __rpow ();
 
 /* Text utilities */
 char __rchar (long i);
@@ -771,10 +770,9 @@ __txtvp __rtstrip (__txtvp t);
 __txtvp __rcopy (long as, __txtvp t);
 __txtvp __rblanks (long as, long n);
 __txtvp __rconc (long as, __txtvp t1x, __txtvp t2x);
-extern __txtvp __rtextvalassign ();
+__txtvp __rtextvalassign (__txtvp t1x, __txtvp t2x);
 __txtvp __rtextassign (__txtvp t1x, __txtvp t2x);
 char __reqrtext (__txtvp t1x, __txtvp t2x);
-extern char __reqrtext ();
 char __reqtext (__txtvp t1x, __txtvp t2x);
 char __rlttext (__txtvp t1x, __txtvp t2x);
 char __rletext (__txtvp t1x, __txtvp t2x);
@@ -785,7 +783,7 @@ void __rleftshift (__txtvp t, long j);
 
 /* FILESYSTEM.C */
 
-extern long __rfsize ();
+long __rfsize ();
 
 /* Class file */
 __txtvp __rfilename (long as, __bs1FILE *p);
@@ -819,7 +817,7 @@ __dhp __rooutimage (__bs2FILE *p)		/* Skriver ikke ut etterfolgende blanke */;
 __dhp __rooutrecord (__bs2FILE *p);
 __dhp __robreakoutimage (__bs2FILE *p);
 __dhp __rooutchar (__bs2FILE *p, char c);
-extern __dhp __roouttext ();
+__dhp __roouttext (__bs2FILE *p, __txtvp t);
 __dhp __rooutint (__bs2FILE *p, long i, long w);
 __dhp __rooutfix (__bs2FILE *p, double r, long i, long  w);
 __dhp __rooutreal (__bs2FILE *p, double r, long i, long w);
