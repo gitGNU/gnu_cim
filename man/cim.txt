@@ -1,0 +1,176 @@
+CIM(1)			    General Commands Manual			CIM(1)
+
+
+
+NAME
+       cim - Compile Simula programs into C
+
+
+SYNOPSIS
+       cim [ options ] file ...
+
+DESCRIPTION
+       GNU Cim is the Simula compiler that compiles into C. The C program will
+       then be compiled with cc , and linked with other modules.
+
+       GNU Cim will accept one Simula program and other none  Simula  modules.
+       The  specified Simula program will be compiled and linked with the mod‐
+       ules. If a main Simula program is compiled then it  will	 be  automatic
+       linked  with  the  Simula  modules that it uses. If a separate Class or
+       Procedure is compiled, then the linking will be supressed.
+
+OPTIONS
+       The following options are accepted by the cim command:
+
+       -a     Try to produce an atr-file even if an error occurs.  Compare the
+	      produced	atr-file with the atr-file produced from previous com‐
+	      pilation and if they differ return an error status  code.	  With
+	      use  of this option it is possible to have external modules with
+	      circular dependencies. You will then need	 to  compile  all  the
+	      modules  with  this  option  until no error status codes are re‐
+	      turned. Then you should do a final compilation with option -p or
+	      option  -d. To get this to work it is important that the topmost
+	      external head does not contain any external declaration that  is
+	      part of the circular dependency. Such external declarations must
+	      be placed in an external head that comes after the first	class-
+	      or procedure decraration.
+
+       -b     The following argument will be parsed to the CC-command.
+
+       -B     The following argument will be parsed to the link-command.
+
+       -c     Supress linking of the complete program.
+
+       -Cname Set the name of the C compiler.
+
+       -d     Compare the produced c-code with the code produced from previous
+	      compilation and if they are equal then touch the object-file in‐
+	      stead of compiling the c-code.
+
+       -Dname Define a symbol name.
+
+       -e     On  systems that support dynamic linking, this  prevents linking
+	      with the shared libraries.  On other systems, this option has no
+	      effect.
+
+       -E     Run only the preprocessor and output the result to standard out‐
+	      put.
+
+       -g     Make the C compiler produce debugging information.  This	option
+	      is useful for debugging the generated code.
+
+       -G     Invoke the Gnu Project C compiler instead of the standard C com‐
+	      piler.  This option is useful if the standard C  compiler	 don't
+	      generate correct code.
+
+       -h     Print a summary of the options to `cim', and exit.
+
+       -H     Omit  line  number  information in the  compiled	program.  This
+	      will  make the program smaller and faster.
+
+       -I dir Use the Simula include file located in directory dir instead  of
+	      the standard directory.
+
+       -llibrary
+	      Link  with object library library.  This option is parsed to the
+	      link-command.
+
+       -L dir Use the Simula library located in directory dir instead  of  the
+	      standard directory.
+
+       -m     The memory pool size may be set at runtime by an option -mn.
+
+       -mn    Set the initial memory pool size to n mega bytes.
+
+       -Mn    Set the maximal memory pool size to n mega bytes.
+
+       -N     Only link the specifiede files.
+
+       -o     The  following  argument	is  the	 name of the output executable
+	      file.
+
+       -p     If supported for the target machines, generate position-indepen‐
+	      dent code,  suitable for use in a shared library.
+
+       -P     Only link the specifiede files.
+
+       -q     Run the compiler in quiet mode.
+
+       -s     Only C-compile and link the specified files.
+
+       -S     Run the source file trough Simula-compiler, only.
+
+       -R     Recompile the module using the same timestamp.
+
+       -t     Do  not  remove  temporary  files. If a main program is compiled
+	      with option -r, then the executable file will be removed	unless
+	      this option or option -T is specified.
+
+       -Uname Remove any initial definition of the symbol name (Inverse of the
+	      -D option).
+
+       -v     Run the compiler in verbose mode.
+
+       -V     Print the version number of Cim and exit.
+
+       -w     Do not print warnings.
+
+FILES
+       file   Executable file.
+
+       file.a Library of source files, attribute files and object files.   In‐
+	      clude  this simula library when compiling and linking.  The sim‐
+	      ula library is created with ar(1V) and  ranlib(1).   All	source
+	      and .atr files should be placed before .o files in the archive.
+
+       file.o Object file.
+
+       file.c Simula-compiler output file.
+
+       file.h Output file that is included in file.c.
+
+       file.sim
+	      Simula source file.
+
+       file   File  names without an extension are assumed to be shorthand no‐
+	      tation for the corresponding .sim file.
+
+       /usr/local/lib/libcim.a
+	      Simula library that contains the environment,  Run  Time	System
+	      and  class Simset and Simulation.	 The source code to Simset and
+	      Simulation is also included, so these parts can be compiled  us‐
+	      ing compiler directive %include.
+
+       /usr/local/include/cim.h
+	      Include file for the produced C-code.
+
+SE ALSO
+       cc(1), ld(1), ar(1V), lorder(1), topsort(1), ranlib(1)
+
+       Standard Simula, SS 636114.  The Simula Standards Group, August 1986.
+
+       Viderefoering  og  testing av et portabelt Simula-system.  Hovedoppgave
+       til cand.scient.-graden av Terje	 Mjoes.	  Institutt  for  informatikk,
+       Universitetet i Oslo, April 1989.
+
+       Et portabelt Simula-system bygget paa C.	 Hovedoppgave til cand.scient-
+       graden av Sverre Johansen.  Institutt for informatikk, Universitetet  i
+       Oslo, Mai 1987.
+
+
+DIAGNOSTICS
+       The  diagnostics	 produced  by  the  Simula compiler are intended to be
+       self-explanatory.
+
+
+BUGS
+       Bugs should be reported to bug-cim@gnu.org.
+
+
+AUTHOR
+       Sverre Hvammen Johansen, Department of Informatics, University of Oslo.
+
+
+
+
+				  13 Jan 1989				CIM(1)

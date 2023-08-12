@@ -18,6 +18,7 @@
 
 /******************************************************************************
                                              Definition of runtime-constants */
+#include <stdlib.h>
 
 #define __FALSE 0
 #define __TRUE 1
@@ -453,7 +454,7 @@ typedef struct
   }
 __labelnamepar;
 
-/* Label var and standard transmitted parameter or 
+/* Label var and standard transmitted parameter or
  * a name, var or standard transmitted switch parameter */
 
 typedef struct			/* No thunk for switch parameter by name */
@@ -510,7 +511,7 @@ extern char *__errnone,
 extern __progadr __goto,
   __return;
 extern long __vreturn;
-extern void __main_modul ();
+void __main_modul ();
 
 /* switch */
 extern int __swv;
@@ -518,7 +519,7 @@ extern int __swv;
 /* Local-block, parameter-block, and static environm,ent to rcp(p)() */
 extern __dhp __lb,
   __pb;
-extern __dhp __sl;		/* Can't be a parameter since GBC must update 
+extern __dhp __sl;		/* Can't be a parameter since GBC must update
 				 * it */
 
 /* Garbage collections statistics */
@@ -594,7 +595,7 @@ extern __dhp __p;
 
 /* RTCK.C */
 __dhp __rca (__arrp a);
-extern __dhp __ralloc ();
+__dhp __ralloc (long);
 char __rin (__dhp bpx, __pty p);
 char __rrin (__pty q, __pty p);
 char __ris (__dhp bpx, __pty p);
@@ -604,7 +605,7 @@ char __rgetrv (__refnamepar *p, long as, int ret, void (*mret) ());
 char __rgettv (__textnamepar *p, long as, int ret, void (*mret));
 char __rgetproc (__procname *p, long as, int ret, void (*mret) ());
 char __rgetlab (__labelnamepar *p, long as, int ret, void (*mret) ());
-char __rgetsa (__simplenamepar *p, long as, int ret, void (*mret) ());
+char __rgetsa (__aritnamepar *p, long as, int ret, void (*mret) ());
 void __rreturn (long vret, int ret, void (*mret) ());
 void __rundump (__txtvp t, int ret, void (*mret) ());
 void __rdump (__txtvp t, int ret, void (*mret) ());
@@ -614,6 +615,7 @@ void __rexchange (__dhp sh, __dhp ob, int ret, void (*mret) ());
 char __rgetav (char ftype, __aritnamepar *p, long as, int ret, void (*mret) ());
 
 void __rcp (__pty ppx, long as);
+void __rcpp (__pty ppx);
 void __rterror (__txtvp t);
 void __renddecl (int plev);
 void __rep (void);
@@ -622,9 +624,11 @@ void __rrs (void);
 void __rcpb (int ret, void (*mret) ());
 void __rss (long as);
 void __rcprb (__pty ppx);
+void __rcprbb (int ret, void (*mret) ());
 void __reth (void);
 void __rgbc (void);
 void __do_for_each_pointer (__dhp p, void (*doit) (), void (*doit_notest) ());
+void __do_for_each_stat_pointer (void (*doit) (), void (*doit_notest) (), int force);
 void __rgoto (__dhp ob);
 void __rsystemerror (char *s);
 void __rendclass (int plev);
@@ -643,6 +647,7 @@ void __rstart (int argc, char *argv[]);
 void __rb (__pty ppx);
 void __rtrace (void);
 void __repp (void);
+void __rbe (void);
 
 /* RTBASICIO.C */
 __dhp __rsysin (void);
@@ -651,6 +656,7 @@ __dhp __rsyserr (void);
 
 /* ENVIRONMENT.C */
 
+void __init_FILE (void);
 void __init_SIMENVIR (void);
 void __rprintfilline (void);
 void __rhisto (__arrp A, __arrp B, double c, double d);
@@ -683,7 +689,6 @@ double __rrdiv0(double i);
 /* Power functions */
 double __rpow (double x, double r);
 double __rpowri (double r, long i);
-extern double __rpow ();
 
 /* Text utilities */
 char __rchar (long i);
@@ -765,10 +770,9 @@ __txtvp __rtstrip (__txtvp t);
 __txtvp __rcopy (long as, __txtvp t);
 __txtvp __rblanks (long as, long n);
 __txtvp __rconc (long as, __txtvp t1x, __txtvp t2x);
-extern __txtvp __rtextvalassign ();
+__txtvp __rtextvalassign (__txtvp t1x, __txtvp t2x);
 __txtvp __rtextassign (__txtvp t1x, __txtvp t2x);
 char __reqrtext (__txtvp t1x, __txtvp t2x);
-extern char __reqrtext ();
 char __reqtext (__txtvp t1x, __txtvp t2x);
 char __rlttext (__txtvp t1x, __txtvp t2x);
 char __rletext (__txtvp t1x, __txtvp t2x);
@@ -779,7 +783,7 @@ void __rleftshift (__txtvp t, long j);
 
 /* FILESYSTEM.C */
 
-extern long __rfsize ();
+long __rfsize ();
 
 /* Class file */
 __txtvp __rfilename (long as, __bs1FILE *p);
@@ -813,7 +817,7 @@ __dhp __rooutimage (__bs2FILE *p)		/* Skriver ikke ut etterfolgende blanke */;
 __dhp __rooutrecord (__bs2FILE *p);
 __dhp __robreakoutimage (__bs2FILE *p);
 __dhp __rooutchar (__bs2FILE *p, char c);
-extern __dhp __roouttext ();
+__dhp __roouttext (__bs2FILE *p, __txtvp t);
 __dhp __rooutint (__bs2FILE *p, long i, long w);
 __dhp __rooutfix (__bs2FILE *p, double r, long i, long  w);
 __dhp __rooutreal (__bs2FILE *p, double r, long i, long w);
@@ -886,3 +890,5 @@ char **__rcopytextarrtoc (__arrp p, char byvalue);
 char *__rcopyarrtoc (__arrp p);
 
 char *xmalloc (unsigned int size);
+void __update_gl_to_obj (void);
+void __update_gl_to_null (void);

@@ -104,7 +104,7 @@ static void sent_list_trans (sent_t *parent_sent)
                                                                  MODULETRANS */
 
 static void module_trans (sent_t *sent)
-{     
+{
   if (! separat_comp)
     insert_before_sent (sent, NULL, new_sent (MGOTOSTOP));
   sent_list_trans (sent);
@@ -157,7 +157,7 @@ static void class_trans (sent_t *sent)
 static void inspect_trans (sent_t *sent)
 {
   cblock= sent->cblock;
-  sent->iexp= transcall (sent->exp->up, sent->exp, 1, 1, 1); 
+  sent->iexp= transcall (sent->exp->up, sent->exp, 1, 1, 1);
   sent_list_trans (sent);
 }
 
@@ -208,11 +208,11 @@ static void forelem_trans (exp_t *re, exp_t *rex)
       konst_step = rey->right->left->token == MINTEGERKONST;
 
       restep= transcall (rey->right, rey->right->left, 1, 1, 1);
-      restep= concexp (restep, transcall (rey->right, rey->right->right, 
+      restep= concexp (restep, transcall (rey->right, rey->right->right,
 					  1, 1, 1));
 
       reinit= transcall (rey, rey->left, 1, 1, 1);
-      reinit= concexp (reinit, red= makeexp(MASSIGND,copytree (re->left), 
+      reinit= concexp (reinit, red= makeexp(MASSIGND,copytree (re->left),
 				       rey->left));
       red->type= red->right->type;
       reinit= concexp (reinit, copytree (restep));
@@ -223,10 +223,10 @@ static void forelem_trans (exp_t *re, exp_t *rex)
       if (!konst_step)
 	retest= makeexp (MMUL, (notnegativ?rey->right->left:
 				rey->right->left->left), retest);
-      retest= makeexp (notnegativ?MLE:MGE, retest, 
+      retest= makeexp (notnegativ?MLE:MGE, retest,
 		    makeexp (MINTEGERKONST, NULL, NULL));
 
-      restep= concexp (restep, red= makeexp(MASSIGNADD,copytree (re->left), 
+      restep= concexp (restep, red= makeexp(MASSIGNADD,copytree (re->left),
 				       rey->right->left));
       red->type= red->right->type;
 
@@ -240,7 +240,7 @@ static void forelem_trans (exp_t *re, exp_t *rex)
     case MFORWHILE:
       restep= transcall (rey, rey->left, 1, 1, 1);
       restep= concexp (restep, makeexp (re->left->type==TTEXT?re->token==MFOR?
-					MVALASSIGNT:MREFASSIGNT:MASSIGND, 
+					MVALASSIGNT:MREFASSIGNT:MASSIGND,
 					copytree (re->left),rey->left));
       restep= concexp (restep, transcall (rey, rey->right, 1, 1, 1));
       rey->left= restep;
@@ -248,7 +248,7 @@ static void forelem_trans (exp_t *re, exp_t *rex)
     default:
       restep= transcall (rex, rey, 1, 1, 1);
       restep= concexp (restep, makeexp (re->left->type==TTEXT?re->token==MFOR?
-					MVALASSIGNT:MREFASSIGNT:MASSIGND, 
+					MVALASSIGNT:MREFASSIGNT:MASSIGND,
 					copytree (re->left),rey));
       rex->left= restep;
       break;
@@ -274,7 +274,7 @@ static void fordo_trans (sent_t *sent)
 
 static void while_trans (sent_t *sent)
 {
-  sent->iexp= transcall (sent->exp->up, sent->exp, 1, 1, 1); 
+  sent->iexp= transcall (sent->exp->up, sent->exp, 1, 1, 1);
   sent_list_trans (sent);
 }
 
@@ -454,6 +454,8 @@ void sent_trans (sent_t *sent)
     case MTHUNKARRAY:
     case MTHUNKPROCEDURE:
       thunk_trans (sent);
+      break;
+    default:
       break;
     }
 }

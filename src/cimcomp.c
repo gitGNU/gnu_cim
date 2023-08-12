@@ -30,6 +30,7 @@
 #include "gen.h"
 #include "trans.h"
 #include "passes.h"
+#include "extspec.h"
 
 #if STDC_HEADERS || HAVE_STRING_H
 #include <string.h>
@@ -232,7 +233,7 @@ static char *basename (char *str)
 		 && strcmp (&str[i - 4], ".cim")
 		 && strcmp (&str[i - 4], ".CIM")))
     str[i - 4] = '\0';
-  
+
   return str;
 }
 
@@ -250,9 +251,9 @@ static int print_help(int status)
 	  "\n      "
 	  " [-d] [--compare]"
 	  " [-D NAME] [--define=NAME]"
-	  " [-e] [--static]" 
+	  " [-e] [--static]"
 	  "\n      "
-	  " [-E] [--preprocess]" 
+	  " [-E] [--preprocess]"
 	  " [-F] [--write-mif]"
 	  " [-g] [--debug]"
 	  "\n      "
@@ -358,10 +359,10 @@ static int parseoptions (int argc, char *argv[])
 
       switch (c)
 	{
-     	case 0:
-     	  /* If this option set a flag, do nothing else now.   */
-     	  break;
-     	case 'a':
+	case 0:
+	  /* If this option set a flag, do nothing else now.   */
+	  break;
+	case 'a':
 	  option_atr = TRUE;
 	  option_checkdiff = TRUE;
 	  option_reuse_timestamp = TRUE;
@@ -579,8 +580,7 @@ static int parseoptions (int argc, char *argv[])
 
 /******************************************************************************
                                                                         MAIN */
-
-main (int argc, char *argv[], char *envp[])
+int main (int argc, char *argv[], char *envp[])
 {
   char *archname;
   char *kom;
@@ -596,7 +596,7 @@ main (int argc, char *argv[], char *envp[])
   init_trap_routines();
 
   get_all_env();
-  
+
   insert_name_in_dirlist (systemlibdir);
 
   init_name ();
@@ -608,24 +608,26 @@ main (int argc, char *argv[], char *envp[])
 
   if (option_verbose)
     {
-      fprintf 
-	(stderr, 
+      fprintf
+	(stderr,
 	 "Cim Compiler (version: %s configuration name: %s).\n"
 	 "Copyright 1989-1998 by Sverre Hvammen Johansen, Stein Krogdahl,"
-	 "Terje Mjøs and Free Software Foundation, Inc.\n"
+	 "Terje MjÃ¸s and Free Software Foundation, Inc.\n"
 	 "Cim comes with ABSOLUTELY NO WARRANTY.\n"
 	 "This is free software, and you are welcome to redistribute it\n"
-	 "under the GNU General Public License; version 2.\n", 
+	 "under the GNU General Public License; version 2.\n",
 	 PACKAGE_VERSION, SYSTEM_TYPE);
     }
 
-  if(option_atr)
-    system (newstrcat6 ("cp -f ", extcodename, " ", extcodename, 
-			 ".old", " 2>/dev/null"));
-
+  if(option_atr) {
+    if (system (newstrcat6 ("cp -f ", extcodename, " ", extcodename,
+			 ".old", " 2>/dev/null")) != 0) {
+      fprintf (stderr, "Failed to copy %s to %s.old\n", extcodename, extcodename);
+    }
+  }
   if(option_checkdiff)
     {
-      rename (ccodename, newstrcat2 (ccodename, ".old")); 
+      rename (ccodename, newstrcat2 (ccodename, ".old"));
     }
 
   if (!option_nosim && passes_do ())
@@ -634,13 +636,13 @@ main (int argc, char *argv[], char *envp[])
 
       if(option_checkdiff)
 	{
-	  rename (ccodename, newstrcat2 (ccodename, ".old")); 
+	  rename (ccodename, newstrcat2 (ccodename, ".old"));
 	}
       return (1);
     }
 
 #if 0
-  /* Følgende skal ikke gjøre skade. 
+  /* Følgende skal ikke gjøre skade.
      Må få dette til å virke før cim
      kan gjøre mer enn en kompilering. */
 
@@ -655,7 +657,7 @@ main (int argc, char *argv[], char *envp[])
       char status;
       unlink (ccodename);
 
-      status = system (newstrcat5 ("cmp -s ", extcodename, " ", 
+      status = system (newstrcat5 ("cmp -s ", extcodename, " ",
 				  extcodename, ".old 2>/dev/null"));
       unlink (newstrcat2 (extcodename, ".old"));
       if (status)
@@ -676,7 +678,7 @@ main (int argc, char *argv[], char *envp[])
 	  return (1);
 	}
 
-      fprintf (shlfile, 
+      fprintf (shlfile,
 	       "#! /bin/sh\n"
 	       "\n"
 	       "CC='%s'\n"
@@ -777,7 +779,7 @@ main (int argc, char *argv[], char *envp[])
 	       "  fi\n"
 	       "fi\n"
 	       "\n",
-	       ccomp, "", SLDFLAGS,
+	       ccomp, "-Wno-unsequenced", SLDFLAGS,
 	       WL_FLAG, LINK_STATIC_FLAG, PIC_FLAG,
 	       ccodename, ccodename,
 	       ccodename,
@@ -795,15 +797,17 @@ main (int argc, char *argv[], char *envp[])
 		   "  fi\n"
 		   "\n"
 		   "  $CC $LDFLAGS -o %s %s %s %s || exit 1\n"
-		   "fi\n", 
+		   "fi\n",
 		   outputname, ocodename, get_names_in_linklist (),
 		   outputname, ocodename, get_names_in_linklist (), SLIBS);
 	}
-      if (!((option_nolink && !separat_comp) 
+      if (!((option_nolink && !separat_comp)
 	    || option_nocc || option_notempdel))
 	fprintf (shlfile, "rm -f %s\n",shlname);
       fclose (shlfile);
-      system (newstrcat2 ("chmod +x ", shlname));
+      if (system (newstrcat2 ("chmod +x ", shlname)) != 0) {
+	fprintf (stderr, "%s: Failed to set executable flag\n", shlname);
+      }
     }
   fflush (stdout);
   argv[0]= shlname;

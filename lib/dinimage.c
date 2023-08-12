@@ -48,7 +48,7 @@ __dhp __rdinimage (__bs5FILE *p)
   l = ((__bs5FILE *) p)->imagelength;
   f = ((__bs1FILE *) p)->file;
 
-  if (((__bs5FILE *) p)->endfile = (((__bs5FILE *) p)->loc > __rdlastloc (p)))
+  if ((((__bs5FILE *) p)->endfile = (((__bs5FILE *) p)->loc > __rdlastloc (p))))
     {
       *(c++) = 25;
       for (i = 2; i <= l; i++)
@@ -56,7 +56,7 @@ __dhp __rdinimage (__bs5FILE *p)
     }
   else
     {
-      if (p->lastop == __WRITE 
+      if (p->lastop == __WRITE
 	  && fseek (((__bs1FILE *) p)->file, 0L, 1) == __EOF)
 	__rerror ("Inimage: Not possible to seek");
       p->lastop = __READ;

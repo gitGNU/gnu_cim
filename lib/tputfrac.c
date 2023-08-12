@@ -30,7 +30,7 @@ __txtvp __rtputfrac (__txtvp t, long i, long n)
     antg = 0,
     k;
 
-  if (minus = i < 0)
+  if ((minus = i < 0))
     i *= -1;
   if (t->obj == __NULL)
     __rerror ("Putfrac: Notext");

@@ -17,7 +17,8 @@ TAGS
 *.o
 *.lo
 *.la
-Makefile
 Makefile.in
 .deps
 .libs
+build
+build.log

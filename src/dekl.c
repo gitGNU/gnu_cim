@@ -25,16 +25,16 @@
 #include "name.h"
 #include "salloc.h"
 #include "cimcomp.h"
+#include "extspec.h"
+#include "error.h"
 
 #include <stdio.h>
-#include <obstack.h>
+#include "obstack.h"
 #include "config.h"
 
 #if STDC_HEADERS
 #include <stdlib.h>
 #endif
-
-char *xmalloc();
 
 #define obstack_chunk_alloc xmalloc
 #define obstack_chunk_free free
@@ -62,12 +62,12 @@ int localused;
 int arrdim;
 
 
-block_t *ssblock; /* First system block 
-                          (The outermost system block with blev=0) 
+block_t *ssblock; /* First system block
+                          (The outermost system block with blev=0)
                           the system environment is conected to this block */
 
 block_t *cblock; /* Current block */
-block_t *sblock; /* First non system block 
+block_t *sblock; /* First non system block
                          (The outermost block with blev=1)
                          sblock is connected with ssblock through
                          two INSP blocks (sysin and sysout) */
@@ -76,13 +76,13 @@ static block_t *lblock;
 static int cblno;
 
 
-block_t *seenthrough;	/* Settes av find_global og find_local og peker 
+block_t *seenthrough;	/* Settes av find_global og find_local og peker
 				 * p}  en utenforliggende inspect blokk(hvis
 				 * den      finnes). Det er fordi jeg onsker
 				 * } vite n}r en variable er sett gjennom
 				 * inspect. Trenger      denne informasjon i
 				 * kode genereringen for }    aksessere
-				 * variable fra den inspiserte klassen 
+				 * variable fra den inspiserte klassen
 				 * gjennom inspect variabelen */
 decl_t *classtext;
 
@@ -90,7 +90,7 @@ decl_t *classtext;
 int cblev;
 
 decl_t *cprevdecl;
- 
+
 /* Har en peker som peker p} en array deklarasjon som ikke har f}tt
  * satt sin dim verdi. */
 decl_t *last_array;
@@ -171,7 +171,7 @@ void decl_init_pass1 (void)
 {
   block_t *rb;
   decl_t *rd;
-  
+
   cblev= -1;
   unknowns = new_block ();
   unknowns->quant.kind = KERROR;
@@ -186,7 +186,7 @@ void decl_init_pass1 (void)
      i en evig løkke dersom det er noe som er udeklarert. Er ikke sikker
      på om å bare kommentere det ut er riktig løsning */
 
-  lesinn_external_spec (tag ("TEXTOBJ*"), "simenvir");
+  lesinn_external_spec (tag ("TEXTOBJ*"), "simenvir", KSIMPLE);
 
   commonprefiks = find_global (tag ("COMMON*"), TRUE);
   commonprefiks->plev = -1;
@@ -195,13 +195,13 @@ void decl_init_pass1 (void)
   begin_block (KINSP);
   begin_block (KINSP);
   rd = find_global (tag ("MAXLONGREAL"), TRUE);
-  rd->value.rval = MAX_DOUBLE;
+  rd->value.rval = DBL_MAX;
   rd = find_global (tag ("MINLONGREAL"), TRUE);
-  rd->value.rval = -MAX_DOUBLE;
+  rd->value.rval = -DBL_MAX;
   rd = find_global (tag ("MAXREAL"), TRUE);
-  rd->value.rval = MAX_DOUBLE;
+  rd->value.rval = DBL_MAX;
   rd = find_global (tag ("MINREAL"), TRUE);
-  rd->value.rval = -MAX_DOUBLE;
+  rd->value.rval = -DBL_MAX;
   rd = find_global (tag ("MAXRANK"), TRUE);
   rd->value.ival = MAXRANK;
   rd = find_global (tag ("MAXINT"), TRUE);
@@ -321,10 +321,10 @@ static decl_t *newnotseen (char *ident)
                                                          FINDDECL            */
 
 /* Find_decl leter etter deklarasjonen ident lokalt i blokken og langs
- *  den prefikskjede.Den kalles rekursivt for hvert BLOCK objekt langs 
- *  prefikskjeden.Ved en inspect blokk kalles den for den ispiserte 
- *  klassen og dens prefikser.Finnes den returneres en peker til 
- *  deklarasjonspakka, hvis ikke returneres NULL                         
+ *  den prefikskjede.Den kalles rekursivt for hvert BLOCK objekt langs
+ *  prefikskjeden.Ved en inspect blokk kalles den for den ispiserte
+ *  klassen og dens prefikser.Finnes den returneres en peker til
+ *  deklarasjonspakka, hvis ikke returneres NULL
  *  HVIS virt==TRUE skal det først letes i evt. virtuell liste */
 
 decl_t *find_decl (char *ident, block_t *rb, char virt)
@@ -354,7 +354,7 @@ decl_t *find_decl (char *ident, block_t *rb, char virt)
       || rb->quant.kind == KFOR || rb->quant.kind == KCON)
     if (rb->quant.plev > -1 && rb->quant.prefqual != NULL)
       if ((rd = find_decl (ident, rb->quant.prefqual->descr,
-			  rb->quant.kind == KCLASS | rb->quant.kind == KPRBLK ? FALSE : virt)) != NULL)
+			  (rb->quant.kind == KCLASS | rb->quant.kind == KPRBLK) ? FALSE : virt)) != NULL)
 	return (rd);
 
   return (NULL);
@@ -363,9 +363,9 @@ decl_t *find_decl (char *ident, block_t *rb, char virt)
 /******************************************************************************
                                                                 FINDGLOBAL   */
 
-/* Find_global  finner  den deklarasjonen som  svarer til et navn 
- * Den leter for  hvert  blokknivaa, i  prefikskjeden  og lokalt 
- * Stopper ved f\rste forekomst, fins den ikke kalles newnotseen 
+/* Find_global  finner  den deklarasjonen som  svarer til et navn
+ * Den leter for  hvert  blokknivaa, i  prefikskjeden  og lokalt
+ * Stopper ved f\rste forekomst, fins den ikke kalles newnotseen
  * Hvis virt==true skal det først letes i evt. virtuell liste */
 
 decl_t *find_global (char *ident, char virt)
@@ -390,7 +390,7 @@ decl_t *find_global (char *ident, char virt)
 }
 
 /******************************************************************************
-                                  				SAMEPARAM    */
+								SAMEPARAM    */
 
 /* Sjekker om parameterene er de samme */
 
@@ -466,14 +466,14 @@ static void makeequal (decl_t *rd1, decl_t *rd2)
 
 decl_t *commonqual (decl_t *rdx, decl_t *rdy)
 {				/* Hvis rdx eller rdy peker på
-				 * commonprefiks (som har plev=-1) s} vil 
+				 * commonprefiks (som har plev=-1) s} vil
 				 * den leveres som felles kvalifikasjon, som
-				 * er ønskelig i den situasjonen. Men hvis 
+				 * er ønskelig i den situasjonen. Men hvis
 				 * ikke en av dem peker dit så vil IKKE
 				 * commonprefiks være felles kvalifikasjon.
-				 * Dette betyr at det ikke er nødvendig 
-				 * med spesialbehandling for parametere til 
-				 * call, resume. Hvis rdx eller rdy er lik 
+				 * Dette betyr at det ikke er nødvendig
+				 * med spesialbehandling for parametere til
+				 * call, resume. Hvis rdx eller rdy er lik
 				 * NULL, returneres den andre. */
   if (rdx == NULL) return (rdy);
   if (rdy == NULL) return (rdx);
@@ -556,10 +556,10 @@ void begin_block (char kind)
 	if (lastcblock != NULL)
 	  {
 	    if (lastcblock->lastparloc == NULL)
-	      cprevdecl= lastcblock->parloc=lastcblock->lastparloc= 
+	      cprevdecl= lastcblock->parloc=lastcblock->lastparloc=
 		&cblock->quant;
 	    else
-	      cprevdecl= lastcblock->lastparloc= 
+	      cprevdecl= lastcblock->lastparloc=
 		lastcblock->lastparloc->next= &cblock->quant;
 	    cblock->quant.type= TNOTY;
 	    cblock->quant.categ= CLOCAL;
@@ -707,7 +707,7 @@ void reg_decl (char *ident, char type, char kind, char categ)
     case CVAR:      /* Denne er kun satt for eksterne moduler */
       if (kind == KNOKD)
 	{
-	  for (pd = cblock->parloc; 
+	  for (pd = cblock->parloc;
 	       pd != NULL && pd->ident != ident; pd = pd->next);
 	  if (pd != NULL || type != TVARARGS)
 	    {
@@ -858,7 +858,7 @@ void reg_decl (char *ident, char type, char kind, char categ)
 	}
       break;
     default:
-      d1error (37);
+      d1error (37, ident);
       break;
     }
 #ifdef DEBUG
@@ -870,7 +870,7 @@ void reg_decl (char *ident, char type, char kind, char categ)
 /******************************************************************************
                                                        REGINNER              */
 
-/* Kalles fra syntakssjekkeren hver gang  
+/* Kalles fra syntakssjekkeren hver gang
  * inner oppdages, sjekker da lovligheten */
 
 void reg_inner (void)
@@ -881,11 +881,11 @@ void reg_inner (void)
 	    ,lineno, cblev);
 #endif
   if (cblock->quant.kind != KCLASS)
-    d1error (38);
+    d1error (38, "");
   else
     {
       if (cblock->inner)
-	d1error (39);
+	d1error (39, "");
       else
 	cblock->inner = TRUE;
     }
@@ -907,7 +907,7 @@ void reg_inner (void)
 
 #ifdef DEBUG
 
-static 
+static
 dumpdekl (rd)
      decl_t *rd;
 {
@@ -967,7 +967,7 @@ dumpblock (rb)
      block_t *rb;
 {
   decl_t *rd;
-  printf 
+  printf
     ("->BLOCK:(%d,%d)  k:%c, np:%d, nv:%d, nvl:%d, f:%d, c:%d, l:%ld, ",
      rb->blno, rb->blev, rb->quant.kind,
      rb->napar, rb->navirt, rb->navirtlab, rb->fornest,
@@ -1083,7 +1083,7 @@ dump ()
 
 /* Setter/fjerner protected merket når klasser entres/forlates */
 
-static setprotectedvirt (block_t *rb, decl_t *rd, char protected)
+static void setprotectedvirt (block_t *rb, decl_t *rd, char protected)
 {
   block_t *rbx;
   decl_t *rdx;
@@ -1140,7 +1140,7 @@ static void setprotected (block_t *rb, char protected)
                                                               SETPREFCHAIN   */
 
 /* Setter opp prefikskjeden rekursift
- * Oppdager ulovlig prefiks og feil prefiksnivå 
+ * Oppdager ulovlig prefiks og feil prefiksnivå
  * Oppdager ved merking sirkulær prefikskjede */
 
 static void setprefchain (decl_t *rd)
@@ -1178,9 +1178,9 @@ static void setprefchain (decl_t *rd)
 	}
       else if ((cblock->quant.kind == KFOR && rdx->encl != rd->encl)
 	/* For for-block s} blir ikke blokkniv}et |ket. Prefiksen vil aldri
-	 * v{re deklarert  i for-blokken (da ville det v{rt lagt p} en ekstra 
-	 * blokk), den vil ligge i  prefiksen til for-blokken, og det er 
-	 * ulovlig, da en for-blokk alltid skal opptre som om det er en blokk 
+	 * v{re deklarert  i for-blokken (da ville det v{rt lagt p} en ekstra
+	 * blokk), den vil ligge i  prefiksen til for-blokken, og det er
+	 * ulovlig, da en for-blokk alltid skal opptre som om det er en blokk
 	 */
 	       || (rdx->encl->blev != rd->encl->blev))
 	{
@@ -1207,7 +1207,7 @@ static void setprefchain (decl_t *rd)
 /******************************************************************************
                                                         SETQUALPREFCHAIN     */
 
-/* Setter opp prefikskjeden og kvalifikasjonen til pekere        
+/* Setter opp prefikskjeden og kvalifikasjonen til pekere
  * gjør kall på setprefchain og sjekker  kvalifikasjonen */
 
 static decl_t *setqualprefchain (decl_t *rd, int param)
@@ -1225,13 +1225,13 @@ static decl_t *setqualprefchain (decl_t *rd, int param)
 	  rd->plev = 0;
 	  if (rdx->categ == CNEW)
 	    {
-	      d2error (53, rd);
+	      d2error (53, rd, rdx);
 	      rdx->categ = CERROR;
 	    }
 	  else if (rdx->kind != KCLASS)
 	    {
 	      if (rdx->categ != CERROR)
-		d2error (54, rd);
+		d2error (54, rd, rdx);
 	      rdx->categ = CERROR;
 	      rd->type = TERROR;
 	    }
@@ -1246,9 +1246,9 @@ static decl_t *setqualprefchain (decl_t *rd, int param)
 /******************************************************************************
                                                                 SJEKKDEKL    */
 
-/* Kalles i pass 2 for hver blokk som ikke er en prosedyre eller klasse 
- * Sjekkdekl tar seg av å sjekke og akumulere opp virtuelle 
- * Prefikskjeden og kvalifikasjoner settes ved kall på setqualprefchain 
+/* Kalles i pass 2 for hver blokk som ikke er en prosedyre eller klasse
+ * Sjekkdekl tar seg av å sjekke og akumulere opp virtuelle
+ * Prefikskjeden og kvalifikasjoner settes ved kall på setqualprefchain
  * den sjekker også konsistensen for type kind og categ */
 
 static void sjekkdekl (block_t *rb)
@@ -1320,9 +1320,9 @@ static void sjekkdekl (block_t *rb)
 		 || rdx->protected == TRUE; rdx = rdx->next);
 	  if (rdx != rd)
 	    {
-	      if (kind == KPROC && (rdx->categ == CDEFLT || 
+	      if (kind == KPROC && (rdx->categ == CDEFLT ||
 				    rdx->categ == CVALUE ||
-				    rdx->categ == CNAME || 
+				    rdx->categ == CNAME ||
 				    rdx->categ == CVAR) &&
 		  rd->categ != CDEFLT && rd->categ != CVALUE &&
 		  rd->categ != CNAME && rd->categ != CVAR)
@@ -1335,11 +1335,11 @@ static void sjekkdekl (block_t *rb)
 		  obstack_free (&os_pref, s);
 		}
 	      else
-		d2error (55, rd);
+		d2error (55, rd, rdx);
 	    }
 	}
       if (rd->kind == KNOKD && rd->type != TVARARGS)
-	d2error (63, rd);
+	d2error (63, rd, rdx);
       if (rd->kind == KARRAY && rd->type == TNOTY)
 	rd->type = TREAL;
       switch (rd->categ)
@@ -1355,17 +1355,17 @@ static void sjekkdekl (block_t *rb)
 /*	  if (kind == KCLASS)
 	    {
 	      if (rd->kind == KPROC | rd->type == TLABEL)
-		d2error (56, rd);
+		d2error (56, rd, rdx);
 	    }*/
 	  if (rd->type == TVARARGS)
 	    {
 	      if (rd->next != NULL)
-		d2error (80, rd);
+		d2error (80, rd, rdx);
 	      if (kind != KPROC || rb->quant.categ != CCPROC)
-		d2error (81, rd);
+		d2error (81, rd, rdx);
 	    }
 	  if (rd->type == TLABEL && rb->quant.categ == CCPROC)
-	    d2error (82, rd);
+	    d2error (82, rd, rdx);
 	  break;
 	case CVALUE:
 	  /* Sjekker om lovlig valueoverføring */
@@ -1379,14 +1379,14 @@ static void sjekkdekl (block_t *rb)
 	  else if (rd->type == TVARARGS)
 	    {
 	      if (rd->next != NULL)
-		d2error (80, rd);
+		d2error (80, rd, rdx);
 	      if (kind != KPROC || rb->quant.categ != CCPROC)
-		d2error (81, rd);
+		d2error (81, rd, rdx);
 	    }
 	  else
-	    d2error (57, rd);
+	    d2error (57, rd, rdx);
 	  if (rd->type == TLABEL && rb->quant.categ == CCPROC)
-	    d2error (82, rd);
+	    d2error (82, rd, rdx);
 	  break;
 	case CVAR:
 	  if (rd->type == TREF && (rd->kind == KSIMPLE | rd->kind == KARRAY))
@@ -1396,30 +1396,30 @@ static void sjekkdekl (block_t *rb)
 	case CNAME:
 	  /* Nameparameter til klasser er ikke lovlig */
 /*	  if (kind == KCLASS)
-	    d2error (58, rd);*/
+	    d2error (58, rd, rdx);*/
 	  if (kind == KPROC && rb->quant.categ == CCPROC &&
 	      (rd->type == TTEXT || rd->type == TREF))
-	    d2error (77, rd);
+	    d2error (77, rd, rdx);
 	  if (rd->type == TVARARGS)
 	    {
 	      if (rd->next != NULL)
-		d2error (80, rd);
+		d2error (80, rd, rdx);
 	      if (kind != KPROC || rb->quant.categ != CCPROC)
-		d2error (81, rd);
+		d2error (81, rd, rdx);
 	    }
 	  if (rd->type == TLABEL && rb->quant.categ == CCPROC)
-	    d2error (82, rd);
+	    d2error (82, rd, rdx);
 	  break;
 	case CEXTR:
 	case CEXTRMAIN:
 	  break;
 	case CCPROC:
 	  if (rd->type == TREF)
-	    d2error (78, rd);
+	    d2error (78, rd, rdx);
 	  break;
 	default:
 	  /* ULOVLIG CATEG */
-	  d2error (59, rd);
+	  d2error (59, rd, rdx);
 	}
     }
   if (rb->quant.kind == KCLASS || rb->quant.kind == KPRBLK)
@@ -1465,7 +1465,7 @@ static void sjekkdekl (block_t *rb)
 		   va->protected == TRUE; va = va->next);
 	      if (va != vc)
 		{
-		  d2error (60, vc);
+		  d2error (60, vc, rdx);
 		  while (va->next != vc)
 		    va = va->next;
 		  va->next = vc->next;
@@ -1476,7 +1476,7 @@ static void sjekkdekl (block_t *rb)
 		  /* Sjekker om det er lovlig virtuell */
 		  if (vc->kind != KPROC && vc->type != TLABEL)
 		    {
-		      d2error (61, vc);
+		      d2error (61, vc, rdx);
 		      vc->type = TERROR;
 		      vc->kind = KERROR;
 		    }
@@ -1513,7 +1513,7 @@ static void sjekkdekl (block_t *rb)
     if ((rd->kind == KCLASS && rd->match != sjekkdeklcalled)
      || (rd->kind == KPROC && (rd->categ == CLOCAL || rd->categ == CCPROC)))
       {
-	cblock = rd->descr; 
+	cblock = rd->descr;
 	sjekkdekl (rd->descr);
       }
     else
@@ -1536,12 +1536,12 @@ static void sjekkdekl (block_t *rb)
     {
       if (vc->protected)
 	continue;
-      for (va = rb->parloc; va != NULL && va->ident != vc->ident; 
+      for (va = rb->parloc; va != NULL && va->ident != vc->ident;
 	   va = va->next);
       if (va != NULL)
 	{
 	  if ((vc->type == TERROR && (va->kind == KPROC || va->type == TLABEL))
-	      || (vc->type == TLABEL && va->type == TLABEL 
+	      || (vc->type == TLABEL && va->type == TLABEL
 		  && vc->kind == va->kind)
 	  || (vc->kind == KPROC && va->kind == KPROC && subordinate (va, vc)
 	      && same_param (vc->descr, va->descr)))
@@ -1551,7 +1551,7 @@ static void sjekkdekl (block_t *rb)
 	      vc->prefqual = va->prefqual;
 	    }
 	  else
-	    d2error (62, va);
+	    d2error (62, va, rdx);
 	}
       else if (vc->match == vc)
 	vc->match = NULL;
@@ -1564,11 +1564,11 @@ static void sjekkdekl (block_t *rb)
 	  rdx = find_local (rd->ident, &rb->quant, TRUE);
 	  if (rdx->categ == CNEW)
 	    {
-	      d2error (74, rd);
+	      d2error (74, rd, rdx);
 	      rdx->categ = CERROR;
 	    }
 	  else if (rd->categ != CHIDEN && rdx->encl != rb)
-	    d2error (75, rd);
+	    d2error (75, rd, rdx);
 	  else if (rd->categ != CHIDEN && rdx->categ == CVIRT)
 	    {
 	      if (rb->quant.plev == 0)
@@ -1578,11 +1578,11 @@ static void sjekkdekl (block_t *rb)
 	      else
 		vno = rb->quant.prefqual->descr->navirtlab;
 	      if (rdx->virtno <= vno)
-		d2error (75, rd);
+		d2error (75, rd, rdx);
 	      else
 		rd->match = rdx;
 	    }
-	  else if (rd->categ == CHIDEN && rdx->categ == CVIRT 
+	  else if (rd->categ == CHIDEN && rdx->categ == CVIRT
 		   && rb->quant.plev > 0)
 	    {
 	      for (rdy = rb->quant.prefqual->descr->virt;
@@ -1598,7 +1598,7 @@ static void sjekkdekl (block_t *rb)
       for (rd = rb->hiprot; rd != NULL; rd = rd->next)
 	if (rd->categ == CHIDEN && rd->match != NULL &&
 	    rd->match->protected == FALSE)
-	  d2error (76, rd);
+	  d2error (76, rd, rdx);
     }
 }
 
@@ -1608,7 +1608,7 @@ static void sjekkdekl (block_t *rb)
 /*****************************************************************************/
 
 /******************************************************************************
-  							      FIRSTCLASS     */
+							      FIRSTCLASS     */
 
 block_t *firstclass (void)
 {				/* Retunerer med blev for den n{rmeste
@@ -1671,7 +1671,7 @@ void out_block (void)
     {
       cblock->quant.prefqual->descr->when = NULL;
     }
-  if (cblock->quant.kind == KFOR || cblock->quant.kind == KINSP 
+  if (cblock->quant.kind == KFOR || cblock->quant.kind == KINSP
       || cblock->quant.kind == KCON)
     cblock = cblock->quant.prefqual->descr;
   else
@@ -1698,7 +1698,7 @@ void reginsp (block_t *rb, decl_t *rd)
 {
   if (rd == NULL)
     {
-      d2error (73, &rb->quant);
+      d2error (73, &rb->quant, NULL);
       rd = find_global (tag ("Noqual"), FALSE);
       rd->categ = CERROR;
     }
@@ -1741,7 +1741,7 @@ decl_t *reg_this (char *ident)
 		if (rd->ident == ident)
 		  {
 		    if (rd->descr->thisused == MAYBEE)
-		      d2error (72, rd);
+		      d2error (72, rd, rdx);
 		    rd->descr->thisused |= TRUE;
 #ifdef DEBUG
 		    if (option_input)
@@ -1762,17 +1762,17 @@ decl_t *reg_this (char *ident)
   if (option_input)
     printf ("---end\n");
 #endif
-  d2error (79, rd = find_global (ident, FALSE));
+  d2error (79, rd = find_global (ident, FALSE), rdx);
   return (rd);
 }
 
 /******************************************************************************
                                                                 FINDLOCAL    */
 
-/* Find_local  finner  den  deklarasjonen som  svarer til  et navn 
- * Den leter lokalt i den lista den har fåt og dens prefikskjede 
- * Har den ikke  fåt noen liste  leter den slik  find_global gjør 
- * Den registrerer også localused 
+/* Find_local  finner  den  deklarasjonen som  svarer til  et navn
+ * Den leter lokalt i den lista den har fåt og dens prefikskjede
+ * Har den ikke  fåt noen liste  leter den slik  find_global gjør
+ * Den registrerer også localused
  * Hvis virt==TRUE skal det først letes i evt. virtuell liste */
 
 decl_t *find_local (char *ident, decl_t *rd, char virt)
@@ -1793,8 +1793,8 @@ decl_t *find_local (char *ident, decl_t *rd, char virt)
 /******************************************************************************
                                                     NEXTPARAM & FIRSTPARAM   */
 
-/* To prosedyrer for å finne parameterene      
- * til en prosedyre eller klasse 
+/* To prosedyrer for å finne parameterene
+ * til en prosedyre eller klasse
  * Får som input forrige parameter */
 
 decl_t *next_param (decl_t *rd)
@@ -1866,8 +1866,8 @@ decl_t *first_param (decl_t *rd)
       else
 	arrayparam->dim = USPECDIM;
       return (arrayparam);
-    }				
-  /* else Kommentertut p.g.a full spesifisering 
+    }
+  /* else Kommentertut p.g.a full spesifisering
    * av parametere til  formelle prosedyrer.
    * if(rd->kind==KPROC && rd->categ==CDEFLT) {
    * return(procparam); } */
@@ -1905,7 +1905,7 @@ int more_param (decl_t *rd)
 	return (TRUE);
       return (FALSE);
     }
-  /* er kommenter ut siden formelle procedyrer er fullt ut spesifisert 
+  /* er kommenter ut siden formelle procedyrer er fullt ut spesifisert
    * if(rd==procparam)return(MAYBEE); */
   return (TRUE);
 }
@@ -1922,7 +1922,7 @@ int body (decl_t *rd)
   rbx = cblock;
   rb = rd->descr;
   for (rbx= cblock; rbx->blev > 0; rbx= rbx->quant.encl)
-    {				
+    {
       /* Hvis vi er inne i en inspect blokk eller for blokk  */
       /* m} match f|lges for } f} riktig blokk. KAN BARE     */
       /* BRUKES FOR ] UNDERS\KE OM MAN ER INNE I EN PROSEDYRE */
@@ -1935,7 +1935,7 @@ int body (decl_t *rd)
 }
 
 /******************************************************************************
-                                        			DANGERPROC   */
+								DANGERPROC   */
 
 /* Er prosedyren farlig og m] isoleres i uttrykk */
 
@@ -1963,7 +1963,7 @@ char danger_proc (decl_t *rd)
 void remove_block (block_t *rb)
 {
   decl_t *rd;
-  if (rb->quant.encl->parloc->descr == rb) 
+  if (rb->quant.encl->parloc->descr == rb)
     rb->quant.encl->parloc= rb->quant.encl->parloc->next;
   else
     {

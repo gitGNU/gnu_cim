@@ -22,6 +22,7 @@
 #include "checker.h"
 #include "expmacros.h"
 #include "name.h"
+#include "error.h"
 
 static decl_t *absfunction;
 static decl_t *absfunctionr;
@@ -127,31 +128,31 @@ static void sserror (int melding, exp_t *re)
 {
   if (RD && RD->categ == CNEW)
     {
-      serror (melding, RD->ident);
+      serror (melding, RD->ident, 0);
       RD->categ = CERROR;
     }
   else if (LEFT && LEFTRD && LEFTRD->categ == CNEW)
     {
-      serror (melding, LEFTRD->ident);
+      serror (melding, LEFTRD->ident, 0);
       LEFTRD->categ = CERROR;
     }
   else if (RIGHT && RIGHTRD && RIGHTRD->categ == CNEW)
     {
-      serror (melding, RIGHTRD->ident);
+      serror (melding, RIGHTRD->ident, 0);
       RIGHTRD->categ = CERROR;
     }
   else if (QUAL && QUAL->categ == CNEW)
     {
-      serror (melding, QUAL->ident);
+      serror (melding, QUAL->ident, 0);
       QUAL->categ = CERROR;
     }
-  else if ((LEFT ? LEFTTYPE != TERROR : TRUE) 
+  else if ((LEFT ? LEFTTYPE != TERROR : TRUE)
 	   && (RIGHT ? RIGHTTYPE != TERROR : TRUE) &&
        (UP ? UPTYPE != TERROR : TRUE) && (RD ? RD->type != TERROR : TRUE) &&
-	   (QUAL ? QUAL->type != TERROR : TRUE) 
+	   (QUAL ? QUAL->type != TERROR : TRUE)
 	   && (UPRD ? UPRD->type != TERROR : TRUE) &&
 	   (TYPE != TERROR))
-    serror (melding, RD ? RD->ident : 0);
+    serror (melding, RD ? RD->ident : 0, 0);
   TYPE = TERROR;
 }
 
@@ -188,7 +189,7 @@ static void konvtype (exp_t **re, char type, decl_t *qual)
 	{
 	  if (((*re)->up->left == NULL || (*re)->up->left->type != TERROR)
 	  && ((*re)->up->right == NULL || (*re)->up->right->type != TERROR))
-	    serror (85, (*re)->up->token);
+	    serror (85, "", (*re)->up->token);
 	  (*re)->type = (*re)->up->type = TERROR;
 	}
       else if ((rd = commonqual ((*re)->qual, qual)) == qual) /* OK */ ;
@@ -210,7 +211,7 @@ static void konvtype (exp_t **re, char type, decl_t *qual)
 	  if (((*re)->token == MNEWARG) ||
 	      (((*re)->up->left == NULL || (*re)->up->left->type != TERROR)
 	  && ((*re)->up->right == NULL || (*re)->up->right->type != TERROR)))
-	    serror (85, (*re)->up->token);
+	    serror (85, "", (*re)->up->token);
 	  (*re)->type = (*re)->up->type = TERROR;
 	}
     }
@@ -230,7 +231,7 @@ static void sametype (exp_t **rel, exp_t **rer)
 /******************************************************************************
                                                                ARGUMENTERROR */
 
-static argumenterror (int melding, exp_t *re)
+static void argumenterror (int melding, exp_t *re)
 {
   int i = 1;
   if (TYPE == TERROR)
@@ -243,7 +244,6 @@ static argumenterror (int melding, exp_t *re)
   if (re->type == TERROR)
     return;
   serror (melding, re->value.ident, i);
-
 }
 
 /******************************************************************************
@@ -310,7 +310,7 @@ static void exp_check (exp_t *re)
       if(TOKEN==MUNTIL && TYPE==TINTG && RIGHTTYPE==TREAL)
 	{
 
-	} 
+	}
       else
 	{
 	  konvtype (&RIGHT, TYPE, QUAL);
@@ -354,7 +354,7 @@ static void exp_check (exp_t *re)
       if (UPTOKEN != MASSIGN && UPTOKEN != MASSIGNR
 	  && UPTOKEN != MENDASSIGN && UPTOKEN != MCONST)
 	SERROR (118);
-      else if (TYPE != TTEXT && LEFTTOKEN != MIDENTIFIER 
+      else if (TYPE != TTEXT && LEFTTOKEN != MIDENTIFIER
 	       && LEFTTOKEN != MPROCASSIGN
 	       && LEFTTOKEN != MARRAYARG && LEFTTOKEN != MDOT)
 	SERROR (90);
@@ -586,7 +586,7 @@ static void exp_check (exp_t *re)
 	  if (RD->kind != KCLASS)
 	    {
 	      if (RD->kind != KERROR)
-		serror (84);
+		serror (84, "", 0);
 	    }
 	} else
       if (RD == sourcelinefunction)
@@ -661,7 +661,7 @@ static void exp_check (exp_t *re)
 	    }
 	  else
 	    SERROR (7);
-	} 
+	}
       break;
     case MTHIS:
       RD = reg_this (VALUE.ident);
@@ -986,6 +986,8 @@ static void exp_check (exp_t *re)
 	  break;
 	}
       break;
+    default:
+      break;
     }
 }
 
@@ -998,4 +1000,3 @@ void main_exp_check (exp_t *re)
   computeconst (re);
   setdanger_const (re);
 }
-

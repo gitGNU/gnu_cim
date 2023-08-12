@@ -181,7 +181,7 @@ struct _block
 				 * parameter */
 #define CCTEXTDANGER 12
 #define CCFILEBLANKSCOPY 13	/* Kall p} filename */
-#define CCFILE       9		/* Peker til file-klasse som f|rste parameter 
+#define CCFILE       9		/* Peker til file-klasse som f|rste parameter
 				 */
 #define CCFILEDANGER 3
 #define CCDETACH     4		/* Peker til klasse som skal detach'es som
@@ -189,7 +189,7 @@ struct _block
 #define CCCALLRESUME 5		/* Siste parameter er returadressen */
 #define CCEXIT	     6		/* Main modul: goto ll<exitlabel>; Ekstern
 				 * modul: lgoto=<exitlabel>;mgoto=0;return; */
-#define CCRANDOMRUTDANGER 7	/* Ranom rutinene har siste parameter 
+#define CCRANDOMRUTDANGER 7	/* Ranom rutinene har siste parameter
 				 * overfort by name */
 #define CCCPROC      8		/* Ekstern C-prosedyre */
 
@@ -199,10 +199,9 @@ void end_block (char *rtname, char codeclass);
 void reg_decl (char *ident, char type, char kind, char categ);
 void reg_inner (void);
 decl_t *new_decl (void);
-extern block_t *firstclass (void);
+block_t *firstclass (void);
 void in_block (void);
 void out_block (void);
-extern decl_t *reg_this ();
 
 void remove_block (block_t *rb);
 
@@ -248,4 +247,6 @@ void reginsp (block_t *rb, decl_t *rd);
 decl_t *reg_this (char *ident);
 
 extern char yaccerror;
+
+char *xmalloc (unsigned int size);
 #endif

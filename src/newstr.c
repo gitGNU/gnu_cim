@@ -17,7 +17,7 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA. */
 
 #include <stdio.h>
-#include <obstack.h>
+#include "obstack.h"
 #include "newstr.h"
 #include "config.h"
 
@@ -31,8 +31,7 @@
 #include <stdlib.h>
 #endif
 
-
-char *xmalloc();
+char *xmalloc (unsigned int size);
 
 #define obstack_chunk_alloc xmalloc
 #define obstack_chunk_free free
@@ -148,4 +147,3 @@ char *newstrcat6(char *s1, char *s2, char *s3, char *s4, char *s5, char *s6)
   obstack_grow0 (&os_newstr, s6, strlen(s6));
   return obstack_finish (&os_newstr);;
 }
-

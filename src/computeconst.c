@@ -17,7 +17,7 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA. */
 
 #include <stdio.h>
-#include <obstack.h>
+#include "obstack.h"
 #include <math.h>
 
 #include "const.h"
@@ -25,6 +25,8 @@
 #include "checker.h"
 #include "expmacros.h"
 #include "newstr.h"
+#include "error.h"
+#include "gen.h"
 
 /******************************************************************************
                                                             SETDANGER_CONST  */
@@ -56,17 +58,17 @@ char setdanger_const (exp_t *re)
     sub_danger = setdanger_const (LEFT);
   if (RIGHT != NULL)
     sub_danger |= setdanger_const (RIGHT);
-  DANGER = FALSE;
+  re->danger = FALSE;
   switch (re->token)
     {
     case MNEWARG:
     case MARRAYARG:
     case MCONC:
-      DANGER = TRUE;
+      re->danger = TRUE;
       break;
     case MPROCARG:
-      DANGER = danger_proc (RD);
-      if (DANGER == FALSE)
+      re->danger = danger_proc (RD);
+      if (re->danger == FALSE)
 	{
 	  exp_t *rex;
 	  KONST = TRUE;
@@ -81,6 +83,8 @@ char setdanger_const (exp_t *re)
 		case MINTEGERKONST:
 		case MBOOLEANKONST:
 		  continue;
+                default:
+                  break;
 		}
 	      KONST = FALSE;
 	      break;
@@ -89,24 +93,26 @@ char setdanger_const (exp_t *re)
       break;
     case MASSIGNR:
       if (UPTOKEN == MASSIGNR && RIGHTTOKEN != MASSIGNR)
-	DANGER = TRUE;
+	re->danger = TRUE;
       break;
     case MREFASSIGNT:
       if (UPTOKEN == MVALASSIGNT)
-	DANGER = TRUE;
+	re->danger = TRUE;
       break;
     case MIDENTIFIER:
       if (RD->kind == CNAME)
-	DANGER = TRUE;
+	re->danger = TRUE;
       break;
     case MORELSEE:
     case MANDTHENE:
     case MIFE:
     case MELSE:
-      DANGER = sub_danger;
+      re->danger = sub_danger;
+      break;
+    default:
       break;
     }
-  return (sub_danger | DANGER);
+  return (sub_danger | re->danger);
 }
 
 /******************************************************************************
@@ -119,11 +125,12 @@ static int sstrcmp (char s[], char t[])
     ss,
     tt;
   i = 0;
-  if (s == NOTEXT)
+  if (s == NOTEXT) {
     if (t == NOTEXT)
       return (0);
     else
       return ((char) -1);
+  }
   while (s[i] == t[i])
     {
       if (s[i] == '\0')
@@ -159,14 +166,15 @@ int sstrlen (char s[])
   while (s[i])
     {
       ii++;
-      if (s[i++] == '\\')
+      if (s[i++] == '\\') {
 	if (s[i++] == '\n')
 	  ii--;
 	else
 	  i += 2;
+      }
     }
   if (ii >= MAX_TEXT_CHAR)
-    serror (44);
+    serror (44, "", 0);
   return (ii);
 }
 
@@ -182,7 +190,7 @@ int sstrlen (char s[])
  * Den fjerner ogs} noder med token lik MNOOP, med unntak n}
  * typen er lik TTEXT og tokenet til noden over i treet er lik MDOT,
  * og tokenet til venstrenoden er lik MIF, MARRAYARG eller MIDENTIFIER.
- * Den fjerner noder med token lik MREAINT 
+ * Den fjerner noder med token lik MREAINT
  * og MINTREA mellom multippel assign.*/
 
 char computeconst (exp_t *re)
@@ -271,7 +279,7 @@ char computeconst (exp_t *re)
 
       if (lconst == FALSE && LEFT != NULL)
 	{
-	  if (TOKEN == MNOOP && (TYPE != TTEXT || UPTOKEN != MDOT 
+	  if (TOKEN == MNOOP && (TYPE != TTEXT || UPTOKEN != MDOT
 				 || (LEFTTOKEN != MIFE
 		    && LEFTTOKEN != MARRAYARG && LEFTTOKEN != MIDENTIFIER)))
 	    {
@@ -404,8 +412,8 @@ char computeconst (exp_t *re)
 	long i, s;
 	VALUE.rval = 1.0;
 	if (LEFTVALUE.rval == 0 && RIGHTVALUE.ival == 0)
-	  serror (4);
-	if (RIGHTVALUE.ival < 0) 
+	  serror (4, "", 0);
+	if (RIGHTVALUE.ival < 0)
 	  {
 	    RIGHTVALUE.ival= -RIGHTVALUE.ival;
 	    s= 1;
@@ -450,7 +458,7 @@ char computeconst (exp_t *re)
       TOKEN = MINTEGERKONST;
       if (RIGHTVALUE.ival == 0)
 	{
-	  serror (1);
+	  serror (1, "", 0);
 	  VALUE.ival = LEFTVALUE.ival;
 	}
       else
@@ -461,7 +469,7 @@ char computeconst (exp_t *re)
 	long i;
 	VALUE.ival = 1;
 	if (RIGHTVALUE.ival < 0)
-	  serror (4);
+	  serror (4, "", 0);
 	for (i = 1; i <= RIGHTVALUE.ival; i++)
 	  VALUE.ival *= LEFTVALUE.ival;
 	TOKEN = MINTEGERKONST;
@@ -483,4 +491,3 @@ char computeconst (exp_t *re)
   RIGHT = NULL;
   return (TRUE);
 }
-

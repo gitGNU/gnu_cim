@@ -39,7 +39,7 @@
  * ret, mret -> Returadressen
  * Returnerer: Adressen i er og __ev (også hvis en thunk kalles) */
 
-char __rgetsa (__simplenamepar *p, long as, int ret, void (*mret) ())
+char __rgetsa (__aritnamepar *p, long as, int ret, void (*mret) ())
 {
   switch (p->namekind)
     {
@@ -50,7 +50,7 @@ char __rgetsa (__simplenamepar *p, long as, int ret, void (*mret) ())
     case __ADDRESS_THUNK:
       __goto = p->adr;		/* I tilfelle at kallet p} rct f|rer til
 				 * garbage collection, slik  at p ikke
-				 * lenger peker riktig, leses disse 
+				 * lenger peker riktig, leses disse
 				 * verdiene f|r kallet. */
       __sl = p->sl;
       __rct (as);		/* Oppretter objektet og
@@ -70,4 +70,5 @@ char __rgetsa (__simplenamepar *p, long as, int ret, void (*mret) ())
       return (__FALSE);
     }
   /* NOTREACHED */
+  return 0;
 }

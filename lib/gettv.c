@@ -50,13 +50,13 @@ char __rgettv (__textnamepar *p, long as, int ret, void (*mret))
     case __ADDRESS_THUNK:
       __goto = p->adr;	/* I tilfelle at kallet p} rct f|rer til
 				 * garbage collection, slik  at p ikke
-				 * lenger peker riktig, leses disse 
+				 * lenger peker riktig, leses disse
 				 * verdiene f|r kallet. */
       __sl = p->sl;
       __rct (as);		/* Oppretter objektet og overf|rer
 			         * returadressen. */
       ((__thunkp) __pb)->h.ex.ment = mret;
-      ((__thunkp) __pb)->h.ex.ent = ret; 
+      ((__thunkp) __pb)->h.ex.ent = ret;
       __lb = __pb; 		/* Gj|r thunken eksikverbar.  */
       return (__TRUE);
     case __ADDRESS_NOTHUNK:
@@ -75,4 +75,5 @@ char __rgettv (__textnamepar *p, long as, int ret, void (*mret))
       return (__FALSE);
     }
   /* NOTREACHED */
+  return 0;
 }

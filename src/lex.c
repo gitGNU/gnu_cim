@@ -34,8 +34,7 @@
 double strtod ();
 #endif
 
-#include <obstack.h>
-char *xmalloc();
+#include "obstack.h"
 
 #define obstack_chunk_alloc xmalloc
 #define obstack_chunk_free free
@@ -66,8 +65,8 @@ static char leerror = FALSE;
 
 static char end_of_file;
 
-char external = FALSE;	/* Har man sett "EXTERNAL PROC/CLASS =" angir 
-				 * external at man venter et filnavn 
+char external = FALSE;	/* Har man sett "EXTERNAL PROC/CLASS =" angir
+				 * external at man venter et filnavn
 				 * som ikke skal behandles som
 				 * en text-konstant. */
 
@@ -116,7 +115,7 @@ static int input (void)
       )
     lerror (7);
   if (yytchar == '#' && notintext) return('%');
-  return (islower (yytchar) && notintext && sensitive == OFF 
+  return (islower (yytchar) && notintext && sensitive == OFF
 	  ? toupper (yytchar) : yytchar);
 }
 
@@ -133,7 +132,7 @@ static int input (void)
  *                                  til objekter.
  *                      %stripsideeffects  Ikke ta hensyn til sideeffekter i
  *                                  uttrykk.
- *                      %casesensitive 
+ *                      %casesensitive
  *                                  on/off Case-sensitive p} samtlige symboler.
  *                                  Hvis on er satt s} m} n|kkelord skrives
  *                                  med store bokstaver.
@@ -143,7 +142,7 @@ static int input (void)
  *                      %nocomment  Resten av linje blir behandlet p} vanlig
  *                                  m}te. Dette direktivet er nyttig p} den
  *                                  m}ten at andre kompilatorer vanligvis vil
- *                                  ignorere denne linjen, mens cim ikke 
+ *                                  ignorere denne linjen, mens cim ikke
  *                                  gj|r det. F.eks. Lund gir bare en warning
  *                                  for slike linjer.
  *                      %define     Definerer et symbol.
@@ -151,7 +150,7 @@ static int input (void)
  *                      %ifdef      Sjekker om symbolet er definert.
  *                      %ifnotdef   Sjekker om symbolet ikke er definert.
  *                      %else       Se nedenfor.
- *                      %endif      %ifdef og %ifnotdef er etterfulgt av 
+ *                      %endif      %ifdef og %ifnotdef er etterfulgt av
  *                                  et antall linjer muligens etterfulgt
  *                                  av %else og deretter etterfulgt av %endif.
  *                                  Hvis betingelsen er sann da vil alle
@@ -161,7 +160,7 @@ static int input (void)
  *                                  (hvis %else er utelatt) ignorert.
  *                      %elsedef    Forkortelse for %else - %ifdef - %endif.
  *                      %elsenotdef Forkortelse for %else - %ifnotdef - %endif.
- *                      %timestamp  Setter opp et tidsmerke for en 
+ *                      %timestamp  Setter opp et tidsmerke for en
  *                                  ekstern modul
  *                      %eof        End of file. Brukes for include-filer
  *                                  som er lagt i ar-biblioteker. */
@@ -529,7 +528,7 @@ static long radix (int r, char *t)
 static void scan_nows (void)
 {
   obstack_free (&os_lex, yytext);
-  while (lexchar != '\n' && lexchar != EOF 
+  while (lexchar != '\n' && lexchar != EOF
 	 && lexchar != ' ' && lexchar != '\t')
     {
       obstack_1grow (&os_lex, lexchar);
@@ -539,7 +538,7 @@ static void scan_nows (void)
   yytext= obstack_finish (&os_lex);
 }
 
-static scan_name (void)
+static void scan_name (void)
 {
   obstack_free (&os_lex, yytext);
   while ((isalnum (lexchar) || lexchar == '_'))
@@ -566,7 +565,7 @@ static void scan_ifdef (void)
       if (!strcmp (yytext, "ENDIF"))
 	{
 	  if (ifdefp == include_ifdefp ()) lerror (23);
-	  else 
+	  else
 	    {
 	      ifdefstack_t *prev= ifdefp->prev;
 	      obstack_free (&os_ifdef, ifdefp);
@@ -603,7 +602,7 @@ static void scan_ifdef (void)
 		{
 		  elsedef = FALSE;
 		  notdef = TRUE;
-		} 
+		}
 	      else goto proceed;
 
 	      while (lexchar == ' ' | lexchar == '\t')
@@ -611,7 +610,7 @@ static void scan_ifdef (void)
 	      if (isalpha (lexchar) || lexchar == '_')
 		{
 		  scan_name ();
-	      
+
 		  if (elsedef == TRUE)
 		    {
 		      if (!(ifdefp->ifdef & IFGREN))
@@ -632,7 +631,7 @@ static void scan_ifdef (void)
 		    }
 		  ifdefp->ifdef = ifdef_name (tag (yytext)) | IFGREN | scan;
 		}
-	      else 
+	      else
 		{
 		  if (!bl_in_dir_line) lerror (8);
 		  goto proceed;
@@ -655,7 +654,7 @@ static void scan_ifdef (void)
       if ((ifdefp->ifdef == (IFGREN | TRUE)) ||
 	  (ifdefp->ifdef == (ELSEGREN | FALSE)))
 	break;
-      
+
     proceed:
       while (lexchar != EOF)
 	{
@@ -663,7 +662,7 @@ static void scan_ifdef (void)
 	  lineno++;
 	  if (!option_write_tokens)
 	    mout (MNEWLINE);
-	  if (newlexchar == '%' && 
+	  if (newlexchar == '%' &&
 	      ((newlexchar == ' ' && option_bl_in_dir_line) ?
 	       (newlexchar, bl_in_dir_line = TRUE) :
 	       ((bl_in_dir_line = FALSE), TRUE)) && isalpha (lexchar))
@@ -761,16 +760,16 @@ static void scan_dirline (void)
 		      while (lexchar != '\n' && lexchar != EOF)
 			newlexchar;
 		      if (lexchar == EOF) lerror (19);
-		      
+
 		      lineno++;
 		      if (!option_write_tokens) mout (MNEWLINE);
-		      if (newlexchar == '%' && 
+		      if (newlexchar == '%' &&
 			  ((newlexchar == ' ' &&
-			    option_bl_in_dir_line) ? newlexchar : 0, TRUE) 
+			    option_bl_in_dir_line) ? newlexchar : 0, TRUE)
 			  && isalpha (lexchar))
 			{
 			  scan_name ();
-			  
+
 			  if (!strcmp (yytext, "COMMENT"))
 			    comlev++;
 			  if (!strcmp (yytext, "ENDCOMMENT"))
@@ -783,12 +782,12 @@ static void scan_dirline (void)
 	    case 'D':
 	      if (!strcmp (yytext, "DEFINE"))
 		{
-		  while (lexchar == ' ' | lexchar == '\t')
+		  while (lexchar == ' ' || lexchar == '\t')
 		    newlexchar;
-		  if (isalpha (lexchar) | lexchar == '_')
+		  if (isalpha (lexchar) || lexchar == '_')
 		    {
 		      scan_name ();
-		      
+
 		      define_name (tag (yytext), TRUE);
 		    }
 		  else if (!bl_in_dir_line) lerror (8);
@@ -821,7 +820,7 @@ static void scan_dirline (void)
 		  if (lexchar != '\n' | lexchar != EOF)
 		    {
 		      scan_nows ();
-		      
+
 		      notintext = TRUE;
 
 		      pushfilmap (tag (yytext), ifdefp);
@@ -853,7 +852,7 @@ static void scan_dirline (void)
 			}
 		      obstack_1grow (&os_lex, 0);
 		      yytext= obstack_finish (&os_lex);
-		  
+
 		      nylinje = radix (10, yytext);
 		      notintext = FALSE;
 		      while (lexchar == ' ' | lexchar == '\t')
@@ -861,7 +860,7 @@ static void scan_dirline (void)
 		      if (lexchar != '\n' & lexchar != EOF)
 			{
 			  scan_nows ();
-		      
+
 			  setfilmap (tag (yytext), nylinje);
 			}
 		      else
@@ -875,9 +874,9 @@ static void scan_dirline (void)
 	    case 'M':
 	      if (!strcmp (yytext, "MAIN"))
 		{
-		  while (lexchar == ' ' | lexchar == '\t')
+		  while (lexchar == ' ' || lexchar == '\t')
 		    newlexchar;
-		  if (isalpha (lexchar) | lexchar == '_')
+		  if (isalpha (lexchar) || lexchar == '_')
 		    {
 		      scan_name ();
 
@@ -925,12 +924,12 @@ static void scan_dirline (void)
 	    case 'T':
 	      if (!strcmp (yytext, "TIMESTAMP"))
 		{
-		  while (lexchar == ' ' | lexchar == '\t')
+		  while (lexchar == ' ' || lexchar == '\t')
 		    newlexchar;
-		  if (isalpha (lexchar) | lexchar == '_')
+		  if (isalpha (lexchar) || lexchar == '_')
 		    {
 		      scan_name ();
-		  
+
 		      directive_timestamp= yytext;
 		      yytext= obstack_finish (&os_lex);
 		    }
@@ -942,9 +941,9 @@ static void scan_dirline (void)
 	    case 'U':
 	      if (!strcmp (yytext, "UNDEF"))
 		{
-		  while (lexchar == ' ' | lexchar == '\t')
+		  while (lexchar == ' ' || lexchar == '\t')
 		    newlexchar;
-		  if (isalpha (lexchar) | lexchar == '_')
+		  if (isalpha (lexchar) || lexchar == '_')
 		    {
 		      scan_name ();
 
@@ -1004,7 +1003,7 @@ void lex_reinit (void)
   obstack_free (&os_ifdef, first_object_allocated_ptr_ifdef);
 }
 /******************************************************************************
-  						          PUTCHARACTER       */
+						          PUTCHARACTER       */
 
 /* Hjelpe-prosedyre for } bygge opp et konstant-tektsobjekt. */
 
@@ -1021,13 +1020,13 @@ static char *putcharacter (unsigned char character)
 }
 
 /******************************************************************************
-  							      PUTCHARTEXT    */
+							      PUTCHARTEXT    */
 
 /* Prosedyre som fungerer som grensesnitt mot scanner,
  *  for } bygge opp et konstant-tekstobjekt.
  *  Denne rutinen kalles for hvert tegn som skal inn i tekst-objektet. */
 
-static putchartext ( unsigned char character)
+static void putchartext ( unsigned char character)
 {
   char *s;
   s = putcharacter (character);
@@ -1035,10 +1034,10 @@ static putchartext ( unsigned char character)
 }
 
 /******************************************************************************
-                                   			  GETQUOTEDTEXT      */
+							  GETQUOTEDTEXT      */
 
 /* Denne rutinen bygger opp et internt konstant-tekstobjekt og returnerer
- * en peker til det. Teksten er bygget opp p} en slik m}te at den 
+ * en peker til det. Teksten er bygget opp p} en slik m}te at den
  * kun inneholder skrivbare tegn eksklusiv '\' ' ' og '"'.
  * Ikke skrivbare tegn og de tre som er nevnt ovenfor er kodet oktalt
  * i teksten (\nnn). Denne teksten kan uten videre skrives ut i C og trenger
@@ -1088,7 +1087,7 @@ int yylex (void)
     if (isalpha (newlexchar))
       {
 	scan_name ();
-	
+
 	unput (lexchar);
 	switch (yytext[0])
 	  {
@@ -1160,49 +1159,49 @@ int yylex (void)
 		      {
 			if (newlexchar == 'N')
 			  {
-			    if (newlexchar == 'D' && !isalnum (newlexchar) 
+			    if (newlexchar == 'D' && !isalnum (newlexchar)
 				&& lexchar != '_')
 			      {	/* END is found and comment is terminated */
 				unput (lexchar);
 				newsymbole = HEND;
 				return (HEND);
-			      } else 
-				if (antnewline && !reported) 
+			      } else
+				if (antnewline && !reported)
 				  {lerror (32); reported = 1;}
 			  }
-			else if (lexchar == 'L' && newlexchar == 'S' 
+			else if (lexchar == 'L' && newlexchar == 'S'
 				 && newlexchar == 'E'
 				 && !isalnum (newlexchar) && lexchar != '_')
 			  { /* ELSE is found and comment is terminated */
 			    unput (lexchar);
 			    newsymbole = HELSE;
 			    return (HEND);
-			  } else if (antnewline && !reported) 
+			  } else if (antnewline && !reported)
 			    {lerror (32); reported = 1;}
 		      }
 		    else if (lexchar == 'W')
 		      {
-			if (newlexchar == 'H' && newlexchar == 'E' 
+			if (newlexchar == 'H' && newlexchar == 'E'
 			    && newlexchar == 'N'
 			    && !isalnum (newlexchar) && lexchar != '_')
 			  { /* WHEN is found and comment is terminated */
 			    unput (lexchar);
 			    newsymbole = HWHEN;
 			    return (HEND);
-			  } else if (antnewline && !reported) 
+			  } else if (antnewline && !reported)
 			    {lerror (32); reported = 1;}
 		      }
-		    else if (lexchar == 'O' && newlexchar == 'T' 
-			     && newlexchar == 'H' && newlexchar == 'E' 
+		    else if (lexchar == 'O' && newlexchar == 'T'
+			     && newlexchar == 'H' && newlexchar == 'E'
 			     && newlexchar == 'R' && newlexchar == 'W'
-			     && newlexchar == 'I' && newlexchar == 'S' 
+			     && newlexchar == 'I' && newlexchar == 'S'
 			     && newlexchar == 'E'
 			     && !isalnum (newlexchar) && lexchar != '_')
 		      {	/* OTHERWISE is found and comment is terminated */
 			unput (lexchar);
 			newsymbole = HOTHERWISE;
 			return (HEND);
-		      } else if (antnewline && !reported) 
+		      } else if (antnewline && !reported)
 			{lerror (32); reported = 1;}
 		    while (isalpha (lexchar) || lexchar == '_')
 		      newlexchar;
@@ -1388,7 +1387,7 @@ int yylex (void)
 	    yylval.token = HEQR;
 	    return (HREFRELOPERATOR);
 	  }
-	if (lexchar == '/')
+	if (lexchar == '/') {
 	  if (newlexchar == '=')
 	    {
 	      yylval.token = HNER;
@@ -1396,6 +1395,7 @@ int yylex (void)
 	    }
 	  else
 	    lerror (7);
+        }
 	unput (lexchar);
 	yylval.token = HEQ;
 	return (HVALRELOPERATOR);
@@ -1491,11 +1491,12 @@ int yylex (void)
 	    return (HREALKONST);
 
 	  }
-	if (lexchar == '.')
+	if (lexchar == '.') {
 	  if (newlexchar == '.')
 	    return (HDOTDOTDOT);
 	  else
 	    lerror (7);
+        }
 	unput (lexchar);
 	return (HDOT);
       case ',':
@@ -1576,7 +1577,7 @@ int yylex (void)
 			if (newlexchar == '!')
 			  {
 			    if (firstchar < '2'
-				|| (firstchar == '2' && 
+				|| (firstchar == '2' &&
 				    (secondchar < '5'
 				     || (secondchar == '5'
 					 && thirdchar < '6'))))
@@ -1665,14 +1666,14 @@ int yylex (void)
 			    thirdchar = lexchar;
 			    if (newlexchar == '!')
 			      {
-				if (firstchar < '2' 
-				    || (firstchar == '2' 
+				if (firstchar < '2'
+				    || (firstchar == '2'
 					&& (secondchar < '5'
 					    || (secondchar == '5'
 						&& thirdchar < '6'))))
 				  {
-				    putchartext 
-				      ((unsigned char) 
+				    putchartext
+				      ((unsigned char)
 				       (((firstchar - '0') * 10
 					 + secondchar - '0') * 10
 					+ thirdchar - '0'));
@@ -1696,7 +1697,7 @@ int yylex (void)
 			  }
 			else if (lexchar == '!')
 			  {
-			    putchartext ((unsigned char) 
+			    putchartext ((unsigned char)
 					 ((firstchar - '0') * 10
 					  + secondchar - '0'));
 			    newlexchar;
@@ -1783,7 +1784,7 @@ int yylex (void)
 
 	obstack_free (&os_lex, yytext);
 	obstack_1grow (&os_lex, lexchar);
-	if (newlexchar == 'R' && (first_lexchar == '2' | first_lexchar == '4' 
+	if (newlexchar == 'R' && (first_lexchar == '2' | first_lexchar == '4'
 				  | first_lexchar == '8'))
 	  {
 	    lexradix = first_lexchar - '0';
@@ -1834,7 +1835,7 @@ int yylex (void)
 	    lerror (24);
 	    ifdefp = (ifdefstack_t *) include_ifdefp ();
 	  }
-	fclose (include_file ());	
+	fclose (include_file ());
 	popfilmap ();
 	if (no_filemap ())
 	  return (NOSYMBOL);
@@ -1870,7 +1871,7 @@ void scan_and_write_tokens (void)
   int token;
   long line = 1L;
   /* printf("% Cim_pp\n%line 1 %s\n",sourcename); */
-  while (token = yylex ())
+  while ((token = yylex ()))
     {
       while (line < lineno)
 	{
@@ -1880,4 +1881,3 @@ void scan_and_write_tokens (void)
       print_lexsymbol (token, &yylval);
     }
 }
-

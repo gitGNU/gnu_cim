@@ -18,6 +18,7 @@
  */
 
 #include "cim.h"
+#include <ctype.h>
 
 /******************************************************************************
                                           TEXT PROCEDURE LOWCASE(t)          */
@@ -30,8 +31,8 @@ __txtvp __rlowcase (__txtvp t)
 
   for (i = 0; i < t->length; i++)
     s[t->start + i - 1] =
-      (isalpha (s[t->start + i - 1]) 
-       ? (isupper (s[t->start + i - 1]) 
+      (isalpha (s[t->start + i - 1])
+       ? (isupper (s[t->start + i - 1])
 	  ? tolower ((int) s[t->start + i - 1]) : s[t->start + i - 1])
        : s[t->start + i - 1]);
   __et.obj = t->obj;

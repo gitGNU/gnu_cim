@@ -17,6 +17,7 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA. */
 
 #include "config.h"
+#include <limits.h>
 
 /* lex.c */
 #define MAX_TEXT_CHAR 65535  /* Max size of text-objects DO NOT EDIT */
@@ -29,15 +30,15 @@
 #define FIRST_DATA_LOCATION ((int)(&__start_data_segment))
 
 /* Define MAX_INT */
-#if SIZEOF_LONG == 8
-#define MAX_INT (~(1L<<63))
-#else
-#define MAX_INT (~(1L<<31))
-#endif
+#define MAX_INT INT_MAX
 
 /* Define TYPE_32_INT */
-#if SIZEOF_LONG == 8
 #define TYPE_32_INT int
-#else
-#define TYPE_32_INT long
-#endif
+
+#define MIN_DOUBLE DBL_MIN
+#define MAX_DOUBLE DBL_MAX
+
+#define LINES_PER_PAGE 60
+#define DYNMEMSIZEKB 512
+#define INPUT_LINE_LENGTH 80
+#define OUTPUT_LINE_LENGTH 80

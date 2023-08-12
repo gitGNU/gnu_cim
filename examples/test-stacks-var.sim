@@ -1,0 +1,97 @@
+! Stack implementation using the system class SIMSET;
+! Storing items of various types;
+
+external class Stacks;
+Stacks begin
+
+    Link class NodeC(C);
+        character C;
+        !User defined character stack element;
+    begin
+        procedure Show;
+            outchar(C);
+    end;
+
+    Link class NodeI(I);
+        integer I;
+        !User defined integer stack element;
+    begin
+        procedure Show;
+            outint(I, 4);
+    end;
+
+    Link class NodeR(R);
+        real R;
+        !User defined real stack element;
+    begin
+        procedure Show;
+            outfix(R, 2, 8);
+    end;
+
+    ref(Stack) S;
+    ref(Link)  Item;
+    ref(NodeC) ItemC;
+    ref(NodeI) ItemI;
+    ref(NodeR) ItemR;
+    character C;
+    integer J;
+    real X;
+
+    !Program body;
+
+    S :- new Stack;    !creating a stack;
+
+    outtext("Stack created, size = ");
+    outint(S.Size, 3);
+    outimage;
+
+    outtext("Enter a sentence, finish it by '.'");
+    outimage;
+    C := ' ';
+    while C <> '.' do begin
+        C := InChar;
+        ItemC :- new NodeC(C);
+        S.Push(ItemC);
+    end while;
+
+    outtext("Enter integer numbers, finish by '0'");
+    outimage;
+    J := -1;
+    while J <> 0 do begin
+        J := InInt;
+        ItemI :- new NodeI(J);
+        S.Push(ItemI);
+    end while;
+
+    outtext("Enter real numbers, finish by '0'");
+    outimage;
+    X := -1;
+    while X <> 0 do begin
+        X := InReal;
+        ItemR :- new NodeR(X);
+        S.Push(ItemR);
+    end while;
+
+    outtext("Number of items in the stack:");
+    outint(S.Size, 3);
+    outimage;
+
+    outtext("One more Link pushed in the stack.");
+    outimage;
+    Item :- new Link;
+    S.Push(Item);
+
+    outtext("The whole sequence inverted:");
+    outimage;
+
+    while not S.Empty do begin
+        Item :- S.Pop;
+        inspect Item
+            when NodeC do Show
+            when NodeI do Show
+            when NodeR do Show
+            otherwise outtext("Unknown item");
+    end while;
+    outimage;
+
+end**of**program;

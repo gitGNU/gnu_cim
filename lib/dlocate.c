@@ -19,6 +19,7 @@
 
 #define INCLUDE_SIMFILE_H
 #include "cim.h"
+#include <stdio.h>
 
 /******************************************************************************
                                          PROCEDURE LOCATE                    */
@@ -30,7 +31,7 @@ __dhp __rdlocate (__bs5FILE *p, long i)
   if (p->loc != i)
     {
       p->loc = i;
-      if (fseek (((__bs1FILE *) p)->file, 
+      if (fseek (((__bs1FILE *) p)->file,
 		 (i - 1) * (((__bs5FILE *) p)->imagelength + 1), 0) == __EOF)
 	__rerror ("Locate: Not possible to seek");
       p->lastop = __SEEK;

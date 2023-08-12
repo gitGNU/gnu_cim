@@ -67,6 +67,4 @@
 #define UPISLEFT re->up->up->left==re->up
 #define ISRIGHT re->up->right==re
 
-#undef DANGER
-#define DANGER re->danger
 #define KONST re->konst

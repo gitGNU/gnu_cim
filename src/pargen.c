@@ -38,10 +38,10 @@ static void gen_conv_and_q (exp_t *rex, char procedure, char transported, char c
       goto nextcase;
     }
   else
-    /* END-LIK AKTUELL OG FORMELL KVALIFIKASJON */ 
+    /* END-LIK AKTUELL OG FORMELL KVALIFIKASJON */
     if (subclass (rex->left->qual, rex->rd->prefqual) && !procedure)
     {
-      /* AKTUELL kval. er en subklasse av FORMELL kval. 
+      /* AKTUELL kval. er en subklasse av FORMELL kval.
       * FP.CONV = AP.CONV || writetest -- FP.Q = AP.Q */
     nextcase:
       if (!transported || !copied_all || writetest)
@@ -51,8 +51,7 @@ static void gen_conv_and_q (exp_t *rex, char procedure, char transported, char c
 	{
 	  if (copied_all)
 	    if (writetest)
-	      fprintf (ccode, "|= __WRITETEST;",
-			      rex->left->value.ident);
+	      fprintf (ccode, "|= __WRITETEST;");
 	    else;
 	  else
 	    {
@@ -82,26 +81,26 @@ static void gen_conv_and_q (exp_t *rex, char procedure, char transported, char c
       fprintf (ccode, ";");
     }
   else
-    /* END-AKTUELL KVAL. EN SUBKLASSE AV FORMELL KVAL. */ 
+    /* END-AKTUELL KVAL. EN SUBKLASSE AV FORMELL KVAL. */
     if (subclass (rex->rd->prefqual, rex->left->qual))
     {
       if (transported)
 	{
 	  /* FORMELL kval. er en subklasse av AKTUELL kval.
-	   * if(FORMELL kval. sub AP.kval)                       
-	   * {                                                   
-	   *    FP.CONV=readtest;FP.Q=FORMELL kval.              
-	   * }else                                               
-	   * if(AP.kval sub FORMELL kval.)                       
-	   * {                                                   
-	   *    FP.CONV=AP.CONV;FP.Q=AP.Q                        
-	   *  }else                                              
-	   * __rerror();                                         
+	   * if(FORMELL kval. sub AP.kval)
+	   * {
+	   *    FP.CONV=readtest;FP.Q=FORMELL kval.
+	   * }else
+	   * if(AP.kval sub FORMELL kval.)
+	   * {
+	   *    FP.CONV=AP.CONV;FP.Q=AP.Q
+	   *  }else
+	   * __rerror();
            *
-	   * rrin() er en runtime som utf|rer en in test         
-	   * Den skal ha to prototype pekerer som parametere     
-	   * i motsetning til rin() som skal ha en objektpeker   
-	   * og en prototype peker                               
+	   * rrin() er en runtime som utf|rer en in test
+	   * Den skal ha to prototype pekerer som parametere
+	   * i motsetning til rin() som skal ha en objektpeker
+	   * og en prototype peker
 	   * Tester alts} om par1 in par2 */
 
 	  fprintf (ccode, "if(__rrin(");
@@ -131,7 +130,7 @@ static void gen_conv_and_q (exp_t *rex, char procedure, char transported, char c
 	      fprintf (ccode, "((__bs%d *)__pb)->%s.conv=",
 			      rex->rd->encl->blno, rex->rd->ident);
 	      gensl (rex->left, TRUE, ON);
-	      fprintf (ccode, "%s.conv;((__bs%d *)__pb)->%s.q=", 
+	      fprintf (ccode, "%s.conv;((__bs%d *)__pb)->%s.q=",
 		       rex->left->value.ident,
 		       rex->rd->encl->blno, rex->rd->ident);
 	      gensl (rex->left, TRUE, ON);
@@ -239,7 +238,7 @@ static void send_to_formal_par (exp_t *rex, char addressthunk)
 
 /* Genererer kode som for ADDRESS_THUNK avgj|r om thunken skal returnere
  * med en adresse eller en verdi. Dersom en verdi skal returners
- * genereres det ogs} kode som utf|rer evt. konverteringer og 
+ * genereres det ogs} kode som utf|rer evt. konverteringer og
  * kvalifikasjonstester */
 
 void gen_thunk_simple_address (exp_t *rex)
@@ -262,7 +261,7 @@ void gen_thunk_simple_address (exp_t *rex)
       if (nonetest == ON)
 	fprintf (ccode,
 			")==__NULL?(__dhp)__rerror(__errnone):__bp)");
-      fprintf 
+      fprintf
 	(ccode, ";__ev.i=((char *)&((__bs%d *)__p)->%s) - (char *)__p;",
 	 rex->left->right->rd->encl->blno,
 	 rex->left->right->rd->ident);
@@ -273,7 +272,7 @@ void gen_thunk_simple_address (exp_t *rex)
     fprintf (ccode, "if(!((__thunkp)__pb)->writeaccess)"
 	     "__ev.c= *(char *)(((char *)__er)+__ev.i);");
   else if (rex->rd->type == TINTG || rex->rd->type == TREAL)
-    {				/* Leser og konverterer verdien hvis det ikke 
+    {				/* Leser og konverterer verdien hvis det ikke
 				 * er skrive aksess. */
       fprintf (ccode, "if(!((__thunkp)__pb)->writeaccess)"
 	       "   if(((__thunkp)__pb)->ftype==__TINTG)");
@@ -333,7 +332,7 @@ void gen_thunk_simple_value (exp_t *rex)
 
   /* KONVERTERING OG KVAL. TESTER */
   if (rex->rd->type == TINTG || rex->rd->type == TREAL)
-    {				/* Leser og konverterer verdien hvis det ikke 
+    {				/* Leser og konverterer verdien hvis det ikke
 				 * er skrive aksess. */
       fprintf (ccode, "if(((__thunkp)__pb)->ftype==__TINTG)");
       if (rex->left->type == TINTG)
@@ -344,8 +343,8 @@ void gen_thunk_simple_value (exp_t *rex)
       if (rex->left->type == TINTG)
 	fprintf (ccode, "__ev.f=__ev.i;");
       else
-	fprintf 
-	  (ccode, 
+	fprintf
+	  (ccode,
 	   "if(((__thunkp)__pb)->conv==__REALINTREAL)__ev.f=__rintrea(__ev.f);");
     }
   else if (rex->rd->type == TREF)
@@ -361,10 +360,7 @@ void gen_thunk_simple_value (exp_t *rex)
 
 static void gensimplepar (exp_t *rex)
 {
-  int i;
 /***** ENKEL INTEGER, REAL, CHAR, REF,TEXT ELLER BOOL  PARAMETER     ****/
-  exp_t *re;
-  char index_is_const = TRUE;
 
   if (rex->rd->categ == CVALUE && rex->rd->type == TTEXT)
     {
@@ -381,7 +377,7 @@ static void gensimplepar (exp_t *rex)
 
       if (rex->rd->type == TTEXT)
 	{
-	  fprintf 
+	  fprintf
 	    (ccode, "((__bs%d *)__pb)->%s= *", rex->rd->encl->blno,
 	     rex->rd->ident);
 	  genvalue (rex->left);
@@ -410,16 +406,16 @@ static void gensimplepar (exp_t *rex)
 	  gensl (rex->left, TRUE, ON);
 	  fprintf (ccode, "%s;", rex->left->value.ident);
 	  gen_conv (rex, FALSE, TRUE);
-	} /* END VIDEREFRING AV ENKEL VAR-PARAMETER */ 
+	} /* END VIDEREFRING AV ENKEL VAR-PARAMETER */
       else if (rex->left->rd->categ == CNAME)
 	{
-	  /* Aktuell parameter er en formell NAME-par i 
+	  /* Aktuell parameter er en formell NAME-par i
 	   * en ytre prosedyre. Kallet p} transcall som
 	   * legger ut kode for kall p} __rgetsa. Den
-	   * returnerer adressen til variabelen i er og 
+	   * returnerer adressen til variabelen i er og
 	   * ev. */
 	  fprintf (ccode, "((__bs%d *)__pb)->%s.bp=__er;"
-		   "((__bs%d *)__pb)->%s.ofs=__ev.i;", 
+		   "((__bs%d *)__pb)->%s.ofs=__ev.i;",
 		   rex->rd->encl->blno, rex->rd->ident,
 		   rex->rd->encl->blno, rex->rd->ident);
 	  gen_conv (rex, FALSE, FALSE);
@@ -427,7 +423,7 @@ static void gensimplepar (exp_t *rex)
       else
 	{
 	  /* ENKEL VAR PARAMETER, IKKE VIDEREF\RING  Tilordner bp */
-	  fprintf (ccode, "((__bs%d *)__pb)->%s.bp=", 
+	  fprintf (ccode, "((__bs%d *)__pb)->%s.bp=",
 		   rex->rd->encl->blno, rex->rd->ident);
 
 	  switch (rex->left->token)
@@ -447,8 +443,10 @@ static void gensimplepar (exp_t *rex)
 	    case MIDENTIFIER:
 	      gensl (rex->left, FALSE, ON);
 	      break;
+            default:
+	      break;
 	    }
-	  fprintf (ccode, ";((__bs%d *)__pb)->%s.ofs=", 
+	  fprintf (ccode, ";((__bs%d *)__pb)->%s.ofs=",
 		   rex->rd->encl->blno,rex->rd->ident);
 
 	  if (rex->left->token == MARRAYADR)
@@ -459,8 +457,7 @@ static void gensimplepar (exp_t *rex)
 	  else
 	    fprintf (ccode, "((char *)&((__bs%d *)__p)->%s)"
 		     "-(char *)__p;",
-		     rex->left->rd->encl->blno, rex->left->rd->ident,
-		     rex->rd->encl->blno, rex->rd->ident);
+		     rex->left->rd->encl->blno, rex->left->rd->ident);
 	  gen_conv (rex, FALSE, FALSE);
 	}			/* END IKKE VIDEREF\RING AV ENKEL
 				 * VAR-PARAMETER */
@@ -472,7 +469,7 @@ static void gensimplepar (exp_t *rex)
       switch (rex->left->token)
 	{
 	case MTEXTKONST:
-	  /* VALUE NOTHUNK  Overf|rer peker til textvariabelen for konstanten 
+	  /* VALUE NOTHUNK  Overf|rer peker til textvariabelen for konstanten
 	   */
 	  fprintf (ccode, "((__bs%d *)__pb)->%s.tp=",
 		   rex->rd->encl->blno, rex->rd->ident);
@@ -538,12 +535,12 @@ static void gensimplepar (exp_t *rex)
 	      gen_conv (rex, FALSE, TRUE);
 	    }
 	    /* END-VIDEREF\RING AV FORMELL NAME-PARAMETER I EN YTRE
-	     * PROSEDYRE. */ 
+	     * PROSEDYRE. */
 	  else if (rex->left->rd->categ == CVAR)
 	    {
 	      /* AKTUELL PARAMETER ER EN FORMELL VAR-PARAMETER I EN YTRE
 	       * PROSEDYRE. Setter bp, en hjelpevariabel, til } peker p} den
-	       * aktuelle parameterens blokk. Dermed blir aksessveien kortere 
+	       * aktuelle parameterens blokk. Dermed blir aksessveien kortere
 	       * under kopieringen. */
 
 	      fprintf (ccode, "__bp=");
@@ -552,7 +549,7 @@ static void gensimplepar (exp_t *rex)
 	      /* Tilordner den formelle name-parameterens bp og ofs */
 	      fprintf (ccode, ";((__bs%d *)__pb)->%s.bp="
 		"((__bs%d *)__bp)->%s.bp;((__bs%d *)__pb)->%s.v.ofs="
-		"((__bs%d *)__bp)->%s.ofs;", 
+		"((__bs%d *)__bp)->%s.ofs;",
 		       rex->rd->encl->blno, rex->rd->ident,
 		       rex->left->rd->encl->blno,
 		       rex->left->value.ident,
@@ -578,7 +575,7 @@ static void gensimplepar (exp_t *rex)
 		       "((char *)&((__bs%d *)__p)->%s)-(char *)__p;",
 		       rex->rd->encl->blno, rex->rd->ident,
 		       rex->left->rd->encl->blno,
-		       rex->left->rd->ident, rex->left->rd->encl->blno);
+		       rex->left->rd->ident);
 #if ADDNOTH
 	      fprintf (ccode, "((__bs%d *)__pb)->%s.namekind"
 		       "=__ADDRESS_NOTHUNK;",
@@ -605,6 +602,8 @@ static void gensimplepar (exp_t *rex)
 #endif
 	  gen_conv (rex, FALSE, FALSE);
 	  break;
+        default:
+	  break;
 	}			/* END SWITCH */
     }				/* END-if(rex->rd->categ == CNAME) */
   else				/* FEIL */
@@ -622,7 +621,7 @@ static void genlabelparexp (exp_t *rex, exp_t *formellpar, char thunk)
    * genererer kode for et uttrykk av "if-i-uttrykk"-setninger som skal
    * gi labelens adresse og objekt-peker. Genvalue ville lagd kode
    * for } hoppe til labelen.
-   * Parameteren rex peker til en node i uttrykks-treet (enten    
+   * Parameteren rex peker til en node i uttrykks-treet (enten
    * MIFE, MELSEE eller MIDENTIFIER) mens formellpar  peker p} noden for
    * den formelle parameteren. Hvis den formelle parameteren har
    * categ==CNAME, skal det genereres en thunk. Parameteren exit er
@@ -642,7 +641,7 @@ static void genlabelparexp (exp_t *rex, exp_t *formellpar, char thunk)
     }
   else
     {				/* rex->token==MIDENTIFIER Hvis det ikke er
-				 * tatt av en label i systemet, s} gj|res det 
+				 * tatt av en label i systemet, s} gj|res det
 				 * her, og den legges i plev attributtet */
 
       if (rex->token == MARRAYARG)
@@ -672,7 +671,7 @@ static void genlabelparexp (exp_t *rex, exp_t *formellpar, char thunk)
       if (thunk)
 	fprintf (ccode, ";__er=");
       else
-	fprintf (ccode, ";((__bs%d *)__pb)->%s.ob=", 
+	fprintf (ccode, ";((__bs%d *)__pb)->%s.ob=",
 		 formellpar->rd->encl->blno, formellpar->rd->ident);
 
       gensl (rex, FALSE, ON);
@@ -697,8 +696,6 @@ void gen_thunk_lable (exp_t *rex)
 
 static void genlabelswitchpar (exp_t *rex)
 {
-  int i;
-
   if (rex->left->token == MIDENTIFIER)
     {
       switch (rex->left->rd->categ)
@@ -706,7 +703,7 @@ static void genlabelswitchpar (exp_t *rex)
 	case CNAME:
 	  if (rex->rd->kind != KARRAY && rex->rd->categ != CNAME)
 	    {
-	      /* Label par og ikke switch par. Aktuell parameter er en name 
+	      /* Label par og ikke switch par. Aktuell parameter er en name
 	       * parameter i en ytre prosedyre.       M} kalle p} transcall
 	       * som genererer kode for kall p} __rgetlab() . og som
 	       * returnerer med adressen i modul og ev, og objekt peker i
@@ -748,9 +745,9 @@ static void genlabelswitchpar (exp_t *rex)
 	  /* VIDEREF\RING AV FORMELL CDEFLT ELLER CVAR (eller NAME for
 	   * switch) I EN YTRE PROSEDYRE  KOPIERER ment, ent og ob. Setter
 	   * bp, en hjelpevariabel, til } peker p} den  aktuelle
-	   * parameterens blokk. Dermed blir aksessveien under kopieringen. 
+	   * parameterens blokk. Dermed blir aksessveien under kopieringen.
 	   */
-	  
+
 	  fprintf (ccode, "((__bs%d *)__pb)->%s=",
 		   rex->rd->encl->blno, rex->rd->ident);
 	  gensl (rex->left, TRUE, ON);
@@ -761,7 +758,7 @@ static void genlabelswitchpar (exp_t *rex)
 		   rex->rd->encl->blno, rex->rd->ident);
 	  gensl (rex->left, FALSE, ON);
 	  /* ment og ent er gitt av virt tabellen */
-	  fprintf (ccode, ";((__bs%d *)__pb)->%s.adr=" 
+	  fprintf (ccode, ";((__bs%d *)__pb)->%s.adr="
 		   "((__bs%d *)__pb)->%s.ob->pp->virtlab[%d];",
 		   rex->rd->encl->blno, rex->rd->ident,
 		   rex->rd->encl->blno, rex->rd->ident,
@@ -775,18 +772,18 @@ static void genlabelswitchpar (exp_t *rex)
 	case CLOCAL:
 	  fprintf (ccode, "((__bs%d *)__pb)->%s.adr.ment=",
 		   rex->rd->encl->blno, rex->rd->ident);
-	  
+
 	  /* Bestemmer modulnavnet */
-	  
+
 	  genmodulemark(rex->left->rd->encl->timestamp);
 	  fprintf (ccode, ";");
-	  
+
 	  /* Hvis det ikke er tatt av en label i systemet, s} gj|res det
 	   * her, og den legges i plev attributtet */
-	  
+
 	  if (rex->left->rd->plev == 0)
 	    rex->left->rd->plev = newlabel ();
-	  
+
 	  fprintf (ccode, "((__bs%d *)__pb)->%s.adr.ent=%ld;"
 		   "((__bs%d *)__pb)->%s.ob=",
 		   rex->rd->encl->blno, rex->rd->ident,
@@ -806,7 +803,7 @@ static void genlabelswitchpar (exp_t *rex)
     /* FORMELL CATEG LIK CDEFLT eller CVAR for label eller       CATEG LIK
      * CDEFLT, CVAR eller CNAME for switch. Alle disse tilfellene skal
      * behandles likt. Aktuell token kan enten   v{re MIDENTIFIER eller
-     * MIFE. Hvis det er MIFE, kalles     genlabelparexp som legger ut kode 
+     * MIFE. Hvis det er MIFE, kalles     genlabelparexp som legger ut kode
      * slik at overf|ringen    gj|res i hver gren. */
     genlabelparexp (rex->left, rex, FALSE);
 }
@@ -826,7 +823,6 @@ void gen_thunk_array (exp_t *rex)
 
 static void genarraypar (exp_t *rex)
 {
-  int i;
   switch (rex->rd->categ)
     {
     case CVALUE:
@@ -874,7 +870,7 @@ static void genarraypar (exp_t *rex)
 	{
 	  if (rex->left->rd->categ == CNAME)
 	    {
-	      /* Viderf|ring av en array parameter Kopierer aktuell parameter 
+	      /* Viderf|ring av en array parameter Kopierer aktuell parameter
 	       * spesifikasjon som er en  formell parameter spesifikasjon i
 	       * ytre en prosedyre. (ment, ent ,sl, ap og namekind) Setter
 	       * bp, en hjelpevariabel, til } peker p} den  aktuelle
@@ -931,7 +927,6 @@ void gen_thunk_procedure (exp_t *rex)
 
 static void genprocedurepar (exp_t *rex)
 {
-  int i;
   /* OVERF\RING AV PROSEDYRER SOM PARAMETERE */
 
   if (rex->left->token == MIDENTIFIER)
@@ -969,12 +964,12 @@ static void genprocedurepar (exp_t *rex)
 	    {
 	      /* AKTUELL PARAMETER ER EN NAME-PAR I EN YTRE PROSEDYRE
 	       * Kallerp} transcall som skriver ut koden for kallet
-	       * __rgetproc. Den rutinen returnerer med statisk 
+	       * __rgetproc. Den rutinen returnerer med statisk
 	       * omgivelse i sl og prototypen i pp.
 	       * Disse overf|res til den formelle parameteren */
 
 	      fprintf (ccode, "((__bs%d *)__pb)->%s.psl=__sl;"
-		       "((__bs%d *)__pb)->%s.pp=__pp;", 
+		       "((__bs%d *)__pb)->%s.pp=__pp;",
 		       rex->rd->encl->blno, rex->rd->ident,
 		       rex->rd->encl->blno, rex->rd->ident);
 	      gen_conv (rex, TRUE, FALSE);
@@ -1015,7 +1010,7 @@ static void genprocedurepar (exp_t *rex)
     {
       /* Aktuell par.token = MDOT */
 
-      fprintf (ccode, "((__bs%d *)__pb)->%s.psl=", 
+      fprintf (ccode, "((__bs%d *)__pb)->%s.psl=",
 	       rex->rd->encl->blno, rex->rd->ident);
       if (nonetest == ON)
 	fprintf (ccode, "((__bp=");
@@ -1053,18 +1048,18 @@ void genprocparam (exp_t *re)
 
   for (rex = re->right; rex->token != MENDSEP; rex = rex->right)
     {
-      if(rex->token == MSENTCONC)  
+      if(rex->token == MSENTCONC)
 	{
 	  genvalue (rex->left); fprintf (ccode, ";");
-	} 
+	}
       else if (rex->token == MSENDADDRESSTHUNKTOFORMALPAR)
 	{
 	  send_to_formal_par (rex, TRUE);
-	} 
+	}
       else if (rex->token == MSENDVALUETHUNKTOFORMALPAR)
 	{
 	  send_to_formal_par (rex, FALSE);
-	} 
+	}
       else if (rex->rd->kind == KSIMPLE)
 	{
 	  /* ENKEL PARAMETER */
@@ -1076,7 +1071,7 @@ void genprocparam (exp_t *re)
 	  /* TEXT ELLER BOOLEAN PARAMETER */
 	}
       else
-	/* END-ENKEL PARAMETER */ 
+	/* END-ENKEL PARAMETER */
 	if (rex->rd->kind == KARRAY)
 	  {
 	    if (rex->rd->type != TLABEL)	/* ARRAY  PARAMETER */
@@ -1086,7 +1081,7 @@ void genprocparam (exp_t *re)
 	  }
 	else if (rex->rd->kind == KPROC)
 	  genprocedurepar (rex);
-	else			/* FEIL */; 
+	else			/* FEIL */;
     }/* END FOR L\KKE */
 }			/* END GENPROCPARAM */
 
@@ -1097,12 +1092,12 @@ void genpredefproccall (exp_t *re)
 {
   int i;
   /* Hvis danger = TRUE s} skal returverdien legges p} stakken */
-  
+
   exp_t *rex;
 
   if (re->rd->descr->codeclass != CCEXIT)
     fprintf (ccode, "%s(", re->rd->descr->rtname);
-  
+
   switch (re->rd->descr->codeclass)
     {
     case CCRANDOMRUTDANGER:
@@ -1133,8 +1128,8 @@ void genpredefproccall (exp_t *re)
       break;
     case CCEXIT:		/* TERMINATE_PROGRAM */
       if (separat_comp)
-	fprintf 
-	  (ccode, "__goto.ent=%d,__goto.ment=__NULL;return;", 
+	fprintf
+	  (ccode, "__goto.ent=%d,__goto.ment=__NULL;return;",
 	   STOPLABEL);
       else
 	gotolabel (STOPLABEL);
@@ -1152,7 +1147,7 @@ void genpredefproccall (exp_t *re)
     case CCBLANKSCOPY:
     case CCFILEBLANKSCOPY:
       fprintf (ccode, "%ldL", re->value.n_of_stack_elements);
-      if (re->right->token != MENDSEP 
+      if (re->right->token != MENDSEP
 	  || re->rd->descr->codeclass == CCFILEBLANKSCOPY)
 	fprintf (ccode, ",");
       if (re->rd->descr->codeclass == CCBLANKSCOPY)
@@ -1162,14 +1157,14 @@ void genpredefproccall (exp_t *re)
       /* En av fil-prosedyrene. F|rste parameter er peker til fil
        * klasse objektet */
       gensl (re, FALSE, nonetest);
-      
+
       if (re->right->token != MENDSEP)
 	fprintf (ccode, ",");
       break;
     }			/* END-SWITCH */
-  
+
   /* Overf|rer bruker parameterene */
-  
+
   for (rex = re->right; rex->token != MENDSEP; rex = rex->right)
     {
       if (rex->rd->categ == CVAR)
@@ -1179,12 +1174,12 @@ void genpredefproccall (exp_t *re)
 	  fprintf (ccode, "&");
 	}
       genvalue (rex->left);
-      
+
       if (rex->right->token != MENDSEP)
 	fprintf (ccode, ",");
     }
   fprintf (ccode, ")");
-  
+
 }				/* END-Genpredefproccall */
 
 
@@ -1200,13 +1195,13 @@ void genpredefproccall (exp_t *re)
 static decl_t *getfirstclassattribut (decl_t *rd)
 {
   decl_t *rdd;
-  
-  if (rd->plev != 0 
+
+  if (rd->plev != 0
       && (rdd = getfirstclassattribut (rd->prefqual)) != NULL)
     return (rdd);
-  
+
   for (rdd = rd->descr->parloc; rdd != NULL &&
-       !(rdd->categ == CLOCAL && (rdd->kind == KSIMPLE 
+       !(rdd->categ == CLOCAL && (rdd->kind == KSIMPLE
 				  || rdd->kind == KARRAY));
        rdd = rdd->next);
   return (rdd);
@@ -1236,7 +1231,7 @@ static void par_to_cproc (exp_t *rex)
 	    }
 	  else if (rex->rd->categ == CDEFLT)
 	    {
-	      /* By referanse, Overf|rer en peker til f|rste character. 
+	      /* By referanse, Overf|rer en peker til f|rste character.
 	       * (dette gj|res av rt-rutienen raddroffirstchar */
 	      fprintf (ccode, "__raddroffirstchar(");
 	      genvalue (rex->left);
@@ -1257,7 +1252,7 @@ static void par_to_cproc (exp_t *rex)
 	       * til } peke p} f|rste attributt i klassen
 	       * rex->left->qual eller i en av dens prefiks-klasser.
 	       * Hvis klassen ikke har noen attributter overf|res NULL */
-	      
+
 	      rd = getfirstclassattribut (rex->left->qual);
 	      if (rd == NULL)
 		fprintf (ccode, "__NULL");
@@ -1318,7 +1313,7 @@ static void par_to_cproc (exp_t *rex)
 		       rex->left->right->rd->descr->rtname :
 		       rex->left->rd->descr->rtname));
       break;
-      
+
     }
 }
 
@@ -1329,19 +1324,19 @@ static void par_to_cproc (exp_t *rex)
 void gencproccall (exp_t *re)
 {
   exp_t *rex;
-  
+
   fprintf (ccode, "%s(", re->rd->descr->rtname);
-  
+
   /* Overf|rer parameterene */
-  
+
   for (rex = re->right; rex->token != MENDSEP; rex = rex->right)
     {
       par_to_cproc (rex);
       if (rex->right->token != MENDSEP)
 	fprintf (ccode, ",");
-      
+
     }			/* END-OVERF\RING AV PARAMETERE */
-  
+
   fprintf (ccode, ")");
-  
+
 }

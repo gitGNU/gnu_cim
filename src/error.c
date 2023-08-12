@@ -19,11 +19,11 @@
 /* Inneholder de tekstlige feilmeldingene som kompilatoren kan gi.
  * For noen tilfeller b|r det gis bedre og mer spesifike feilmeldinger.
  * Dette gjelder spesielt for feilmeldinger fra sjekkeren.
- *                                                              
+ *
  * Siden det kan inkluderes filer m} det lages et tabellverk som
  * holder greie p} hvilke linjenummere internt i kompilator-programmet
- * som h|rer til de enkelte filene.                              
- * Dette tabellverket brukes s} i forbindelse med utskrift              
+ * som h|rer til de enkelte filene.
+ * Dette tabellverket brukes s} i forbindelse med utskrift
  * av feilmeldinger. */
 
 #include "const.h"
@@ -33,17 +33,18 @@
 #include "extspec.h"
 #include "mapline.h"
 
+#include "config.h"
+
 #if STDC_HEADERS
 #include <stdlib.h>
 #endif
-
-#include "config.h"
 
 #if STDC_HEADERS || HAVE_STRING_H
 #include <string.h>
 #else
 #include <strings.h>
 #endif
+#include <ctype.h>
 
 int anterror;
 
@@ -60,7 +61,7 @@ starterror (long line)
 }
 
 /******************************************************************************
-                               					 LERROR      */
+								 LERROR      */
 
 /* Feil som oppdages av LEX */
 
@@ -181,7 +182,7 @@ void lerror (int errcode)
 }
 
 /******************************************************************************
-                           					YERROR       */
+								YERROR       */
 
 /* Feil som oppdages av YACC */
 
@@ -249,7 +250,7 @@ void yerror (int errcode, char *txt)
 }
 
 /******************************************************************************
-                                				D1ERROR      */
+								D1ERROR      */
 
 /* Feil som oppdages av DECL PASS 1 */
 
@@ -290,7 +291,7 @@ void d1error (int errcode, char *name)
 }
 
 /******************************************************************************
-                                    				D2ERROR      */
+								D2ERROR      */
 
 /* Feil som oppdages av DECL PASS 2 */
 
@@ -408,7 +409,7 @@ void d2error (int errcode, decl_t *rd1, decl_t *rd2)
 }
 
 /******************************************************************************
-                                				TEXTNUMBER   */
+								TEXTNUMBER   */
 
 char *textnumber (int i)
 {
@@ -452,7 +453,7 @@ char *textnumber (int i)
 }
 
 /******************************************************************************
-                                 				SERROR       */
+								SERROR       */
 
 /* Feil som oppdages av SJEKKEREN */
 
@@ -492,7 +493,7 @@ void serror (int errcode, char *name, int ant)
       exit (TRUE);
       break;
     case 71:
-      fprintf (stderr, "System error: Illegal symbol in M.\n"
+      fprintf (stderr, "System error: Illegal symbol %s in M.\n"
 		      , name);
       exit (TRUE);
       break;
@@ -640,7 +641,7 @@ void serror (int errcode, char *name, int ant)
 }
 
 /******************************************************************************
-                                				GERROR       */
+								GERROR       */
 
 /* Feil som oppdages av kodegeneratoren */
 
@@ -728,7 +729,7 @@ void merror (int errcode, char *name)
 		      ,name);
       break;
     default:
-      fprintf (stderr, "System error: No Message specified (%d).\n", 
+      fprintf (stderr, "System error: No Message specified (%d).\n",
 		      errcode);
     }
   exit (TRUE);

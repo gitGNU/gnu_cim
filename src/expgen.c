@@ -19,6 +19,8 @@
 #include "limit.h"
 #include "gen.h"
 #include "extspec.h"
+#include "error.h"
+#include "checker.h"
 
 int stack;
 static int anttext;
@@ -83,7 +85,7 @@ void genchain (block_t *rb, char atr)
   int i;
   if (rb->stat)
     if (atr)
-      fprintf (ccode, "(__blokk%d%s).", rb->blno, 
+      fprintf (ccode, "(__blokk%d%s).", rb->blno,
 	       rb->timestamp?rb->timestamp:timestamp);
 #if 0
     else if (rb == sblock && separat_comp)
@@ -92,14 +94,14 @@ void genchain (block_t *rb, char atr)
 #endif
       fprintf (ccode, "__NULL");
     else
-      fprintf (ccode, "((__dhp)&__blokk%d%s)", rb->blno, 
+      fprintf (ccode, "((__dhp)&__blokk%d%s)", rb->blno,
 	       rb->timestamp?rb->timestamp:timestamp);
   else
     {
       block_t *rbx;
       /*      rbx = display[rb->blev];*/
       for (rbx= cblock; rbx->blev != rb->blev; rbx= rbx->quant.encl);
-      
+
       while (rbx->quant.kind == KFOR || rbx->quant.kind == KINSP
 	     || rbx->quant.kind == KCON)
 	rbx = rbx->quant.prefqual->descr;
@@ -108,12 +110,12 @@ void genchain (block_t *rb, char atr)
 	  if (atr)
 	    {
 	      fprintf (ccode, "((__bs%d *)&__blokk%d%s)->",
-		       rb->blno, rbx->blno, 
+		       rb->blno, rbx->blno,
 		       rbx->timestamp?rbx->timestamp:timestamp);
 	    }
 	  else
-	    fprintf (ccode, "((__dhp)&__blokk%d%s)", 
-		     rbx->blno, 
+	    fprintf (ccode, "((__dhp)&__blokk%d%s)",
+		     rbx->blno,
 		     rbx->timestamp?rbx->timestamp:timestamp);
 	}
       else
@@ -121,11 +123,11 @@ void genchain (block_t *rb, char atr)
 	  if (atr)
 	    fprintf (ccode, "((__bs%d *)__lb", rb->blno);
 	  else
-	    fprintf (ccode, "__lb", rb->blno);
+	    fprintf (ccode, "__lb");
 	  for (i = cblev + (inthunk ? 1 : 0); i > rb->blev; i--)
 	    fprintf (ccode, "->sl");
 	  if (atr)
-	    fprintf (ccode, ")->", rb->blno);
+	    fprintf (ccode, ")->");
 	}
     }
 }
@@ -168,8 +170,8 @@ void gen_adr_prot (FILE *code, decl_t *rd)
   fprintf (code, "&__p%d%s"
 	   ,rd->descr->timestamp == 0 ? rd->descr->blno : rd->descr->ptypno
 	   ,rd->descr->timestamp == 0 ?
-	   (rd->encl->blev == SYSTEMGLOBALBLEV && 
-	    rd->encl->quant.plev == 0 
+	   (rd->encl->blev == SYSTEMGLOBALBLEV &&
+	    rd->encl->quant.plev == 0
 	    ? "" :timestamp) : rd->descr->timestamp);
 }
 
@@ -209,7 +211,7 @@ static void gen_attr_object (int i, int type)
       rb= cblock;
     }
 
-  if ((rb->quant.kind == KCLASS || rb->quant.kind == KPRBLK) && 
+  if ((rb->quant.kind == KCLASS || rb->quant.kind == KPRBLK) &&
       rb->quant.plev > 0)
     {
       while (rb->quant.plev >0)
@@ -362,13 +364,13 @@ void genvalue (exp_t *re)
       break;
 
     case MPROCARG:
-      /* Predefinerte prosedyrer, C-prosedyrer eller vanlige 
+      /* Predefinerte prosedyrer, C-prosedyrer eller vanlige
        * proper-procedures, som er behandlet av transcall. De
        * predefinerte og C-prosedyrene skal behandles her, mens vanlige
        * proper-procedures allerede er behandlet i transcall. */
       if (re->rd->descr->codeclass == CCNO)
 	{
-	  /* Statisk link overf|res i den globale variabelen sl. 
+	  /* Statisk link overf|res i den globale variabelen sl.
 	   * Genererer kallet p} rcp. */
 
 	  if (re->rd->categ != CNAME)
@@ -388,13 +390,13 @@ void genvalue (exp_t *re)
 
 	  if (re->rd->categ == CVIRT)
 	    {
-	      /* Kall p} en virtuell prosedyre. 
-               * Prosedyrens prototype  er gitt i virtuell tabellen. 
+	      /* Kall p} en virtuell prosedyre.
+               * Prosedyrens prototype  er gitt i virtuell tabellen.
 	       * M} teste at den ikke er  NULL, som gir
 	       * run-time error. */
 	      fprintf (ccode, "if((__pp=");
 	      gensl (re, FALSE, OFF);
-	      fprintf (ccode, "->pp->virt[%d])==__NULL)__rerror(__errvirt);", 
+	      fprintf (ccode, "->pp->virt[%d])==__NULL)__rerror(__errvirt);",
 		       re->rd->virtno - 1);
 	    }
 
@@ -420,7 +422,7 @@ void genvalue (exp_t *re)
 	  if (re->type == TNOTY)
 	    fprintf (ccode, ");");
 	  else
-	    fprintf (ccode, ",%ldL);", 
+	    fprintf (ccode, ",%ldL);",
 		     re->value.n_of_stack_elements);
 
 	  /* Kaller p} genprocparam som genererer kode for parameter-
@@ -432,10 +434,10 @@ void genvalue (exp_t *re)
 	   * kalles.(Den informasjonen trengs ikke da) */
 
 
-	  /* N} er alle parameterene overf}rt, 
+	  /* N} er alle parameterene overf}rt,
 	   * og prosedyren kan  settes i gang. */
 
-	  { 
+	  {
 	    int l;
 	    fprintf (ccode, "__rcpb(%d,", l= newlabel ());
 	    genmodulemark(NULL);
@@ -454,8 +456,8 @@ void genvalue (exp_t *re)
 	  /* H}ndterer evt. funksjonsverdier. Sjekker om det
 	   * er n|dvendig med konvertering av aritm.  returverier eller
 	   * kvalifikasjonskontroll for type REF   Dette gjelder formelle
-	   * prosedyrer med categ lik CVAR og CNAME (type = TREF, 
-	   * TINTG og TREAL) 
+	   * prosedyrer med categ lik CVAR og CNAME (type = TREF,
+	   * TINTG og TREAL)
 	   */
 
 	  switch (re->type)
@@ -516,7 +518,7 @@ void genvalue (exp_t *re)
 	    gencproccall (re);
 	    fprintf (ccode, ";");
 	    fprintf (ccode, "__rblanks(%ldL,__ctext==__NULL?0:"
-		     "strlen(__ctext));(void)strcpy(", 
+		     "strlen(__ctext));(void)strcpy(",
 		     re->value.n_of_stack_elements);
 	    fprintf (ccode, "__et.obj->string,__ctext);");
 
@@ -734,7 +736,7 @@ void genvalue (exp_t *re)
       fprintf (ccode, ",");
       genvalue (re->right);
       fprintf (ccode, ");");
-      
+
       break;
     case MTEXTKONST:
       fprintf (ccode, "(__txtvp)&__tk%d%s", re->value.tval.id,
@@ -817,7 +819,7 @@ void genvalue (exp_t *re)
 		  (re->type == TREAL || re->type == TINTG) &&
 		  (!(re->up->token == MASSIGN && re->up->left == re)))
 		{		/* Lese aksess av aritm. var-parameter. For
-				 *   bare er gjort RT-call for skrive-aksess. 
+				 *   bare er gjort RT-call for skrive-aksess.
 				 */
 		  if (re->type == TINTG)
 		    {	/* To muligheter : ingen eller real -> int */
@@ -844,17 +846,17 @@ void genvalue (exp_t *re)
 			       re->rd->ident);
 		    }
 		}
-	      else if (re->rd->categ == CNAME 
+	      else if (re->rd->categ == CNAME
 		       && re->up->token == MASSIGN &&
 		       re->up->right == re)
 		{
 		  /* Lese-aksess av en name-parameter som det    nettopp
 		   * er gjort skrive-aksess p}. Vanligvis  gj|res
-		   * konvertering av NAME-parametere av   RT-rutiene, men 
-		   * ikke i tilfelle med multippel assignment. Det gj|res 
+		   * konvertering av NAME-parametere av   RT-rutiene, men
+		   * ikke i tilfelle med multippel assignment. Det gj|res
 		   * da her. Noden er     omd|pt fra MNAMEADR til
 		   * MIDENTIFER i case   MASSIGN grenen i genvalue. */
-			  
+
 		  if (re->type == TINTG)
 		    {	/* To muligheter : ingen eller real -> int */
 		      fprintf (ccode, "((");
@@ -900,7 +902,7 @@ void genvalue (exp_t *re)
 		  /* Lese-aksess av referanse var-parametere. Legger inn
 		   * kode som sjekker om re er "in" strengeste
 		   * kvalifikasjon p} aksessveien. */
-			  
+
 		  fprintf (ccode, "((((__vrp= &");
 		  gensl (re, TRUE, ON);
 		  fprintf (ccode, "%s)->conv==__READTEST "
@@ -913,11 +915,11 @@ void genvalue (exp_t *re)
 		}
 	      else
 		{
-		  /* For parametere av type Character, Boolean,   LESE og 
+		  /* For parametere av type Character, Boolean,   LESE og
 		   * SKRIVE-AKSESS AV B]DE VAR OG NAME-   PARAMETERE som
 		   * ikke er behandlet lengre oppe */
-			  
-		  if (re->rd->kind == KARRAY) 
+
+		  if (re->rd->kind == KARRAY)
 		    if (re->rd->categ ==CNAME)
 		      fprintf (ccode, "(__arrp)__er");
 		    else
@@ -933,25 +935,23 @@ void genvalue (exp_t *re)
 			fprintf (ccode, " *(");
 		      gentype (re);
 		      fprintf (ccode, " *)(((char *)");
-			      
+
 		      gensl (re, TRUE, ON);
 		      fprintf (ccode, "%s.", re->rd->ident);
-			      
+
 		      if (re->rd->categ == CVAR)
 			fprintf (ccode,
 				 "bp)+");
 		      else
-			fprintf (ccode, "bp)+",
-				 re->rd->ident);
-			      
+			fprintf (ccode, "bp)+");
+
 		      gensl (re, TRUE, ON);
 		      fprintf (ccode, "%s.", re->rd->ident);
-			      
+
 		      if (re->rd->categ == CVAR)
-			fprintf (ccode, "ofs)", re->rd->ident);
+			fprintf (ccode, "ofs)");
 		      else
-			fprintf (ccode, "v.ofs)",
-				 re->rd->ident);
+			fprintf (ccode, "v.ofs)");
 		    }
 		}
 	    }		/* End Var eller Name-parameter */
@@ -993,7 +993,7 @@ void genvalue (exp_t *re)
 	       * for de etterf|lgende aksessene */
 	      fprintf (ccode, "__bp=");
 	      gensl (re, FALSE, ON);
-	      fprintf (ccode, ";__rgoto(((__bs%d *)__bp)->%s.ob);" 
+	      fprintf (ccode, ";__rgoto(((__bs%d *)__bp)->%s.ob);"
 		       "__goto=((__bs%d *)__bp)->%s.adr;",
 		       re->rd->encl->blno, re->rd->ident,
 		       re->rd->encl->blno, re->rd->ident);
@@ -1006,7 +1006,7 @@ void genvalue (exp_t *re)
 		  gensl (re, FALSE, ON);
 		  fprintf (ccode, ");");
 		  fprintf (ccode, "if((__pp=__lb");
-		} 
+		}
 	      else
 		{
 		  fprintf (ccode, "if((__pp=");
@@ -1030,7 +1030,7 @@ void genvalue (exp_t *re)
 	      if (re->rd->encl->timestamp != 0)
 		{
 		  /* Skal hoppe til en label i en annen modul */
-		  fprintf (ccode, "__goto.ent=%ld;__goto.ment=", 
+		  fprintf (ccode, "__goto.ent=%ld;__goto.ment=",
 			   re->rd->plev);
 		  genmodulemark(re->rd->encl->timestamp);
 		  fprintf (ccode, ";");
@@ -1041,7 +1041,7 @@ void genvalue (exp_t *re)
 	      break;
 	    }
 	  not_reached = TRUE;
-	} 
+	}
       else
 	{
 	  int i, dim;
@@ -1064,22 +1064,21 @@ void genvalue (exp_t *re)
 	      for (rex = re->right; rex->token != MENDSEP; rex = rex->right)
 		dim++;
 
-	      fprintf 
+	      fprintf
 		(ccode, "((__arrp)");
 	      gen_ref_stack (re->value.stack.ref_entry);
-	      fprintf (ccode, ")->h.dim!=%d?__rerror(__errarr):1;", 
-		 dim, re->rd->ident);
+	      fprintf (ccode, ")->h.dim!=%d?__rerror(__errarr):1;", dim);
 	    }
 	  dim= 0;
 	  for (rex = re->right; rex->token != MENDSEP; rex = rex->right)
 	    {
 	      if (dim == MAX_ARRAY_DIM)
-		gerror (85);
+		gerror (85, "");
 	      fprintf (ccode, "__h[%d]=", dim++);
 	      genvalue (rex->left);
 	      fprintf (ccode, "-((__arrp)");
 	      gen_ref_stack (re->value.stack.ref_entry);
-	      fprintf (ccode, ")->limits[%d].low;", 
+	      fprintf (ccode, ")->limits[%d].low;",
 		       dim - 1);
 	    }
 	  fprintf (ccode, "if(");
@@ -1146,7 +1145,7 @@ void genvalue (exp_t *re)
       gensl (re, TRUE, ON);
       {
 	int i;
-	fprintf (ccode, "%s,%ldL,%d,", re->rd->ident, 
+	fprintf (ccode, "%s,%ldL,%d,", re->rd->ident,
 		 re->value.n_of_stack_elements, i = newlabel ());
 	genmodulemark(NULL);
 	fprintf (ccode, "))");
@@ -1162,14 +1161,14 @@ void genvalue (exp_t *re)
       gen_int_stack (re->value.stack.val_entry);
       fprintf (ccode, "=__ev.i;");
       gen_ref_stack (re->value.stack.ref_entry);
-      fprintf (ccode, "=__er;" 
+      fprintf (ccode, "=__er;"
 	       "break; case __VALUE_THUNK: case __VALUE_NOTHUNK: ");
       gen_txt_stack (re->value.stack.txt_entry);
       fprintf (ccode, "=__et;");
       gen_ref_stack (re->value.stack.ref_entry);
       fprintf (ccode, "= __NULL;"
 	       "");
-      fprintf (ccode, "");
+      fputs ("", ccode);
       gen_int_stack (re->value.stack.val_entry);
       fprintf (ccode, "= ((char *)&");
       gen_txt_stack (re->value.stack.txt_entry);
@@ -1202,8 +1201,8 @@ void genvalue (exp_t *re)
 	genchain (re->qual->descr, FALSE);
       break;
     case MQUA:
-      /* Sjekker om det er n\dvendig } utf\re en none-test, eller om den er
-       * utf\rt lengre ned i treet. */
+      /* Checks whether it is necessary to perform a none test,
+       * or whether it has been performed further down the tree. */
       if (re->left->token != MDOT && re->left->token != MQUA &&
 	  re->left->token != MQUANOTNONE && nonetest == ON)
 	{
@@ -1227,8 +1226,8 @@ void genvalue (exp_t *re)
       fprintf (ccode, ")?(__dhp)__rerror(__errqual):__bp)");
       break;
     case MQUANOTNONE:
-      /* Sjekker om det er n\dvendig } utf\re en none-test, eller om den er
-       * utf\rt lengre ned i treet. */
+      /* Checks whether it is necessary to perform a none test,
+       * or whether it has been performed further down the tree. */
       if (re->left->token != MDOT && re->left->token != MQUA &&
 	  re->left->token != MQUANOTNONE)
 	{
@@ -1345,7 +1344,7 @@ void genvalue (exp_t *re)
       fprintf (ccode, "(");
       if (re->right->token == MASSIGN)
 	{
-	  if (re->right->left->token == MNAMEADR 
+	  if (re->right->left->token == MNAMEADR
 	      || re->right->left->token == MTEXTADR)
 	    {
 	      if (re->right->left->type == TREAL)
@@ -1385,7 +1384,7 @@ void genvalue (exp_t *re)
 			   re->left->rd->ident);
 		}
 	      else
-		{		/* Tre muligheter : ingen, int -> real, og 
+		{		/* Tre muligheter : ingen, int -> real, og
 				 * real ->int ->real */
 		  fprintf (ccode, "if((__vvp= &");
 		  gensl (re->left, TRUE, ON);
@@ -1474,7 +1473,7 @@ void genvalue (exp_t *re)
 		   "|| __vrp->conv==__READWRITETEST) && !__rin((__bp= ",
 		   rex->rd->ident);
 	  genvalue (re->right);
-	  fprintf 
+	  fprintf
 	    (ccode, "),__vrp->q))?(__dhp)__rerror(__errqual):(__bp=");
 	  genvalue (re->right);
 	  fprintf (ccode, "))");
@@ -1485,7 +1484,7 @@ void genvalue (exp_t *re)
     case MNOOP:
       if (re->type == TTEXT)
 	{
-	  /* Parantes i forbindelse med tekster. Venstre-siden skal legges p} 
+	  /* Parantes i forbindelse med tekster. Venstre-siden skal legges p}
 	   * en anonym tekst-variabel. */
 	  fprintf (ccode, "__rtextassign(&__et,");
 	  genvalue (re->left);
@@ -1495,7 +1494,7 @@ void genvalue (exp_t *re)
 	genvalue (re->left);
       break;
     case MSL:
-      
+
       break;
     case MSENTCONC:
       genvalue (re->left);
@@ -1609,7 +1608,7 @@ void gen_textconst (exp_t *re)
 		   anttext, antchar + 1,
 		   anttext, timestamp, anttext, timestamp,
 		   antchar, anttext, timestamp, antchar, t);
-	  
+
 	  re->value.tval.id = anttext;
 	}
     }

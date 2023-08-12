@@ -22,15 +22,15 @@
 #include "newstr.h"
 #include "filelist.h"
 #include "config.h"
+#include "error.h"
 
 #if STDC_HEADERS
 #include <stdlib.h>
 #endif
 
 #include <stdio.h>
-#include <obstack.h>
-
-char *xmalloc();
+#include <ctype.h>
+#include "obstack.h"
 
 #define obstack_chunk_alloc xmalloc
 #define obstack_chunk_free free
@@ -126,7 +126,7 @@ static char insert_name (filelist_t *listp, char *name, char first)
 	{
 	  new->next= listp->first;
 	  listp->first= new;
-	} 
+	}
       else
 	{
 	  listp->last= listp->last->next= new;
@@ -143,6 +143,7 @@ char insert_name_in_dirlist (char *name)
   if (name==NULL)
     {
       clear_list (&dirlist);
+      return TRUE;
     }
   else
     {
@@ -197,7 +198,7 @@ static FILE *open_name (filelist_t *dirlist, filelist_t *linklist, char *name, c
       if ((f = fopen (str, "r"))!= NULL)
 #endif
 	{
-	  if (link) 
+	  if (link)
 	    insert_name (linklist, transform_name (str, ".atr", ".o"), TRUE);
 	  return (f);
 	}
@@ -249,17 +250,23 @@ static FILE *open_and_position_arch_name (char *archname, char *name)
 #endif
   if (f == NULL)
     merror (6, archname);
-  fscanf (f, "%7s", s1);
+  if (fscanf (f, "%7s", s1) != 1)
+    merror (7, archname);
   getc (f);
   if (strcmp (s1, "!<arch>"))
     merror (7, archname);
   while ((s2 = short_file_name (f)) != NULL)
     {
-      fscanf (f, "%12ld", &l);
-      fscanf (f, "%6ld", &l);
-      fscanf (f, "%6ld", &l);
-      fscanf (f, "%8ld", &l);
-      fscanf (f, "%10ld", &l);
+      if (fscanf (f, "%12ld", &l) != 1)
+	merror (8, archname);
+      if (fscanf (f, "%6ld", &l) != 1)
+	merror (8, archname);
+      if (fscanf (f, "%6ld", &l) != 1)
+	merror (8, archname);
+      if (fscanf (f, "%8ld", &l) != 1)
+	merror (8, archname);
+      if (fscanf (f, "%10ld", &l) != 1)
+	merror (8, archname);
       while ((c = getc (f)) != '`' && c != EOF);
       if (c != '`' || getc (f) != '\n')
 	merror (8, archname);
@@ -317,11 +324,11 @@ FILE *searc_and_open_name_in_archlist (char *name, char link)
       if (link) insert_name (&linklist, transform_name(name,".atr",".o"), TRUE);
       return (f);
     }
-  
+
   f=open_name (&dirlist, &linklist, name, link);
 
   for (elem= archlist.first; elem!=NULL; elem= elem->next)
-    if ((f= open_and_position_arch_name (elem->name, name)) != NULL) 
+    if ((f= open_and_position_arch_name (elem->name, name)) != NULL)
       return(f);
 
   return (NULL);
@@ -361,14 +368,10 @@ static char searc_and_insert_name (filelist_t *dirlistp, filelist_t *listp, char
 
 void new_lib (char *name)
 {
-  searc_and_insert_name (&dirlist, &archlist, 
-			 transform_name (newstrcat3 (LIBPREFIX, name, 
-						     LIBSUFFIX), 
+  searc_and_insert_name (&dirlist, &archlist,
+			 transform_name (newstrcat3 (LIBPREFIX, name,
+						     LIBSUFFIX),
 					 LIBSUFFIX, LIBARCHSUFFIX));
-					 
+
   insert_name (&linklist, newstrcat2 ("-l", name), FALSE);
 }
-
-
-
-

@@ -16,7 +16,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA. */
 
-#include <obstack.h>
+#include "obstack.h"
 #include "mellbuilder.h"
 #include "config.h"
 
@@ -31,7 +31,7 @@
 #include <stdlib.h>
 #endif
 
-char *xmalloc();
+char *xmalloc (unsigned int size);
 
 #define obstack_chunk_alloc xmalloc
 #define obstack_chunk_free free
@@ -168,4 +168,3 @@ void mbuilder_reinit(void)
 
   first_object_allocated_ptr_mell= 0;
 }
-

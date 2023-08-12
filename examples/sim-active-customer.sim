@@ -1,0 +1,65 @@
+! Active customer approach;
+Simulation begin
+    real        TrialDuration;          ! Experiment length [min];
+    ref(Head)   Queue;                  ! The queue;
+    integer     Servers;                ! Total number of servers;
+    integer     BusyServers;            ! Numbers of working servers;
+    integer     TrialSeedG, TrialSeedS; ! Seeds of random generators;
+    long real   TotalTime, TimeSpent;   ! Variables for statistics;
+    integer     CustomersOut;           ! Number of served customers;
+    real        MinInt, MaxInt;         ! Uniform interval between arrivals;
+    real        SMean, SStd;            ! Normal service duration;
+
+    Process class Generator;
+    begin
+        while true do begin
+            activate new Customer(Time);
+
+            ! Interval between arrivals: ;
+            Hold(Uniform(MinInt, MaxInt, TrialSeedG));
+        End While;
+    end of Generator;
+
+    Process class Customer(Arrival);
+        real Arrival;
+    begin
+        ref(Customer) Next;
+        if not Queue.Empty or (BusyServers >= Servers) then
+            Wait(Queue);                ! Has to wait in Queue;
+
+        ! Service can start: ;
+        BusyServers := BusyServers + 1;
+
+        ! This is the teller service: ;
+        Hold(Normal(SMean, SStd, TrialSeedS));
+        BusyServers := BusyServers - 1;
+        if not Queue.Empty then begin
+                Next :- Queue.First;
+                Next.Out;               ! First from Queue served;
+                activate Next after Current;
+        end if;
+
+        ! Statistics;
+        CustomersOut := CustomersOut + 1;
+        TotalTime := TotalTime + Time - Arrival;
+    end of Customer;
+
+    ! MAIN program body: ;
+    TrialSeedG := 7;                    ! Seeds for random variables;
+    TrialSeedS := 23;
+    MinInt := 1;                        ! Min and Max intervals;
+    MaxInt := 3;
+    SMean := 8;                         ! Random normal servers;
+    SStd  := 2;
+    outtext("Enter the number of Servers : ");
+    outrecord;
+    Servers := InInt;                   ! Initial numbers;
+    TrialDuration := 600;
+    Queue :- new Head;
+    activate new Generator;
+    Hold(TrialDuration);                ! Experiment duration;
+    TimeSpent := TotalTime / CustomersOut;
+    outtext("Average time spent in the system: ");
+    outfix(TimeSpent, 3, 10);
+    outimage;
+end of program;

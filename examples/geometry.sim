@@ -1,0 +1,129 @@
+!              OOP in the Simula language               ;
+!                                                       ;
+!   The program defines the main class "geometry".      ;
+!   It represents a theory with terms:                  ;
+!       "point, rectangle, circle, line".               ;
+!   The life of geometry generates the origin and       ;
+!   the axes x and y.                                   ;
+!   Later the class geometry will be used as prefix.    ;
+
+class Geometry;
+begin
+    !Definition of classes (terms) local in geometry: ;
+
+    class Point(X, Y);
+        real X, Y;                  ! Cartesian coordinates;
+    begin
+        procedure Print;            ! Displaying the location;
+        begin
+            outtext("Point: ");
+            outfix(x, 1, 4);
+            outtext(",");
+            outfix(y, 1, 4);
+        end of Print;
+
+        procedure Shift(Dx, Dy);    ! Dx, Dy are increments of the shift;
+            real Dx, Dy;
+        begin
+            X := X + Dx;
+            Y := Y + Dy;
+        end of Shift;
+
+        Print;                      ! Life of point;
+        outtext(" created");
+        outimage
+    end of Point;
+
+    class Rectangle(RecName, Width, Height);    ! Class with 3 parameters;
+        text RecName;                           ! Specification of parameters;
+        real Width, Height;
+    begin
+        real Area, Perimeter;       ! Attributes;
+
+        procedure Update;           ! Method;
+        begin
+            Area := Width * Height;
+            Perimeter := 2 * (Width + Height)
+        end of update;
+
+        procedure Show;             ! Method;
+        begin
+            outtext(" I am a rectangle ");
+            outtext(RecName);
+            outimage;
+            outtext(" Width: ");
+            outfix(Width, 2, 6);
+            outtext(" Height: ");
+            outfix(Height, 2, 6);
+            outtext(" Area: ");
+            outfix(Area, 2, 7);
+            outtext(" Perimeter: ");
+            outfix(Perimeter, 2, 6);
+            outimage
+        end of Show;
+
+        Update;                     ! Life of rectangle;
+        outtext("Rectangle created.");
+        outimage;
+        Show;
+    end of rectangle;
+
+    class Circle(Radius, Center);
+        real Radius;
+        ref(Point) Center;
+    begin
+        procedure Shift(Dx, Dy);
+            real Dx, Dy;
+        begin
+            Center.Shift(Dx, Dy);
+            outtext("Circle shifted to ");
+            outfix(Center.X, 1, 4);
+            outfix(Center.Y, 1, 4);
+            outimage
+        end of Shift;
+
+        outtext("Circle created at ");  ! Life of circle;
+        Center.Print;
+        outtext("  with radius ");
+        outfix(Radius, 1, 5);
+        outimage
+    end of Circle;
+
+    class Line(M, N);
+        ref(Point) M, N;            ! Line defined by two points;
+    begin
+        real Slope;
+
+        Slope := if M.X = N.X then  ! Life of line;
+                    MaxReal
+                 else
+                    (N.Y - M.Y) / (N.X - M.X);
+        outtext("Line (");
+        M.Print;
+        outtext("),(");
+        N.Print;
+        outtext(") with slope =");
+        if Slope = MaxReal then
+            outtext(" 90 degrees ")
+        else
+            outfix(Slope, 2, 12);
+        outtext(" created");
+        outimage
+    end of Line;
+
+    !Variables declared in geometry: ;
+
+    ref(Point) Origin, A, B;
+    ref(Line) X, Y;
+
+    !Life of geometry: ;
+
+    Origin :- new Point(0,0);    !creating the origin;
+    A :- new Point(1, 0);
+    B :- new Point(0, 1);
+    X :- new Line(Origin,A);     !creating the axes;
+    Y :- new Line(Origin,B);
+    outtext("*** Geometry initialized ***");
+    outimage;
+
+end of Geometry;

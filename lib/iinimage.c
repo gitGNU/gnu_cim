@@ -72,4 +72,5 @@ utinimage:
   return ((__dhp) p);
 inimageerror:
   __rerror ("Inimage: IMAGE to short");
+  return 0;
 }

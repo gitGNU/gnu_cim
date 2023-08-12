@@ -17,7 +17,7 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA. */
 
 #include <stdio.h>
-#include <obstack.h>
+#include "obstack.h"
 
 #include "const.h"
 #include "builder.h"
@@ -33,8 +33,6 @@
 #if STDC_HEADERS
 #include <stdlib.h>
 #endif
-
-char *xmalloc();
 
 #define obstack_chunk_alloc xmalloc
 #define obstack_chunk_free free
@@ -59,7 +57,7 @@ void ebuilder_init_pass2 (void)
 }
 
 /******************************************************************************
- 								      NEWEXP */
+								      NEWEXP */
 
 exp_t *newexp(void)
 {
@@ -176,7 +174,7 @@ static void eclean(void )
 /******************************************************************************
 								       EPUSH */
 
-static epush(exp_t *re)
+static void epush(exp_t *re)
 {
   obstack_grow (&os_stack, &re, sizeof (void *));
 }
@@ -305,6 +303,3 @@ void ebuild (void)
       token= min();
     }
 }
-
-
-

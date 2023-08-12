@@ -63,20 +63,21 @@ double __rtgetreal (__txtvp t)
   skipblanke;
   if (!more)
     __rerror ("Getreal: Can't find any real item");
-  if (sign = fortegn)
+  if ((sign = fortegn))
     i++;
   if (sign == -1)
     cs[csi++] = '-';
   skipblanke;
   if (!more)
     __rerror ("Getreal: Can't find any integer item");
-  if (!digit)
+  if (!digit) {
     if (s[i] == __currentlowten)
       {
 	cs[csi++] = '1';
       }
     else if (s[i] != __currentdecimalmark)
       __rerror ("Getreal: Illegal real item");
+  }
   for (; more && digit; i++)
     {
       if (csi >= __RTPUTTEXTLENGTH)
@@ -103,7 +104,7 @@ double __rtgetreal (__txtvp t)
       skipblanke;
       if (!more)
 	__rerror ("Getreal: Can't find any real item");
-      if (sign = fortegn)
+      if ((sign = fortegn))
 	i++;
       if (csi >= __RTPUTTEXTLENGTH)
 	goto texttolong;
@@ -139,4 +140,5 @@ double __rtgetreal (__txtvp t)
 texttolong:
   __rerror ("Getreal: To big real item");
   /* NOTREACHED */
+  return 0;
 }

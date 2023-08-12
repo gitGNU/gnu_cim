@@ -57,7 +57,7 @@ char __rgetav (char ftype, __aritnamepar *p, long as, int ret, void (*mret) ())
 				 * lenger peker riktig, leses disse
 				 * verdiene f|r kallet. */
 
-      __goto = p->adr;	
+      __goto = p->adr;
       __sl = p->sl;
       __rct (as);		/* Oppretter objektet */
       ((__thunkp) __pb)->conv = tconv;
@@ -69,13 +69,13 @@ char __rgetav (char ftype, __aritnamepar *p, long as, int ret, void (*mret) ())
       return (__TRUE);
     case __ADDRESS_NOTHUNK:
       if (ftype == __TINTG)
-	__ev.i = (p->conv == __NOCONV 
+	__ev.i = (p->conv == __NOCONV
 		  ? *(long *) (((char *) p->bp) + p->v.ofs) :
 		  (long) *(double *) (((char *) p->bp) + p->v.ofs));
       else
-	__ev.f = (p->conv == __NOCONV 
+	__ev.f = (p->conv == __NOCONV
 		  ? *(double *) (((char *) p->bp) + p->v.ofs) :
-		  p->conv == __INTREAL 
+		  p->conv == __INTREAL
 		  ? (double) *(long *) (((char *) p->bp) + p->v.ofs) :
 	     (double) (long) *(double *) (((char *) p->bp) + p->v.ofs));
 #if SPLIT_MODUL
@@ -96,4 +96,5 @@ char __rgetav (char ftype, __aritnamepar *p, long as, int ret, void (*mret) ())
       return (__FALSE);
     }
   /* NOTREACHED */
+  return 0;
 }

@@ -1,0 +1,61 @@
+! Chess control - package implementation;
+class Chess;                    ! Main class with local: Player, Referee;
+begin
+    boolean Mate;
+    ref(Player) White, Black, Winner;
+    ref(Referee) Master;
+    integer Seed;
+
+    class Player(PName);
+        text PName;
+    begin
+        ref(Player) Opponent;
+        integer Move;
+
+        ! The life of Player;
+        Detach;
+        OutText(PName);
+        OutText("'s First Move");
+        OutImage;
+        Detach;
+        OutText(PName);
+        OutText("'s Second Move");
+        OutImage;
+        Detach;
+        Move := 2;
+        while true do begin
+            Move := Move+1;
+            OutText(PName);
+            OutText("'s Move # ");
+            OutInt(Move, 10);
+            OutImage;
+            if Draw(0.05,Seed) then begin
+                Mate := true;
+                Winner :- this Player;
+            end;
+            Detach;
+        end while;
+    end player;
+
+    class Referee;
+    begin
+        Detach;
+        while not Mate do begin
+            Call(White);
+            if not Mate then
+                Call(Black)
+        end while
+    end of referee;
+
+    begin
+        ! Life of Chess;
+        Seed := 11;
+        OutText("Creating the Players and the Master");
+        OutImage;
+        White :- new Player("White");
+        Black :- new Player("Black");
+        White.Opponent :- Black;
+        Black.Opponent :- White;
+        Master :- new Referee;
+    end
+end of Chess;

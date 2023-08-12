@@ -17,6 +17,7 @@
 #include "config.h"
 #include "gen.h"
 #include "extspec.h"
+#include "error.h"
 
 static int dim;
 /******************************************************************************
@@ -35,7 +36,7 @@ static exp_t *savepar (exp_t *ret, exp_t *re, char up, char *ident,
   exp_t *rex;
 
   if (first) stackno=0;
-  
+
   if (up)
     {
       rex = re->up;
@@ -53,7 +54,7 @@ static exp_t *savepar (exp_t *ret, exp_t *re, char up, char *ident,
 		     minval, minref, mintxt);
 	  savepar (ret, rex, TRUE, ident, type, FALSE,
 		   minval, minref, mintxt);
-	} 
+	}
       else
 	{
 	  if (rex->left != NULL)
@@ -66,7 +67,7 @@ static exp_t *savepar (exp_t *ret, exp_t *re, char up, char *ident,
   else
     {
       if (re->token == MIDENTIFIER && re->rd->ident == ident)
- 	{
+	{
 	  if (re->up->token == MARGUMENTSEP &&
 	      (re->up->rd->categ == CNAME ||
 	       re->up->rd->categ == CVAR))
@@ -74,7 +75,7 @@ static exp_t *savepar (exp_t *ret, exp_t *re, char up, char *ident,
 	  else
 	    {
 	      exp_t *restack1, *restack2, *reconc;
-	      
+
 	      if (stackno == 0)
 		{
 		  switch (type)
@@ -89,18 +90,18 @@ static exp_t *savepar (exp_t *ret, exp_t *re, char up, char *ident,
 		      stackno= findallentry (ret, re, USEDVAL, minval);
 		      break;
 		    }
-		  
+
 		  restack1= makeexp (MSTACK, NULL, NULL);
 		  if (re->up->left == re)
 		    re->up->left= restack1;
 		  else
 		    re->up->right= restack1;
 		  restack1->up= re->up;
-		  
-		  reconc= 
-		    makeexp(rex->type==TTEXT? MREFASSIGNT:MASSIGN, 
+
+		  reconc=
+		    makeexp(rex->type==TTEXT? MREFASSIGNT:MASSIGN,
 			    restack2=makeexp (MSTACK, NULL,NULL), re);
-		  
+
 		  restack1->value.entry= restack2->value.entry= stackno;
 		  restack1->type= restack2->type= type;
 		  return reconc;
@@ -181,8 +182,7 @@ int findallentry (exp_t *ret, exp_t *re, int type, int min)
   while (rex != ret)
     {
       rex = re->up;
-      while (rex != ret & (rex->left == re | rex->left == NULL 
-			   | rex->token == MELSE))
+      while (rex != ret && (rex->left == re || rex->left == NULL || rex->token == MELSE))
 	{
 	  re = rex;
 	  rex = rex->up;
@@ -227,10 +227,11 @@ int findallentry (exp_t *ret, exp_t *re, int type, int min)
 	      if (i > rb->maxusedval) rb->maxusedval= i;
 	      break;
 	    }
-#endif	  
+#endif
 	  return (i);
 	}
-  gerror (87);
+  gerror (87, "");
+  return 0;
 }
 
 /******************************************************************************
@@ -241,9 +242,9 @@ long ant_stack (exp_t *ret, exp_t *re, int minval, int minref, int mintxt)
 #if ACSTACK_IN_OBJ
   return (0);
 #else
-  return 
-    (((long) findallentry (ret, re, USEDVAL | MAXUSED, minval)) << 16 
-     | ((long) findallentry (ret, re, USEDREF | MAXUSED, minref)) << 8 
+  return
+    (((long) findallentry (ret, re, USEDVAL | MAXUSED, minval)) << 16
+     | ((long) findallentry (ret, re, USEDREF | MAXUSED, minref)) << 8
      | (findallentry (ret, re, USEDTXT | MAXUSED, mintxt)));
 #endif
 }
@@ -301,7 +302,7 @@ static exp_t *genstack (exp_t *ret, exp_t *re, char only_pointers, int minval, i
        * evalueres og resultatet legges p} stakken. */
       if (!rex->left->konst ||
 	  rex->left->rd->descr->codeclass == CCTEXT)
- 	goto save;
+	goto save;
       break;
     case MTEXTKONST:
     case MCHARACTERKONST:
@@ -316,8 +317,8 @@ static exp_t *genstack (exp_t *ret, exp_t *re, char only_pointers, int minval, i
     default:
     save:
       if (rex->left->type == TLABEL)
- 	return reconc;
-      { 
+	return reconc;
+      {
 	int entry;
 	int type= rex->left->type;
 	exp_t *restack;
@@ -342,7 +343,7 @@ static exp_t *genstack (exp_t *ret, exp_t *re, char only_pointers, int minval, i
 	    break;
 	  }
 
-	reconc= concexp (reconc, makeexp(rex->left->type==TTEXT? MREFASSIGNT:MASSIGN, 
+	reconc= concexp (reconc, makeexp(rex->left->type==TTEXT? MREFASSIGNT:MASSIGN,
 					 restack=makeexp(MSTACK, NULL,NULL),
 					 rex->left));
 	rex->left= makeexp (MSTACK, NULL, NULL);
@@ -350,12 +351,12 @@ static exp_t *genstack (exp_t *ret, exp_t *re, char only_pointers, int minval, i
 	restack->value.entry= rex->left->value.entry= entry;
 	restack->type= rex->left->type= type;
 
-	if (rex->token == MBOUNDPARSEP && rex->right != re && 	
+	if (rex->token == MBOUNDPARSEP && rex->right != re &&
 	    !only_pointers)	/* sjekk at det er slik at rex->right!=NULL */
 	  {
 	    entry= findallentry (ret, rex->right, USEDVAL, minval);
 	    reconc= concexp (reconc, makeexp(rex->left->type==TTEXT? MREFASSIGNT:MASSIGN,
-					     restack=makeexp (MSTACK, 
+					     restack=makeexp (MSTACK,
 							      NULL,NULL),
 					     rex->right));
 	    type= rex->type;
@@ -372,14 +373,14 @@ static exp_t *genstack (exp_t *ret, exp_t *re, char only_pointers, int minval, i
 /******************************************************************************
                                                          WORKBEFORETEST      */
 
-/* G}r gjennom subtreet og ser om det vil bli skrevet ut noen kode f|r      
+/* G}r gjennom subtreet og ser om det vil bli skrevet ut noen kode f|r
  * genvalue() kalles. Brukes i forbindelse med if i uttrykk og i forbindelse
  * med ORELSE og ANDTHEN */
 
 static char workbeforetest (exp_t *re)
 {
   int token;			/* token er deklarert som int fordi
-				 * kompilatoren ga warning om at constant 136 
+				 * kompilatoren ga warning om at constant 136
 				 * is out of range of char comparison etter
 				 * at MCONC ble lagt inn. Dette m} ses
 				 * n{rmere p}.                      */
@@ -407,7 +408,7 @@ static void transparam (exp_t *ret, exp_t *re, int minval, int minref, int mintx
   rexp=re;
   for (rex = re->right; rex->token != MENDSEP; rex = rex->right)
     {
-      if (rex->rd->categ == CNAME)  
+      if (rex->rd->categ == CNAME)
 	{
 	  if (rex->rd->kind == KSIMPLE)
 	    {
@@ -434,13 +435,13 @@ static void transparam (exp_t *ret, exp_t *re, int minval, int minref, int mintx
 			 re = re->right)
 		      if (re->left->token != MINTEGERKONST)
 			index_is_const = FALSE;
-		    
+
 		    if (!index_is_const)
 		      insert_thunk (rex,  MTHUNKSIMPLEADDRESS);
 		    else goto trcall;
 		    break;
 		  case MDOT:
-		    /* Dersom det er et dot'et prosedyre-kall, 
+		    /* Dersom det er et dot'et prosedyre-kall,
 		     * s} skal  det genereres
 		     * VALUE_THUNK og ikke ADDRESS_THUNK. */
 		    if (rex->left->right->rd->kind != KPROC)
@@ -451,11 +452,11 @@ static void transparam (exp_t *ret, exp_t *re, int minval, int minref, int mintx
 		    else;    /* Denne grenen skal IKKE ha break, Skal gli
 			      * rett over i neste case. */
 		  default:
-		    
+
 		    insert_thunk (rex,  MTHUNKSIMPLEVALUE);
 		  }
 	    }
-	  else if (rex->rd->kind == KARRAY && rex->rd->type != TLABEL && 
+	  else if (rex->rd->kind == KARRAY && rex->rd->type != TLABEL &&
 		   rex->left->token == MDOT)
 	    {
 	      /* ADDRESS_THUNK */
@@ -509,7 +510,7 @@ exp_t *transcall (exp_t *ret, exp_t *re, int minval, int minref, int mintxt)
       rex= makeexp (MASSIGND, makeexp (MSTACK, NULL, NULL),
 		    makeexp (MEXITARGUMENT, NULL, NULL));
       rex->type= rex->left->type= rex->right->type= TREF;
-      rex->left->value.entry= re->value.entry= 
+      rex->left->value.entry= re->value.entry=
 	findallentry (ret, re, USEDREF, minref);
       reconc= concexp (reconc, rex);
       break;
@@ -529,12 +530,12 @@ exp_t *transcall (exp_t *ret, exp_t *re, int minval, int minref, int mintxt)
 	  if (re->rd->categ == CNAME)
 	    {
 	      rex= copytree (re);
-	      rex->value.n_of_stack_elements= 
+	      rex->value.n_of_stack_elements=
 		ant_stack (ret, re, minval, minref, mintxt);
 	      rex->token= MNAMEREADACESS;
 	      reconc= concexp (reconc, rex);
 	    }
-	  
+
 	  switch (re->type)
 	    {
 	    case TREF:
@@ -550,7 +551,7 @@ exp_t *transcall (exp_t *ret, exp_t *re, int minval, int minref, int mintxt)
 	      break;
 	    }
 
-	  re->value.n_of_stack_elements= 
+	  re->value.n_of_stack_elements=
 	    ant_stack(ret, re, minval, minref, mintxt);
 
 	  reconc= concexp (reconc, replacenode (&re, MSTACK));
@@ -575,19 +576,19 @@ exp_t *transcall (exp_t *ret, exp_t *re, int minval, int minref, int mintxt)
 	       * parametere. */
 	      if ((rex->rd->categ == CNAME || rex->rd->categ == CVAR) &&
 		  rex->left->token == MIDENTIFIER)
-		reconc= concexp (reconc, savepar (ret, re, TRUE, 
+		reconc= concexp (reconc, savepar (ret, re, TRUE,
 						  rex->left->rd->ident,
 						  rex->left->rd->type, TRUE,
 						  minval, minref, mintxt));
 	    }
-	  for (rex = re->right; rex->token != MENDSEP; 
+	  for (rex = re->right; rex->token != MENDSEP;
 	       rex = rex->right)
-	    reconc= concexp (reconc, transcall (ret, rex->left, 
+	    reconc= concexp (reconc, transcall (ret, rex->left,
 						minval, minref, mintxt));
 	  if (re->type == TTEXT)
 	    {
 	      entry= findallentry (ret, re, USEDTXT, mintxt);
-	      re->value.n_of_stack_elements= 
+	      re->value.n_of_stack_elements=
 		ant_stack (ret, re, minval, minref, mintxt);
 
 	      reconc= concexp (reconc, replacenode (&re, MSTACK));
@@ -618,7 +619,7 @@ exp_t *transcall (exp_t *ret, exp_t *re, int minval, int minref, int mintxt)
 	      for (rex = re->right; rex->token != MENDSEP; rex = rex->right)
 		reconc= concexp (reconc, transcall (ret, rex->left,
 						    minval, minref, mintxt));
-      
+
 	      if (re->rd->descr->codeclass == CCRANDOMRUTDANGER)
 		{
 		  /* Leter etter siste aktuelle parameter, som */
@@ -645,8 +646,8 @@ exp_t *transcall (exp_t *ret, exp_t *re, int minval, int minref, int mintxt)
 		  entry= findallentry (ret, re, USEDVAL, minval);
 		  break;
 		}
-	      
-	      re->value.n_of_stack_elements= 
+
+	      re->value.n_of_stack_elements=
 		ant_stack (ret, re, minval, minref, mintxt);
 
 	      if (re->type == TNOTY)
@@ -681,7 +682,7 @@ exp_t *transcall (exp_t *ret, exp_t *re, int minval, int minref, int mintxt)
 					  minval, minref, mintxt));
       if ((rex = re->left)->token == MNAMEADR && rex->type == TREF)
 	{
-	  reconc= concexp (reconc, makeexp(MINSTRONGEST,copytree(re->left), 
+	  reconc= concexp (reconc, makeexp(MINSTRONGEST,copytree(re->left),
 			    copytree(re->right)));
 	}
       break;
@@ -706,9 +707,9 @@ exp_t *transcall (exp_t *ret, exp_t *re, int minval, int minref, int mintxt)
 	 kan den følgende koden fjernes */
       re->left= makeexp (MARRAYADR, NULL, NULL);
       re->left->up = re;
-      re->left->value.stack.ref_entry= re->value.stack.ref_entry= 
+      re->left->value.stack.ref_entry= re->value.stack.ref_entry=
 	findallentry (ret, re, USEDREF, minref);
-      re->left->value.stack.val_entry= re->value.stack.val_entry= 
+      re->left->value.stack.val_entry= re->value.stack.val_entry=
 	findallentry (ret, re, USEDVAL, minval);
       if (re->rd->categ == CNAME)
 	{
@@ -754,21 +755,21 @@ exp_t *transcall (exp_t *ret, exp_t *re, int minval, int minref, int mintxt)
 	      rex= makeexp (MASSIGND, makeexp (MSTACK, NULL, NULL),
 			    makeexp (MEXITARGUMENT, NULL, NULL));
 	      rex->type= rex->left->type= rex->right->type= TREF;
-	      rex->left->value.entry= re->value.stack.ref_entry= 
+	      rex->left->value.entry= re->value.stack.ref_entry=
 		findallentry (ret, re, USEDREF, minref);
 	      reconc= concexp (reconc, rex);
 
 	      rex= makeexp (MASSIGND, makeexp (MSTACK, NULL, NULL),
 			    makeexp (MEXITARGUMENT, NULL, NULL));
 	      rex->type= rex->left->type= rex->right->type= TINTG;
-	      rex->left->value.entry= re->value.stack.val_entry= 
+	      rex->left->value.entry= re->value.stack.val_entry=
 		findallentry (ret, re, USEDVAL, minval);
 	      reconc= concexp (reconc, rex);
 
 	      re->token = MNAMEADR;
 	    } /* END-SKRIVEAKSESS NAME-PARAMETER */
 	  else
-	    
+
 	    { /* LESE  AKSESS */
 
 	      rex->token= MNAMEREADACESS;
@@ -779,11 +780,11 @@ exp_t *transcall (exp_t *ret, exp_t *re, int minval, int minref, int mintxt)
 	      else if (re->type == TTEXT)
 		{
 		  rex= copytree (re);
-		  rex->value.stack.val_entry= re->value.stack.val_entry= 
+		  rex->value.stack.val_entry= re->value.stack.val_entry=
 		    findallentry (ret, re, USEDVAL, minval);
-		  rex->value.stack.ref_entry= re->value.stack.ref_entry= 
+		  rex->value.stack.ref_entry= re->value.stack.ref_entry=
 		    findallentry (ret, re, USEDREF, minref);
-		  rex->value.stack.txt_entry= re->value.stack.txt_entry= 
+		  rex->value.stack.txt_entry= re->value.stack.txt_entry=
 		    findallentry (ret, re, USEDTXT, mintxt);
 		  rex->token= MNAMEREADTEXT;
 		  reconc= concexp (reconc, rex);
@@ -795,7 +796,7 @@ exp_t *transcall (exp_t *ret, exp_t *re, int minval, int minref, int mintxt)
 		  rex= makeexp (MASSIGND, makeexp (MSTACK, NULL, NULL),
 				makeexp (MEXITARGUMENT, NULL, NULL));
 		  rex->type= rex->left->type= rex->right->type= re->type;
-		  rex->left->value.entry= re->value.entry= 
+		  rex->left->value.entry= re->value.entry=
 		    findallentry (ret, re, re->type == TREF?USEDREF:USEDVAL,
 				  re->type == TREF?minref:minval);
 		  reconc= concexp (reconc, rex);
@@ -813,9 +814,9 @@ exp_t *transcall (exp_t *ret, exp_t *re, int minval, int minref, int mintxt)
 	  int i;
 	  reconc= concexp (reconc, genstack (ret, re, FALSE,
 					     minval, minref, mintxt));
-	  rex= makeexp (re->token == MANDTHENE ? MANDTHEN : MORELSE, 
+	  rex= makeexp (re->token == MANDTHENE ? MANDTHEN : MORELSE,
 			copytree (re->left), transcall (ret, re->right,
-							minval, minref, 
+							minval, minref,
 							mintxt));
 	  rex->type= re->type;
 	  reconc= concexp (reconc, rex);
@@ -827,7 +828,7 @@ exp_t *transcall (exp_t *ret, exp_t *re, int minval, int minref, int mintxt)
 	{
 	  reconc= concexp (reconc, genstack (ret, re->right, FALSE,
 					     minval, minref, mintxt));
-	  rex= makeexp (MIF, re->left, transcall (ret, re->right, 
+	  rex= makeexp (MIF, re->left, transcall (ret, re->right,
 						  minval, minref, mintxt));
 	  rex->type= re->type;
 	  rex->qual= re->qual;
@@ -835,7 +836,7 @@ exp_t *transcall (exp_t *ret, exp_t *re, int minval, int minref, int mintxt)
 	}
       break;
     case MELSEE:
-      rex= makeexp (MELSE, transcall (ret, re->left, minval, minref, mintxt), 
+      rex= makeexp (MELSE, transcall (ret, re->left, minval, minref, mintxt),
 		    transcall (ret, re->right, minval, minref, mintxt));
       rex->type= re->type;
       rex->qual= re->qual;
@@ -846,7 +847,7 @@ exp_t *transcall (exp_t *ret, exp_t *re, int minval, int minref, int mintxt)
       reconc= concexp (reconc, transcall (ret, re->right,
 					  minval, minref, mintxt));
 
-      re->value.n_of_stack_elements= 
+      re->value.n_of_stack_elements=
 	ant_stack  (ret, re, minval, minref, mintxt);
       rex= newexp ();
       *rex= *re;
@@ -856,7 +857,7 @@ exp_t *transcall (exp_t *ret, exp_t *re, int minval, int minref, int mintxt)
       rex= makeexp (MASSIGND, makeexp (MSTACK, NULL, NULL),
 		    makeexp (MEXITARGUMENT, NULL, NULL));
       rex->type= rex->left->type= rex->right->type= TTEXT;
-      rex->left->value.entry= re->value.entry= 
+      rex->left->value.entry= re->value.entry=
 	findallentry (ret, re, USEDTXT, mintxt);
       reconc= concexp (reconc, rex);
 

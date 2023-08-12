@@ -64,4 +64,5 @@ char __rgetproc (__procname *p, long as, int ret, void (*mret) ())
       return (__FALSE);
     }
   /* NOTREACHED */
+  return 0;
 }

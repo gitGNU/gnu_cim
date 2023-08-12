@@ -70,4 +70,5 @@ char __rgetcbv (__charboolnamepar *p, long as, int ret, void (*mret) ())
       return (__FALSE);
     }
   /* NOTREACHED */
+  return 0;
 }

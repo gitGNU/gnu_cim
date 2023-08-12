@@ -23,14 +23,13 @@
 #include "name.h"
 
 #include <stdio.h>
+#include <string.h>
 
 #if STDC_HEADERS
 #include <stdlib.h>
 #endif
 
-#include <obstack.h>
-
-char *xmalloc();
+#include "obstack.h"
 
 #define obstack_chunk_alloc xmalloc
 #define obstack_chunk_free free

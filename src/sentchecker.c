@@ -21,6 +21,8 @@
 #include "builder.h"
 #include "checker.h"
 #include "trans.h"
+#include "error.h"
+#include "gen.h"
 
 /******************************************************************************
                                                                    SENTCHECK */
@@ -41,13 +43,13 @@ void sent_check (sent_t *parent_sent, char res_labels)
 	  main_exp_check (sent->exp);
 	  {
 
-	    /* TBD Har ikke implementert fremoverreferanser for konstant deklarasjoner */ 
+	    /* TBD Har ikke implementert fremoverreferanser for konstant deklarasjoner */
 	    int token = sent->exp->right->token;
-	    if (token != MREALKONST & token != MTEXTKONST 
+	    if (token != MREALKONST & token != MTEXTKONST
 		& token != MCHARACTERKONST
 		& token != MINTEGERKONST & token != MBOOLEANKONST
 		& sent->exp->right->type != TERROR)
-	      serror (6);
+	      serror (6, "", 0);
 	  }
 	  sent->exp->left->rd->value = sent->exp->right->value;
 	  sent->exp->left->rd->categ = CCONST;
@@ -62,14 +64,14 @@ void sent_check (sent_t *parent_sent, char res_labels)
 	  main_exp_check (sent->exp);
 	  in_block ();
 	  sent->cblock=cblock;
-	  if (res_labels) 
+	  if (res_labels)
 	    {
 	      sent->cblock->ent = newlabel ();
 	      newlabel ();
 	    }
 	  if (sent->exp->type != TERROR &&
 	      (sent->exp->token != MARGUMENT || sent->exp->rd->kind != KCLASS))
-	    serror (3);
+	    serror (3, "", 0);
 	  sent_check (sent, res_labels);
 	  out_block ();
 	  break;
@@ -83,7 +85,7 @@ void sent_check (sent_t *parent_sent, char res_labels)
 	case MCLASS:
 	  in_block ();
 	  sent->cblock=cblock;
-	  if (res_labels) 
+	  if (res_labels)
 	    {
 	      sent->cblock->ent = newlabel ();
 	      newlabel ();		/* Label etter dekl. del */
@@ -95,7 +97,7 @@ void sent_check (sent_t *parent_sent, char res_labels)
 	case MINSPECT:
 	  main_exp_check (sent->exp);
 	  if (sent->exp->type != TREF && sent->exp->type != TERROR)
-	    serror (73, token);
+	    serror (73, "", token);
 	  in_block ();
 	  sent->cblock=cblock;
           reginsp (sent->cblock, sent->exp->qual);
@@ -115,30 +117,30 @@ void sent_check (sent_t *parent_sent, char res_labels)
 	  sent->cblock=cblock;
 	  {
 	    char not_removed=TRUE;
-	    /* Sjekker om rd er samme klasse eller en subklasse til * klassen 
+	    /* Sjekker om rd er samme klasse eller en subklasse til * klassen
 	     * som inspiseres,eller omvendt */
 	    if (!subclass (sent->exp->rd, parent_sent->cblock->virt)
 		&& !subclass (parent_sent->cblock->virt, sent->exp->rd))
 	      {
-		serror (83, sent->exp->rd->ident);
+		serror (83, sent->exp->rd->ident, 0);
 		/* Trenger ikke å legge ut kode for denne WHEN grenen */
 		remove_block (sent->cblock);
-		remove_sent (parent_sent, sent); 
+		remove_sent (parent_sent, sent);
 		not_removed= FALSE;
 	      }
 	    else if (subclass (parent_sent->cblock->virt, sent->exp->rd) &&
 		     sent->prev == NULL)
 	      {
-		serror (82, sent->exp->rd->ident);
+		serror (82, sent->exp->rd->ident, 0);
 	      }
 	    else
 	      {
-		for (when_sent=parent_sent->first; when_sent != sent; 
+		for (when_sent=parent_sent->first; when_sent != sent;
 		     when_sent= when_sent->next)
 		  {
 		    if (subclass (sent->exp->rd, when_sent->exp->rd))
 		      {
-			serror (83, sent->exp->rd->ident);
+			serror (83, sent->exp->rd->ident, 0);
 			/* Ingen kode for denne WHEN grenen */
 			remove_block (sent->cblock);
 			remove_sent (parent_sent, sent);
@@ -161,7 +163,7 @@ void sent_check (sent_t *parent_sent, char res_labels)
 	  in_block ();
 	  sent->cblock=cblock;
 	  main_exp_check (sent->exp);
-	  if (sent->first == NULL) serror (81);
+	  if (sent->first == NULL) serror (81, "", 0);
 	  sent_check (sent, res_labels);
 	  out_block ();
 	  break;
@@ -169,8 +171,8 @@ void sent_check (sent_t *parent_sent, char res_labels)
 	  sent->cblock=cblock;
 	  main_exp_check (sent->exp);
 	  if (sent->exp->type != TBOOL && sent->exp->type != TERROR)
-	    serror (77, token);
-	  if (sent->first == NULL) serror (81);
+	    serror (77, "", token);
+	  if (sent->first == NULL) serror (81, "", 0);
 	  sent_check (sent, res_labels);
 	  break;
 	case MIF:
@@ -178,7 +180,7 @@ void sent_check (sent_t *parent_sent, char res_labels)
 	  main_exp_check (sent->exp);
 	  if (sent->exp->type != TBOOL)
 	    if (sent->exp->type != TERROR)
-	      serror (77, token);
+	      serror (77, "", token);
 	  sent_check (sent, res_labels);
 	  break;
 	case MELSE:
@@ -193,7 +195,7 @@ void sent_check (sent_t *parent_sent, char res_labels)
 	  sent->cblock=cblock;
 	  main_exp_check (sent->exp);
 	  if (sent->exp->type != TLABEL && sent->exp->type != TERROR)
-	    serror (108, token);
+	    serror (108, "", token);
 	  break;
 	case MINNER:
 	  sent->cblock=cblock;
@@ -210,7 +212,7 @@ void sent_check (sent_t *parent_sent, char res_labels)
 	      sent->exp->token != MASSIGNR && sent->exp->token != MVALASSIGNT &&
 	      (sent->exp->token != MDOT || sent->exp->right->token != MPROCARG) &&
 	      sent->exp->type != TERROR)
-	    serror (115);
+	    serror (115, "", 0);
 	  break;
 	case MENDARRAY:
 	  sent->cblock=cblock;
@@ -220,7 +222,8 @@ void sent_check (sent_t *parent_sent, char res_labels)
 	  sent->cblock=cblock;
 	  main_exp_check (sent->exp);
 	  break;
+	default:
+	  break;
 	}
     }
 }
-
